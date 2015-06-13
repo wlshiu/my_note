@@ -1,0 +1,113 @@
+repo help
+    repo help COMMAND
+
+repo status
+    顯示所有project的狀態
+
+repo init -u URL
+    用來在目前目錄安裝下載整個Android repository，會下建立一個".repo"的目錄。
+    -u 參數用來指定一個URL，從這個URL中獲取repository的manifest文件。
+
+    例如：repo init -u git://android.git.kernel.org/platform/manifest.git，獲取的manifest文件放在.repo目錄中，命名為manifest.xml。
+    這個文件的內容其實就是Android work space下所有被git管理的git repository的列表！
+
+    如果你有仔細看，可以發現到.repo/manifests是個被git管理的repository，裡面放著所有的manifest文件 (*.xml)。
+    而透過參數的設定，則可以指定要使用哪個manifest文件，甚至是該文件的不同branch。
+
+    -m：用來選擇獲取 repository 中的某一個特定的 manifest 文件。如果不具體指定，那麼表示為預設的 manifest 文件 (default.xml)
+    repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
+
+    -b：用來指定某個manifest 分支。
+    repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
+
+    options:
+        -u URL, --manifest-url=URL
+                            manifest repository location
+
+        -b REVISION, --manifest-branch=REVISION
+                            manifest branch or revision
+
+        -m NAME.xml, --manifest-name=NAME.xml
+                            initial manifest file
+
+        --mirror            mirror the forrest
+        --reference=DIR     location of mirror directory
+        --depth=DEPTH       create a shallow clone with given depth; see git clone
+
+        -g GROUP, --groups=GROUP
+                            restrict manifest projects to ones with a specified
+                            group
+
+        -p PLATFORM, --platform=PLATFORM
+                            restrict manifest projects to ones with a
+                            specifiedplatform group
+                            [auto|all|none|linux|darwin|...]
+
+
+repo sync [PROJECT_LIST]
+    下載最新文件，更新成功後，文件會和遠端server中的代碼是一樣的。
+    可以指定需要更新的project ， 如果不指定任何參數，則會同步整個所有的project。
+
+    Options:
+        -h, --help            show this help message and exit
+        -f, --force-broken    continue sync even if a project fails to sync
+        -l, --local-only      only update working tree, don't fetch
+        -n, --network-only    fetch only, don't update working tree
+        -d, --detach          detach projects back to manifest revision
+        -c, --current-branch  fetch only current branch from server
+        -q, --quiet           be more quiet
+        -j JOBS, --jobs=JOBS  projects to fetch simultaneously (default 1)
+
+        -m NAME.xml, --manifest-name=NAME.xml
+                            temporary manifest to use for this sync
+
+        --no-clone-bundle     disable use of /clone.bundle on HTTP/HTTPS
+        -s, --smart-sync      smart sync using manifest from a known good build
+
+        -t SMART_TAG, --smart-tag=SMART_TAG
+                            smart sync using manifest from a known tag
+
+        -u MANIFEST_SERVER_USERNAME, --manifest-server-username=MANIFEST_SERVER_USERNAME
+                            username to authenticate with the manifest server
+
+        -p MANIFEST_SERVER_PASSWORD, --manifest-server-password=MANIFEST_SERVER_PASSWORD
+                            password to authenticate with the manifest server
+
+repo upload [PROJECT_LIST]
+    上傳修改的代碼 ，如果你的代碼有所修改，那麼在運行 repo sync 的時候，會提示你上傳修改的代碼。
+    所有修改的代碼分支會上傳到 Gerrit，Gerrit 收到上傳的代碼，會轉換為一個改動，從而可以讓人們來review 修改的代碼。
+
+    使用帶有 --amend 參數
+    $ git add xxx.c
+    $ git commit --amend [-a]
+    預設的編輯器會出現，裡面會包含上一次提交的訊息內容，將訊息修改/儲存變更並離開編輯器。
+    ps. 修改預設編輯器 $ git config --global core.editor vim
+
+    重新 upload to Gerrit
+    $ repo upload .
+
+repo diff [PROJECT_LIST]
+    顯示尚未commit的改動差異
+
+repo download [target] [revision]
+    下載指定的修改版本，
+    例如:  repo download platform/frameworks/base 1241 ，就是下載修改版本為 1241 的代碼。
+
+repo start new_branch_name [PROJECT_LIST]
+    在指定的project中建立新的branch，並且切換到該branch上。
+    --all：代表指定所有的git projects
+
+repo prune [PROJECT_LIST]
+    刪除已經merge好的project。
+
+repo forall [PROJECT_LIST] -c COMMAND
+    針對指定的project執行所帶入的git command，
+    例如：repo forall -c git reset --hard HEAD 就會將所有project中的改動全部都清掉。
+
+
+
+
+
+
+
+
