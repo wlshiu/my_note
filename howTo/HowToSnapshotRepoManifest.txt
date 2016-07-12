@@ -1,0 +1,16 @@
+使用google gerrit做為版本控制，有時候我們發佈版本後，想保存對應的manifest中，每個倉儲的commit號，
+
+用於追溯當時發佈產品的問題，google 的repo命令已經為我們封裝好了：
+	
+    $ repo manifest -r -o snapshot.xml
+    $ repo manifest -r -o snapshot.xml
+
+生成的xml 結果類似下面這樣：
+	
+<project name="platform/developers/build" path="developers/build" remote="aosp" revision="f49bfc3d06d0cc0eac0ce1a5620ef5bc8e38f064" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/developers/demos" path="developers/demos" remote="aosp" revision="a7254542b06878f0c3b34a6c3d91b9e7d3990f74" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/developers/docs" path="developers/docs" remote="aosp" revision="c0b835ddd9acc27176dc9a0f7d1aa2faf5d51806" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/developers/samples/android" path="developers/samples/android" remote="aosp" revision="8eadf92f54aa68fb937182b712aebdef3b3bd9ec" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/docs/source.android.com" path="docs/source.android.com" remote="aosp" revision="48fb042cf314333926a5146ee7acc004a9e953c8" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/external/ceres-solver" path="external/ceres-solver" remote="aosp" revision="399f7d09e0c45af54b77b4ab9508d6f23759b927" upstream="refs/tags/android-4.4.2_r2"/>
+<project name="platform/external/chromium-libpac" path="external/chromium-libpac" remote="aosp" revision="f34af54bcab917eb5943d1918f32d26364f45578" upstream="refs/tags/android-4.4.2_r2"/>

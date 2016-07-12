@@ -33,7 +33,7 @@ move /Y .\cscope.po.out %dest_linux%\cscope.po.out
 move /Y .\tags %dest_linux%\tags
 
 echo move to %dest_linux%
-echo;
+echo
 
 pause
 if "%ERRORLEVEL%" != "0" pause

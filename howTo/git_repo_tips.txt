@@ -1,0 +1,105 @@
+WARNING: Please never commit your code without repo start a branch,
+         or you have to fix commit and upload problem by your self.
+
+* .bash_profile config
+  you can add following script into your .bash_profile
+  1. bash completion can use tab key complete get command.
+
+  # Bash completion
+  if [ -f /etc/bash_completion ]; then
+      . /etc/bash_completion
+  fi
+
+  2. display branch name on current directory. You can directly recognize branch is started or not.
+     if show [(no branch)] means you did not start a branch, then never commit your code in it.
+
+     function formattedGitBranch {
+         _branch="$(git branch 2>/dev/null | sed ""-nes/^*[[:space:]]*//p"")"
+         test -n "$_branch" && echo -e " [$_branch]"
+     }
+     export PS1='\u@\h:\[\e[1;33m\]\w\[\033[0;32m\]$(formattedGitBranch)\[\033[00m\]$ '
+
+* Basic Operation:
+  Q1. How to start modify source code? !!!important first step!!!
+  A1. step 1. goto git tree directory. For example: "ambarella/kernel/linux"
+      step 2. repo sync .                 <-- update tree to latest version.
+      step 3. repo start [branch name] .  <-- create branch to modify code.
+      step 4. Now you can start modify code.
+
+  Q2. How to add new file?
+  A2. git add [filename]          <-- git cannot add an directory with empty file, only practical file can be added.
+
+  Q3. How to check difference you currently modified.
+  A3. git diff                    <-- this will show uncommited difference.
+
+  Q3. How to commit changed files?
+  A3. git commit -a               <-- commit all you modified code.
+
+  Q4. How to commit particular files?
+  A4. git commit [file1] [file2] ...   <-- commit files you expected
+
+  Q5. How upload changes to amcode review server after finish bug fix or new issue?
+  A5. repo upload .
+
+  Q6. How to change git editor?
+  A6. git config --global core.editor [vim|vi|emacs|...]
+
+  Q7. How to repo sync all git tree?
+  A7. step 1. cd boss     <-- goto boss directory
+      step 2. repo sync   <-- sync all git tree under this directory
+
+* Basic problem you will encounter when you use repo and git
+  Q1. repo sync with error message for example:
+      "error: android/device/ambarella/ipc/: contains uncommitted changes"
+  A1. go to "android/device/ambarella/ipc" directory
+      step 1. git stash       <-- save local difference for this git tree
+      step 2. repo sync       <-- re-sync again
+      step 3. git stash apply <-- recover difference
+
+  Q2. how to do after repo upload and still need to modify something into 
+      same issue?
+  A2. after you commit and upload once, you may want to do some modify to fix
+      bug or coding style that previous upload code. Following steps can 
+      re-upload without abandon previous difference on amcode review board.
+
+      step 1. goto git directory you modified.
+      step 2. git commit -a --amend  <-- this can re-commit current difference to previous commit.
+      step 3. repo upload            <-- re-upload again.
+
+      After upload complete, you can see your original difference on amcode
+      review board have patch 2 information. This means you re-upload success.
+      And there will have patch 2+N if you re-upload lots of times.
+
+  Q3. what if conflict occur when someone approve to merge difference?
+  A3. step 1. repo sync      <-- sync current code (maybe don't need)
+      step 2. repo rebase    <-- move your commit to the head of change
+              if local conflict occure between repo rebase
+              step a. use editor resolve the conflict
+              step b. git add [resolved conflict file]
+              step c. git rebase --continue
+      step 3. repo upload
+
+  Q4. what if we want to reset the commit we made by "git commit"
+  A4. step 1. git reset --soft HEAD^
+      step 2. git reset HEAD^ <file>
+      step 3. git status
+
+* The major purpose of repo and git is one issue one branch, so this is what I do when I fix a bug or modify a new issue.
+  and I think will decrease problem during operating repo and git. This is only my work flow, you can still use your own flow too.
+  but if use only one branch all the time, please be sure your git tree always synchronous with server to reduce repo problem.
+
+  1. goto git project directory you want to modify
+  2. repo prune .   <-- check local git branch and delete local branch that already merged in amcode server.
+  3. repo sync .    <-- sync current project with server.
+  4. repo start [issue branch name] .    <-- start a branch for this issue.
+  5. modify code you want
+  6. git commit -a
+  7. repo upload .  <-- upload current git project to amcode review board.
+
+
+
+
+
+
+==> To repo sync up by time
+repo forall -c 'git checkout `git rev-list --all -n1 --before="2012-03-01 15:00"`'

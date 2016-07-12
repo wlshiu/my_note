@@ -50,7 +50,7 @@ move /Y .\cscope.po.out %dest_rtos%\cscope.po.out
 move /Y .\tags %dest_rtos%\tags
 
 echo move to %dest_rtos%
-echo;
+echo
 
 pause
 if "%ERRORLEVEL%" != "0" pause
