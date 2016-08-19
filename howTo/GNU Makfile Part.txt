@@ -1,0 +1,214 @@
+GNU MAKEFILE Part
+在Embedded Linux開發的愛好者們 對於makefile一定是相當的熟悉，我是最近才開始研究makefile的語法.
+
+GNU MAKE這支程式主要是要用來讓程式設計師透過可撰寫的script來自動化的完成"SOURCE CODE TO EXECUTABLE IMAGE" 這個動作.
+
+而在make script內則描述著 原始碼 中間檔以及可執行檔的關係  甚至可以根據time stamp的
+
+先後來選擇性的更新目標檔 !
+
+以下是make script 的基本條件.
+
+1.
+Target .... :  Prereq.....
+    Command ...........
+
+Target:    工作目標是一個必須被建造的檔案.
+Prereq:    工作目標所依靠的對象  也是target被建構前所必須要存在的檔案.
+Command:   Prereq存在時 所必須要執行的shell command(例如 gcc 1.c -o 1.out)
+                      記的這個前面要有一個"tab"的位移!!
+
+
+2.當 Preq 的timestamp比Target還要新時 Make就會去執行Target所對應的command,並且認定工作目標已經完成更新動作.
+
+------------------------------------------------------------------------------------
+
+Makefile 可以在command line時就直接指定要更新的target對象 這範例可以在移植u-boot時看到
+根據不同的target board可以下 make target_config 來初始一些設定config檔.
+
+以下是u-boot範例(可以看到make也支援variable declaration)
+smdk2410_config    :    unconfig
+    @$(MKCONFIG) $(@:_config=) arm arm920t smdk2410 NULL s3c24x0
+
+// 透過相依特性的更新方法
+make script的架構 採用top-down的方式 也就是說他每個target所依賴的preq 會在下方被定義成另一個target，
+
+當MAKE 去read script時如果發現target需要更新時(target不存在) 則會去下方去尋找以preq當作target的宣告 依序向下去做更新動作，
+
+讓下層的target被用來作為上層的target保持最新的狀態 !
+
+以下是u-boot範例(可以看到最上層target的preq是最終要產出的檔案 , 依據top-down的架構因為要更新target所以相對的preq也跟著要依據下方的宣告跟著更新)
+
+ALL = $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND)
+all:        $(ALL)
+
+
+
+
+當我們在為project編寫makefile時，會定義makefile的規則 這些規則主要是用來可以generate出最後的可執行的binary code。
+
+或者是相關聯的所需檔案(如dependency file , lib file.....)，
+
+也為規則定義了 Target,Prequisite,Commmand 這些definition 好讓make可以根據有相依性質的所有檔案以及gen code 的command產生出你所想要的image。
+
+裡面所描述的規則群會有 target->dependency->target 的敘述，就是上一個target的dependency會是另一個rule的target，
+
+原因是我們開發比較大型的project時，往往需要眾多的library而這些library通常是某個lib or 可執行的binary所需要的depency files，
+
+而他們也是需要depend一堆c asm c++ .. code，因此在makefile就會看到這些有糾纏性質的rule。Make會根據裡面的rule形成Dependency graph，
+
+按照這個dependency graph就可以更新特定的target!!
+
+這些rule會根據特定的性質分成五大部分
+1. Explicit rule
+2. Pattern rule
+3. Builtin rule
+4. Suffix rule
+5. Static pattern rule
+
+1.Explicit rule
+以指定的特定檔案來作為rule的Target 和 Prequisite，且每個rule都可以有多個Target也就是多個target共用Prequisite和Commmand。
+---------------  U-BOOT example -----------------
+prs200_config \
+prs200_DDR_config \
+prs200_highboot_config \
+prs200_highboot_DDR_config: unconfig
+------------------------------------------------------------------------------------
+
+2.Pattern rule
+很明顯的和explicit rule有著不同特型態的描述，透過pattern可以取得有共同特性的檔案(ex:c檔案都可以經由gcc編譯出相同名稱的的.o檔)
+
+這樣我們就可以簡化對makefile的管理(不需要因為要新增一個可編譯檔，而去修改rule).
+
+------------- GNU Make example --------------------------
+%.o: %.c
+        $(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+-----------------------------------------------------------------
+
+3.Builtin rule
+這個則是make的內建規則，當make file內無定義輸出target所需要的command(必要條件時)，make就會使用builtin rule來幫你建立所需要的command!!!
+
+可以用這個argument(--print-data-base)讓make輸出內建規則。如果想要取消內建規則，可以透過pattern rule但是別加command !!
+----------------Make builtin rule --------------------------
+%.o: %.C
+#  commands to execute (built-in):
+ $(COMPILE.C) $(OUTPUT_OPTION) $<
+---------------------------------------------------------------
+
+4.Suffix rule
+這個就不用介紹了因為這是比較過時的用法 有興趣的可以去GNU ORG上找線上DOCUMENT。
+
+5.Static pattern rule
+可以參考下面的語法說明，targets-pattern必須要match targets，透過wildcard(%)來取得字幹(ex: pattern 是 %.c targets是 test.c 則字幹就是'test')，
+
+利用字幹以及prereq-patterns得知prereq，使得make可以建立rule。
+
+-----------------  Static pattern rule syntax ---------------
+targets ... : targets-pattern : prereq-patterns
+        commands
+
+---------------  example ----------------------------------
+objects = foo.o bar.o
+     all: $(objects)
+     $(objects): %.o: %.c     ----> $(objects): 就是targets  %.o:是targets-pattern %.c:prereq-patterns
+             $(CC) -c $(CFLAGS) $< -o $@
+
+以上這個範例相當於
+foo.o bar.o: foo.c bar.c
+        $(CC) -c $(CFLAGS) $< -o $@
+----------------------------------------------------------------
+
+
+
+
+
+$*  Target的主檔名( If the target is <samp>dir/a.foo.b</samp> and the target pattern is <samp>a.%.b</samp> then the stem is <samp>dir/foo</samp>)
+
+1. Auto variable
+
+    make 內建變數的涵義
+
+    $@ Target的檔名
+
+    $% 程式庫成員中的檔名元素
+
+    $<  第一個prequeite的檔名
+
+    $?  Timestamp 在Target之後的Prequeite
+
+    $^  所有的Prequeite的檔名 但不包含重複部分
+
+    $+  所有的Prequeite的檔名
+
+
+    $(@D) $(<D)  指的是Target的檔案路徑
+
+    $(@F) $(<F)   指的是Target的檔案名稱
+
+2. Phony Target
+
+在makefile script內通常可以看到 .Phony這個關鍵字串 ,
+
+他的用途主要是用來讓make可以執行Programmer所設定的特殊程序(例如:清除之前build code所產生的obj or related files.).
+
+.Phony 後面跟著 Target name 這樣可以讓GNU Make 得知folder下就算有與target相同名稱的檔案,這個target的command還是會跟著執行(不會出現 "xxx is up to date").
+
+--------------------------------- GNU Make example ------------------------------------------------------
+ .PHONY: cleanall cleanobj cleandiff
+
+     cleanall : cleanobj cleandiff
+             rm program
+     cleanobj :
+             rm *.o
+     cleandiff :
+             rm *.diff
+----------------------------------------------------------------------------------------------------------------------
+
+甚至我們可以透過Phony target的特色來做個make file 的help menu.
+如下所示.
+--------------------------------- GNU Make example ------------------------------------------------------
+help:
+    @$(ECHO) "---------------------"
+    @$(ECHO) "Make sample"
+    @$(ECHO) "---------------------"
+    @$(ECHO) "The following targets are supported:"
+    @$(ECHO) "   help      : This help"
+    @$(ECHO) "   all       : Make lib and bin"
+    @$(ECHO) "   clean     : Remove all autogenerated files."
+----------------------------------------------------------------------------------------------------------------------
+
+3. Auto generate dependent file.
+
+當我們在開發程式時往往會撰寫header file方便讓其他程式檔可以去取得共用variable的定義,所以一但這個header file有經過修改,
+
+make就必須要負責重建依靠這個header fle的目標. 但是header file的撰寫方式很有可能是又包含其他的header file , 層層的包裹很難讓programmer手動去尋找相關聯檔.
+
+我們可以透過GCC 來幫我們尋找出相關聯的HEADER FILEW .透過兩個參數("-M -I")可以取得程式碼內所需要include的header files!!
+-------------------------------- GNU Make example ------------------------------------------------------
+$ echo "#include<stdio.h>" > main.c
+$ gcc -M main.c  > depend
+main.o: main.c /usr/include/stdio.h /usr/include/_ansi.h ...........
+---------------------------------------------------------------------------------------------------------------------
+再 INCLUDE 剛剛的depend檔,即可透過make來監視這些有dependency關係的header file
+
+-------------------------------- GNU Make example ------------------------------------------------------
+include depend
+---------------------------------------------------------------------------------------------------------------------
+
+有一個make 的sample 可以加入自己的make file script ,這樣就不需要每次都要先gen出這個depend檔.透過下方的script則會產生main.d這個dependency的檔案裡頭會描述著下方的表示,
+
+透過這個rule代表.d可以順利被更新一但main,c 和一堆.h檔有被更改時.
+
+main.o main.d : main.c /usr/include/stdio.h /usr/include/_ansi.h ...........
+
+-------------------------------- GNU Make example ------------------------------------------------------
+#定義.c和.d的關係 使的.d檔可以依據程式碼檔案取得正確的dependence file
+# 接下來的command敘述著如何產生正確的.d file, 經由sed 把match的pattern(\($*\).o[ :]*)全部取代成(\1.o $@ : ),後面那個替代的pattern代表
+#  $*.o %.d :(ex: main.o main.d :)
+
+%.d : %.c
+    $(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+    sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@;\
+    rm -f   $@.$$$$
+
+
