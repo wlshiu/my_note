@@ -126,14 +126,14 @@ Machine Learning
 + Sparse coding (稀疏編碼)
     > 稀疏編碼的概念來自於神經生物學。生物學家提出,哺乳類動物在長期的進化中,生成了能夠快速,準確,低代價地表示自然圖像的視覺神經方面的能力。
         我們直觀地可以想像,我們的眼睛每看到的一副畫面都是上億像素的,而每一副圖像我們都只用很少的代價重建與存儲。
-        我們把它叫做稀疏編碼，即 Sparse Coding.
+        我們把它叫做稀疏編碼,即 Sparse Coding.
 
     - Sparse coding 的目的: 在大量的數據集中,找到一組能描述 input的基礎向量(basic element)。
         > 自然數據中通常纏繞著高度密集的 feature。原因是這些 feature vectors是相互關聯的,一個小小的關鍵因子可能牽擾著一堆特徵,有點像蝴蝶效應。
             因此如果能夠解開特徵間纏繞的複雜關係,轉換為稀疏特徵,那麼特徵就有了 robustness。
 
         > 一般來說,大部分底層取出的 features和最高層輸出的 feature,沒有關係或者不提供任何信息的。
-            在最小化目標函數的時候,考慮所有的特徵，雖然可以獲得更小的訓練誤差;
+            在最小化目標函數的時候,考慮所有的特徵,雖然可以獲得更小的訓練誤差;
             但在預測新的樣本時,這些無用的信息反而會干擾對最高層 feature的預測。
             稀疏規則化算子的引入,就是為了完成特徵自動選擇的光榮使命,它會學習地去掉這些沒有信息的特徵,也就是把這些特徵對應的權重置為0。
 
@@ -147,9 +147,28 @@ Machine Learning
             ```
 
         > Training: 給定一系列的樣本圖片{img_1, img_2, ...},我們需要學習得到一組基 {D1, D2, ...},也就是字典。
-            
+
 
     - Sparse coding 難點: 其最優化目標函數的求解(需反覆計算逼近)
+
++ 梯度下降法(Gradient descent)
+    > Convolution為線性轉換,因此我們需要在**向量空間**中搜索最合適的權值向量,我們需要有一定的規則指導我們的搜索,
+        採用沿著梯度方向往下走的方法,就稱為`梯度下降法(Gradient Descent)`。
+        這種方法可以說是一種貪婪演算法(Greedy Algorithm),因為它每次都朝著最斜的方向走去,企圖得到最大的下降幅度。
+
+    > 為了要計算梯度,我們不能採用不可微分的 sign 步階函數,因為這樣就不能用微積分的方式計算出梯度了,
+        而必須改用可以微分的連續函數 sigmoid,這樣才能夠透過微分計算出梯度。
+
+    > 定義輸出誤差函數,通常使用均方差(MSE)。藉由導函數尋找極限值,即最小梯度(斜率)
+
+        ```
+        Total Error = sum((target(i) – output(i))^2) / 2   , i = number of elements
+        ```
+
+    - 缺點
+        1. 靠近極小值時速度減慢
+        2. 直線搜索可能會產生問題
+        3. 可能會 Z字型下降。
 
 + Deep learning (un-supervised)
     > 複雜的圖形,通常都是由基本結構組成。Deep learning = 生物神經系統的概念(neural network分層, base -> complex) + 特徵學習
@@ -162,7 +181,7 @@ Machine Learning
         2. 明確突顯出特徵學習的重要性,即通過逐層特徵變換,將樣本在原空間的特徵轉換到一個新特徵空間,從而使分類或預測更加容易
 
     - training flow
-        1. feature learning (un-supervised)
+        1. feature learning (un-supervised) - Forward Phase
             > 類似初始化,deep learning 效果好壞,很大程度上歸功於第一步的 feature learning過程
 
             >> 傳統類神經網路使用隨機初始值,再逐一修正 (有可能會有盲點 e.g. 向右走後, 左邊的情況只能用猜測)
@@ -187,8 +206,8 @@ Machine Learning
 
                     > encoder必須學習去除 noise而獲得真正 pure input,因此較 robustness,通用性也較佳
 
-        2. optimal (supervised)
-            a. 使用已標註的資料(labeled trainign data)
+        2. optimal (supervised) - Backward Phase
+            a. 使用已標註的資料(labeled training data)
             b. 由上而下依序傳遞誤差,並微調(fine-tune)各層參數
             c. 最上層加入一個 classifier,藉由 verification info調整 classifier的 input,並將調整的差值依序向下傳遞,達到微調各層參數
 
@@ -223,7 +242,7 @@ Machine Learning
             1. 神經元(neuron): the filter to extract feature
             1. 感受野(receptive field): the area mapping to the filter size
             1. 激活映射(activation map)或特徵映射(feature map): the set of filtered result
-            1. 激活函數(activation function): 用來做 sparsity, 通常是 sigmoid function 或 Hyperbolic function
+            1. 激活函數(activation function): 用來做 sparsity, 通常是 ReLU, sigmoid function 或 Hyperbolic function
             1. 步幅(stride): the unit of filter moveing every time
             1. 填充(padding): for keeping the same spatial size of output, pad the input with zeros on the border of the input
 
@@ -238,28 +257,70 @@ Machine Learning
 
             > 強化特徵
 
-        - ReLU(Rectified Linear Units) layer
-            > 增加模型乃至整個神經網絡的非線性特徵,達到在準確度不發生明顯改變的情況下,提高訓練速度
+        - Activation layer
+            > 增加模型乃至整個神經網絡的 Non-linear feature,達到在準確度不發生明顯改變的情況下,提高訓練速度,
+                同時可以一直保持一層一層下去的數值範圍是可控的
 
             > Non-linearly scale the feature map.
-                特徵強化後,藉 sigmoid function來判定是否激活(activative),來減少資料量,同時非線性可以避免 overfitting
+                特徵強化後,藉 Activative function來判定是否激活(activative),來減少資料量,同時非線性可以避免 overfitting
 
-            ```
-            sigmoid function = 1 / (1 + exp(-t))
-            越接近 1表示 activative, 越接近 0則被抑制
-            ```
+            1. ReLU(Rectified Linear Units)
+                ```
+                ReLU function f(x) = max(0, x)
+                小於 0的全變為 0
+                ```
 
-        - Pooling Layer (dowm sample)
+            2. sigmoid function
+
+                ```
+                sigmoid function f(t) = 1 / (1 + exp(-t))
+                越接近 1表示 activative, 越接近 0則被抑制
+                ```
+
+            3. hyperbolic tangent
+
+                ```
+                hyperbolic tangent f(x) = |tanh(x)|
+                ```
+
+        - Pooling Layer (down sample)
             > Partition the input into a set of non-overlapping rectangles
-                and get a representative value to describe this area(e.g. maximum, avaerage, L2-norm, ..., etc)
+                and get a representative value to describe this area(e.g. Maximum-Pooling, avaerage, L2-norm, ..., etc)
 
             > feature 的相對位置就可表達特性
 
             1. 大幅減小空間維度,因此降低了計算成本
             1. 可以控制過擬合(overfitting)
+            1. 種類
+                a. Maximum-Pooling: 將 feature map區分為 2x2的區域,並在從此區域中取最大值 (效果較佳)
+                b. Avaerage: 將 feature map區分為 2x2的區域,並在從此區域中取平均
 
-        - fully connected
+        - fully connected (do classification)
+            > Filters in a fully connected layer have full connections to all activations in the previous layer
 
+            > 使用所有的 feature map來做分類的 input。等同於傳統類神經網路的多層感知器(分類器)
+
+        - training flow summry
+            1. 初始化所有的 filter,使用隨機值設置參數/權重
+
+            2. 網絡接收一張 training image作為 input,通過前向傳播過程(Convolution/ReLU/Pooling/Full connected layer),找到各個類的輸出概率
+                > 我們假設船這張圖像的輸出概率是 [dog, cat, boat, bird] = [0.2, 0.4, 0.1, 0.3],
+                    因為對於第一張訓練樣本的權重是隨機分配的,輸出的概率也是隨機的
+
+            3. 在輸出層計算總誤差(計算 4 類的和)
+                > Total Error = (sum((target probability – output probability)^2)) / 2
+
+            4. 使用反向傳播算法(Back-Propagation),根據網絡的權重計算誤差的梯度,
+                並使用梯度下降算法(Gradient descent)更新所有濾波器的值/權重以及參數的值,使輸出誤差最小化
+
+                > 權重的更新與它們對總誤差的佔比有關
+
+                > 當同樣的圖像再次作為輸入,這時的輸出概率可能會是 [0.1, 0.1, 0.7, 0.1],這就與目標矢量 [0, 0, 1, 0] 更接近了
+                    這表明網絡已經通過調節權重/濾波器,可以正確對這張特定圖像的分類,這樣輸出的誤差就減小了
+
+                > 像 filter數量、filter大小、網絡結構等這樣的參數,在第一步前都是固定的,在訓練過程中保持不變; 僅僅是 filter矩陣的值和連接權重在更新
+
+            5. 對訓練數據中所有的圖像重複步驟 1 ~ 4
 
 # Model Assessments
 
