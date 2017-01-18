@@ -1,12 +1,12 @@
 Machine Learning
 ---
-+ 在多維度(features)空間中,將各個 feature投影(內積: inner product)到某維度/區域,並判斷此維度/區域上的量級(純量)
++ 在多維度(features)空間中,將各個 feature投影(內積: inner product)到某維度/區域,並判斷此維度/區域上的量級(純量: Scalar)
 
 
 ## Type of learning
 ---
 
-# Input side
+## Input side
 
 + supervised learning
     > every X comes with corresponding Y
@@ -44,7 +44,7 @@ Machine Learning
     - Concept:
         > 即一個連續決策的過程(Markov decision process, MDP)。目前的狀態(state),尋找最好的行為(action),得到最大的回報(reward)
 
-# Output side
+## Output side
 
 + Regression
     > the output variable takes continuous values.
@@ -115,7 +115,7 @@ Machine Learning
 
     > 比如一個句子的詞性分析,會需要考慮到句子中的前後文,而句子的組合可能有無限多種,因此不能單純用 Multiclass Classification 來做到
 
-# Definition
+## Definition
 
 + Over-fitting
     > 對資料過度解釋,即 hyperplane 過度貼近(e.g. 參數過多, 算法過於複雜) Training Data,而導致預測 Testing Data 的時候, Error 變得更大
@@ -227,6 +227,26 @@ Machine Learning
         input -> Convolutional 0 -> Pooling 0/ReLU -> Convolutional 1 -> Pooling 1 -> Convolutional 2 -> Pooling 2 -> ... -> fully connected(classifier)
         ```
 
+        - 演進
+            1. LeNet (1990s)
+            2. AlexNet (2012) – Alex Krizhevsky(與其他人)發佈了 AlexNet,它是比 LeNet更深更寬的版本,
+                並在 2012年的 ImageNet大規模視覺識別大賽(ImageNet Large Scale Visual Recognition Challenge,ILSVRC)中以巨大優勢獲勝。
+                這對於以前的方法具有巨大的突破,當前 CNN 大範圍的應用也是基於這個工作。
+
+            3. ZF Net (2013) – ILSVRC 2013的獲勝者是來自 Matthew Zeiler和 Rob Fergus的卷積神經網絡。
+                它以 ZFNet(Zeiler & Fergus Net 的縮寫)出名。它是在 AlexNet架構超參數上進行調整得到的效果提升。
+
+            4. GoogLeNet (2014) – ILSVRC 2014的獲勝者是來自於 Google的 Szegedy等人的卷積神經網絡。
+                它的主要貢獻在於使用了一個 Inception模塊,可以大量減少網絡的參數個數(4M,AlexNet 有 60M 的參數)。
+
+            5. VGGNet (2014) – 在 ILSVRC 2014的領先者中有一個 VGGNet的網絡。它的主要貢獻是展示了網絡的深度(層數)對於性能具有很大的影響。
+
+            6. ResNets (2015) – 殘差網絡是何凱明(和其他人)開發的,並贏得 ILSVRC 2015的冠軍。
+                ResNets 是當前卷積神經網絡中最好的模型,也是實踐中使用 ConvNet的默認選擇(截至到 2016 年五月)。
+
+            7. DenseNet (2016 八月) – 近來由 Gao Huang(和其他人)發表的,the Densely Connected Convolutional Network的各層都直接於其他層以前向的方式連接。
+                DenseNet 在五種競爭積累的目標識別基準任務中,比以前最好的架構有顯著的提升。可以在這裡看 Torch 實現。
+
         - Definition
             1. 2D Convolution:
                 把 NxN filter放在image上(filter的中心對準image中要處理的元素),用filter的每個元素去乘image中被覆蓋的對應元素,總和等於convolution後該位置的值。
@@ -281,7 +301,36 @@ Machine Learning
 
                 ```
                 hyperbolic tangent f(x) = |tanh(x)|
+                控制在[-1, 1]之間
                 ```
+
+            4. Softmax
+                > 將 value of Linear Prediction轉化為 class的概率。由 target element的對數值,與 all elements 對數值 sum的比值,可以形成一個概率分佈
+
+                > softmax能分多類(機率分佈),而 sigmoid函數只能分兩類
+
+                ```
+                Ai = LinearPrediction(Xn)
+
+                Pi = exp(Ai) / Sum(exp(Aj))    j = 0 ~ n
+                   = exp(LinearPrediction(Xn)) / Sum(exp(LinearPrediction(Xm)))
+                其中 Ai 是模型對於第 i個分類的輸出,Xn為 training data or input data。
+
+                由上可得到 Xn 轉換到 Pi (第 i類的機率)的關係式。最大化 Pi是我們期望的目標,因而導入最大似然(Maximum Likelihood)法則來求解。
+                實做上會採用反向最小化 (negative log-likelihood)以搭配梯度下降法(找到最小梯度,人為設定 threshold),則第i類的機率
+
+                    -log(Pi) = -log(exp(Ai) / Sum(exp(Aj)))
+                             = -(log(exp(Ai)) - log(Sum(exp(Aj))))
+                             = -Ai + log(Sum(exp(Aj)))
+                             = -LinearPrediction(Xn) + log(Sum(exp(LinearPrediction(Xm))))
+
+                梯度下降方法可以使 Pi逼近第 i個分類的真實概率。
+
+                ```
+
+                > softmax具有平移不變性(只需要學到 a中元素的相對大小,而不需要學到絕對大小) `softmax(A) = softmax(A + B)`。
+                    因此藉 `softmax(A) = softmax(A − max(Ai))` 可有效地減少計算誤差
+
 
         - Pooling Layer (down sample)
             > Partition the input into a set of non-overlapping rectangles
@@ -299,6 +348,20 @@ Machine Learning
             > Filters in a fully connected layer have full connections to all activations in the previous layer
 
             > 使用所有的 feature map來做分類的 input。等同於傳統類神經網路的多層感知器(分類器)
+
+        - Drop Layer
+            > 以一定機率 (1-p)略過 features,當 bp更新時,暫時不更新該 node相連的 weight(被抽中的 node無條件略過)。
+                也就是 feature機率性出現,可降低 feature間的關聯性(提高獨立性),也能提高運算速度
+
+            > 常出現在 fully connected的地方,因為全連接層中的 node與 node連接太多了,消耗了CNN中絕大多數的內存資源,而這中間有一大部分是沒有必要的。
+
+            1. Dropout
+                > 機率性將 hidden layer中, node的`output`變 0 (沒有 output)
+
+            1. DropConnect (只能用於 fully connected)
+                > 機率性(高斯分佈取樣)將 hidden layer中, node的 `input`變為 0 (暫時令 weight為 0,等同沒有 input)
+
+                > 因對每次的 input features做取樣,會較慢但效果會比較好
 
         - training flow summry
             1. 初始化所有的 filter,使用隨機值設置參數/權重
@@ -322,7 +385,18 @@ Machine Learning
 
             5. 對訓練數據中所有的圖像重複步驟 1 ~ 4
 
-# Model Assessments
+        # LeNet flow (數字手寫辨識, Label 0 ~ 9)
+            - training flow
+                a. 標準化 Input image pixels (pre-process)
+                b. Initialize the value of weight/bias with randomizing
+                c. forward phase
+                    c1. Convolute/Polling/ReLU process and output features of L1/L2/L3
+                    c2. In full connection layer, transfor (dot product) features to linear spaces of Label 0 ~ Label 9
+                            and collect the `Scalars` to figure out which class is max (the target class).
+                d. compare the verification data with the output from forward phase, and get the loss values
+
+                the `Probability` of each class.
+## Model Assessments
 
 + 是否符合實際狀況 (true/false) and Prediction (positive/negative)
     - 實際值是 A, 預估值(prediction)是 A
