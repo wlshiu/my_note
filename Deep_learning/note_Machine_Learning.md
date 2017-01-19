@@ -151,24 +151,84 @@ Machine Learning
 
     - Sparse coding 難點: 其最優化目標函數的求解(需反覆計算逼近)
 
-+ 梯度下降法(Gradient descent)
-    > Convolution為線性轉換,因此我們需要在**向量空間**中搜索最合適的權值向量,我們需要有一定的規則指導我們的搜索,
-        採用沿著梯度方向往下走的方法,就稱為`梯度下降法(Gradient Descent)`。
-        這種方法可以說是一種貪婪演算法(Greedy Algorithm),因為它每次都朝著最斜的方向走去,企圖得到最大的下降幅度。
++ 反向傳播算法(Back-Propagation)
+    > 在人工神經網絡(Artificial Neural Network, ANN)中,每個 neural的參數,希望藉由 training來產生。
+        也就是說在training的過程中,會與預期有誤差(cost/loss)產生。因此將最終輸出的誤差最小化,由後往前逐層反推,並調整各層參數的方法,就叫 Back-Propagation
 
-    > 為了要計算梯度,我們不能採用不可微分的 sign 步階函數,因為這樣就不能用微積分的方式計算出梯度了,
-        而必須改用可以微分的連續函數 sigmoid,這樣才能夠透過微分計算出梯度。
-
-    > 定義輸出誤差函數,通常使用均方差(MSE)。藉由導函數尋找極限值,即最小梯度(斜率)
+    - 使用大量有label的training data(也就是說 training data除了 feature外,同時標記了"標準答案"),經 Neural Network產生 output並與 Label產生關聯。
+        關聯的方式通常是均方差(Mean Squared Error, MSE)
 
         ```
-        Total Error = sum((target(i) – output(i))^2) / 2   , i = number of elements
+        w: weights of a filter
+        b: biase
+
+        input data x -> NN node (wX + b) -> Z -> sigmoid -> A -> MSE (令 MSE為最小)
+                                                                  ^
+            labeled data  Y --------------------------------->----|
+
+        MSE = ((A - Y)^2) / 2
+        A = G(Z)
+          = sigmoid(Z)
+          = sigmoid(wx + b)
+
+
+        Target: Min(MSE) = Min( (sigmoid(wx + b) - Y)^2 / 2 )
+                經 Gradient(偏微分)來獲得 W跟 B移動的走向,並藉大量的 training data來逼近
+
         ```
 
-    - 缺點
-        1. 靠近極小值時速度減慢
-        2. 直線搜索可能會產生問題
-        3. 可能會 Z字型下降。
+        ```
+                                      -> A2
+        image -> nn_1 -> A0 -> nn 2-1 -> A3 -> ... -> An
+                      -> A1 -> nn 2-2 -> A4
+
+        巨觀來看 output其實是 image 經過 Ai的線性轉換結果,而 Ai = G(Zi)
+                 n
+            A = Sum ( AiWi) + B
+                i=1
+        即
+                 n
+            Z = Sum ( G(Zi)Wi) + B
+                i=1
+
+            B為 biases的集合
+
+        因此把 Z對 Zj項做偏微分,可得到 WjG'(Zj)的極限值趨勢,再微觀到 nn node對 wi做偏微分,則可得到 filter權重的趨勢
+
+        ```
+
+    - 梯度下降法(Gradient descent)
+        > 最小值問題可以靠解方程式,了不起就微分求解,但Neural Network有非常非常多的參數,所以這招不太行得通。
+            不過山不轉路轉,我們可以先隨便生出一組weights和biases參數,然後對每個weight和bias取偏微分,
+            偏微分會找出每個b或著w向上的方向,也就是在當下這組b[]和w[]下,b和w參數們往哪個方向微調一點點點,可以使整個Cost增加最多,
+            而把這個方向反過來,那麼就可以使整個Cost減少最多。
+            而決定了這個w[]和b[]的移動方向之後,再決定要一次移動多還是少,就可以改變b和w的值。這種"路轉"的方式叫做gradient descent。
+
+            這樣一來,選擇一些有label的input(稱為batch),把batch裡的每個input b[k]丟入Neural Network,就會透過NeuralNetwork的每個b和w產生一組output。
+            再把output和label的cost function展開成label和所有b,w的cost function,
+            最後不斷使用gradient descent(即使用大量training data),就可以讓Network越來越好。
+
+        > Convolution為線性轉換,因此我們需要在**向量空間**中搜索最合適的權值向量,我們需要有一定的規則指導我們的搜索,
+            採用沿著梯度方向往下走的方法,就稱為`梯度下降法(Gradient Descent)`。
+            這種方法可以說是一種貪婪演算法(Greedy Algorithm),因為它每次都朝著最斜的方向走去,企圖得到最大的下降幅度。
+
+        > 為了要計算梯度,我們不能採用不可微分的 sign 步階函數,因為這樣就不能用微積分的方式計算出梯度了,
+            而必須改用可以微分的連續函數 sigmoid,這樣才能夠透過微分計算出梯度。
+
+        > 定義輸出誤差函數,通常使用均方差(MSE)。藉由導函數尋找極限值,即最小梯度(斜率)
+
+            ```
+            Total Error = sum((target(i) – output(i))^2) / 2   , i = number of elements
+            ```
+        > 參數選擇會有大影響。gradient descent的`步長`是很重要的參數,因為偏微分只知道`在這一點`往哪個方向是變化最大,
+            就像是站在山坡的一點,總會有個方向是最斜的,如果你把一顆球放在地上,它會順著那個方向滑,
+            但是沿著最斜的方向走1公里,未必是走到山腳最近的路。
+            如果倒楣一點,說不定往下滾10公尺之後,又走上了一座大山。
+
+        - 缺點
+            1. 靠近極小值時速度減慢
+            2. 直線搜索可能會產生問題
+            3. 可能會 Z字型下降。
 
 + Deep learning (un-supervised)
     > 複雜的圖形,通常都是由基本結構組成。Deep learning = 生物神經系統的概念(neural network分層, base -> complex) + 特徵學習
@@ -312,17 +372,17 @@ Machine Learning
                 ```
                 Ai = LinearPrediction(Xn)
 
-                Pi = exp(Ai) / Sum(exp(Aj))    j = 0 ~ n
-                   = exp(LinearPrediction(Xn)) / Sum(exp(LinearPrediction(Xm)))
+                softmax function: Pi = exp(Ai) / Sum(exp(Aj))    j = 0 ~ n
+                                     = exp(LinearPrediction(Xn)) / Sum(exp(LinearPrediction(Xm)))
                 其中 Ai 是模型對於第 i個分類的輸出,Xn為 training data or input data。
 
                 由上可得到 Xn 轉換到 Pi (第 i類的機率)的關係式。最大化 Pi是我們期望的目標,因而導入最大似然(Maximum Likelihood)法則來求解。
-                實做上會採用反向最小化 (negative log-likelihood)以搭配梯度下降法(找到最小梯度,人為設定 threshold),則第i類的機率
+                實做上會採用反向最小化 (negative log-likelihood)以搭配梯度下降法(找到最小梯度,人為設定 threshold)
 
-                    -log(Pi) = -log(exp(Ai) / Sum(exp(Aj)))
-                             = -(log(exp(Ai)) - log(Sum(exp(Aj))))
-                             = -Ai + log(Sum(exp(Aj)))
-                             = -LinearPrediction(Xn) + log(Sum(exp(LinearPrediction(Xm))))
+                    Softmax-Loss funcion: -log(Pi) = -log(exp(Ai) / Sum(exp(Aj)))
+                                                   = -(log(exp(Ai)) - log(Sum(exp(Aj))))
+                                                   = -Ai + log(Sum(exp(Aj)))
+                                                   = -LinearPrediction(Xn) + log(Sum(exp(LinearPrediction(Xm))))
 
                 梯度下降方法可以使 Pi逼近第 i個分類的真實概率。
 
@@ -393,7 +453,7 @@ Machine Learning
                     c1. Convolute/Polling/ReLU process and output features of L1/L2/L3
                     c2. In full connection layer, transfor (dot product) features to linear spaces of Label 0 ~ Label 9
                             and collect the `Scalars` to figure out which class is max (the target class).
-                d. compare the verification data with the output from forward phase, and get the loss values
+                d. compare the verification data with the output values from forward phase, and get the cost (loss) values
 
                 the `Probability` of each class.
 ## Model Assessments
