@@ -31,7 +31,7 @@ VirtualBox
 
                 ...
                 # add infomation
-                UUID=your_disk_UUID /data          ext4    defaults        0       2
+                UUID=your_disk_UUID    /data    ext4    defaults     0    1
                 ...
 
 
@@ -72,6 +72,37 @@ VirtualBox
     $ sudo apt-get install build-essential make dos2unix automake libtool pkg-config \
             vim git ctags cscope id-utils
     ```
+    - svn
+        > In RTK, it only support `subversion 1.6.17`
+
+        1. [svn download web] (http://mirrors.kernel.org/ubuntu/pool/main/s/subversion/)
+            > package
+            >> `libsvn1_1.6.17dfsg-3ubuntu3.5_amd64.deb`, `subversion_1.6.17dfsg-3ubuntu3.5_amd64.deb`
+        1. [db lib download web] (http://mirrors.kernel.org/ubuntu/pool/main/d/db4.8)
+            > package
+            >> `libdb4.8_4.8.30-11ubuntu1_amd64.deb`
+
+        1. manually install
+            > you should heed the dependency
+
+            ```
+            $ sudo apt-get install libneon27-gnutls
+            $ sudo dpkg -i libdb4.8_4.8.30-11ubuntu1_amd64.deb \
+                libsvn1_1.6.17dfsg-3ubuntu3.5_amd64.deb \
+                subversion_1.6.17dfsg-3ubuntu3.5_amd64.deb
+
+            ```
+
+    - `32bits-toolchain` in `64bits-OS`
+        1. Enable the i386 architecture (as root user)
+            ```
+            $ dpkg --add-architecture i386
+            $ apt-get update
+            ```
+        1. Install 32-bit libraries
+            ```
+            $ apt-get install libc6:i386 libstdc++6:i386 lib32ncurses5 lib32z1
+            ```
 
 + resolution
     1. Install `VboxGuestAdditions`

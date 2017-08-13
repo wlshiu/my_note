@@ -91,11 +91,17 @@ sina_merlin2
     - Commit()
         > Fill the info to buffer header and setup `multi CReadPointerHandle`
         >   > `m_pBufferNonCachedLower` (IPC case) or `m_pBufferLower` is RingBuffer start pointer
-        > - ReadPointer: default = `2`, max = `4`
-        > - WritePointer: only `1`
+        > - number of ReadPointer: default = `2`, max = `4`
+        > - number of WritePointer: only `1`
 
     - Flush()
         > like memset()
+
+    - GetWriteSize()
+        > Get free space of ring buffer
+
+    - GetReadSize()
+        > Get readable size
 
 + CBasePin (CPin.cpp)
     - JoinFilter() (CBasePin method)
@@ -271,7 +277,10 @@ sina_merlin2
 
     Set of filters for some feature, e.g. decoder filter
 
-+ NavigationFilter
++ INavControl
+    > A generic interface to *send commands* to navigation filter.
+
++ NavigationFilter (inherent from INavControl)
     > include `CNavAVSync.cpp`, `CNavigationFilter.cpp`, `NavPluginFactory.cpp`
 
 
@@ -353,7 +362,8 @@ sina_merlin2
         1. ThreadProcEntry()/ThreadProc()
             a. `HandleUserCmd()` to Pass cmd to InputPlugin
                 > DeQueue() cmd from `m_navCmdQueue`
-                >> User call *PlayXXX()* and EnQueue cmd to `m_navCmdQueue`
+                >> + `m_navCmdQueue` is `ulCircularQueue` type.
+                >> + User call *PlayXXX()* and EnQueue cmd to `m_navCmdQueue`
 
             a. Re-deliver private info with `DeliverPrivateInfo()` <br>
                 if the previous `DeliverPrivateInfo()` fail in `Read()`
@@ -401,6 +411,10 @@ sina_merlin2
 
             a. CI handle
 
+        1. GetBufferFullness()
+            > Get remain size of valid data in Ring Buffer
+
+
     - NavPluginFactory
         > + Attach `Media I/O protocol` (in IOPlugins/*)
         > + Attach `Container Parser`
@@ -446,14 +460,14 @@ sina_merlin2
             > And maybe re-directe to the other IO Plugin depending on H/W
             >> `PFUNC_OPEN_IO_PLUGIN  openFunc` means insert plugin object.
 
-- Decoder/Encoder/In/Out
-    1. Setup Deoder object
++ Decoder/Encoder/In/Out
+    - Setup Deoder object
 
-    2. `Create Agent` (RPC)
+    - `Create Agent` (RPC)
         > Communicate with CODEC at linux kernel side
         >> NAL parser is at linux side
 
-- Misc
++ Misc
     > e.g. File access, Mux, ...etc.
 
 ## Platform
@@ -472,10 +486,121 @@ sina_merlin2
 + PlayControl
     > Handle event trigger (role: control)
 
++ CommandManager
+    > Message transportation (S/W MsgQ), which bases on `FIFO`, and it supports timestamp for dropping expired cmd.
+
+    >   > Support multi-CmdQ, and priority High to Low
+    >   > 1. m_pIMSCmdQue
+    >   > 2. m_pCtrlCmdQue
+    >   > 3. m_pCmdQue
+
+    - Peek()
+        > ONLY get the 1st Cmd Item
+
+    - Pop()
+        > *Get* the 1st Cmd Item and *remove* it from queuq.
+
+    - IsValidControlCommand()
+        > valid condition
+        > 1. timestamp == -1 (forever)
+        > 1. Cmd is NOT time out (VALID_DEFER_PERIOD)
+
+#### RSS Client
+
+    scriptFunctionList[] in ScriptFunctionList.cpp
+        > SDK support methods with mapping to script API
+
++ CRegisterScriptFunctions
+    > *Constructor* will register the script methods (FunctionTable) to `CSimpleScriptEngine`
+
+
++ CSimpleScriptEngine
+    > Script render engines
+
+    ```text
+    # structure of Script method
+
+    ~ FunctionTableItem
+    |~ FunctionTable_0   => Method Type, e.g. menu, drow, ...etc.
+    | |- my_print()      => Map to script's cmd (method)
+    | \- getItemInfo()
+    |
+    |
+    |
+    |+ FunctionTable_1
+    |+ FunctionTable_2
+    |
+
+    ```
+
+    - scriptFunctionsInit()
+        > Prepare Script Methods
+
+    - callFunction()
+        > Execture funciton, which map to Script Method, When *GNU Bison* parse RSS script.
+
++ SimpleScriptParser
+    > Context parser (from GNU Bison parser)
+
+
++ CRSSApplication
+    > The interface of RSS engine.
+
+    - init()
+        > `m_rssCore.start()` will load RSS file and split the elements. (XML element)
+
 
 ## Customer project
 
     User UI/Flow by project
+
++ RtkBootUP in project/xxx/bootup/BootUP.cpp
+    > Iniit/Setup module (almost about H/W, besides kernel)
+
+    - pli_init()
+    - board_init()
+    - SetupClass::SetInstance()
+        > Set target SetupClass, e.g. SetupClassSqliteEeprom, SetupClassSqlite, or SetupClassBinary
+
+    - firmware_init()
+        > Setup RPC, e.g. Audio, Video, and Reply Handler
+
+    - Factory test
+    - Panel setting
+    - Scaler setting (~/system/src/Platform_Lib/TVScalerControl_DriverBase/scaler/)
+        > Assign H/W registers
+
+        1. Scaler_Init()
+            > Select default source input
+
+    - backlight control
+
+#### UI
+
++ Module
+
++ Control
+    - AbstractAP
+        > master controlling flow
+
+    - Category
+        > - category 1: main window   ???
+        > - category 2: pop window    ???
+
++ View (Graphic middle ware)
+    > IMS_new folder
+
+    - CBasicView
+
+        1. drawWidgets()
+            > Follow the input CRSSElement to Draw surface
+            >> `CRSSApplication` will load/parse the target RSS file and output a CRSSElement.
+
+
+
+
+
+
 
 
 
