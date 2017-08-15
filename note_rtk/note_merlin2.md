@@ -72,8 +72,11 @@ sina_merlin2
     > e.g. `Class CAudioRingAllocator`
 
 + CMemRingAllocator
-    > Only *Get/Set* R/W pointer info and handle *Mapping Memory Space* (NO Operate R/W Index)
-    >> `Read/Write pointer should be operated by user self`.
+    > + RingBuffer Header
+    >   > If IPC type, it will be allocated at share memory (share with A/V Processor).
+    >
+    > + Only *Get/Set* R/W pointer info and handle *Mapping Memory Space* (NO Operate R/W Index)
+    >   > `Read/Write pointer should be operated by user self`.
 
     ```cpp
 
@@ -89,7 +92,7 @@ sina_merlin2
         >> You can malloc buffer by self or input NULL to auto assign buffer
 
     - Commit()
-        > Fill the info to buffer header and setup `multi CReadPointerHandle`
+        > Fill the info (beginAddr) to *RingBuf Header* and setup `multi CReadPointerHandle`
         >   > `m_pBufferNonCachedLower` (IPC case) or `m_pBufferLower` is RingBuffer start pointer
         > - number of ReadPointer: default = `2`, max = `4`
         > - number of WritePointer: only `1`
@@ -126,6 +129,9 @@ sina_merlin2
         1. ConnectedTo()
             > Copy out the (one) OutputPin pointer in the current `CBaseInputPin`
 
+    - ConnectedTo()
+        > Report the pointer of the connected OutputPin.
+
     - Receive Data/PrivateInfo from `CBaseOutputPin->Deliver()`
         1. Data Process Interface (IMemInputPin)
             > a. Pre-process Received data
@@ -144,6 +150,9 @@ sina_merlin2
 
         1. ConnectedTo()
             > Copy out the InputPin pointers in the current `CBaseOutputPin`.
+
+    - ConnectedTo()
+        > Report the pointer list of the connected InputPin.
 
     - Deliver Data/PrivateInfo to all linked InputPins
         1. Data Process Interface (IMemOutputPin)
@@ -272,6 +281,9 @@ sina_merlin2
     - SendCommand()
         > Send text command to underlying filters.
 
++ CReferenceClock
+    > Record infomation about PTS, A/V sync priorigy, ..., etc.
+    >> Use share memory (H/W registers ???)
 
 ## Middle filter
 
@@ -461,11 +473,50 @@ sina_merlin2
             >> `PFUNC_OPEN_IO_PLUGIN  openFunc` means insert plugin object.
 
 + Decoder/Encoder/In/Out
-    - Setup Deoder object
+    > + Setup Deoder object
+    >
+    > + `Create Agent` (RPC)
+    >   > Communicate with CODEC at linux kernel side
+    >   >   > NAL parser is at linux side
+    >
+    > + InBand buffer
+    >   > For performance (avoid system_call), use share memory to run-time update. ???
+    >
+    >   - Share buffer between System/Decoder CPU
+    >   - Ring buffer
+    >   - Store variety of packets, which involve cmd, payload address/size, ...etc.
 
-    - `Create Agent` (RPC)
-        > Communicate with CODEC at linux kernel side
-        >> NAL parser is at linux side
+    - CMPEG2Decoder
+
+    - CMPEG2InputPin
+        > + Create payload ring buffer (m_pAllocator)
+        > + Create inband ring buffer (m_pICQAllocator)
+
+        1. InitRingBuf()
+
+            a. Setup bit-stream buffer (m_pAllocator) and inband buffer (m_pICQRPHandle)
+                > bit-staream buffer: audio/video payload <br>
+                > inband buffer: some private info (e.g. meta data, specific control, ...etc.)
+            a. Assign buffer type to *RingBuf Header*
+                > m_pAllocator: RINGBUFFER_STREAM <br>
+                > m_pICQBufferHeader: RINGBUFFER_COMMAND
+            a. Send physical address of *RingBuf Header* to Video Processor with RPC.
+                > `VP_RPC_TOAGENT_INITRINGBUFFER()`
+                >> NavigationFilter and Video Processor update/get info to/from *RingBuf Header*
+
+        1. PrivateInfo()
+            > Receive info from NavigationFilter
+
+            a. Prepare packet (inherent struct INBAND_CMD_PKT_HEADER) based on *infoId*
+            a. DeliverInBandCommand() enqueue packet to `m_pICQAllocator`
+
+    - CVideoOutFilter
+        > Send command to Video Processor with RPC
+
+        1. ConnectVDec()
+
+    - CVideoOutInputPin
+        >
 
 + Misc
     > e.g. File access, Mux, ...etc.
