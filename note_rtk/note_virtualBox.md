@@ -154,10 +154,74 @@ VirtualBox
         1. With Virtual Linux
             > ALT+CTRL+SPACE and Keep ALT+CTRL prees F7
 
++ Samba
+    - install
 
++ Network File System (NFS)
+    - VirtualBox
+        1. set network `Adapter 2`
+            a. Atteched to: Bridget Adapter
+            a. Promiscuous Mode: Allow All
+            a. Reflash MAC address
 
+    - lunbuntu 16.04
 
+        1. install
+            ```
+            $ apt-get install nfs-kernel-server nfs-common portmap
+            ```
 
+        1. setup
+            a. edit /etc/netboot/interface
+                ```
+                # Add network interface setting
+                auto enp0s8
+                iface enp0s8 inet static    # static ip
+                address 172.22.49.177       # it should be in the same domain with PCBA
+                geteway 172.22.49.254       # it should be in the same domain with PCBA
+                netmask 255.255.255.0
 
+                # rtk route setting
+                up route add default gw 172.22.49.254 metric 1
+                dns-nameservers 172.21.1.10 172.21.1.11
+                dns-search realtek.com.tw
+                ```
+
+            a. edit /etc/exports
+                ```
+                # Allow connection from any (*)
+                /home/username/my_nfs *(rw,sync,no_root_squash,no_subtree_check)
+
+                  # update export info
+                $ exportfs -ra
+                ```
+            a. Set the share folder
+                ```
+                $ mkdir ~/my_nfs
+
+                  # it is available by anyone.
+                $ sudo chmod 777 ~/my_nfs
+                ```
+        1. enable NFS
+            ```
+            $ sudo service nfs-kernel-server restart
+            ```
+
+        1. test
+            a. local test
+
+                ```
+                $ sudo mkdir /tmp/test_nfs
+                $ sudo chmod 777 /tmp/test_nfs
+                $ sudo mount -t nfs -o nolock localhost:/home/username/my_nfs/ /tmp/test_nfs
+                $ ls /tmp/test_nfs
+                ```
+    - PCBA
+        ```
+          # set eth0 ip, which is in PC ip domain
+        $ ifconfig eth0 172.22.49.178
+        $ mkdir /tmp/nfs
+        $ mount -t nfs -o proto=tcp -o nolock 172.22.49.177:/home/username/my_nfs /tmp/nfs
+        ```
 
 

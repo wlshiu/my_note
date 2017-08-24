@@ -384,7 +384,7 @@ sina_merlin2
             a. Read()
                 > Read data from InputPlugin and output DemuxOut info
 
-                a. If buffer Empty
+                b. If buffer Empty
                     > + Call `m_inputPlugin.read()` to fill buffer and response info with `struct NAVBUF`
                     >   > - If `NAVBUF_DATA` or `NAVBUF_EXT`
                     >   >   > 1. Backup `struct NAVBUF` info to `DemuxIn`
@@ -393,7 +393,7 @@ sina_merlin2
                     >   >   >   > Support re-try at `ThreadProc()` (Info be queued in `m_demuxInReserved[]`)
                     >   > - If other type, send to `DeliverNavBufCommands()` to handle cmd.
 
-                a. If buffer NOT empty, Data send to Demux Plugin `m_demuxPlugin[channelIndex].parse()`
+                b. If buffer NOT empty, Data send to Demux Plugin `m_demuxPlugin[channelIndex].parse()`
                     > Parsing result will record in DemuxOut
 
                     > + MPEGProgram case
@@ -405,17 +405,17 @@ sina_merlin2
                 > Deliver data to RingBuffers, which linked CBaseInputPins <br>
                 > Support re-try at `ThreadProc()` (Info be queued in `m_demuxOutReserved[]`)
 
-                a. Prepare Payload Size which map to all connected PINs.
+                b. Prepare Payload Size which map to all connected PINs.
                     > Info is record in NAVBUF (like MsgBox)
 
-                a. Check Free Space in Ring Buffer and get the current writing pointer,
+                b. Check Free Space in Ring Buffer and get the current writing pointer,
                    `pAllocator->RequestWriteSpace()`
                     > `CMemRingAllocator` is just a database......@$%&
 
                     > + Free sapce in Ring Buffer MUST be more than `5%` or drop data
                     > + Keep PTS data MUST be less than 18 sec or drop data ???
 
-                a. Handel NavBuf (like MsgBox)
+                b. Handel NavBuf (like MsgBox)
                     > + DeliverPrivateInfo()
                     > + Copy payload to RingBuffer with `NAV_MEMCPY()`
                     >   > Need to calculate new writing pointer.
@@ -486,7 +486,12 @@ sina_merlin2
     >   - Ring buffer
     >   - Store variety of packets, which involve cmd, payload address/size, ...etc.
 
-    - CMPEG2Decoder
+    - CMPEG2Decoder (inherent from CVideoFilter)
+        > `m_agentInstanceID` is *Decoding Handle* in Video Processor side. ???
+
+        > + Create and Add Pins
+        > + Pass command with RPC, e.g. Run()/Pause()/Stop()
+
 
     - CMPEG2InputPin
         > + Create payload ring buffer (m_pAllocator)
@@ -507,7 +512,7 @@ sina_merlin2
         1. PrivateInfo()
             > Receive info from NavigationFilter
 
-            a. Prepare packet (inherent struct INBAND_CMD_PKT_HEADER) based on *infoId*
+            a. Prepare packet (inherent from struct INBAND_CMD_PKT_HEADER) based on *infoId*
             a. DeliverInBandCommand() enqueue packet to `m_pICQAllocator`
 
     - CVideoOutFilter
@@ -520,6 +525,11 @@ sina_merlin2
 
 + Misc
     > e.g. File access, Mux, ...etc.
+
++ RPC
+    - Prepare client calling header, involve `options`, `program_id`, and `version_id`
+    - Create Agent (Handle of Decoder) if necessary.
+    - Decoding Processor is *Big-endian* (mips) and system is *little-endian* (arm).
 
 ## Platform
 
@@ -626,6 +636,40 @@ sina_merlin2
 
     - backlight control
 
++ AbstractAP
+    > `AP`: a object which has self message handler and rendered by RSS engine or Self Drawing <br>
+    > `feature`: a set of multi-APs, e.g. `MediaPlayer =  VideoPlaybackAP + PopupMenuAP * n + VolumeCtrlAP + ...`
+    >
+    > - Statically method declare (only one instance)
+    > - Common inherent methods
+    >   1. Activate()
+    >       > Init APP
+    >   1. Deactivate()
+    >       > DeInit APP
+    >   1. ProcessKey()
+    >       > Message handle
+
+    ```
+                AbstractAP
+        + ----------+---------------+
+        |                           |
+    Category_2                  Category_1
+    |- PopupMenuAP              |- RootAp
+    |- VolumeCtrlAP             |- VideoPlaybackAP
+    |- PhotoPlaybackAp          |- AudioPlaybackAP
+    |- ...etc.
+
+    ```
+
+    - Category
+        1. Category_1: Normal AP
+        1. Category_2: Pop Up AP
+            > It can *Alpha Brand* on Category_1
+
+
+    1. SwitchAPTo()
+        > Change forcus APP (like switch window to top)
+
 #### UI
 
 + Module
@@ -634,9 +678,6 @@ sina_merlin2
     - AbstractAP
         > master controlling flow
 
-    - Category
-        > - category 1: main window   ???
-        > - category 2: pop window    ???
 
 + View (Graphic middle ware)
     > IMS_new folder

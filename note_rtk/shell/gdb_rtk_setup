@@ -1,0 +1,3 @@
+handle SIG32 noprint
+handle SIGUSR1 noprint
+handle SIG33 noprint
