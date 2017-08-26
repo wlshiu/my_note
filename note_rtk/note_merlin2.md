@@ -610,6 +610,21 @@ sina_merlin2
     - init()
         > `m_rssCore.start()` will load RSS file and split the elements. (XML element)
 
++ XML architecture
+
+    ```
+    Document (DOM)
+    |- Declaration : <?xml version='1.0' ?>
+    \- Root Element : <html>
+       |- element <header>
+       |   \- element <title>
+       |        \- attribue : text = "My Title"
+       |
+       |- element <body>
+       |   |- element <h1>
+       |   \- element <h2>
+
+    ```
 
 ## Customer project
 
@@ -636,11 +651,11 @@ sina_merlin2
 
     - backlight control
 
-+ AbstractAP
++ AbstractAP (@#$%....... The architecture is a stupid jok)
     > `AP`: a object which has self message handler and rendered by RSS engine or Self Drawing <br>
     > `feature`: a set of multi-APs, e.g. `MediaPlayer =  VideoPlaybackAP + PopupMenuAP * n + VolumeCtrlAP + ...`
     >
-    > - Statically method declare (only one instance)
+    > - Statically methods declare (only one instance)
     > - Common inherent methods
     >   1. Activate()
     >       > Init APP
@@ -650,6 +665,8 @@ sina_merlin2
     >       > Message handle
 
     ```
+    # classify APP
+
                 AbstractAP
         + ----------+---------------+
         |                           |
@@ -662,15 +679,43 @@ sina_merlin2
     ```
 
     - Category
+        > Actually, this APP category is superfluous (It should be a attribue, overlayable)
+
         1. Category_1: Normal AP
         1. Category_2: Pop Up AP
             > It can *Alpha Brand* on Category_1
 
+    1. ProcessKey()
+        > Message handle
+
+        ```
+        Cmd (struct COMMAND_BUFFER)
+            -> Cur_APP->ProcessKey() -> If cmd is defined, handle Cmd
+                |
+                +-> AbstractAP::ProcessKey -> If cmd is defined, by pass to target_APP
+                    |
+                    +-> CommandManager Queue
+                        -> System Main_loop get cmd
+                            -> by pass to target_APP or Cur_APP
+        ```
 
     1. SwitchAPTo()
-        > Change forcus APP (like switch window to top)
+        > Change *forcus* APP (like switch window to top)
+        >
+        > + call `Deactivate()` to deinit current APP
+        > + call `Activate()` to init new APP
+        >   > use `struct MessagePack` to pass arguments
+        >
+        >   - Create `CRSSApplication` as Render, e.g. PopupMenuAP::Activate()
+        >       > call `CRSSApplication::init()` to start
+        >   - rss_path format: `rss_file://xxx/xxx.rss`
+        >       > e.g. `rss_file://Resource/ui_script/DVBT_TV040/media_mainMenu.rss`
+
 
 #### UI
+
++ IMS (for what ???)
+    - handle key ???
 
 + Module
 
