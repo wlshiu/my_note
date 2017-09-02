@@ -39,6 +39,52 @@ sina_merlin2
     $ sudo apt-get install build-essential make dos2unix automake libtool pkg-config
     ```
 
++ Debug
+    - reduce linux log
+        > `printk` support 8 level log message and control it by `/proc/sys/kernel/printk`. </br>
+        > You can use `echo` to change the level in `/proc/sys/kernel/printk`. </br>
+        > Log message will be printed if log level more than `/proc/sys/kernel/printk`
+        >
+        > - KERN_EMERG     "0": System is unusable
+        > - KERN_ALERT     "1": Action must be taken immediately
+        > - KERN_CRIT      "2": Critical conditions
+        > - KERN_ERR       "3": Error conditions
+        > - KERN_WARNING   "4": Warning conditions
+        > - KERN_NOTICE    "5": Normal but significant condition
+        > - KERN_INFO      "6": Informational
+        > - KERN_DEBUG     "7": Debug-level messages
+
+    ```c
+    /* add the below code to RtkBootUP (BootUP.cpp) constructor end*/
+
+    RtkBootUP::RtkBootUP()
+    {
+        ...
+
+    #if (defined ENABLE_DEBUG)
+        if (access("/usr/local/etc/dvdplayer/gdb", F_OK) =0)
+        {
+            system("rm -rf /usr/local/etc/noaplogprint");
+            system("rm -rf /usr/local/etc/foreground");
+            system("echo 8 > /proc/sys/kernel/printk"); // close all kernel message
+            system("echo 1 > /sys/realtek_boards/rtice_enable");
+            system("sync");
+        }
+    #endif
+    }
+
+    ```
+
+    - Simulate IR with tty
+        > Re-direct keypad input to simulate IR control </br>
+        > *Mark* this thread to recover the linux tty (shell)
+
+        ```
+        // in main.cpp
+        pthread_create(&thread_id_tty, NULL, thread_tty, (void *)NULL);
+        ```
+
+
 # Architecture
 ---
 
@@ -240,7 +286,7 @@ sina_merlin2
         >> - Decrease `1` on Backward direction
         >>      > Trace backward *only* the parent Filter.
 
-	---
+    ---
 
     - Thread()/StartDefaultHandlingThread()/StopDefaultHandlingThread()
         > Handle `Default Event` with local thread <br>
@@ -433,7 +479,7 @@ sina_merlin2
         >   1. Attach the operator of Source data
         >       > a. Operator involve `InputXXX/*.cpp`
         >       >   > MKV, AVI, MP4, Network, ...etc.
-		>       >
+        >       >
         >       > a. `void *pInstance` of struct INPUTPLUGIN is the `private handle` in InputPlugin
         >       > a. Record in `INPUT_PLUGIN_MODULES[]`
         >
@@ -445,7 +491,7 @@ sina_merlin2
         >       > a. If MKV, AVI, ...etc, Use `CDemuxPassthrough` to bypass the A/V data
         >       > a. If Transport Stream, Use `CDemuxMPEGTransport` to split PSI/SI and A/V of PES
         >       > a. if MPEG file, Use `CDemuxMPEGProgram` to split A/V data of PES
-		>       > a. Record in `DEMUX_PLUGIN_MODULES[]`
+        >       > a. Record in `DEMUX_PLUGIN_MODULES[]`
 
         1. SelectInputPlugin()
             > + Find the target `I/O` Plugin
@@ -576,7 +622,7 @@ sina_merlin2
 
 
 + CSimpleScriptEngine
-    > Script render engines
+    > Execute script (like adobe flash's Action Script)
 
     ```text
     # structure of Script method
@@ -601,14 +647,63 @@ sina_merlin2
         > Execture funciton, which map to Script Method, When *GNU Bison* parse RSS script.
 
 + SimpleScriptParser
-    > Context parser (from GNU Bison parser)
+    > + Context parser (Actually, it is GNU Bison parser)
+    > + It is like `interpreter`
+    >   > The script commands (methods) are mapping to `scriptFunctionList[]` in ScriptFunctionList.cpp
+    > + The script syntax is just like ANSI-C, but don't need to declare veriable.
+    >   > e.g. `>: &gt;`, `<: &lt;`, `&: &amp;` ........@#$% WTF </br>
+            ```
+            if((a > b) & (c == 1)) ; => if((a &gt; b) &amp; (c == 1)) ;
+            ```
 
+    - Script Commands (Methods)
+        > Map to `scriptFunctionList[]`
+
+        1. `executeScript("user_func")`
+            > Re-direct to execute user function at RSS.
+
+            ```
+            # in RSS File
+
+            <my_function>
+                print("Hello");
+            </my_function>
+
+            <script>
+                executeScript("my_function");
+            </script>
+
+            # 1. Parser get Command (Method) Name 'executeScript'
+            # 2. Search the tag element 'my_function' in rootElement (RSS)
+            # 3. Execute the Tag element (my_function)
+            ```
+        1. `print`
+            > print message
+
+            ```
+            browserType = getEnv("browserType");
+            print("browserType  = "+browserType); ....... @#$% WTF
+            ```
 
 + CRSSApplication
     > The interface of RSS engine.
 
     - init()
         > `m_rssCore.start()` will load RSS file and split the elements. (XML element)
+
++ IMediaDisplay
+    > Operation of Render (control interface)
+    >   > Base Render: *CBaseView*, *CCmdLineDisplay*, and *commonView*
+
+    1. createView(), in Display.cpp
+        > Create a Render
+
+    1. setDataProvider()
+        > Set Graphic's scenario provider (input graphic context, it should be a CRSSApplication)
+
++ CBaseView (inherent from IMediaDisplay)
+    > A Base class of Render, it can mutate to *COnePartView*, *CThreePartsView*, *CNullView*, or *CPhotoView*
+
 
 + XML architecture
 
@@ -625,6 +720,151 @@ sina_merlin2
        |   \- element <h2>
 
     ```
+
++ RSS UI layout syntax
+    ```
+    # rss scope:    01 ~ 29
+    # global scope: 03 ~ 28
+    # mediaDisplay scope: 12 ~ 21
+    # channel scope: 25 ~ 28
+
+    01|+ <?xml version='1.0' ?>
+    02|~ <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    03| |
+    04| |+ <bookmark>MainMenu</bookmark>
+    05| |
+    06| |+ <onEnter> ... </onEnter>
+    07| |
+    08| |+ <onRefresh> ... </onRefresh>
+    09| |
+    10| |+ <onExit> ... </onExit>
+    11| |
+    12| |~ <mediaDisplay
+    13| | |   name=onePartView
+    14| | |
+    15| | |   [surface rectangle setting, e.g. X, Y, Width, Heigth]
+    16| | |
+    17| | |   [items setting, e.g. Item number, Color, ...etc]
+    18| | | >
+    19| | |
+    20| | |+ <item> ... </item>
+    21| | \ </mediaDisplay>
+    22| |
+    23| |+ <script> ... </script>
+    24| |
+    25| |~ <channel>
+    26| | |  <title>Main menu</title>
+    27| | |  <link>"rss_file://./Resource/ui_script/"+ProjectName+"/mainMenu.rss"</link>
+    28| \ </channel>
+    29\ </rss>
+
+    ```
+    - Tag
+        1. `mediaDisplay`
+            > Define what kind of view you want to draw (onePartView, threePartsView, photoView)
+            > - Set area of graphic objects in this surface
+            >       > this surface rectangle: `viewAreaX`, `viewAreaY`, `viewAreaWidth`, `viewAreaHeigh` </br>
+            >       > Percentage discription: `viewAreaXPC`, `viewAreaYPC`, `viewAreaWidthPC`, `viewAreaHeighPC`
+            > - If in a Item Scope, `mediaDisplay` define the surface of this item.
+            > - Sub-element tags supported
+            >   1. *text*
+            >       > attribue: area (offsetX, offsetY, width, height), align, backgroundColor,foregroundColor, cornerRounding </br>
+            >       > what the base value with the offsetX, Y ???
+            >   1. *image* (ARGB8888)
+            >       > attribue: area ((offsetX, offsetY, width, height)), alphaMode </br>
+            >       > what the base value with the offsetX, Y ???
+            >   1. *backgroundDisplay*
+            >       > Describe the background of the display area of `mediaDisplay`. </br>
+            >       > It can support sub-element (text and image)
+            >   1. *itemDisplay*
+            >       > Describe the layout inside the display area of each item
+            >       >   > Does it mean how to draw a single menu item ???
+            >       > area (itemX, itemY, itemWidth, itemHeigh)
+            >
+
+        1. global scope
+            a. Default callback Tags
+                > + `OnEnter`
+                >       > Be executed when every time enter this page (rss ???).
+                > + `onExit`
+                >       > Be executed when every time leave this page (rss ???).
+                > + `onRefresh`
+                >       > Regularly reflesh surface by use `setRefreshTime(ms)`
+                > + `onClick`
+                >       > When user clicks an item or menu, it will be called first.
+                > + `onUserInput`
+                >       > Handles events from user operation or system callback
+
+            a. User definition Tags
+                > user function depend on Script Commands (Methods)
+
+                ```
+                <my_func>
+                    print("WTF");
+                </my_func>
+                ```
+            a. Identify tags
+                > Simply verify this RSS file
+
+                > + `rss`
+                > + `channel`
+                >   > sub-element: `link`
+
+        1. Control Tags
+            a. `script`
+                > - `If it is at global scope, it will be executed only once at the initial stage of the page`
+                > - Not only at global scope, and support multi script sections in a RSS.
+                ```
+                <script>
+                    image_path = "./xxx/11.png";
+
+                    <!-- return or receive to/from system -->
+                    image_path;
+                </script>
+                ```
+
+            a. `autoSelect`
+            a. `showMenu`
+            a. `bookmark`
+                > Let child page to reference their parent page ???
+
+        1. `onUserInput`
+            > Handles events from user operation or system callback </br>
+            > return true: RSS UI take care Event </br>
+            > return false: Event bypass to system
+
+            ```
+                    executeScript("onUserInput")      /   <onUserInput>
+            Background -------- 2 ------------> RSS UI        <!-- Get current Event -->
+              system   <----------- 3 -----------+    \       userEvent = currentUserInput();
+                ^           postMessage()              \
+                |           and convert to             |      UI Behavior with userEvent...
+                |           emun USR_SELECT            |      e.g. move cursor, ...etc.
+                |                                      |      feedback with:
+              1 |                                      |            postMessage("retutn");
+                |                                      |  </onUserInput>
+                |                                      |
+            RemoteCtrl
+
+            ```
+
+            a. `currentUserInput`
+                > RSS UI get the Event from Background system
+                >
+                > + Get the last user input `m_lastUserInput` from render (IMediaDisplay)
+                > + Convert `enum USR_SELECT` to `RSS String`
+
+
+            a. `postMessage`
+                > Post message from RSS UI to Background System
+
+                ```
+                postMessage() in  commonData.cpp, RssParser
+                ps. Convert message to emun USR_SELECT and Pass to Render (CGraphics)
+                    --> CGraphics::postMessage(enum USR_SELECT, ...) in CGraphics.cpp
+                        ps. Convert emun USR_SELECT to struct COMMAND_BUFFER and Pass to CommandManager with type = COMMAND_IMS
+                            --> CommandManager::GetInstance()->SetCommand(COMMAND_IMS, ...) in CommandManager.cpp
+                ```
 
 ## Customer project
 
@@ -650,6 +890,7 @@ sina_merlin2
             > Select default source input
 
     - backlight control
+
 
 + AbstractAP (@#$%....... The architecture is a stupid jok)
     > `AP`: a object which has self message handler and rendered by RSS engine or Self Drawing <br>
@@ -714,7 +955,7 @@ sina_merlin2
 
 #### UI
 
-+ IMS (for what ???)
++ IMS (Internet Media Sharing)
     - handle key ???
 
 + Module

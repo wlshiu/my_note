@@ -48,3 +48,49 @@ dup2(3,1)
 
 
 
+
+1、字符串判斷
+str1 = str2　　　　　　當兩個串有相同內容、長度時為真
+str1 != str2　　　　　 當串str1和str2不等時為真
+-n str1　　　　　　　 當串的長度大於0時為真(串非空)
+-z str1　　　　　　　 當串的長度為0時為真(空串)
+str1　　　　　　　　   當串str1為非空時為真
+2、數字的判斷
+int1 -eq int2　　　　兩數相等為真
+int1 -ne int2　　　　兩數不等為真
+int1 -gt int2　　　　int1大於int2為真
+int1 -ge int2　　　　int1大於等於int2為真
+int1 -lt int2　　　　int1小於int2為真
+int1 -le int2　　　　int1小於等於int2為真
+3 文件的判斷
+-r file　　　　　用戶可讀為真
+-w file　　　　　用戶可寫為真
+-x file　　　　　用戶可執行為真
+-f file　　　　　文件為正規文件為真
+-d file　　　　　文件為目錄為真
+-c file　　　　　文件為字符特殊文件為真
+-b file　　　　　文件為塊特殊文件為真
+-s file　　　　　文件大小非0時為真
+-t file　　　　　當文件描述符(默認為1)指定的設備為終端時為真
+3、複雜邏輯判斷
+-a 　 　　　　　 與
+-o　　　　　　　 或
+!　　　　　　　　非
+
+
+
+
+
+
+
+$#	參數的數目
+$*	代表所有參數
+$?	Exit status of previous command
+$$	PID of this shell's process
+$!	PID of the most recently started backgr
+
+
+
+
+
+
