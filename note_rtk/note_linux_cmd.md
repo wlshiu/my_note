@@ -95,6 +95,28 @@ Linux cmd
 
     ```
 
++ cgdb (need to install)
+    - bind cross gdb in toolchain
+        ```
+        $ cgdb -d xxx/arm-linux-gdb PROGRAM
+        ```
+
+    - `esc` key
+        > move to source code window
+        1. move with `j`, `k`
+
+        1. search with `/` key
+
+        1. `space` key
+            > toggle brackpoint
+
+        1. `o` key
+            > select source file
+            >> `q` key to leave file list
+
+    - `i` key
+        > move to gdb window, and use gdb cmd to operate
+
 
 
 

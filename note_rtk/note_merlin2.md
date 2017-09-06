@@ -701,9 +701,11 @@ sina_merlin2
     1. setDataProvider()
         > Set Graphic's scenario provider (input graphic context, it should be a CRSSApplication)
 
-+ CBaseView (inherent from IMediaDisplay)
++ CBaseView (inherent from IMediaDisplay in IMS_new/)
     > A Base class of Render, it can mutate to *COnePartView*, *CThreePartsView*, *CNullView*, or *CPhotoView*
 
+    1. drawWidgets()
+        > Draw surface
 
 + XML architecture
 
@@ -955,24 +957,25 @@ sina_merlin2
 
 #### UI
 
-+ IMS (Internet Media Sharing)
-    - handle key ???
++ RootAP *Background*
+    > black Background
 
-+ Module
++ MediaCenterAP *Background*
+    > Media Player Background
 
-+ Control
-    - AbstractAP
-        > master controlling flow
++ MenuBarAP *Foreground*
+    > pop up window
+    
+    1. In `MediaCenterAP`, use rss_file://xxx/media_contentMenu.rss
 
++ IMSAP (Internet Media Sharing) *Background*
+    > handle file system and ???
+    
+    1. File List (file manager), use rss_file://xxx/browser_filelist.rss
 
-+ View (Graphic middle ware)
-    > IMS_new folder
-
-    - CBasicView
-
-        1. drawWidgets()
-            > Follow the input CRSSElement to Draw surface
-            >> `CRSSApplication` will load/parse the target RSS file and output a CRSSElement.
++ VideoPlaybackAP *Background*
+    > display video
+    
 
 
 

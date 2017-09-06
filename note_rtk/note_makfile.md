@@ -1,5 +1,39 @@
 Makefile
 ---
++ toolchain
+    - `arm-none-eabi`
+        > 這個是沒有 OS的，不支援那些跟 OS關係密切的函數，比如fork(2)。他使用的是`newlib`這個專用於嵌入式系統的C庫。
+
+        1. 用於編譯 ARM 架構的裸機系統, 包括 ARM Linux 的 boot、kernel，*不適用編譯 Linux 應用 Application*，
+            一般適合 ARM7、Cortex-M 和 Cortex-R 內核的芯片使用，所以不支持那些跟操作系統關係密切的函數，
+            比如fork(2)，他使用的是 `newlib` 這個專用於嵌入式系統的C庫。
+
+            ```
+            e.g. arm-none-eabi-xxx
+            ```
+
+        1. ubuntu
+            ```
+            $ sudo apt-get install libnewlib-arm-none-eabi
+            ```
+
+    - `arm-none-linux-eabi`
+        > 用於Linux的，使用`Glibc`
+
+        1. 主要用於基於ARM架構的Linux系統，可用於編譯 ARM 架構的 u-boot、Linux內核、linux應用等。
+            arm-none-linux-gnueabi基於GCC，使用Glibc庫，經過 Codesourcery 公司優化過推出的編譯器。
+            arm-none-linux-gnueabi-xxx 交叉編譯工具的浮點運算非常優秀。
+            一般ARM9、ARM11、Cortex-A 內核，*帶有 Linux OS的會用到*。
+
+            ```
+            e.g. arm-none-linux-gnueabi-xxx
+            ```
+
+        1. ubuntu
+            ```
+            $ sudo apt-get install gcc-arm-linux-gnueabi
+            ```
+
 + make
     > automake
 
@@ -96,7 +130,7 @@ Makefile
 
     - `if_changed` (in scripts/Kbuild.include)
         > 在當發現規則的依賴有更新, 或者是對應目標的命令行參數發生改變時, 執行後面的語句
-    
+
 + 自動變數
     ```
     [target]: [dependency list]
