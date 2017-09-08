@@ -43,7 +43,7 @@ sina_merlin2
     - reduce linux log
         > `printk` support 8 level log message and control it by `/proc/sys/kernel/printk`. </br>
         > You can use `echo` to change the level in `/proc/sys/kernel/printk`. </br>
-        > Log message will be printed if log level more than `/proc/sys/kernel/printk`
+        > Log message will be printed if log level less than `/proc/sys/kernel/printk`
         >
         > - KERN_EMERG     "0": System is unusable
         > - KERN_ALERT     "1": Action must be taken immediately
@@ -66,7 +66,7 @@ sina_merlin2
         {
             system("rm -rf /usr/local/etc/noaplogprint");
             system("rm -rf /usr/local/etc/foreground");
-            system("echo 8 > /proc/sys/kernel/printk"); // close all kernel message
+            system("echo 8 > /proc/sys/kernel/printk"); // open all kernel message
             system("echo 1 > /sys/realtek_boards/rtice_enable");
             system("sync");
         }
@@ -965,17 +965,17 @@ sina_merlin2
 
 + MenuBarAP *Foreground*
     > pop up window
-    
+
     1. In `MediaCenterAP`, use rss_file://xxx/media_contentMenu.rss
 
 + IMSAP (Internet Media Sharing) *Background*
     > handle file system and ???
-    
+
     1. File List (file manager), use rss_file://xxx/browser_filelist.rss
 
 + VideoPlaybackAP *Background*
     > display video
-    
+
 
 
 
