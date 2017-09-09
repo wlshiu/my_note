@@ -18,6 +18,41 @@ Linux cmd
     1. `-A5` means show the context of 5 lines *after* the current line.
     1. `-B5` means show the context of 5 lines *before* the current line.
 
++ wget
+    ```
+    $ wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
+    ```
+
++ curl
+    1. download
+        ```
+        -o      save as customer name
+        -O      save with orginal name
+
+        $ curl -o 1.jpg http://cgi2.tky.3web.ne.jp/~zzh/screen1.JPG
+        $ curl -O http://cgi2.tky.3web.ne.jp/~zzh/screen1.JPG
+
+        ## advance use
+
+        $ curl -O http://cgi2.tky.3web.ne.jp/~zzh/screen[1-10].JPG  # 連續檔名下載
+
+
+        $ curl -o #2_#1.jpg http://cgi2.tky.3web.ne.jp/~{ zzh,nick }/[001-201].JPG
+
+        自定義文件名的下載:
+        #1 是變量，指的是{ zzh,nick }這部分，第一次取值zzh，第二次取值nick
+        #2 代表的變量，則是第二段可變部分---[001-201]，取值從001逐一加到201
+        這樣，自定義出來下載下來的文件名，就變成了這樣：
+        原來： ~zzh/001.JPG ---> 下載後： 001-zzh.JPG
+        原來： ~nick/001.JPG ---> 下載後： 001-nick.JPG
+        ```
+    1. username/password
+        ```
+        curl -u name:passwd ftp://ip:port/path/file
+            or
+        curl ftp://name:passwd@ip:port/path/file
+        ```
+
 + du
 
     ```
