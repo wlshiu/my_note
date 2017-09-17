@@ -75,6 +75,19 @@ Linux cmd
     $ du -sm .
     ```
 
++ df
+    > 查詢硬碟空間
+    ```
+    $ df -h
+    ```
+
++ dpkg
+    > ubuntu 套件管理
+    ```
+    -l              list all installed packages
+    -L [name]       the package installed path
+    ```
+
 + locate
     > 可以很快速的搜尋檔案系統內是否有指定的檔案
 
@@ -137,10 +150,11 @@ Linux cmd
         ```
 
     - `esc` key
-        > move to source code window
-        1. move with `j`, `k`
+        > move to source code window, it only support *Pure VI* normal mode
+        1. move with `j`, `k`, `h`, `l`, `C-f`(forward), `C-b`((backward), `C-d`, `C-u`
 
         1. search with `/` key
+            > jump to searching match `n`, `N`
 
         1. `space` key
             > toggle brackpoint
@@ -152,6 +166,21 @@ Linux cmd
     - `i` key
         > move to gdb window, and use gdb cmd to operate
 
+    - set progream args
+        ```
+        $ cgdb --args [your progream] [args...]
+        ```
+    - hot key
+        1. `F5`
+            > gdb run
+        1. `F6`
+            > gdb continue
+        1. `F7`
+            > gdb finish (leave sub-function)
+        1. `F8`
+            > gdb next (next line)
+        1. `F10`
+            > gdb step (enter sub-function)
 
 
 

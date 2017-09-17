@@ -172,7 +172,7 @@ VirtualBox
             ```
 
         1. setup
-            a. edit /etc/netboot/interface
+            a. edit /etc/network/interface
                 ```
                 # Add network interface setting
                 auto enp0s8
