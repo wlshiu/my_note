@@ -182,7 +182,17 @@ Linux cmd
         1. `F10`
             > gdb step (enter sub-function)
 
++ strace
+    ```
+    $ strace -e TARGET_FUNC_NAME -f PROGRAM
 
+      # get open so info
+    $ strace -e open -f PROGRAM | grep '\.so'
+
+
+      # 看 /proc/PID/maps 可方便看各別 process、thread 載入的函式庫, 也不會拖慢觀察目標的執行程式, 需配合 gdb 停在該停的地方。
+    $ cat /proc/PID/maps
+    ```
 
 
 

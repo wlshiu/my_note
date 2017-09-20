@@ -4,7 +4,7 @@ Merlin3 RoKu
 + git
     - `git clean -xdf`
 
-+ debug mode
++ debug
     - gdb
 
         ```
@@ -12,6 +12,25 @@ Merlin3 RoKu
 
         $ gdb --args executablename arg1 arg2 arg3
         ```
+
+    - c++filt
+        > recover the megic number of function name
+        ```
+        $ c++filt _ZTIN5boost11regex_errorE
+        ```
+
+    - strace
+        ```
+        $ strace -e TARGET_FUNC_NAME -f PROGRAM
+
+          # get open so info
+        $ strace -e open -f PROGRAM | grep '\.so'
+        ```
+
++ re-mount rootfs to r/w
+    ```
+    $ mount -o rw,remount /
+    ```
 
 
 ## project
@@ -344,6 +363,45 @@ Merlin3 RoKu
 
     $ make
     ```
+
+    - boost
+        > + g++ option `-frtti` (Run Time Type Information)
+        >   > if you use `-frtti`, all project should enable `-frtti`
+        >   > or it will happen run-time error `undefined symbol:` (can't find type info)
+
++ add executable file
+    > use android build system
+
+    - add your LOCAL_MODULE's name for installed
+        > `venus/device/realtek/RealtekSDK/device.mk`
+
+    - install prebuild lib
+        > every *so* file MUST be declared
+
+        ```
+        # Android.mk,
+        include $(CLEAR_VARS)                                   # reset env variables
+        LOCAL_MODULE := libboost_thread                         # target name (LOCAL_SRC_FILES will be renamed to LOCAL_MODULE after insalled)
+        LOCAL_MODULE_TAGS := optional
+        LOCAL_MODULE_CLASS := SHARED_LIBRARIES                  # put to out_path/obj/SHARED_LIBRARIES/
+        LOCAL_MODULE_SUFFIX := $(TARGET_SHLIB_SUFFIX)           # the suffix of LOCAL_MODULE
+        LOCAL_MODULE_PATH := $(PRODUCT_OUT)/system/lib/         # install path
+        LOCAL_SRC_FILES := bin/lib/libboost_thread.so.1.57.0    # source path (relative to LOCAL_PATH)
+        LOCAL_MULTILIB := 32
+        LOCAL_EXPORT_C_INCLUDES := bin/include
+        include $(BUILD_PREBUILT)                               # the kind of handling you want
+
+        include $(CLEAR_VARS)
+        LOCAL_MODULE := libboost_graph
+        LOCAL_MODULE_TAGS := optional
+        LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+        LOCAL_MODULE_SUFFIX := $(TARGET_SHLIB_SUFFIX)
+        LOCAL_MODULE_PATH := $(PRODUCT_OUT)/system/lib/
+        LOCAL_SRC_FILES := bin/lib/libboost_graph.so.1.57.0
+        LOCAL_MULTILIB := 32
+        LOCAL_EXPORT_C_INCLUDES := bin/include
+        include $(BUILD_PREBUILT)
+        ```
 
 ## kernel
     Operation System
