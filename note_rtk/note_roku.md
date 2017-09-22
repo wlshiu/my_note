@@ -2,7 +2,71 @@ Merlin3 RoKu
 ---
 ## misc
 + git
-    - `git clean -xdf`
+    - Remove untracked
+        ```
+        $ git clean -xdf
+        ```
+
+    - `fatal: Unable to find remote helper for 'https' android`
+        > lose git-remote-https
+
+        1. openssl
+            ```
+            $ wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz
+            $ tar -zxf openssl-1.0.2l.tar.gz
+            $ cd openssl-1.0.2l
+            $ ./config enable-shared --prefix=$HOME/.local/usr
+            $ make && make install
+            ```
+
+        1. libssh2
+            ```
+            $ wget https://www.libssh2.org/download/libssh2-1.8.0.tar.gz
+            $ tar -zxf libssh2-1.8.0.tar.gz
+            $ cd libssh2-1.8.0
+            $ ./configure --enable-shared --prefix=$HOME/.local/usr
+            $ make && make install
+            ```
+
+        1. Expat
+            ```
+            $ curl -o expat-2.2.4.tar.bz2 https://sourceforge.net/projects/expat/files/expat/2.2.4/expat-2.2.4.tar.bz2/download
+            $ tar -jxf expat-2.2.4.tar.bz2
+            $ cd expat-2.2.4
+            $ ./configure --enable-shared --prefix=$HOME/.local/usr
+            $ make && make install
+            ```
+
+        1. curl
+            ```
+            $ wget https://curl.haxx.se/download/curl-7.41.0.tar.gz
+            $ tar -zxf curl-7.41.0.tar.gz
+            $ cd curl-7.41.0
+            $ ./configure --enable-shared --prefix=$HOME/.local/usr
+            ```
+
+        1. git
+            ```
+            $ wget https://www.kernel.org/pub/software/scm/git/git-2.9.5.tar.xz
+            $ tar -xJf git-2.9.5.tar.xz
+            $ cd git-2.9.5
+            $ ./configure --prefix=$HOME/.local/usr --with-curl=$HOME/.local/usr
+            $ make && make insall
+
+            # check below libs exist in git-core/
+            #   git-remote-http
+            #   git-remote-https
+            #   git-remote-ftp
+            #   git-remote-ftps
+
+              # need to exort private git-core
+            export PATH="$PATH:$HOME/.local/usr/libexec/git-core/"
+            ```
+
++ re-mount rootfs to r/w
+    ```
+    $ mount -o rw,remount /
+    ```
 
 + debug
     - gdb
@@ -27,10 +91,15 @@ Merlin3 RoKu
         $ strace -e open -f PROGRAM | grep '\.so'
         ```
 
-+ re-mount rootfs to r/w
-    ```
-    $ mount -o rw,remount /
-    ```
++ gcc-5 and gcc-4
+
+    - `libstdc++`
+        > A *Dual ABI* is provided by the library in gcc-5.
+        >   >  gcc-5 Full support C++11 and the old ABI (gcc-4) still be supported with some tips.
+
+        1. Is it possible for `GCC 5.x` to link with the library compiled by `GCC 4.x`?
+            > Yes, the old ABI can be used by defining the macro `_GLIBCXX_USE_CXX11_ABI` to `0`
+                before including any C++ standard library headers.
 
 
 ## project
@@ -100,6 +169,24 @@ Merlin3 RoKu
 
 ## GStreamer (GST)
     Applicatoin Program
+
++ definition
+    - system time clock (STC)
+        > usually 90KHz
+
+    - base time
+        > start time of playing
+
+    - stream time
+        > media file contect duration (fix)
+
+    - running time (float)
+        > playing duration, Forward/Backward/Play/Pause will impact it
+
+        ```
+        running time = STC - base_time
+        ```
+
 
 + Architecture
     ```
@@ -194,6 +281,10 @@ Merlin3 RoKu
             +---------------------------------------------------------------+
             ```
 
+        1. GstBus
+            > Asynchronous message bus subsystem
+            >> Message Manager between elements
+
     - Inheritance
         ```
                       GObject                                    GstObject
@@ -208,6 +299,67 @@ Merlin3 RoKu
 
         ```
 
+        1. [Object Hierarchy] (https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/index.html)
+            ```
+            GObject
+            ╰── GInitiallyUnowned
+                ╰── GstObject
+                    ├── GstAllocator
+                    ├── GstPad
+                    │   ╰── GstProxyPad
+                    │       ╰── GstGhostPad
+                    ├── GstPadTemplate
+                    ├── GstPluginFeature
+                    │   ├── GstElementFactory
+                    │   ├── GstTracerFactory
+                    │   ├── GstTypeFindFactory
+                    │   ├── GstDeviceProviderFactory
+                    │   ╰── GstDynamicTypeFactory
+                    ├── GstElement
+                    │   ╰── GstBin
+                    │       ╰── GstPipeline
+                    ├── GstBus
+                    ├── GstTask
+                    ├── GstTaskPool
+                    ├── GstClock
+                    │   ╰── GstSystemClock
+                    ├── GstControlBinding
+                    ├── GstControlSource
+                    ├── GstPlugin
+                    ├── GstRegistry
+                    ├── GstBufferPool
+                    ├── GstTracer
+                    ╰── GstTracerRecord
+
+
+            GInterface
+            ├── GstChildProxy
+            ├── GstURIHandler
+            ├── GstPreset
+            ╰── GstTagSetter
+
+
+            GBoxed
+            ├── GstMemory
+            ├── GstQuery
+            ├── GstStructure
+            ├── GstCaps
+            ├── GstCapsFeatures
+            ├── GstMessage
+            ├── GstEvent
+            ├── GstBuffer
+            ├── GstBufferList
+            ├── GstSample
+            ├── GstContext
+            ├── GstDateTime
+            ├── GstTagList
+            ├── GstSegment
+            ├── GstAllocationParams
+            ├── GstToc
+            ├── GstTocEntry
+            ╰── GstParseContext
+
+            ```
 
 + Compile
     ```
@@ -280,7 +432,6 @@ Merlin3 RoKu
             > Duplicate and register *Plugin_Description* to list
             >> It will record full path of plugin
 
-
     - self plugin
         > offical support template
 
@@ -295,6 +446,129 @@ Merlin3 RoKu
         1. instance `plugin_init()`
         1. use c-tamplate `GST_PLUGIN_DEFINE` to declare and extern your *Plugin_Description*
         1. implement features of self plugin
+
+
+    - plugin concept
+        ```
+        GObject
+        ╰── GInitiallyUnowned
+            ╰── GstObject
+                ╰── GstPluginFeature
+                    ╰── GstElementFactory
+        ```
+
+        1. A plugin (*so* file) owns a `gst_plugin_dest` as a enter pointer.
+        1. Use `gst_plugin_dest->plugin_init()` to check multi-elements in this plugin.
+        1. Every element use `gst_element_register()` to register element *Name* and *descriptor*
+
+        1. definition
+            a. *GstRegistry*
+                > Abstract base class for management of GstPlugin objects </br>
+                > It records registered plugins by GstPlugin and GstPluginFeature.
+
+            a. *GstPlugin*
+                > Container for features loaded from a shared object module (.so)
+
+            a. *GstPluginFeature*
+                > Base class for contents of a GstPlugin
+
+            a. *GstElementFactory*
+                > A factory which create special GstElements
+
+            a. *GstElement*
+                > Abstract base class for all pipeline elements
+
+        1. flow
+            ```
+            gst_plugin_load_file()
+                -> gst_plugin_register_func()
+                    -> plugin_init()
+            ```
+
+            a. gst_plugin_load_file()
+                > + Search plugin description from *so* file
+                > + Create a plugin object (handle: hPlugin)
+                > + Assine attributes of hPlugin (follow plugin description)
+                > + call `gst_plugin_register_func()`
+
+            a. gst_plugin_register_func()
+                > + Authenticate the attributes of hPlugin
+                > + call `plugin_init()` to initial this plugin (*so* file)
+
+            a. plugin_init()
+                > Common interface in each plugin (*so* file).
+                >   > Actually, it call `gst_element_register()` to assine descriptors of elements/bins to hPlugin.
+
+            a. gst_element_register()
+                > Every inherits from `GstElement` can use this function
+
+                ```
+                GObject
+                ╰── GInitiallyUnowned
+                    ╰── GstObject
+                        ╰── GstElement
+                            ╰── GstBin
+                                ╰── GstPipeline
+                ```
+
+
++ source codes
+    > basic request gstreamer/gst-plugins-base/gst-plugins-good
+        ```
+          # simple test tone
+        $ gst-launch-1.0 -vm audiotestsrc ! audioconvert ! audioresample ! osssink
+        ```
+
+    - gstreamer-1.12.3
+
+        ```
+        ├── gst             # master core, and instance element factory
+        ├── libs            # parent class of elements
+        ├── plugins         # plugin architecture and support basic plugins
+        ├── po              # multi-language
+        ├── tests           # unit test
+        ├── tools           # application program
+        ```
+
+
+    - gst-plugins-base-1.12.3
+        ```
+        ├── ext             # elements depend on thire-party libs
+        ├── gst             # API suppored by plugin base
+        ├── gst-libs        # parent class of elements
+        ├── po              # multi-language
+        ├── sys             # elements depend on system
+        ├── tests           # unit test
+        ├── tools           # application program
+        ```
+
+        - playback
+            1. Inheritance
+                ```
+                bin (parent)
+                -> pipeline
+                    -> playbasebin
+                        -> playbin
+                ```
+
+            1. *playbin *
+                > stable
+                >> `gstplaybin.c`
+                >> `gstplaybasebin.c`
+                >> `gstdecodebin.c`
+                >> `gststreaminfo.c`
+                >> `gststreamselector.c`
+                >> `gstplaymarshal.c`
+
+            1. *playbin2*
+                > unstable
+                >> `gstplaybin2.c`
+                >> `gstplaysink.c`
+                >> `gstdecodebin2.c`
+
+
+    - gst-plugins-good-1.12.3
+
 
 + gst-rtk-test
     > rtk self player

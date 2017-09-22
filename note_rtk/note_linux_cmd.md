@@ -11,6 +11,10 @@ Linux cmd
         a. `{}` means the output of find cmd
         a. `\;` means the end of `-exec`
 
++ mkdir
+    ```
+    -p:     可以是一個路徑名稱。此時若路徑中的某些目錄尚不存在,加上此選項後,系統將自動建立好那些尚不存在的目錄
+    ```
 + grep
     1. `-n` means line number
     1. `-H` means show the file path
@@ -149,6 +153,36 @@ Linux cmd
         $ cgdb -d xxx/arm-linux-gdb PROGRAM
         ```
 
+    - trace share library
+        > *so* file need use `CFLAGS="-g -O0"`
+
+        1. shared or sharedlibrary
+            > list so libs which included
+
+            ```
+            (gdb) info sharedlibrary
+            ```
+
+        1. `LD_LIBRARY_PATH`
+            > define the search path for *so* files
+
+        1. `LD_PRELOAD`
+            > define the soruce code path
+
+        1. pre-set brackpoint for un-loading *so*
+            > when gdb run-time load *so*, it will check the brackpoint after loading *so*
+
+            ```
+            (gdb) break xxx.cpp:123
+            ```
+
+        1. set *so* search path
+            > set solib-search-path SO_PATH
+
+            ```
+            (gdb) set solib-search-path /home/nfs/arm/lib:/home/nfs/arm/usr/lib
+            ```
+
     - `esc` key
         > move to source code window, it only support *Pure VI* normal mode
         1. move with `j`, `k`, `h`, `l`, `C-f`(forward), `C-b`((backward), `C-d`, `C-u`
@@ -193,6 +227,62 @@ Linux cmd
       # 看 /proc/PID/maps 可方便看各別 process、thread 載入的函式庫, 也不會拖慢觀察目標的執行程式, 需配合 gdb 停在該停的地方。
     $ cat /proc/PID/maps
     ```
+
++ diff
+    ```
+    -a :    將所有檔案都視為文字檔
+    -r :    遞歸。設置後diff會將兩個不同版本源代碼目錄中的所有對應文件全部都進行一次比較，包括子目錄文件。
+    -N :    選項確保補丁文件將正確地處理已經創建或刪除文件的情況。
+    -u :    輸出每個修改前後的3行，也可以用-u5等指定輸出更多上下文。
+    --exclude=".svn":       skip directory
+    -E, -b, -w, -B, --strip-trailing-cr :   忽略各種空白，可參見文檔，按需選用。
+
+
+      # In root dir
+    $ diff -Nur ./test0 ./test1 > test.patch
+    ```
+
+
++ patch
+    ```
+    -p Num: 忽略幾層文件夾。
+                以 /usr/src/linux 為例, 若
+                    -p0 就是不取消任何路經
+                    -p1 則將 / 取消, 得 usr/src/linux
+                    -p2 則是將 /usr/ 取消, 得 src/linux
+                再以 src/linux 為例:
+                    -p0 依然為 src/linux
+                    -p1 則為 linux
+    -E:     選項說明如果發現了空文件，那麼就刪除它
+    -R:     取消打過的補丁。
+    --dry-run:      pre-verify
+
+      # In root dir
+    $ patch -p0 < test.patch
+        or
+    $ patch -i test.patch
+
+
+    if show message:
+    can't find file to patch at input line 1
+    Perhaps you should have used the -p or --strip option?
+    The text leading up to this was:
+    --------------------------
+    |--- a/CPP/7zip/UI/Agent/Agent.cpp
+    |+++ b/CPP/7zip/UI/Agent/Agent.cpp
+    --------------------------
+    File to patch:
+
+    因為patch 檔是用兩個目錄比較的方式產生的，可以看到原始碼分別放在 a 和 b 兩個目錄下做比較，
+    但我們的原始碼並沒有 a 和 b 目錄，所以 patch 就搞不懂狀況了...
+
+    這時要多加一個 -p1 的參數，代表要跳過一層目錄結構，
+    如果 patch 檔產生時是在更深層的目錄結構的話，可能就會用到 -p2, -p3, ...
+
+    $ patch -p1 -i test.patch
+    ```
+
+
 
 
 
