@@ -516,7 +516,7 @@ Merlin3 RoKu
     > basic request gstreamer/gst-plugins-base/gst-plugins-good
         ```
           # simple test tone
-        $ gst-launch-1.0 -vm audiotestsrc ! audioconvert ! audioresample ! osssink
+        $ gst-launch-1.0 -vm audiotestsrc ! autoaudiosink
         ```
 
     - gstreamer-1.12.3
