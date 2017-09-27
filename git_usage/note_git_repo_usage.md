@@ -70,6 +70,12 @@
     $ git diff --name-only --cached     # get the staged files list
     ```
 
+- Git stash
+    ```
+    $ git stash         # 暫存目前所有檔案狀態到 stack, 並 checkout 到 HEAD (概念上就是保存一份 patch)
+    $ git stash pop     # 將暫存的檔案狀態 pop出來 (將保存的 patch打進來)
+    ```
+
 - Git blame
 
     ```
