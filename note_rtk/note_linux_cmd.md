@@ -1,6 +1,11 @@
 Linux cmd
 ---
 
++ printenv
+    ```
+    會顯示所有現行環境變數
+    ```
+
 + find
     1. `-exec`
 
@@ -200,6 +205,12 @@ Linux cmd
     - `i` key
         > move to gdb window, and use gdb cmd to operate
 
+    - `_` (on source window)
+        > Shrink source window 25%
+
+    - `+` (on source window)
+        > Grow source window 25%
+
     - set progream args
         ```
         $ cgdb --args [your progream] [args...]
@@ -282,7 +293,30 @@ Linux cmd
     $ patch -p1 -i test.patch
     ```
 
++ pushd/popd
+    ```
+    pushd  [directory] # cd to directory and push directory name to stack
+
+    $ pushd ./tt  # cd 到./tt 並將 ./tt 放到 directory stack裡
+
+    popd    # cd to popped directory
 
 
+    $ pushd ~/a
+    $ pushd ~/b
+    $ pushd ~/c
+    $ cd ~
 
+    | a |  First In Last Out
+    +---+
+    | b |
+    +---+
+    | c |
+    +---+
+
+    $ popd
+    $ pwd
+    ~/c
+
+    ```
 

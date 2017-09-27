@@ -218,7 +218,9 @@ Merlin3 RoKu
             +-------------+   +-------------+   +-----------+
             | source elem |   | filter elem |   | sink elem |
             |            src-sink          src-sink         |
-            +-------------+   +-------------+   +-----------+
+            +-------------+ ^ +-------------+   +-----------+
+                            |
+                     view-point of pad (src/sink)
 
             ```
 
@@ -245,6 +247,8 @@ Merlin3 RoKu
             > Capability (attribute) of a element
 
         1. GstBin
+            > Base class and element that can contain other elements (Container)
+
             > - It is an element subclass and acts as a *Container* for other elements </br>
             >   so that multiple elements can be combined into one element.
             > - A bin can have its own source/sink pads by *ghost pad* one or more of its member's pads to itself.
@@ -261,6 +265,8 @@ Merlin3 RoKu
             ```
 
         1. GstPipeline
+            > Top-level bin with *clocking* and *bus management* functionality.
+
             > It is a special sub-set of Bin and usually a toplevel bin and provides all of its members with a clock, </br>
             > it also provides a toplevel GstBus
 
@@ -298,6 +304,8 @@ Merlin3 RoKu
         GstPipeline
 
         ```
+        1. Parent Object -> take care interface
+        1. Child Object  -> take care private attributes/methods
 
         1. [Object Hierarchy] (https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/index.html)
             ```
@@ -397,6 +405,13 @@ Merlin3 RoKu
     - glib
         1. dynamic link support
             > `g_module_open()`, `g_module_symbol`
+
+        1. create a object
+            a. `static void gst_XXX_class_init()`
+                > Declare members of this object
+
+            a. `static void gst_XXX_init()`
+                > the constructor of this object
 
     - plugin register
         > Use *Dynamic link* `*.so` file to get the *Plugin_Description* symbols </br>
@@ -511,6 +526,91 @@ Merlin3 RoKu
                                 ╰── GstPipeline
                 ```
 
+    - pad
+        > Pre-process the data stream, e.g. buffering, alignment, re-order byte, ..., etc.
+        > + static or always pad `GST_PAD_AWAYS`
+        >   > appended when construction (always exist)
+        >
+        > + Dynamic or sometimes pads
+        >   > run-time append, e.g. demux
+        >
+        > + Request pads
+        >   > manually add (feature enable/disable), e.g. streaming and capturing (element_tee)
+
+        1. GstPadTemplate
+            > Describe the media base type of a pad.
+            > + When create a element, </br>
+            >   we declare this members of element object in `static void gst_XXX_class_init()`, </br>
+            >   which will register pads base on GstPadTemplate
+            >
+            >   > - `gst_element_class_add_static_pad_template()`
+            >   >   > 1. create a `GstPadTemplate`
+            >   >   > 1. assine attributes following `struct GstStaticPadTemplate`
+            >   >   > 1. append `GstPadTemplate` to *pad list* of this element
+            >
+            > + You can define the self capabilities (struct GstStaticPadTemplate) and assine to GstPadTemplate
+            >
+
+        1. Caps Negotiation
+            > When link 2 elements, need to negotiate the capabilities of pads between elements.
+
+            a. up-stream trigger down-stream
+            a. elem_1 query elem_2 and elem_2 report the caps
+            a. elem_1 accepta cap (fixed_caps) and post to elem_2
+            a. elem_2 notify yes
+            a. elem_1 push event (ready to receive) to elem_2
+            a. elem_1 start trasmision
+
+
+            ```
+                            up -----> down stream
+
+                element_1                                                        element_2
+                    |   gst_pad_peer_query_caps(srcpad, filter)                     |
+                    +--------------------------------------------->                 |
+                    |                                                caps           |
+                    |            <------------------------------------------------- +
+                    |   gst_pad_peer_accept_caps(srcpad, fixed_caps)                |
+            srcpad  +----------------------------------------->                     | sinkpad
+                    |                                                 yes           |
+                    |              <------------------------------------------------+
+                    |   gst_pad_push_event(srcpad, gst_event_new_caps(fixed_caps))  |
+                    +----------------------------------------->                     |
+                    |   transmit data                                               |
+                    +----------------------------------------->                     |
+            ```
+
+        1. Re-configure
+            > `GST_EVENT_RECONFIGURE` event is used to re-negotiate from down-stream
+
+            a. down-stream trigger up-stream re-negotiation
+            a. elem_2 push event `GST_EVENT_RECONFIGURE` to elem_1
+            a. elem_1 re-query capabilities
+            a. elem_2 only repot fixed_caps
+            a. elem_1 push event (ready to receive) to elem_2 and start transmition
+
+            ```
+                            up -----> down stream
+
+                element_1                                                        element_2
+                    |              gst_pad_peer_accept_caps(sinkpad, fixed_caps)    |
+                    |          <----------------------------------------------------+
+                    |   yes                                                         |
+                    +--------------------------------------------->                 |
+                    |    gst_pad_push_event(srcpad, gst_event_new_reconfigure())    |
+            srcpad  |          <----------------------------------------------------+ sinkpad
+                    |                                                               |
+                    |   gst_pad_peer_query_caps(srcpad, filter)                     |
+                    +--------------------------------------------->                 |
+                    |                                                fixed_caps     |
+                    |            <------------------------------------------------- +
+                    |                                                               |
+                    |   gst_pad_push_event(srcpad, gst_event_new_caps(fixed_caps))  |
+                    +----------------------------------------->                     |
+                    |   transmit data                                               |
+                    +----------------------------------------->                     |
+            ```
+
 
 + source codes
     > basic request gstreamer/gst-plugins-base/gst-plugins-good
@@ -611,6 +711,37 @@ Merlin3 RoKu
 
 ## venus
     middleware (HAL layer)
+
++ directory
+    ```
+    venus
+        ├── bionic          # android vresion libc/libstdc++/libm/libdl (lite version from gnu)
+        ├── build           # core of android build system
+        ├── device          # vender code
+        ├── external        # exteranl lib
+        ├── frameworks      # the implementation of key services such as the System Server
+        ├── hardware
+        ├── prebuilts       # toolchain
+        ├── roku-root       # customer's rootfs
+        ├── rtk-bionic      # extract from bionic for tvservice when use glibc
+        ├── system          # source code files for the core Android system (for tvservice)
+    ```
+
+    - bionic
+        > The standard C library (libc) developed by Google for its Android OS.
+        > + Lite glibc and not fully support POSIX
+        > + more faster and smaller
+
+    - rtk-bionic
+        > extract some funcions from lib-bionic
+        >> Because lib-bionic will conflict with glibc, but tvserver will use some special API in lib-bionic.
+
+        ```
+                     fire                           fire
+        system/init ------> system/servicemanager -------> tvservice
+        ```
+
+
 
 + compile
     ```
