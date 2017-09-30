@@ -170,6 +170,11 @@ Merlin3 RoKu
 ## GStreamer (GST)
     Applicatoin Program
 
+    ```
+    # x86 dependency libs
+    $ sudo apt-get install libogg-dev libopus-dev libtheora-dev liborc-dev
+    ```
+
 + definition
     - system time clock (STC)
         > usually 90KHz
@@ -617,6 +622,8 @@ Merlin3 RoKu
         ```
           # simple test tone
         $ gst-launch-1.0 -vm audiotestsrc ! autoaudiosink
+
+        $ gst-launch-1.0.exe -v playbin3 uri=file:///home/xxx/splitvideo01.ogg
         ```
 
     - gstreamer-1.12.3
