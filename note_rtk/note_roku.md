@@ -191,7 +191,11 @@ Merlin3 RoKu
         ```
         running time = STC - base_time
         ```
+    - preroll
+        > pre-decode bit stream to raw data
 
+    - buffering
+        > queue the bit stream
 
 + Architecture
     ```
@@ -373,6 +377,21 @@ Merlin3 RoKu
             ╰── GstParseContext
 
             ```
+
+    - concept
+        1. A element has many handles and a handle may have sub-handles.
+            > e.g. GstPad srcpads/sinkpads, GstBus bus, GstClock clock, ...etc.
+        1. Every handle maps to spacial interface
+            > e.g. GstPad => gst_pad_xxx(), GstBus => gst_bus_xxx()
+        1. Every interface link to target method
+            ```
+                                        gst_base_src_query()
+            interfacd gst_pad_query() --------------------------> gst_video_test_src_query()
+            ```
+
+        1. Create object
+            a. first, create parent object and fill attributes/methods
+            a. Then, create child object and override attributes/methods or not
 
 + Compile
     ```
@@ -616,12 +635,167 @@ Merlin3 RoKu
                     +----------------------------------------->                     |
             ```
 
+        1. chain and queue
+            > push mode: gst_XXX_chain </br>
+            > pull mode: gst_XXX_loop
+
+            a. PUSH mode
+                ```
+                gst_pad_push()      # src pad of the element at up-stream
+                    -> (*chainfunc)()   # element (down-stream) support chain fucnion and attach to sink pad
+                        -> element handle data, e.g. dumuxing, parsing, ...etc.
+                ```
+
+                i. gst_pad_push()
+                    > src pad of element at up-stream push data (GstBuffer format) with gst_pad_push()
+                    >> gst_pad_push() will call `chainfunc()`, which support from element of down-stream and attach to sink pad
+
+                i. chainfunc()
+                    > pre-process data (GstBuffer), e.g. parsing GstBuffer format, buffering, ...etc.
+
+                    ```
+                    file src pad gst_pad_push()
+                        -> gst_xxx_demux_chain()    # chainfunc
+                            -> gst_xxx_parse()
+                                -> dumux src pad gst_pad_push()
+                                    -> gst_xxx_dec_handle_frame()   # element_decoder
+                                        or
+                                    -> gst_xxx_decoder_chain()
+
+
+                    gst_xxx_decoder_chain()
+                        -> gst_xxx_decoder_sink_setcaps()
+                            -> (*set_format)()      # notify the H/W module (subclass) data format
+                            -> (*handle_frame)()    # notify the H/W module (subclass) to work
+
+                    ```
+
+            a. PULL mode
+
+                i. gst_pad_pull_range()
+
+                ```
+                demux chang state
+                    -> gst_pad_start_task()
+                        -> gst_xxx_loop()
+                            -> gst_pad_pull_range()  # get GstBuffer from file src pad at up-stream
+                                -> gst_xxx_parse()
+                                    -> demux src pad gst_pad_push()
+                                        -> gst_xxx_dec_handle_frame()   # element_decoder
+
+                gst_xxx_loop()
+                    -> gst_xxx_get_range()
+                        -> (create)()
+
+
+                ```
+    - events
+        1. gst_xxx_sink_event()
+            > sink receive events from up-stream
+
+        1. gst_xxx_src_event()
+            > src receive events from down-stream
+
+    - decoder (gstaudiodecoder.c/gstvideodecoder.c )
+        > Interface of decoder for gstreamer core system
+
+        ```
+                            +--------------------+
+                            | gstaudiodecoder    |              OutSink
+            +---------+     | gstvideodecoder    |           +-----------+
+            | demuxer | --> |                    |           | videosink |
+            +---------+     | +----------------+ | --------> | audiosink |
+                            | | CODEC          | |           +-----------+
+                            | | - H/W module   | |
+                            | | - ffmpeg       | |
+                            | +----------------+ |
+                            +--------------------+
+
+        ```
+        1. general case
+            a. demuxer      : src pad gst_pad_push()
+            a. gst decoder  : gst_audio_decoder_chain() receive GstBuffer from *demuxer*
+            a. gst decoder  : gst_audio_decoder_sink_setcaps()
+            a. gst decoder  : (*set_format)() to *CODEC*
+            a. CODEC        : setup codec format
+            a. gst decoder  : (*handle_frame)() to *CODEC*
+            a. CODEC        : gst_audio_decoder_set_output_format() to *gst decoder*
+            a. CODEC        : gst_audio_decoder_negotiate() to *gst decoder*
+            a. gst decoder  : gst_pad_set_caps()/ GST_EVENT_CAPS to *OutSink*
+            a. gst decoder  : gst_query_new_allocation() to *OutSink*
+            a. OutSink      : report allocator to *gst decoder*
+            a. CODEC        : gst_audio_decoder_allocate_output_buffer() to *gst decoder*
+            a. gst decoder  : report GstBuffer to *CODEC*
+            a. CODEC        : decode bit stream and put decoded data into GstBuffer
+            a. CODEC        : gst_audio_decoder_finish_frame() to *gst decoder*
+            a. gst decoder  : src pad gst_pad_push() to *OutSink*
+
+        1. omx case
+            > omx define self component state
+            >> H/W module will link to libomx_core.so (venus/hardware/realtek/omx-il-rtk/). </br>
+            >> Actually, libomx_core.so implement rpc between Host and CODEC processor
+
+
+            ```
+            +---------------------------------------+
+            | gstaudiodecoder/ gstvideodecoder      |
+            |                                       |
+            | +-----------------------------------+ |
+            | | CODEC gstomx                      | |
+            | |  - GstOMXAudioDec                 | |
+            | |  - GstOMXVideoDec                 | |
+            | |                                   | |
+            | |  +----------------------------+   | |
+            | |  | Audio/ Video container     |   | |
+            | |  |                            |   | |
+            | |  | - GstOMXAACDec             |   | |
+            | |  | - GstOMXMP3Dec             |   | |
+            | |  | - GstOMXH264Dec            |   | |
+            | |  | - GstOMXH265Dec            |   | |
+            | |  |                            |   | |
+            | |  | +-----------------+        |   | |
+            | |  | | OMX components  |        |   | |
+            | |  | | real H/W module |        |   | |
+            | |  | +-----------------+        |   | |
+            | |  +----------------------------+   | |
+            | +-----------------------------------+ |
+            +---------------------------------------+
+
+            ```
+
+            a. gst decoder  : (*set_format)() to *CODEC (gstomx)*
+            a. CODEC        : setup codec format
+                > e. gstmox           : pass to *GstOMXAudioDec*
+                > e. GstOMXAudioDec   : gst_omx_acc_dec_set_format() to *GstOMXAACDec*
+                > e. GstOMXAACDec     : OMX_IndexParamAudioAac() to *H/W module*
+                > e. GstOMXAudioDec   : change OMX state OMX_StateLoaded to OMX_StateIdle
+                > e. GstOMXAudioDec   : gst_omx_port_allocate_buffers() to *H/W module*
+                > e. H/W module       : report OMX_CommandStateSet is OMX_StateIdle
+                > e. GstOMXAudioDec   : change OMX state OMX_StateIdle to OMX_StateExecuting
+                > e. H/W module       : report OMX_CommandStateSet is OMX_StateExecuting
+
+
+            a. gst decoder  : (*handle_frame)() to *CODEC (gstomx)*
+                > e. gstmox                 : pass to *GstOMXAudioDec*
+                > a. GstOMXAudioDec         : gst_pad_start_task() with `gst_omx_audio_dec_loop()`
+                > a. gst_omx_audio_dec_loop : send an empty buffer to an output port of *H/W module* with `OMX_FillThisBuffer()`
+                > a. GstOMXAudioDec         : launch H/W module with `OMX_EmptyThisBuffer()`
+                > a. gst_omx_audio_dec_loop : wait for `OMX_FillThisBufferDone`
+
 
 + source codes
     > basic request gstreamer/gst-plugins-base/gst-plugins-good
         ```
+          # look up plugins
+        $ gst-ispect-1.0
+
           # simple test tone
         $ gst-launch-1.0 -vm audiotestsrc ! autoaudiosink
+
+          # work but can't see anything ....(Need to install gst-libav)
+        $ gst-launch-1.0 videotestsrc ! videoconvert ! autovideosink
+
+        $ gst-launch-1.0 filesrc location="test.mp3" ! decodebin ! autoaudiosink
 
         $ gst-launch-1.0.exe -v playbin3 uri=file:///home/xxx/splitvideo01.ogg
         ```
@@ -668,14 +842,25 @@ Merlin3 RoKu
                 >> `gstplaymarshal.c`
 
             1. *playbin2*
-                > unstable
+                > stable
                 >> `gstplaybin2.c`
                 >> `gstplaysink.c`
                 >> `gstdecodebin2.c`
 
+            1. *playbin3*
+                >
+                >> `gstplaybin3.c`
+                >> `gstplaysink.c`
+                >> `gstdecodebin3.c`
 
     - gst-plugins-good-1.12.3
-
+        ```
+        ├── ext
+        ├── gst
+        ├── gst-libs
+        ├── sys
+        └── tests
+        ```
 
 + gst-rtk-test
     > rtk self player
@@ -686,7 +871,131 @@ Merlin3 RoKu
 
     ```
     - playbin3 (gst-plugins-base/gst/playback/gstplayback.c)
+
+        ```
+
+                                element (record the bin state after iterate)
+                   bin ------+    ^
+                    ^        |    |
+                    |        |    |   Iteratively contrel
+                pipeline     |   bin -----------------------+     element
+                    ^        |    ^                         |        ^
+                    |        v    |                         |        |
+        app --> playbin3    playsink                        +--> streamsynchronizer
+                    ^
+                    |
+          (add bin) |
+                    |      bin --------------+
+                    |       ^                |
+                    |       |                |
+                    +--- decodebin           +--> multi-queue
+                    |
+                    |        bin --------------+
+                    |         ^                |
+                    |         |                |
+                    +--- urisourcebin          +--> typefind
+                              ^
+                              |                                                  
+                        add   |                                                  
+                              |                                                  
+                            basesrc                                                    
+                                                                                
+                                                                                
+                                                                                
+                    
+                    
+                    
+
+        setup_next_source()
+            -> activate_decodebin()     # create decodebin
+                -> make_or_reuse_element()
+                    -> gst_element_factory_make(decodebin3)
+
+            -> activate_group()         # create a/v/text sink
+                -> make_or_reuse_element()
+                    -> gst_element_factory_make(urisourcebin)
+                -> gst_element_set_state(urisourcebin)
+                    -> setup_source()
+                        -> setup_typefind()
+                            -> gst_element_factory_make(typefind)
+                                # gst_type_find_element_activate_sink() will create a task 'gst_type_find_element_loop()'
+
+        ```
+
         > demux and decoder
+
+        > + *decodebin3*
+        >   > Process bit stream, e.g. demuxing, CODEC parsing/decoding
+        >   >   > Add element multiqueue when construct.
+
+        > + *playsink*
+        >   > Process frame data of A/V/Text, e.g. A/V sync, image/tone tuning
+        >   >    > Add element streamsynchronizer when construct.
+
+        > + *urisourcebin*
+        >   > A bin element for accessing URIs in a uniform manner.
+        >
+        >   - element *typefind*
+        >       > Determines the media-type of a stream and set it's src pad caps to this media-type
+        >       
+        >       1. when activate_pads `gst_type_find_element_activate_sink()`, it will create a task `gst_type_find_element_loop()`
+        >           > `gst_type_find_element_loop()` will compare the *file extension* and the supported caps of pads </br>
+        >           > and emit signal `have-type` to notify *urisourcebin*
+        >
+        >       1. If get the mapping caps of pad, `gst_type_find_element_loop()` will pull data from file `gst_pad_pull_range()`.
+
+
+
+        1. gst_bin_change_state_func()
+            > *Instance* of bin change state
+
+            ```
+            gst_bin_change_state_func()
+                -> gst_bin_element_set_state()
+            ```
+
+        1. gst_bin_element_set_state()
+            > *Interface* of method of a bin element </br>
+            > Iteratively, Set state to all elements in a Bin.
+
+            ```
+            gst_bin_element_set_state()
+                -> gst_element_set_state()
+                -> (*change_state)()
+                    # gst_element_change_state_func()
+            ```
+
+        1. gst_element_set_state()
+            > *Interface* of method of an element
+
+            ```
+            gst_element_set_state()
+                -> (*set_state)()
+                    # gst_element_set_state_func()
+                        -> gst_element_change_state()
+            ```
+
+        1. gst_element_set_state_func()
+            > *Instance* of set state.
+
+        1. gst_element_change_state()
+            > *Interface* of method of an element and check state finish or not
+            > + if state finish => return
+            > + if state continue => `gst_element_continue_state()`
+
+            ```
+            gst_element_change_state()
+                -> (*change_state)()
+                    # gst_element_change_state_func() or
+                    # gst_bin_change_state_func()
+            ```
+
+        1. gst_element_change_state_func()
+            > *Instance* of change state
+            > + control state machine
+            > + activate pads `gst_element_pads_activate()`
+
+
 
     - dvovidoesink (gst-plugins-rtk/ext/directvo/gstdvoplugin.c)
         > vframe scheduler, control video frame display/repeat/drop
@@ -713,8 +1022,38 @@ Merlin3 RoKu
         1. `--gst-plugin-spew`
             > output error message of loading plugin
 
+    - memory leak check
+        1. enable debug message about *GST_BUFFER*
+            ```
+            export GST_DEBUG=GST_BUFFER:5
+            ```
 
+        1. find create buffer function *gst_buffer_init()* and save to file 1
+            ```
+            $ grep gst_buffer_init logfile | cut -d'x' -f 3 | sort | uniq -c > 1
+            $ cat 1
+            # allocate/release times    address
+                1823                    143f518
+                1824                    143f570
+                 682                    143f780
+                 682                    145e808
+                   2                    145e980
+            ```
 
+        1. find destroy buffer function *gst_buffer_finalize()* and save to file 2
+            ```
+            $ grep gst_buffer_finalize logfile | cut -d'x' -f 3 | sort | uniq -c > 2
+            $ cat 2
+            # allocate/release times    address
+                1823                    143f518
+                1824                    143f570
+                 682                    143f780
+                 681                    145e808
+                   1                    145e980
+            ```
+
+        1. diff allocate/release times between *file 1* and *file 2*
+            > search the target address info in logfile
 
 ## venus
     middleware (HAL layer)

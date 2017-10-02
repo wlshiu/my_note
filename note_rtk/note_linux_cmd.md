@@ -227,6 +227,12 @@ Linux cmd
         1. `F10`
             > gdb step (enter sub-function)
 
+    - multi-thread
+        1. thread list
+            ```
+            (gdb) info threads
+            ```
+
 + strace
     ```
     $ strace -e TARGET_FUNC_NAME -f PROGRAM
@@ -319,4 +325,71 @@ Linux cmd
     ~/c
 
     ```
+
++ ulimit
+    > 控制系統資源
+    ```
+    -a          | 顯示當前資源限制設定
+    -c 區塊數   | 核心資料轉存core 檔案的上限, 單位為區塊
+    -d 區塊數   | 程式資料區段大小 (data segment) 的上限, 單位為 KB.
+    -f 檔案大小 | 設定 shell 建立檔案大小的上限
+    -H          | 設定硬性限制 (hard limit)
+    -l 記憶體大小 | 設定可鎖定記憶體的上限
+    -m 記憶體大小 | 設定常駐程式上限
+    -n 檔案數     | 檔案數的上限
+    -p 緩衝區大小 | 設定管道緩衝區 (pipe buffer) 的大小
+    -s 堆疊大小   | 設定堆疊的上限
+    -S          | 設定軟性限制
+    -t CPU 時間 | 佔用CPU 時間的上限 (單位 : 秒)
+    -u 程序數目 | 單一使用者可執行程數的最大數目
+    -v 虛擬記憶體 | shell 可使用的虛擬記憶體最大上限
+
+
+    $ ulimit -a
+    core file size (blocks, -c) 0
+    data seg size (kbytes, -d) unlimited
+    file size (blocks, -f) unlimited
+    pending signals (-i) 4096
+    max locked memory (kbytes, -l) 32
+    max memory size (kbytes, -m) unlimited
+    open files (-n) 1024
+    pipe size (512 bytes, -p) 8
+    POSIX message queues (bytes, -q) 819200
+    stack size (kbytes, -s) 8192
+    cpu time (seconds, -t) unlimited
+    max user processes (-u) 4096 <使用者最大可使用程序數量>
+    virtual memory (kbytes, -v) unlimited
+    file locks (-x) unlimited
+
+    $ ulimit -c unlimited # 不限制 core.xxx 大小
+    ```
++ core dump
+    > 當某 program 崩潰的瞬間，內核會拋出當時該程序進程的內存詳細情況，</br>
+    > 存儲在一個名叫core.xxx(xxx為一個數字，比如core.699)的文件中. </br>
+    > 因為core文件是內核生成的，那某一個 process因為段錯誤而崩潰的時候的內存 image很大，</br>
+    > 會生成一個很大的core文件, 用 ulimit來改變大小限制
+
+    ```
+    compile PROGRAM with CFLAGS="-g"
+
+      # 不限制 core.xxx 大小
+    $ ulimit -c unlimited
+      # exec PROGRAM
+    $ ./a.out
+    Segmentation fault (core dumped)
+
+      # 用gdb調試core文件
+    $ gdb ./a.out ./core.7369
+
+      # include debug symbols
+    (gdb) file ./a.out
+
+      # Segmentation fault 的位置
+    (gdb) where
+    #0  0x080483b8 in do_it () at ./test.c:10
+    #1  0x0804839f in main () at ./test.c:4
+    ```
+
+
+
 
