@@ -426,7 +426,7 @@ Merlin3 RoKu
             ```
 
 + flow
-    - glib
+    - glib-2
         1. dynamic link support
             > `g_module_open()`, `g_module_symbol`
 
@@ -436,6 +436,14 @@ Merlin3 RoKu
 
             a. `static void gst_XXX_init()`
                 > the constructor of this object
+        1. signal
+            a. g_signal_new(signal_name, ...)
+                > Create a signal with *signal_name* and return *signal id*
+            a. g_signal_connect(target_handle, signal_name, callback_routing, usrdata)
+                > Link the *callback_routing* to the *signal_name* in the *target_handle*
+            a. g_signal_emit(target_handle, signal_id, args...)
+                > Emit the *signal_id* to *target_handle* with *args*
+
 
     - plugin register
         > Use *Dynamic link* `*.so` file to get the *Plugin_Description* symbols </br>
@@ -882,42 +890,54 @@ Merlin3 RoKu
                     ^        |    ^                         |        ^
                     |        v    |                         |        |
         app --> playbin3    playsink                        +--> streamsynchronizer
-                    ^
-                    |
-          (add bin) |
-                    |      bin --------------+
-                    |       ^                |
-                    |       |                |
-                    +--- decodebin           +--> multi-queue
-                    |
-                    |        bin --------------+
-                    |         ^                |
-                    |         |                |
-                    +--- urisourcebin          +--> typefind
-                              ^
-                              |                                                  
-                        add   |                                                  
-                              |                                                  
-                            basesrc                                                    
-                                                                                
-                                                                                
-                                                                                
-                    
-                    
-                    
+                
+                
+                    +----------------------------------+
+                    |    bin --------+                 |
+                    |    ^           |                 |
+                    |    |           |                 |
+                    |  decodebin3    +--> multi-queue  |
+                    +-^--------------------------------+
+                      | 
+                +-----+-----------+                
+                | DecodebinInput  |<------------------------------------------+
+                | - ghost_sink    |                                           |
+                | - ...           |                                     +----------------------------+
+                +-----------------+                                     |     bin -----+             |
+                                                                        |      ^       |             |
+                                                                        |      |       |             |
+                                                                        |   parsebin   +--> typefind |
+                                                                        +----------------------------+   
+                                                                           
+                                                                           
+                    +------------------------------------+       
+                    |     bin -------+                   |       |
+                    |     ^          |                   |       |
+                    |     |          |                   |       |
+                    |  uriourcebin   +--> typefind       |       |
+                    |     ^                   +-> srcpad-\- ghost_srcpad
+                    |     |                              |
+                    |   basesrc                          |
+                    +------------------------------ -----+
+
+
+
+
+
 
         setup_next_source()
-            -> activate_decodebin()     # create decodebin
+            -> activate_decodebin()     # create decodebin3
                 -> make_or_reuse_element()
                     -> gst_element_factory_make(decodebin3)
 
             -> activate_group()         # create a/v/text sink
                 -> make_or_reuse_element()
                     -> gst_element_factory_make(urisourcebin)
+
                 -> gst_element_set_state(urisourcebin)
                     -> setup_source()
                         -> setup_typefind()
-                            -> gst_element_factory_make(typefind)
+                            -> gst_element_factory_make(typefind)  # create element typefind
                                 # gst_type_find_element_activate_sink() will create a task 'gst_type_find_element_loop()'
 
         ```
@@ -937,7 +957,7 @@ Merlin3 RoKu
         >
         >   - element *typefind*
         >       > Determines the media-type of a stream and set it's src pad caps to this media-type
-        >       
+        >
         >       1. when activate_pads `gst_type_find_element_activate_sink()`, it will create a task `gst_type_find_element_loop()`
         >           > `gst_type_find_element_loop()` will compare the *file extension* and the supported caps of pads </br>
         >           > and emit signal `have-type` to notify *urisourcebin*

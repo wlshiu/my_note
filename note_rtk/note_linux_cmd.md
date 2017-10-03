@@ -232,6 +232,21 @@ Linux cmd
             ```
             (gdb) info threads
             ```
+        1. switch thread
+            ```
+            (gdb) thread Id # Id from gdb cmd (info thread)
+            ```
+
+        1. brackpoint
+            ```
+            (gdb) b file:line thread id
+            ```
+    - backtrace
+        1. show stack frame size
+            ```
+            (gdb) bt 10     # print backtrace stack frame #0 ~ #9
+            (gdb) bt -10    # print backtrace stack frame #(latest-9) ~ #(latest)
+            ```
 
 + strace
     ```
