@@ -860,6 +860,7 @@ Merlin3 RoKu
                 >> `gstplaybin3.c`
                 >> `gstplaysink.c`
                 >> `gstdecodebin3.c`
+                >> `gstdecodebin3-parse.c`
 
     - gst-plugins-good-1.12.3
         ```
@@ -907,10 +908,10 @@ Merlin3 RoKu
                                                                         |      ^       |             |
                                                                         |      |       |             |
                                                                         |   parsebin   +--> typefind |
-                                                                        +----------------------------+   
-                                                                           
-                                                                           
-                    +------------------------------------+       
+                                                                        +--^-------------------------+   
+                                                                           |
+                                                                 +----> ghost_sink   
+                    +------------------------------------+       |
                     |     bin -------+                   |       |
                     |     ^          |                   |       |
                     |     |          |                   |       |
@@ -1027,7 +1028,7 @@ Merlin3 RoKu
 
     - debug message (offical support)
         ```
-        $ gst_my_play --gst-debug-level=3
+        $ gst_my_play --gst-debug-level=4
         ```
 
         1. `--gst-debug-level=LEVEL`
