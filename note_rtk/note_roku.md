@@ -879,51 +879,178 @@ Merlin3 RoKu
              +-> rtkalsasink
 
     ```
-    - playbin3 (gst-plugins-base/gst/playback/gstplayback.c)
+    - playbin3 (gst-plugins-base/gst/playback/gstplayback3.c)
+
+        1. There are 3 units, GstUriSourceBin, GstDecodeBin3, GstPlaySink.
+        1. GstPlaySink
+            > Process audio/video *frame data* and output to device
+
+            ```
+            gst_play_bin3_init()
+                -> g_object_new(playsink)
+                -> gst_bin_add(playbin, playsink)
+            ```
+
+        1. GstDecodeBin3
+            > Decode bit streams of audio/video
+
+            ```
+            gst_play_bin3_change_state()
+                -> setup_next_source()
+                    -> activate_decodebin()     # create decodebin3
+                        -> make_or_reuse_element()
+                            -> gst_element_factory_make(decodebin3)
+            ```
+
+        1. GstUriSourceBin
+            > Process input module, it uses URI to detect input protocol, e.g. `file://`, `rtsp://`
+
+            ```
+            gst_play_bin3_change_state()
+                -> setup_next_source()
+                    -> activate_group()
+                        -> make_or_reuse_element()
+                            -> gst_element_factory_make(urisourcebin)
+            ```
+        1. flow
+            a. *playbin3*   : constructor create and add *PlaySink*
+                > + connnect signal callback from *PlaySink* to *playbin3*
+                >   - notify::volume
+                >   - notify::mute
+                >   - value-changed
+
+            a. *PlaySink*   : create and add *StreamSynchronizer*
+
+            a. *playbin3*   : change state
+                > + Create *DecodeBin3*
+                > + Create *UriSourceBin*
+
+                g. *DecodeBin3* :
+                    > + constructor create and add *MultiQueue*
+                    > + connnect signal callback from *DecodeBin3* to *playbin3*
+                    >   - pad-added: Be triggered when a pad add to decodebin3
+                    >   - pad-removed
+                    >   - no-more-pads
+                    >   - select-stream
+                    > + set state of elements in *DecodeBin3*
+                    >
+                    >
+                    >
+                    > + `gst_decodebin3_input_pad_link()`: link function of sinkpad of *DecodeBin3*
+                    >   - `ensure_input_parsebin()`: create *Parsebin*
+                    > + create *Parsebin*: `ensure_input_parsebin()` in gstdecodebin3.c
+                    >   - connnect signal callback from *Parsebin* to *DecodeBin3*
+                    >       1. pad-added: Be triggered when a pad add to urisourcebin
+                    >       1. pad-removed
+                    >       1. autoplug-continue
+                    >   - add *Parsebin* to *DecodeBin3*
+                    >   - change state of elements in *Parsebin*
+                    >       1. `gst_element_sync_state_with_parent()`
+                    >       1. `gst_parse_bin_change_state()`
+                    >       1. `gst_type_find_element_change_state()`
+
+                g. *UriSourceBin*
+                    > + connnect signal callback from *UriSourceBin* to *playbin3*
+                    >   - pad-added: Be triggered when a pad add to urisourcebin
+                    >   - pad-removed
+                    >   - notify::source
+                    >   - autoplug-factories
+                    >   - autoplug-select
+                    >   - autoplug-continue
+                    >   - autoplug-query
+                    > + set state of elements in *UriSourceBin*
+                    >   - parse uri: `gen_source_element()` in gsturisourcebin.c
+                    >   - create element_source, e.g. GstFileSre (with uri=file://)
+                    >   - create *TypeFind* (GstTypeFindElement): `setup_typefind()` in gsturisourcebin.c
+                    >       1. connnect signal callback from *TypeFind* to *UriSourceBin*
+                    >           a. have-type: `type_found()` in gsturisourcebin.c
+                    >       1. change *TypeFind* state
+                    >           a. `gst_element_sync_state_with_parent()`
+                    >           a. `gst_type_find_element_change_state()`
+                    >           a. `gst_element_pads_activate()`
+                    >           a. `gst_type_find_element_activate_sink`: create task `gst_type_find_element_loop()`
+                    >   - `gst_type_find_element_loop()`
+                    >       1. search element with *file extension*
+                    >       1. `gst_type_find_element_emit_have_type()`: signal trigger *have-type* to `type_found()` in *UriSourceBin*
+                    >   - `type_found()` in gsturisourcebin.c
+                    >       1. `create_output_pad()`: create a ghost src pad of *UriSourceBin*
+                    >       1. `expose_output_pad()`: Add ghost src pad to *UriSourceBin*
+                    >                                 and signal trigger *pad-added* to `urisrc_pad_added()`in *playbin3*
+                    >   - `urisrc_pad_added()` in *playbin3*
+                    >       1. `gst_pad_link()`: link decodebin3->sinkpad to urisourcebin->ghost_src_pad
+                    >                            and callback to *link func* `gst_decodebin3_input_pad_link()`
+                    >                            of sinkpad (decodebin3->sinkpad)
+
+
+
+        1. uriourcebin -> typefind -> gst_type_find_element_loop()
+            > search support *srcpad* with input *file extension* </br>
+            > and signal (trigger) to urisourcebin `type_found()`
+
+        1. urisourcebin -> `type_found()` handle srcpad
+            and signal to decodebin3 `gst_decodebin3_input_pad_link()`
+
+        1. decodebin3 -> `gst_decodebin3_input_pad_link()`  create parsebin
+
+        1. when change state, parsebin -> typefind -> gst_type_find_element_loop()
+            > search supporting *sinkpad* with *srcpad* and
+            > signal (trigger) to parsebin `type_found()`
+        1. parsebin `type_found()` create *demuxer* and
+            change *demuxer* state
+
+        1. *demuxer* `gst_ogg_demux_loop` push data to `gst_multi_queue_chain()`
+        1. *multiqueue* `gst_multi_queue_loop()` push data to *videodecoder* `gst_video_decoder_chain()`
+        1. `gst_video_decoder_chain()` -> `gst_video_decoder_decode_frame()` ->  `decoder_class->handle_frame()`
+
 
         ```
-
-                                element (record the bin state after iterate)
-                   bin ------+    ^
-                    ^        |    |
-                    |        |    |   Iteratively contrel
-                pipeline     |   bin -----------------------+     element
-                    ^        |    ^                         |        ^
-                    |        v    |                         |        |
-        app --> playbin3    playsink                        +--> streamsynchronizer
-                
-                
-                    +----------------------------------+
-                    |    bin --------+                 |
-                    |    ^           |                 |
-                    |    |           |                 |
-                    |  decodebin3    +--> multi-queue  |
-                    +-^--------------------------------+
-                      | 
-                +-----+-----------+                
-                | DecodebinInput  |<------------------------------------------+
-                | - ghost_sink    |                                           |
-                | - ...           |                                     +----------------------------+
-                +-----------------+                                     |     bin -----+             |
-                                                                        |      ^       |             |
-                                                                        |      |       |             |
-                                                                        |   parsebin   +--> typefind |
-                                                                        +--^-------------------------+   
-                                                                           |
-                                                                 +----> ghost_sink   
-                    +------------------------------------+       |
-                    |     bin -------+                   |       |
-                    |     ^          |                   |       |
-                    |     |          |                   |       |
-                    |  uriourcebin   +--> typefind       |       |
-                    |     ^                   +-> srcpad-\- ghost_srcpad
-                    |     |                              |
-                    |   basesrc                          |
-                    +------------------------------ -----+
-
-
-
-
+                   bin ----+
+                    ^      |
+                    |      |
+                pipeline   |
+                    ^      |
+                    |      |
+        app -> playbin3    |
+                           |
+        +------------------+
+        |   +------------------------------------------------------------------------------------------------------------------------+
+        |   |  +-----------------------------------------+                                                                           |
+        |   |  | GstUriSourceBin                         |                                                                           |
+        |   |  |                                         |                                                                           |
+        |   |  |      bin -------+                       |                                                                           |
+        |   |  |      ^          |                       |               +--------------------------------------------------------+  |
+        |   |  |      |          |    (follow file ext)  |               | GstPlaySink                                            |  |
+        +---+---->  uriourcebin  +--> typefind           |               |                                                        |  |
+        |   |  |     ^                   +-> srcpad----->\-              |    element (record the bin state after iterate)        |  |
+        |   |  |     | add                               |               |      ^                                                 |  |
+        |   |  |   filesrc (follow uri prefix)           |               |      |                                                 |  |
+        |   |  |     |                                   |               |      |   Iteratively contrel                           |  |
+        |   |  |     v                                   |               |     bin ----------------------+     element            |  |
+        |   |  |   basesrc                               |               |      ^                        |        ^               |  |
+        |   |  +-----------------------------------------+               |      |                        |        |               |  |
+        +---+---------------------------------------------------------------> playsink                    +--> streamsynchronizer -->|
+        |   |  +-----------------------------------------------------+   |                                             ^          |  |
+        |   |  | GstDecodeBin3                                       |   +---------------------------------------------\----------+  |
+        |   |  |                                                     |                                                 |             |
+        |   |  |   +----------------------------------------------+  |                                                 |             |
+        |   |  |   |     bin -----+                               |  |                                                 |             |
+        |   |  |   |      ^       |                               |  |                                                 |             |
+        |   |  |   |      |       |                               |  |                                                 |             |
+        |   |  |   |   parsebin   +--> typefind --> oggdemux      |  |                                                 |             |
+        |   |  |   /<----------- sinkpad +            + srcpad -->\  |                                                 |             |
+        |   |  |   |                                              |  |                                                 |             |
+        |   |  |   +----|-----------------------------------------+  |                                                 |             |
+        |   |  |        |                                            |                                                 |             |
+        |   |  |        v                    +                       |                                                 |             |
+        |   |  |                             +--------> theoradec --->/------------------------------------------------+             |
+        +---+-----> decodebin3   +--> multi-queue          |         |                                                               |
+            |  |        |        |                         v         |                                                               |
+            |  |        v        |                    videodeocder   |                                                               |
+            |  |       bin ------+                                   |                                                               |
+            |  |                                                     |                                                               |
+            |  +-----------------------------------------------------+                                                               |
+            |                                                                                                                        |
+            +------------------------------------------------------------------------------------------------------------------------+
 
 
         setup_next_source()

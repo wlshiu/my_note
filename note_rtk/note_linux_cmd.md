@@ -248,6 +248,17 @@ Linux cmd
             (gdb) bt -10    # print backtrace stack frame #(latest-9) ~ #(latest)
             ```
 
+    - re-direct tty
+        ```
+        # an other terminal
+        $ tty
+        /dev/pts/11
+
+        # in gdb
+        (gdb) tty /dev/pts/11
+        (gdb) show inferior-tty
+        Terminal for future runs of program being debugged is "/dev/pts/11".
+        ```
 + strace
     ```
     $ strace -e TARGET_FUNC_NAME -f PROGRAM
