@@ -939,6 +939,9 @@ Merlin3 RoKu
                     > + `gst_decodebin3_input_pad_link()`: link function of sinkpad of *DecodeBin3*
                     >   - `ensure_input_parsebin()`: create *Parsebin*
                     > + create *Parsebin*: `ensure_input_parsebin()` in gstdecodebin3.c
+                    >   - constructor create and add *Typefind*
+                    >       1. create a *ghost sink pad* with sinkpad of *Typefind*
+                    >       1. add *ghost sink pad* to *Parsebin*
                     >   - connnect signal callback from *Parsebin* to *DecodeBin3*
                     >       1. pad-added: Be triggered when a pad add to urisourcebin
                     >       1. pad-removed
@@ -947,7 +950,17 @@ Merlin3 RoKu
                     >   - change state of elements in *Parsebin*
                     >       1. `gst_element_sync_state_with_parent()`
                     >       1. `gst_parse_bin_change_state()`
+                    >           a. connnect signal callback from *Typefind* to *Parsebin*
+                    >               > have-type: `type_found()` in gsturisourcebin.c
+                    >       1. `parent_class->change_state()`: `gst_bin_change_state_func()` iterate change element state in *Parsebin*
                     >       1. `gst_type_find_element_change_state()`
+                    >       1. `gst_element_pads_activate()`
+                    >       1. `gst_type_find_element_activate_sink`: create task `gst_type_find_element_loop()`
+                    >   - `gst_type_find_element_loop()`
+                    >       1. search element with *file extension*
+                    >       1. `gst_type_find_element_emit_have_type()`: signal trigger *have-type* to `type_found()` in *Parsebin*
+                    >   - `type_found()` in gstparsebin.c
+                    >       1. `analyze_new_pad()`
 
                 g. *UriSourceBin*
                     > + connnect signal callback from *UriSourceBin* to *playbin3*
