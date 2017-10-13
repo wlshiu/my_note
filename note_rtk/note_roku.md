@@ -62,11 +62,17 @@ Merlin3 RoKu
               # need to exort private git-core
             export PATH="$PATH:$HOME/.local/usr/libexec/git-core/"
             ```
++ mount
+    - re-mount rootfs to r/w
+        ```
+        $ mount -o rw,remount /
+        ```
 
-+ re-mount rootfs to r/w
-    ```
-    $ mount -o rw,remount /
-    ```
+    - mount usb
+        ```
+        $ mkdir mnt/usb
+        $ mount -v -t auto /dev/sda1 /mnt/usb
+        ```
 
 + debug
     - gdb
@@ -101,6 +107,73 @@ Merlin3 RoKu
             > Yes, the old ABI can be used by defining the macro `_GLIBCXX_USE_CXX11_ABI` to `0`
                 before including any C++ standard library headers.
 
+
++ cmd line key
+    - PCBA
+        1. setup env
+            ```
+            Realtek> env set ethaddr 00:11:22:02:18:93  # MAC address
+            ```
+        1. enable eth0
+            ```
+            / # ifconfig eth0 hw ether 00:11:22:02:18:93  # if bootload set MAC address not work
+
+            / # ifconfig eth0 up ; udhcpc -i eth0 -s /etc/udhcpc.script
+            ```
+    - PC
+        1. connect to PCBA
+            ```
+            telnet board_ip  port:8080
+
+            [message]
+            13A14C999999 (Roku player - 13A14C999999 - 9.0.0.99999)
+            >
+            ```
+        1. cmd `press`
+            > virtual key
+
+            ```
+            option:
+            >press
+            h          Home
+            u          Up
+            d          Down
+            r          Right
+            l          Left
+            s          Select
+            f,>        Fwd
+            b,<        Rev
+            p          Play
+            y          InstantReplay
+            i          Info
+            k          Back
+            =          Backspace
+            o          PlayOnly
+            t          Stop
+            e          Enter
+            a          A
+            c          B
+            n          Closed Caption
+            g          Game
+            j          Sleep
+            ?          Search
+            [          Volume Down
+            ]          Volume Up
+            \          Volume Mute
+            ~          Input Source
+            *1234vt    Input HDMI1-4, AV, Tuner
+            ^          Guide
+            x1-x60     Partner1 - Partner60
+            !          Power
+            @          PowerOn
+            #          PowerOff
+            .ibmfwrec  change source type: i=IR,b=BT,m=MHL,f=FP,
+                                           w=WD(Wifi),r=IR_RF(T3),
+                                           e=ECP,c=CEC,
+                                           u=IR_RF_UNPAIRED
+                                           The default is IR
+
+            ```
 
 ## project
 
@@ -870,6 +943,18 @@ Merlin3 RoKu
         ├── sys
         └── tests
         ```
++ proprietary directory
+    ```
+    gst-omx-rtk (codec interface for gstreamer) ---------> gst-plugins-rtk (Sink elements, e.g. DirectVO)
+            |                                                     |
+            +------+                         +--------------------+
+                   |                         |
+                   v                         v
+                omx_il_rtk (communicate with VideoFirmware, RPC)
+                                    |
+                                    v
+                                Video Processor (H/W)
+    ```
 
 + gst-rtk-test
     > rtk self player
@@ -961,6 +1046,24 @@ Merlin3 RoKu
                     >       1. `gst_type_find_element_emit_have_type()`: signal trigger *have-type* to `type_found()` in *Parsebin*
                     >   - `type_found()` in gstparsebin.c
                     >       1. `analyze_new_pad()`
+                    >       1. `connect_pad()`
+                    >           a. create demuxer_element_factory, e.g. oggdemux
+                    >           a. add demuxer_element_factory to *Parsebin*
+                    >           a. set element *oggdemux* state to *GST_STATE_READY*
+                    >           a. `connect_element()`: check srcpads of demuxer element
+                    >           a. set element *oggdemux* state to *GST_STATE_PAUSED*
+                    >               > + `gst_ogg_demux_change_state()`
+                    >               > + `gst_pad_set_active()`
+                    >               > + `gst_ogg_demux_sink_activate()`
+                    >               > + `gst_ogg_demux_sink_activate_mode()`: create task `gst_ogg_demux_loop()`
+                    >       1. `connect_element()`
+                    >           a. find the *src pads* in demuxer
+                    >           a. check the type of *src pads* (Always/Dynamic pad)
+                    >           a. if dynamic pad, connnect signal callback from *oggdemux* to *Parsebin*
+                    >               > + pad-added: Be triggered when a pad add to *oggdemux*
+                    >               > + pad-removed
+                    >               > + no-more-pads
+                    >
 
                 g. *UriSourceBin*
                     > + connnect signal callback from *UriSourceBin* to *playbin3*
@@ -1182,6 +1285,41 @@ Merlin3 RoKu
             ```
         1. `--gst-plugin-spew`
             > output error message of loading plugin
+
+    - graphviz
+        1. need lib
+            ```
+            $ sudo apt-get install graphviz
+            ```
+        1. enable dot dump
+            ```
+            $ export GST_DEBUG_DUMP_DOT_DIR=~/dot_path/
+            ```
+
+        1. run program
+            ```
+            $ gst-launch audiotestsrc num-buffers=1000 ! fakesink sync=false
+            ```
+
+        1. conve to png
+
+            ```
+            #!/bin/bash
+
+            set -e
+
+            DOT_FILES_DIR="~/dot_path/"
+            PNG_FILES_DIR=$DOT_FILES_DIR
+
+            DOT_FILES=$(ls $DOT_FILES_DIR | grep dot)
+
+            for dot_file in $DOT_FILES
+            do
+              png_file=$(echo $dot_file | sed s/.dot/.png/)
+              dot -Tpng $DOT_FILES_DIR/$dot_file > $PNG_FILES_DIR/$png_file
+            done
+
+            ```
 
     - memory leak check
         1. enable debug message about *GST_BUFFER*

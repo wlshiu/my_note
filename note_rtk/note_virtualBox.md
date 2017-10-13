@@ -70,7 +70,7 @@ VirtualBox
 + Environment
     ```
     $ sudo apt-get install build-essential make dos2unix automake libtool pkg-config \
-            vim git ctags cscope id-utils
+            vim git ctags cscope id-utils texinfo
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
@@ -160,8 +160,15 @@ VirtualBox
 + Network File System (NFS)
     - VirtualBox
         1. set network `Adapter 2`
-            a. Atteched to: Bridget Adapter
-            a. Promiscuous Mode: Allow All
+            a. Atteched to: Bridged Adapter
+            a. name: MAC Bridge Miniport
+                > In windows PC side
+                > + Control Panel -> Network and Sharing Center ->  Change adapter settings
+                > + select both your physical adapter and *VirtualBox Host-Only Network*
+                > + right key of mouse, press *Bridge Connections*
+                > + Windows will new a network bridge *MAC Bridge Miniport*
+            a. Adapter Type: Intel .... (82540EM)
+            a. Promiscuous Mode: Allow All (maybe 'Deny' also work)
             a. Reflash MAC address
 
     - lunbuntu 16.04
@@ -172,20 +179,29 @@ VirtualBox
             ```
 
         1. setup
-            a. edit /etc/network/interface
-                ```
-                # Add network interface setting
-                auto enp0s8
-                iface enp0s8 inet static    # static ip
-                address 172.22.49.177       # it should be in the same domain with PCBA
-                geteway 172.22.49.254       # it should be in the same domain with PCBA
-                netmask 255.255.255.0
+            a. set network interface
+                g. manual setting
+                    ```
+                    $ sudo ifconfig enp0s8 192.168.0.100 network 255.255.255.0
+                    ```
 
-                # rtk route setting
-                up route add default gw 172.22.49.254 metric 1
-                dns-nameservers 172.21.1.10 172.21.1.11
-                dns-search realtek.com.tw
-                ```
+                g. edit /etc/network/interface for auto enable
+                    ```
+                    # Add network interface setting
+                    auto enp0s8
+                    iface enp0s8 inet static    # static ip
+                    address 192.168.0.100       # it should be in the same domain with PCBA
+                    netmask 255.255.255.0
+                    network 192.168.1.1
+                    broadcast 192.168.0.255
+                    gateway 192.168.0.254       # it should be in the same domain with PCBA
+
+
+                    # rtk route setting
+                    up route add default gw 172.22.49.254 metric 1
+                    dns-nameservers 172.21.1.10 172.21.1.11
+                    dns-search realtek.com.tw
+                    ```
 
             a. edit /etc/exports
                 ```
@@ -217,11 +233,50 @@ VirtualBox
                 $ ls /tmp/test_nfs
                 ```
     - PCBA
-        ```
-          # set eth0 ip, which is in PC ip domain
-        $ ifconfig eth0 172.22.49.178
-        $ mkdir /tmp/nfs
-        $ mount -t nfs -o proto=tcp -o nolock 172.22.49.177:/home/username/my_nfs /tmp/nfs
-        ```
+        1. manual setting
+            ```
+              # set eth0 ip, which is in PC ip domain
+            $ ifconfig eth0 192.168.0.105 netmask 255.255.255.0
+            $ mkdir /tmp/nfs
+            $ mount -t nfs -o proto=tcp -o nolock 172.22.49.177:/home/username/my_nfs /tmp/nfs
+            ```
+        1. script
+            ```
+            #!/bin/sh
 
+            Red='\e[0;31m'
+            Yellow='\e[1;33m'
+            Green='\e[0;32m'
+            Cyan='\e[0;36m'
+            NC='\e[0m' # No Color
+
+            host_ip=192.168.0.100
+            local_ip=192.168.0.105
+
+            ifconfig eth0 ${local_ip} netmask 255.255.255.0
+            sleep 5
+
+            if !ping -c 3 ${host_ip} > /dev/null 2>&1; then
+                echo -e "${Red} !!!!!!! connecte ${host_ip} fail !!!${NC}"
+                exit 1;
+            else
+                echo -e "connect ${host_ip} ok.........."
+            fi
+
+            # set -e
+
+            if [ -d /tmp/nfs ]; then
+                umount -l /tmp/nfs
+                rm -fr /tmp/nfs
+            fi
+
+            mkdir /tmp/nfs
+            mount -t nfs -o nolock -o proto=tcp ${host_ip}:/home/wl/work/ /tmp/nfs/
+            if [ $? == 0 ]; then
+                echo -e "${Yellow}mount nfs ok.....${NC}"
+            else
+                echo -e "${Red} mount nfs fail !!!! ${NC}"
+            fi
+
+            ```
 

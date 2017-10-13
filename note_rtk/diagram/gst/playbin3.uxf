@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>220</x>
+      <y>0</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>playbin3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>20</y>
+      <w>30</w>
+      <h>3400</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;3380.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>340</x>
+      <y>0</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>urisourcebin</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>20</y>
+      <w>30</w>
+      <h>3410</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;3390.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>480</x>
+      <y>0</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>decodebin3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>20</y>
+      <w>30</w>
+      <h>3410</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;3390.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>600</x>
+      <y>0</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>playsink</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>20</y>
+      <w>30</w>
+      <h>3430</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=0</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;3410.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>30</y>
+      <w>210</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+gst_play_bin3_init</panel_attributes>
+    <additional_attributes>10.0;20.0;190.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>650</x>
+      <y>90</y>
+      <w>250</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. initialize
+2. create element stream-synchronizer
+3. Add element to playsink
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>80</x>
+      <y>70</y>
+      <w>190</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. constructor of playbin3
+2. create playsink
+3. signal connect (callback)
+   - notity::volume
+   - notify::mute
+   - value-change
+4. set default info
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>70</y>
+      <w>410</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+create playsink</panel_attributes>
+    <additional_attributes>10.0;20.0;390.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>100</y>
+      <w>410</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;10.0;390.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>50</x>
+      <y>250</y>
+      <w>240</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+gst_play_bin3_change_state
+READY to PAUSE</panel_attributes>
+    <additional_attributes>10.0;20.0;220.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>280</y>
+      <w>290</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+create decodebin3</panel_attributes>
+    <additional_attributes>10.0;20.0;270.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>0</x>
+      <y>290</y>
+      <w>270</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. create decodebin3 and add to playbin3
+    + signal connect 
+        - pad-added
+        - pad-removed
+        - select-stream
+2. create urisourcebin
+    + signal connect
+        - pad-added
+        - pad-removed    
+        - autoplug-factories
+          (return decoder list)
+        - autoplug-select</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>530</x>
+      <y>300</y>
+      <w>200</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. initialize
+2. create element multiqueue
+3. Add element to decodebin3
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>310</y>
+      <w>290</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>390</y>
+      <w>200</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. constructor of urisourcebin
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>370</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+create urisourcebin</panel_attributes>
+    <additional_attributes>10.0;20.0;130.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>390</y>
+      <w>150</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>490</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+set to PAUSE</panel_attributes>
+    <additional_attributes>10.0;20.0;130.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>450</x>
+      <y>760</y>
+      <w>170</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Emit 'have-type' signal
+</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>900</y>
+      <w>290</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+gst_pad_link</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>520</y>
+      <w>340</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. gen_source_element()
+    + parse uri and select mapping element
+2. setup_typefind()
+    + Create element typefind
+    + Add element to urisourcebin
+    + signal connect 
+        - have-type
+    + change element typefind state     
+        - create task 'gst_type_find_element_loop()' 
+        - element typefind search mapping element
+          (dependency file extension)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>120</x>
+      <y>870</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>halign=left
+urisrc_pad_added()
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>530</x>
+      <y>930</y>
+      <w>320</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. ensure_input_parsebin()
+    + Create parsebin
+        - create element typefind 
+        - Add element typefind to parsebin
+    + signal connect
+        - pad-added
+        - pad-removed
+3. change parsebin state iteratively
+    + signal connect
+        - have-type
+    + gst_type_find_element_activate_sink()
+        - create task 'gst_type_find_element_loop()'
+        </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>390</x>
+      <y>720</y>
+      <w>200</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>task
+--
+gst_type_find_element_loop()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>530</x>
+      <y>1150</y>
+      <w>200</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>task
+--
+gst_type_find_element_loop()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>1190</y>
+      <w>110</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+type_found()</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>460</x>
+      <y>1250</y>
+      <w>340</w>
+      <h>310</h>
+    </coordinates>
+    <panel_attributes>halign=left
+parsebin
+--
+1. analyze_new_pad()
+    + Find a sink pad connecting with 
+       src pad of element typefind 
+2. connect_pad()
+    + Create demuxer_element, e.g. oggdemux
+    + Add the demuxer to parsebin
+    + Set demuxer element to READY state 
+3. connect_element()
+    + check demuxer_element src pad type (dynamic)
+    + signal connect 
+      (notify parsebin if demuxer get a media stream)
+        - pad-added
+        - pad-removed
+4. Set demuxer state to PAUSE (activate)
+        - gst_ogg_demux_sink_activate_mode()
+          create task 'gst_ogg_demux_loop()'
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>460</x>
+      <y>1580</y>
+      <w>330</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>halign=left
+task
+--
+gst_ogg_demux_loop(): use libogg (ogg demuxer)
+1. gst_ogg_demux_perform_seek_pull()
+2. gst_ogg_demux_activate_chain()
+    + gst_element_add_pad()
+    + gst_ogg_demux_chain_peer()
+        - gst_multi_queue_sink_event()
+          -&gt; gst_single_queue_flush()
+             create task: gst_multi_queue_loop,()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>460</x>
+      <y>1770</y>
+      <w>320</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. analyze_new_pad()
+    + Find a sink pad connecting with 
+      src pad of oggdemuxer
+    + Emit autoplug-factories signal 
+      (gst_parse_bin_autoplug_factories())
+        - get factory list
+2. connect_pad()
+    + expose_pad()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>530</x>
+      <y>1940</y>
+      <w>310</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>halign=left
+task
+--
+gst_multi_queue_loop()
+1. gst_single_queue_push_one()
+    + gst_pad_push_event(GST_EVENT_CAPS) 
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>530</x>
+      <y>2070</y>
+      <w>280</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>halign=left
+multiqueue_src_probe()
+1. reconfigure_output_stream()
+    + create_decoder()
+    + Add decoder to decodebin3
+    + gst_pad_link_full()
+        - Connect multiqueue_srcpad and 
+          decoder_sinkpad
+    + gst_ghost_pad_set_target()
+        - Connect decoder_srcpad and 
+          a pghost_srcpad
+    + gst_element_add_pad()
+        - Add ghost_srcpad to decodebin3
+
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>2020</y>
+      <w>360</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM
+</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>2230</y>
+      <w>290</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+emit pad-added signal
+</panel_attributes>
+    <additional_attributes>10.0;20.0;270.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>420</x>
+      <y>990</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>parsebin</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>450</x>
+      <y>1010</y>
+      <w>30</w>
+      <h>1060</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;1040.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>380</x>
+      <y>1610</y>
+      <w>90</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+Emit signal
+pad-added</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>350</x>
+      <y>1790</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+pad_added_cb()
+caps=
+video/x-theora</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>30</x>
+      <y>2250</y>
+      <w>240</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>halign=left
+1. pad_added_cb()
+    + playbin3 check the type of pad 
+      (from decodebin3) 
+    + Add pads to combiner 
+      (sinkpads of media streams)
+2. no_more_pads_cb()
+   Get pads and connect sinks
+    + Connect decodebin3_srcpad 
+      and playsink_sinkpad
+    + gst_play_sink_reconfigure()
+        - set media stream blocked
+
+  
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>1650</y>
+      <w>80</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+</panel_attributes>
+    <additional_attributes>50.0;130.0;10.0;130.0;10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>530</x>
+      <y>2470</y>
+      <w>310</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>halign=left
+task
+--
+gst_multi_queue_loop()
+1. gst_single_queue_push_one()
+    + gst_pad_push_event(GST_EVENT_CAPS) 
+      (multiqueue -&gt; videodecoder -&gt; playsink)
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>650</x>
+      <y>2600</y>
+      <w>390</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>halign=left
+sinkpad_blocked_cb()
+    Wait until all media stream be blocked
+    
++ gst_play_sink_do_reconfigure()
+    - gen_video_chain(): setup video pipeline
+        i. Create dvovideosink, and set state to READY.
+        i. Set "async", "force-aspect-ratio", "tsoffset" properties 
+            to dvovideosink.
+        i. Create vbin and add dvovideosink to vbin.
+        i. Create queue and add to vbin.
+        i. Link queue srcpad to dvovideosink sinkpad.
+        i. Link vbin_ghost_sink pad to queue sink pad
+    - Get stream_synchronizer_video_sinkpad and 
+      connect with playsink_video_ghost_sinkpad
+    - Add vbin to playsink
++ Disable media stream blocked</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>300</x>
+      <y>2530</y>
+      <w>370</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m1=GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM</panel_attributes>
+    <additional_attributes>350.0;80.0;200.0;80.0;200.0;10.0;240.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>850</y>
+      <w>150</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+emit 
+pad-added signal
+</panel_attributes>
+    <additional_attributes>10.0;20.0;130.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>390</x>
+      <y>830</y>
+      <w>110</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>urisource
+--
+type_found()</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
