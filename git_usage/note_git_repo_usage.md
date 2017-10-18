@@ -388,14 +388,15 @@
     		- Attribute **name**:       project name on Remote
     		- Attribute **path**:       relative path to the .repo
     		- Attribute **revision**:   The version which wants to track for this project. It can be a branch name(HEAD)/tags/SHA-1.
-    		- ...
+    		- Attribute **clone-depth**: history depth when git clone in a project
+		- ...
 
         ```
         e.g.
             <?xml version='1.0' encoding='utf-8'?>
             <manifest>
               <remote fetch="ssh://review.gerrithub.io/Open-TEE" name="origin" review="https://review.gerrithub.io/Open-TEE" />
-              <default remote="origin" revision="master" />
+              <default remote="origin" revision="master" clone-depth="1" />
               <project name="project" path="test_OpenTEE/project" >
                 <copyfile src="README.md" dest="test_OpenTEE/README" />
               </project>
