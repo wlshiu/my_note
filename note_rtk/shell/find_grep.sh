@@ -29,9 +29,12 @@ NC='\e[0m' # No Color
 # set -o nounset                                  # Treat unset variables as an error
 set -e
 
-tag_file_ext='f'
-tag_prune_dir='pd'
-tag_grepword='gw'
+file_ext='f'
+prune_dir='pd'
+grepword='gw'
+tag_file_ext='^'${file_ext}
+tag_prune_dir='^'${prune_dir}
+tag_grepword='^'${grepword}
 
 sh_exec_file='_exec_find_grep.sh'
 
@@ -39,11 +42,11 @@ sh_exec_file='_exec_find_grep.sh'
 
 help ()
 {
-    echo -e "${Yellow} $0 [path_1 patch_2 ...] [-${tag_prune_dir} path_1 patch_2 ...] [-${tag_file_ext} iname_1 iname_2 ...] -${tag_grepword} [grep word]${NC}"
-    echo -e "${Yellow}     -${tag_prune_dir}     -prune is find command ${NC}"
-    echo -e "${Yellow}     -${tag_file_ext}      -iname is find command, only file extension ${NC}"
-    echo -e "${Yellow}     -${tag_grepword}     the grep keyword ${NC}"
-    echo -e "\n${Yellow}     e.g.    $0 ./ -${tag_prune_dir} ./a ./b -${tag_file_ext} sh cpp -${tag_grepword} word ${NC}"
+    echo -e "${Yellow} $0 [path_1 patch_2 ...] [-${prune_dir} path_1 patch_2 ...] [-${file_ext} iname_1 iname_2 ...] -${grepword} [grep word]${NC}"
+    echo -e "${Yellow}     -${prune_dir}     -prune is find command ${NC}"
+    echo -e "${Yellow}     -${file_ext}      -iname is find command, only file extension ${NC}"
+    echo -e "${Yellow}     -${grepword}     the grep keyword ${NC}"
+    echo -e "\n${Yellow}     e.g.    $0 ./ -${prune_dir} ./a ./b -${file_ext} sh cpp -${grepword} word ${NC}"
     exit 1;
 }	# ----------  end of function help  ----------
 
