@@ -956,12 +956,44 @@ Merlin3 RoKu
                                 Video Processor (H/W)
     ```
 
++ DirectVO
+    > include
+    > + gstdvovideosink.c
+    >       > link with gstreamer
+    > + gstdvocontext.c
+    >       > support DirectVO API for user
+    > + gstdvobufferpool.c
+    >       > GstBuffer pool handle
+    > + gstdvobuffermeta.c
+    >       > record physical address of buffer and be included in GstBuffer
+
+    -
+        ```
+        gst_omx_video_dec_set_format() in gstomxvideodec.c
+            -> gst_omx_video_dec_reconfigure_output_port()
+                -> gst_omx_video_dec_allocate_output_buffers()
+                    -> gst_buffer_pool_acquire_buffer()
+                        -> dvo_buffer_pool_acquire_buffer()  in gstdvobufferpool.c
+        ```
+
+    - play flow
+
+        ```
+        gst_omx_video_dec_loop() in gstomxvideodec.c
+            -> gst_omx_video_dec_reconfigure_output_port()
+                -> -> gst_omx_video_dec_allocate_output_buffers()
+        ```
+
+
 + gst-rtk-test
     > rtk self player
 
     ```
     playbin3 +-> dvovidoesink
              +-> rtkalsasink
+
+      shell
+    $ gst-rtk-test-1.0 -p -f [file]
 
     ```
     - playbin3 (gst-plugins-base/gst/playback/gstplayback3.c)
@@ -1269,15 +1301,89 @@ Merlin3 RoKu
 
 + debug
 
+    - [environment variables] (https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gstreamer/html/gst-running.html)
+        1. `GST_PLUGIN_PATH`, `GST_PLUGIN_PATH_1_0`
+            > search path for plugins, `GST_PLUGIN_PATH_1_0` will override `GST_PLUGIN_PATH` if `GST_PLUGIN_PATH_1_0` is set
+
+        1. `GST_DEBUG`
+            > show log by level
+
+            ```
+            $ export GST_DEBUG=[element name 1]:[level],[element name 2]:[level]...
+            ```
+
+        1. `GST_DEBUG_COLOR_MODE`
+            > set log message with color or not
+
+            ```
+            $ export GST_DEBUG_COLOR_MODE=on
+            $ export GST_DEBUG_COLOR_MODE=off
+            ```
+        1. `GST_DEBUG_DUMP_DOT_DIR`
+            > enable output dot files for graphviz
+
+        1. `GST_REGISTRY', 'GST_REGISTRY_1_0`
+            > search cache file of plugins
+
+        1. `GST_REGISTRY_UPDATE`
+            > force update cache of plugins
+
+            ```
+            export GST_REGISTRY_UPDATE=no
+            export GST_REGISTRY_UPDATE=yes
+            ```
+
+        1. `GST_DEBUG_FILE`
+            > re-direct debug message to file
+
+        1. `GST_TRACE`
+            > Enable memory allocation tracing
+
+            ```
+            export GST_TRACE=all
+            export GST_TRACE=live       # Counts all live objects and dumps an overview of the number of unfreed objects
+            export GST_TRACE=mem-live   # Keep track of the unfreed memory pointers and dump an overview of all unfreed memory
+            ```
+
     - debug message (offical support)
         ```
         $ gst_my_play --gst-debug-level=4
         ```
 
         1. `--gst-debug-level=LEVEL`
-            > LEVEL: 0 ~ 5 (0: no message, 5: all message)
+            > LEVEL: 0 ~ 7 (0: no message, 7: all message)
 
-        1. `--gst-debug=LIST`
+            a. ERROR= 1
+                > Logs all fatal errors. These are errors that do not allow the core or elements to perform the requested action.
+                > The application can still recover if programmed to handle the conditions that triggered the error.
+            a. WARNING= 2
+                > Logs all warnings. Typically these are non-fatal, but user-visible problems are expected to happen.
+            a. FIXME= 3
+                > Logs all fixme messages.
+                > Fixme messages are messages that indicate that something in the executed code path
+                > is not fully implemented or handled yet.
+                > The purpose of this message is to make it easier to spot incomplete/unfinished pieces of code when reading the debug log.
+            a. INFO= 4
+                > Logs all informational messages.
+                > These are typically used for events in the system that only happen once,
+                > or are important and rare enough to be logged at this level.
+            a. DEBUG= 5
+                > Logs all debug messages.
+                > These are general debug messages for events that happen only a limited number of times
+                > during an object's lifetime; these include setup, teardown, change of parameters, ...
+            a. LOG= 6
+                > Logs all log messages.
+                > These are messages for events that happen repeatedly during an object's lifetime;
+                > these include streaming and steady-state conditions.
+            a. TRACE= 7
+                > Logs all trace messages.
+                > These messages for events that happen repeatedly during an object's lifetime such as the ref/unref cycles.
+            a. MEMDUMP= 9
+                > Log all memory dump messages.
+                > Memory dump messages are used to log (small) chunks of data as memory dumps in the log.
+                > They will be displayed as hexdump with ASCII characters.
+
+        1. `--gst-debug=[element name]:[level]`
             > special elements output message with debug level.
 
             ```

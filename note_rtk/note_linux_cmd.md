@@ -1,9 +1,12 @@
 Linux cmd
 ---
 
-+ printenv
++ printenv, set
     ```
     會顯示所有現行環境變數
+    $ printenv
+      or
+    $ set
     ```
 
 + find
@@ -26,6 +29,27 @@ Linux cmd
     1. `-r` means recursively search
     1. `-A5` means show the context of 5 lines *after* the current line.
     1. `-B5` means show the context of 5 lines *before* the current line.
+
++ tar
+    ```
+    tar [operations] [tar name] [input dir/files]
+
+    -c   建立新的壓縮檔
+    -x   解壓縮檔案
+    -t   顯示壓縮檔的內容
+    ====
+
+    -z          支援 gzip 解壓檔
+    -j          支援 bzip2 解壓檔
+    -Z          支援 xz 解壓檔
+    -f          指定壓縮檔, f 之後要立即接檔名, 不能再加參數 (建議獨立使用, e.g. -xj -f xxx.tar.bz)
+    -C [dir]    這個選項用在解壓縮到特定目錄 (一定要放在要解壓縮的檔案名稱之前 ???)
+    --exclude=xx      在壓縮的過程中，不要將 xx 打包
+
+
+      # 解壓 a.tar.gz 包裡文件名以 one 開頭的文件到 /tmp 下
+    $ tar -xzv -C /tmp -f a.tar.gz one*
+    ```
 
 + wget
     ```
@@ -416,6 +440,61 @@ Linux cmd
     #1  0x0804839f in main () at ./test.c:4
     ```
 
++ `/dev/null`
+    > 將進入的 data都 cancel 掉
+
+    ```
+    $ xxx.sh > /dev/null 2>&1
+    將 xxx.sh的輸出 stdout(1), stderr(2) 全導向 /dev/null, 即程式執行, 而不會輸出任何程式執行的結果
+
+    ```
 
 
++ free
+    > check memory usage
+
+    ```
+      # -m : MBs
+    $ free -m
+               total        used         free     shared     buffers     cached
+    Mem:       1023916     975816       48100          0       26376     465844
+    -/+ buffers/cache:     483596      540320
+    Swap:      2096440     105564     1990876
+
+
+
+                     total      used        free     shared     buffers      cached
+    Mem:                a        b           c          d         e             f
+    -/+ buffers/cache:             g         h
+    Swap:               i        j           k
+
+    a = 總記憶體大小
+    b = 配給 buffers 與 cache 的記憶體大小(包含未用的 buffers 與 cache)
+    c = 剩下的記憶體大小
+    e = 配給 buffers 但未用的記憶體大小
+    f = 配給 cache 但未用的記憶體大小
+    g = buffers 與 cache 被使用掉的記憶體大小，也就是實際被應用程式用走的
+    h = 那這個就是實際剩下的記憶體大小
+
+    a  = b + c
+    a  = g + h
+    g = b  – e  –  f
+    h = c  + e  + f
+
+    ```
+
++ `/proc/meminfo`
+    > record the memory current usage
+
+    ```
+    $ cat /proc/meminfo
+    MemTotal:        8167848 kB
+    MemFree:         1409696 kB
+    Buffers:          961452 kB
+    Cached:          2347236 kB
+    SwapCached:            0 kB
+    Active:          3124752 kB
+    ...
+
+    ```
 

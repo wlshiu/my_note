@@ -50,7 +50,6 @@ help ()
     exit 1;
 }	# ----------  end of function help  ----------
 
-
 if [ $# -lt 1 ]; then
     help
 fi
@@ -140,9 +139,9 @@ case $# in
         chmod +x ./${sh_exec_file}
         bash ./${sh_exec_file}
 
-        rm -f ${sh_exec_file}
         #-----------------------
         ;;
 
 esac    # --- end of case ---
 
+rm -f ${sh_exec_file}
