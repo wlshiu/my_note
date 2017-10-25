@@ -1,0 +1,99 @@
+Merlin3 Roku GDB 使用方式
+
+Step:
+開機進入 prompt 提示符號下 (/# )
+ps aux |grep Application
+=> root       187  2.0  2.8 897232 44076 ?        Sl   00:00   0:03 ./Application
+cd /gstreamer/bin
+./gdb -p 187
+=> 此步驟執行需要一段時間是正常的，請耐心等候
+(gdb) 提示符號 出現
+(gdb) handle SIG33 SIG53 SIGUSR2 SIGCHLD nostop noprint
+=>
+Signal        Stop      Print   Pass to program Description
+SIGCHLD       No        No      Yes             Child status changed
+SIGUSR2       No        No      Yes             User defined signal 2
+SIG33         No        No      Yes             Real-time event 33
+SIG53         No        No      Yes             Real-time event 53 
+可進行 設置中斷點，info stack (bt)，info thread 來看是否 有 sigsuspend 字樣
+設置中斷點:
+(gdb) b DeviceImpl::setVolume
+=> Breakpoint 1 at 0x125ab8: file source/DeviceImpl.cpp, line 32.
+(gdb) b AlsaDevices::getNoofSoundCards
+=> Breakpoint 2 at 0x11a4bc: file source/AlsaDevices.cpp, line 93.
+(gdb) info b
+=>
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   0x00125ab8 in DeviceImpl::setVolume(NumericRange<int, 0, 100> const&, Device::OutputDestination) 
+                                           at source/DeviceImpl.cpp:32
+2       breakpoint     keep y   0x0011a4bc in AlsaDevices::getNoofSoundCards() at source/AlsaDevices.cpp:93
+可 c 來進行操作，來看是否到達中斷點
+ 
+info thread 來看是否 有 sigsuspend 字樣
+(gdb) info thread
+=>
+* 1    LWP 187 "Application" 0xb5b671b4 in pthread_join ()
+   from /lib/libpthread.so.0
+  2    LWP 189 "IR LED"  0xb5b6b5c0 in pthread_cond_wait ()
+   from /lib/libpthread.so.0
+  3    LWP 190 "PowerModes::Run" 0xb5b6b5c0 in pthread_cond_wait ()
+   from /lib/libpthread.so.0
+  4    LWP 191 "ResourceMonitor" 0xb5b6b990 in pthread_cond_timedwait ()
+   from /lib/libpthread.so.0
+  5    LWP 192 "PlayerUsage" 0xb5b6b5c0 in pthread_cond_wait ()
+   from /lib/libpthread.so.0
+  6    LWP 290 "Automount::run" 0xb5ebfd34 in mq_timedreceive ()
+   from /lib/librt.so.1
+  7    LWP 292 "HeapMon" 0xb5b6f5f0 in nanosleep () from /lib/libpthread.so.0
+  8    LWP 293 "HeapMon" 0xb5b6b5c0 in pthread_cond_wait ()
+   from /lib/libpthread.so.0
+  9    LWP 294 "DebugServer::ru" 0xb5aefd04 in select () from /lib/libc.so.6
+  10   LWP 297 "Watchdog::kicke" 0xb5b6f5f0 in nanosleep ()
+   from /lib/libpthread.so.0
+...
+假若 想看特定 thread 的 stack,
+先按 q 離開
+---Type <return> to continue, or q <return> to quit---q
+Quit
+(gdb) thread 55
+=>
+[Switching to thread 55 (LWP 387)]
+#0  0xb5b6b5c0 in pthread_cond_wait () from /lib/libpthread.so.0
+(gdb) bt
+=>
+#0  0xb5b6b5c0 in pthread_cond_wait () from /lib/libpthread.so.0
+#1  0xb5c9f69c in std::condition_variable::wait(std::unique_lock<std::mutex>&)
+    () from /usr/lib/libstdc++.so.6
+#2  0x00b97b9c in Download::CacheImpl::thread_runner() ()
+#3  0x00b97ca0 in std::thread::_Impl<std::_Bind_simple<Download::CacheImpl::CacheImpl(std::string const&, int, unsigned int)::{lambda()#1} ()> >::_M_run() ()
+#4  0xb5ca27b4 in ?? () from /usr/lib/libstdc++.so.6
+#5  0xb5b65d44 in ?? () from /lib/libpthread.so.0
+Backtrace stopped: Cannot access memory at address 0x6a
+來觀察 stack info.
+ 
+常用得指令:
+這邊是列 Gdb 比較常用command, 相關用法可以 google 一下
+ctrl + c ( entering command mode)
+(gdb) c    (continuous) 
+(gdb) bt   (backtrace) 當發生當機時候 可以用 bt 看當機的 function 是哪一個
+(gdb) l     (list) 可以簡單列出目前執行的程式行
+(gdb) b    (breakpoint) 簡單用法如下
+(gdb) b CMusicFullScreenView::ProcessMsg 針對 function 中斷
+(gdb) b srMusicFullScreenView.cpp:727 針對 檔案 第幾行中斷, 這個比較實用
+(gdb) p    (print) 可以列印變數
+(gdb) info   (information)  這個有很多種用法, 舉例
+(gdb) info b  可以列出所有 breakpoint
+(gdb) delete   刪除 breakpoint, 也可以針對其中一個刪除
+(gdb) q    (quit) 離開
+(gdb) n   (next line)
+(gdb) s   (steps)
+(gdb) up (back to up line)
+(gdb)set print object on(觀看class)
+(gdb)ptype b(印出真正的class;for dervived-base class)
+info threads -- 顯示目前所有的 thread
+thread thread_num -- 切換 GDB 到指定的 thread_num
+info sharedlibrary -- 顯示被載入的共享函式庫 (shared object library)，及載入的記憶體位置
+info registers -- 顯示基本暫存器的內容
+info all-registers -- 顯示所有暫存器的內容
+print $eax -- 顯示 eax 暫存器的內容
+

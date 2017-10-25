@@ -497,4 +497,7 @@ Linux cmd
     ...
 
     ```
-
++ memory usage
+    ```
+    $ ps aux | grep PROGRAM_NAME | awk '{ total += $6; } END { print total/1024"MB" }'
+    ```
