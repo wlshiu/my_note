@@ -283,6 +283,11 @@ Linux cmd
         (gdb) show inferior-tty
         Terminal for future runs of program being debugged is "/dev/pts/11".
         ```
+    - attach pid
+        ```
+        $ gdb -p [PID]
+        ```
+
 + strace
     ```
     $ strace -e TARGET_FUNC_NAME -f PROGRAM
