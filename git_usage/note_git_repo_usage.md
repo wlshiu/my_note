@@ -235,6 +235,11 @@
     $ git archive --format=tar.gz --prefix=folder_name/ HEAD > export.tar.gz
     ```
 
+- Git cherry-pick
+    ```
+    # from server
+    git fetch ssh://name@code.gerrit.com:888/kernel/linux refs/changes/11/64307/1 && git cherry-pick FETCH_HEAD
+    ```
 
 # Repo usage
 ---
