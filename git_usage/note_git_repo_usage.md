@@ -263,6 +263,8 @@
 
 		```
     	repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
+	    or
+	repo init -m proj20151031.xml  # You must put proj20151031.xml to .repo/manifests/
 		```
     + **-b**：用來指定某個manifest 分支。
 
