@@ -9,6 +9,15 @@ Linux cmd
     $ set
     ```
 
++ kenel log
+    ```
+      # disable all log
+    $ echo 0 > /proc/sys/kernel/printk
+
+      # enable all log
+    $ echo 8 > /proc/sys/kernel/printk
+    ```
+
 + find
     1. `-exec`
 
@@ -283,6 +292,7 @@ Linux cmd
         (gdb) show inferior-tty
         Terminal for future runs of program being debugged is "/dev/pts/11".
         ```
+
     - attach pid
         ```
         $ gdb -p [PID]
@@ -505,4 +515,30 @@ Linux cmd
 + memory usage
     ```
     $ ps aux | grep PROGRAM_NAME | awk '{ total += $6; } END { print total/1024"MB" }'
+    ```
+
++ sysRQ
+    > System request, hotkey: C + Pause/Break + h
+    ```
+    Crtl + Pause/Break + [option]
+    options:
+        loglevel(0-9)
+        reboot(b)
+        crash(c)
+        terminate-all-tasks(e)
+        memory-full-oom-kill(f)
+        kill-all-tasks(i)
+        thaw-filesystems(j)
+        show-backtrace-all-active-cpus(l)
+        show-memory-usage(m)
+        nice-all-RT-tasks(n)
+        poweroff(o)
+        show-registers(p)
+        show-all-timers(q)
+        sync(s)
+        show-task-states(t)
+        unmount(u)
+        show-blocked-tasks(w)
+        dump-ftrace-buffer(z)
+
     ```
