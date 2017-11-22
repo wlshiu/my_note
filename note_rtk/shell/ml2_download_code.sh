@@ -3,8 +3,8 @@
 function help()
 {
     echo "USAGE: $0 [folder_name] [kernel/system]"
-    echo "    kernel:  merlin2 kerenl code"
-    echo "    system:  merlin2 system APP code"
+    echo "    kernel:  ml2 kerenl code"
+    echo "    system:  ml2 system APP code"
     exit 1
 }
 
@@ -21,12 +21,12 @@ cd $1
 option=''
 
 if [ $2 == "system" ]; then
-    code_server_url=ssh://code.realtek.com.tw:20001/Sina/manifest
-    target_xml=PanEuroDVB.xml
+    code_server_url=ssh://code.gerrit.com.tw:20001/San/manifest
+    target_xml=Pan.xml
 elif [ $2 == "kernel" ]; then
-    code_server_url=ssh://code.realtek.com.tw:20001/rtk/native/manifest
+    code_server_url=ssh://code.gerrit.com.tw:20001/native/manifest
     target_xml=default.xml
-    option+=' -b merlin2'
+    option+=' -b ml2'
 else
     help
 fi

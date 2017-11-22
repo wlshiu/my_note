@@ -22,11 +22,11 @@ if [ -d ./system ]; then
     sed -i 's/^ENABLE_DEBUG =/ENABLE_DEBUG = YES\n#ENABLE_DEBUG =/' ../include/MakeConfig  # enable debug mode
 
     if [ $1 == "clean" ]; then
-        rm -fr ./system/project/PanEuroDVB/bin
+        rm -fr ./system/project/Pan/bin
     fi
 
 elif [ -d ./kernel ]; then
-    target_project=develop.rtd289x.tv001.emmc.sina
+    target_project=develop.emmc.san
     cd ./kernel/system
     make_options+='PRJ='${target_project}
 
