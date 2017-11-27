@@ -321,8 +321,48 @@ C++11
 
 
 + `override`
+    > 告知編譯器進行重載，編譯時期, 將檢查 parent (base) class 是否存在這樣的 virtual function
+
+    ```
+    struct Base {
+        virtual void foo(int);
+    };
+
+    struct SubClass: Base {
+        virtual void foo(int) override; // 合法
+        virtual void foo(float) override; // 非法, 父類沒有此虛函數
+    };
+    ```
+
 + `final`
+    > 防止 class 被繼續繼承以及終止 virtual function 繼續重載引入
+
+    ```
+    struct Base {
+            virtual void foo() final;
+    };
+    struct SubClass1 final: Base {
+    };                  // 合法
+
+
+    struct SubClass2 : SubClass1 {
+    };                  // 非法, SubClass1 已 final
+
+    struct SubClass3: Base {
+            void foo(); // 非法, foo 已 final
+    };
+    ```
 
 + `enum class`
+    > 實現了類型安全，首先他不能夠被隱式的轉換為整數，同時也不能夠將其與整數數字進行比較，
+    > 更不可能對不同的枚舉類型的枚舉值進行比較。但相同枚舉值之間可以進行比較
 
+    ```
+    enum class my_enum : unsigned int {
+        value1,
+        value2,
+        value3 = 100,
+        value4 = 100
+    };
+    ```
 
