@@ -366,3 +366,59 @@ C++11
     };
     ```
 
++ `explicit`
+    > 只對構造函數(constructor)起作用，用來抑制隱式轉換, 可以有效得防止構造函數的隱式轉換帶來的錯誤或者誤解
+    ```
+    class String {
+        explicit String ( int n ); // 本意是預先分配n個字節給字符串
+        String ( const char* p ); // 用C風格的字符串p作為初始化值
+        //…
+    }
+
+    下面兩種寫法仍然正確：
+        String s2 ( 10 );           //OK 分配10個字節的空字符串
+        String s3 = String ( 10 );  //OK 分配10個字節的空字符串
+
+    下面兩種寫法就不允許了：
+        String s4 = 10;   //編譯不通過，不允許隱式的轉換; 若允許隱式的轉換, 則分配10個字節的空字符串
+        String s5 = 'a';  //編譯不通過，不允許隱式的轉換; 若允許隱式的轉換, 則分配 int('a') 個字節的空字符串
+    ```
+
++ `delete` 與 `default`
+    > 控制預設函式
+
+    - 開發者自己定義一個新的類別的話，就算在什麼都沒有寫的情況下，編譯器也會自動產生一些預設的函式。 <\br>
+      所以，我們定義的類別才可以很方便地直接被建構、刪除、複製。 <\br>
+      而這些函式包括了：
+
+        1. 預設建構函式(default constructor)
+            > `sampleClass()`
+        1. 複製建構函式(copy constructor)
+            > `sampleClass( const sampleClass& )`
+        1. 複製指派運算子(copy assignment operator)
+            > `sampleClass& operator= ( const sampleClass& )`
+        1. 解構函式(destructor)
+            > `~sampleClass()`
+
+    ```
+    class NonCopyable
+    {
+    public:
+        NonCopyable() = default;
+        NonCopyable(const NonCopyable&) = delete;
+        NonCopyable& operator=(const NonCopyable&) = delete;
+    };
+
+    在 copy constructor 與 copy assignment operator 的宣告後面都加上了 "= delete"，
+    藉此讓編譯器知道這兩個函式是不需要的，之後如果呼叫的話，就會產生編譯階段的錯誤。
+
+    在 default constructor 後面加上了 "= default"，是告訴編譯器這邊雖然重新宣告了 default constructor，
+    但是還是要使用編譯器預設產生的版本。
+    ```
+
++ `struct` and `class`
+    > In C++, `struct` defaults to public access and `clas`s defaults to private access.
+    >> more people rarely declare `struct` just to save on typing the *public* keyword.
+
+
+
