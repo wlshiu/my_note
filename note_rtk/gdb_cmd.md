@@ -110,4 +110,13 @@ GDB_CMD
     > 直接執行上個指令
 
 
+# debug tips
 
++ disassembly code maps to source code
+    ```
+    $ objdump -D test.o # check disassembly code ln.65 in main()
+    $ gdb test.o
+    gdb) list *(main+65)
+    0x79 is in main(test.c:27)
+    
+    ```
