@@ -1,12 +1,11 @@
 #!/bin/bash
-# Copyright (c) 2018, All Rights Reserved.
+# Copyright (c) 2018, Wei-Lun Hsu
 # @file    make_defconfig.sh
 # @author  Wei-Lun Hsu
 # @version 0.1
 
 set -e
 
-keil_uv_cc=/C/Keil_v5/UV4/UV4.exe
 
 Red='\e[0;31m'
 Yellow='\e[1;33m'
@@ -23,7 +22,7 @@ help()
 }
 
 
-if [ $# != 1 ]; then
+if [ $# == 0 ]; then
     help
 fi
 
@@ -44,7 +43,7 @@ cd ${cur_dir}
 
 case $1 in
     "savedefconfig")
-        kconfig-conf.exe --savedefconfig=$1_defconfig ${CONFIG_PROJECT_ROOT}/Kconfig
+        kconfig-conf.exe --savedefconfig=$2_defconfig ${CONFIG_PROJECT_ROOT}/Kconfig
         ;;
     *)
         if echo $1 | grep -q '_defconfig'; then
@@ -52,11 +51,11 @@ case $1 in
                 rm -f autokconf.bat
             fi
 
-            if [ -e autokconf.bat ]; then
+            if [ -e autokconf.sh ]; then
                 rm -f autokconf.sh
             fi
 
-            if [ -e autokconf.bat ]; then
+            if [ -e autokconf.h ]; then
                 rm -f autokconf.h
             fi
 
@@ -66,21 +65,10 @@ case $1 in
 
             autokconf -i .config -oh autokconf.h -os autokconf.sh
             z_prepare_sys.sh ${CONFIG_PROJECT_ROOT}
-
-            source ./autokconf.sh
-
-            if [ $(find ${CONFIG_PRJ_FILE_DIR} -maxdepth 1 -type f -name '*_cm3.uvproj') ]; then
-                find ${CONFIG_PRJ_FILE_DIR}/ -type f -name '*_cm3.uvproj' -exec \
-                    ${keil_uv_cc} -b {} -o "build.log" -j0 \;
-            elif [ $(find ${CONFIG_PRJ_FILE_DIR} -maxdepth 1 -type f -name '*.uvproj') ]; then
-                find ${CONFIG_PRJ_FILE_DIR}/ -type f -name '*.uvproj' -exec \
-                    ${keil_uv_cc} -b {} -o "build.log" -j0 \;
-            fi
-
         else
             help
         fi
-    ;;
+        ;;
 
 esac    # --- end of case ---
 
