@@ -6,12 +6,42 @@
 
 set -e
 
-ignore_list=(
-'/share/http'
-'tool/'
-)
+# ignore_list=(
+# '/share/cJSON'
+# 'tool/'
+# )
 
-out_path=release.list
+Red='\e[0;31m'
+Yellow='\e[1;33m'
+NC='\e[0m' # No Color
+
+help()
+{
+    echo -e "${Yellow}usage: $0 [output name] [ignore list] ${NC}"
+    echo -e "${Yellow}  option:${NC}"
+    echo -e "${Yellow}    ignore list: Variable-length arguments${NC}"
+    exit 1;
+}
+
+if [ $# -lt 1 ]; then
+    help
+fi
+
+args=("$@")
+out_path=${args[0]}
+
+if [ $# -ge 1 ]; then
+    # make arguments to be ignore list
+    for ((i=1; i<$#; i++)); do
+        ignore_list[$i - 1]=${args[$i]}
+    done
+fi
+
+# for pattern in "${ignore_list[@]}"; do
+    # echo -e "$pattern"
+# done
+
+# exit
 
 cur_dir=`pwd`
 
@@ -36,12 +66,13 @@ find ${project_root} -type f \
     ! -path '*/sdk/misc*' \
     ! -path '.git*' > ${tmp_list_1}
 
+cp -f ${tmp_list_1} ${out_path}
 cp -f ${tmp_list_1} ${tmp_list_2}
 
 for pattern in "${ignore_list[@]}"; do
     patt=`echo ${pattern} | sed 's:\/:\\\/:g'`
     sed -e '/'"${patt}"'/d' ${tmp_list_2} > ${out_path}
-    
+
     cp -f ${out_path} ${tmp_list_2}
 done
 
