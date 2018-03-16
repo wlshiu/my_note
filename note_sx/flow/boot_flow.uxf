@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>396</x>
+      <y>165</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>ROM Code
+remap_flag=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>374</x>
+      <y>264</y>
+      <w>176</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>bootloader
+--
+1.Check active mode
+2.Check loading table
+3.remap_flag=1
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>440</x>
+      <y>396</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>484</x>
+      <y>484</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>wifi STA_mode
+remap_flag=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>308</x>
+      <y>484</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>wifi AP_mode
+remap_flag=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>407</y>
+      <w>99</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>70.0;70.0;70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>363</x>
+      <y>407</y>
+      <w>99</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>451</x>
+      <y>352</y>
+      <w>33</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>451</x>
+      <y>209</y>
+      <w>33</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>396</x>
+      <y>693</y>
+      <w>132</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>valign=center
+halign=center
+remap_flag=0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>517</x>
+      <y>187</y>
+      <w>143</w>
+      <h>550</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;480.0;110.0;480.0;110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>440</x>
+      <y>594</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>363</x>
+      <y>528</y>
+      <w>99</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>70.0;80.0;10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>528</y>
+      <w>99</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;70.0;80.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>396</x>
+      <y>550</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>event trigger
+CHANGE_MODE
+valign=center
+halign=center
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>451</x>
+      <y>627</y>
+      <w>33</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>275</x>
+      <y>231</y>
+      <w>209</w>
+      <h>440</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>170.0;380.0;10.0;380.0;10.0;10.0;170.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>473</x>
+      <y>660</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Y
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>341</x>
+      <y>616</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>N
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>726</x>
+      <y>517</y>
+      <w>132</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+valign=center
+halign=center
+0x0 (remap=1)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>737</x>
+      <y>660</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+valign=center
+halign=center
+0x0 (remap=0)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>616</y>
+      <w>88</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>valign=center
+halign=center
+ROM
+Boot Code</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>726</x>
+      <y>440</y>
+      <w>88</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+valign=center
+halign=center
+0xFFFF</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>187</y>
+      <w>77</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>SRAM
+
+
+
+
+
+
+
+
+
+
+
+valign=center
+halign=center
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>451</y>
+      <w>77</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>halign=center
+PRAM
+64KB
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>737</x>
+      <y>396</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>style=wordwrap
+valign=center
+halign=center
+0x20000000</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
