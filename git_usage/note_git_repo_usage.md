@@ -1,5 +1,26 @@
 # Git usage
 ---
+- MS Word files (https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes)
+    1. 新增 .gitattributes file
+        ```
+        # Documents
+        *.doc  diff=word
+        *.DOC  diff=word
+        *.docx diff=word
+        *.DOCX diff=word
+        *.dot  diff=astextplain
+        *.DOT  diff=astextplain
+        *.pdf  diff=astextplain
+        *.PDF  diff=astextplain
+        *.rtf  diff=astextplain
+        *.RTF diff=astextplain
+        ```
+    2. 當你要看比較結果時，如果檔副檔名是`doc`，Git 會使用 `word` 篩檢程式(filter)。什麼是 `word` 篩檢程式呢？你必須設定它。
+       下面你將設定 Git 使用 strings 程式，把 Word 文檔轉換成可讀的文字檔，之後再進行比較： 
+       ```
+       $ git config diff.word.textconv catdoc
+       ```
+
 - clone 時把 submodule 一起抓下來
     ```
     $ git clone --recursive url_remote
