@@ -1,5 +1,79 @@
-Cortex M3
+Cotex M3
 ---
+
+# Dual Core Communication (My rule)
+
++ Two cores are in the same memory space
++ Use bit-banding feature
+    - use *atomic* to sync two cores
+    - share buffer range `0x20000000 ~ 0x20000FFF`
+
++ architecture
+
+    ```
+    0x20000000  +--------------------------+
+                | rpc_share_hdr_t          |
+                |                          |
+                +--------------------------+
+                | rpmsg_t * max_queue_num  |
+                |                          |
+                |         ...              |
+                |                          |
+    0x20000FFF  +--------------------------+
+                |                          |
+
+    ```
+
+    - rpc header (proprietary)
+        ```
+        typedef struct rpc_share_hdr
+        {
+            uint32_t        queue[4];       // bit-field (for bit-banding) to record the read/write index
+            uint32_t        max_queue_num;  // set the max queue number by user, but the MAX = 32*4
+
+            uint32_t        spin_lock[2];   // bit-field (for bit-banding) to implement spin lock with bit-banding
+
+        } rpc_share_hdr_t;
+        ```
+
+    - rpmsg header (proprietary)
+        ```
+        typedef enum rpc_cmd
+        {
+            RPC_CMD_UNKNOWN     = 0,
+            RPC_CMD_HOLLOW,
+
+        } rpc_cmd_t;
+
+        typedef struct rpmsg_comm
+        {
+            rpc_cmd_t       cmd;
+            uint32_t        report_rst;
+        } rpmsg_comm_t;
+
+        typedef struct rpmsg
+        {
+            rpmsg_comm_t        comm;
+
+            union {
+                struct {
+                    // if difference memory space, need to prepare data region in share buffer.
+                    uint8_t         *pStr;
+                } hollow;
+
+                struct {
+                    uint32_t    argv0;
+                    uint32_t    argv1;
+                    uint32_t    argv2;
+                    uint32_t    argv3;
+                    uint32_t    argv4;
+                } def;
+            };
+        } rpmsg_t;
+        ```
+
+
+# Keil
 
 + definition
     - `PRAM`
@@ -153,14 +227,8 @@ Cortex M3
             }
             ```
 
-
-
-
-
     - Now, each project has self `.sct`
         1. `Option for target` -> linker -> Scatter File (edit)
-
-
 
 
 + ROM code (for boot)
@@ -191,13 +259,6 @@ Cortex M3
         > ~/share/bootloader
 
 
-
-+ snc7312
-    - single M3 + DSP
-
-+ snc7320
-    - M3 dual core (one core for system, the other is as DSP)
-        > No SMP, just follow `single M3 + DSP` rule to program
 
 
 
