@@ -28,8 +28,13 @@ Cotex M3
         ```
         typedef struct rpc_share_hdr
         {
-            uint32_t        queue[4];       // bit-field (for bit-banding) to record the read/write index
-            uint32_t        max_queue_num;  // set the max queue number by user, but the MAX = 32*4
+            // core_0 -> core_1
+            uint32_t        queue_0[4];       // bit-field (for bit-banding) to record the read/write index
+            uint32_t        max_queue_0_num;  // set the max queue number by user, but the MAX = 32*4
+            
+            // core_1 -> core_0
+            uint32_t        queue_1[4];       // bit-field (for bit-banding) to record the read/write index
+            uint32_t        max_queue_1_num;  // set the max queue number by user, but the MAX = 32*4
 
             uint32_t        spin_lock[2];   // bit-field (for bit-banding) to implement spin lock with bit-banding
 
