@@ -1,6 +1,6 @@
 # Git usage
 ---
-- MS Word files (https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes)
+- handle MS Word files (https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes)
 
     1. 新增 .gitattributes file
         ```
@@ -18,7 +18,7 @@
         ```
 
     2. 當你要看比較結果時，如果檔副檔名是`doc`，Git 會使用 `word` 篩檢程式(filter)。什麼是 `word` 篩檢程式呢？你必須設定它。
-       下面你將設定 Git 使用 strings 程式，把 Word 文檔轉換成可讀的文字檔，之後再進行比較： 
+       下面你將設定 Git 使用 strings 程式，把 Word 文檔轉換成可讀的文字檔，之後再進行比較：
        ```
        $ git config diff.word.textconv catdoc
        ```
@@ -26,21 +26,21 @@
 - clone 時把 submodule 一起抓下來
     ```
     $ git clone --recursive url_remote
-    
+
     # 抓下來才發現 submodule 是空的，可以用以下指令去抓
     $ git submodule init
     $ git submodule update --recursive
 
     git submodule init：根據 .gitmodules 的名稱和 URL，將這些資訊註冊到 .git/config 內，
                        可是把 .gitmodules 內不用的 submodule 移除，
-		       使用這個指令並沒辦法自動刪除 .git/config 的相關內容，必須手動刪除；
+               使用這個指令並沒辦法自動刪除 .git/config 的相關內容，必須手動刪除；
     git submodule update：根據已註冊(也就是 .git/config)的 submodule 進行更新，例如 clone 遺失的 submodule，
                           也就是上一段講的方法，所以執行這個指令前最好加上 --init；
     git submodule sync：如果 submodule 的 remote URL 有變動，可以在 .gitmodules 修正 URL，
                         然後執行這個指令，便會將 submodule 的 remote URL 更正。
 
     ```
-        
+
 
 - 檢查目前 Git 的狀態
 
@@ -228,7 +228,7 @@
         ps. 類似UNIX更新文件的操作, 單純修改檔案
         ```
 
-    	- 合併 patch
+        - 合併 patch
             $ git apply /xxx/yyy.patch
             ps. git apply會一次性將差異全部補齊
 
@@ -243,7 +243,7 @@
             把沒有衝突的文件先合併了，剩下有衝突的作標記。
             $ git apply --reject yyy.patch
 
-	+ patch 由 format-patch 生成
+    + patch 由 format-patch 生成
 
         ```
         a) 兩個節點之間的提交：
@@ -263,8 +263,8 @@
         2. 對於打過的補丁又再打一遍，會產生衝突，因此加上 -3 選項，git會很聰明地告訴我，無需更新，原有的補丁已經應用。
             $ git am -3 yyy.patch
 
-	+ linux cmd
-	> $ patch -p0 < your.patch
+    + linux cmd
+    > $ patch -p0 < your.patch
 
 - Git 匯出
 
@@ -285,7 +285,7 @@
 # Repo usage
 ---
 - repo help
-	> repo help COMMAND
+    > repo help COMMAND
 
 - repo status
     > 顯示所有project的狀態
@@ -294,40 +294,40 @@
     > 用來在目前目錄安裝下載整個Android repository，會下建立一個".repo"的目錄。
 
     + **-u**: 用來指定一個URL，從這個URL中獲取repository的manifest文件。
-	    例如：repo init -u git://android.git.kernel.org/platform/manifest.git，獲取的manifest文件放在.repo目錄中，命名為manifest.xml。
-	    這個文件的內容其實就是Android work space下所有被git管理的git repository的列表！
+        例如：repo init -u git://android.git.kernel.org/platform/manifest.git，獲取的manifest文件放在.repo目錄中，命名為manifest.xml。
+        這個文件的內容其實就是Android work space下所有被git管理的git repository的列表！
 
-	    如果你有仔細看，可以發現到.repo/manifests是個被git管理的repository，裡面放著所有的manifest文件 (*.xml)。
-	    而透過參數的設定，則可以指定要使用哪個manifest文件，甚至是該文件的不同branch。
+        如果你有仔細看，可以發現到.repo/manifests是個被git管理的repository，裡面放著所有的manifest文件 (*.xml)。
+        而透過參數的設定，則可以指定要使用哪個manifest文件，甚至是該文件的不同branch。
 
     + **-m**：用來選擇獲取 repository 中的某一個特定的 manifest 文件。如果不具體指定，那麼表示為預設的 manifest 文件 (default.xml)
 
-		```
-    	repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
-	    or
-	repo init -m proj20151031.xml  # You must put proj20151031.xml to .repo/manifests/
-		```
+        ```
+        repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
+        or
+    repo init -m proj20151031.xml  # You must put proj20151031.xml to .repo/manifests/
+        ```
     + **-b**：用來指定某個manifest 分支。
 
-		```
-		repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
-		```
+        ```
+        repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
+        ```
 
     + **options**:
         - `-u URL, --manifest-url=URL`:
-							manifest repository location
+                            manifest repository location
 
         - `-b REVISION, --manifest-branch=REVISION`:
-							manifest branch or revision
+                            manifest branch or revision
 
         - `-m NAME.xml, --manifest-name=NAME.xml`:
-							initial manifest file
+                            initial manifest file
 
         - `--mirror`:            mirror the forrest
 
         - `--reference=DIR`:     location of mirror directory
 
-		- `--depth=DEPTH`:       create a shallow clone with given depth; see git clone
+        - `--depth=DEPTH`:       create a shallow clone with given depth; see git clone
 
         - `-g GROUP, --groups=GROUP`: restrict manifest projects to ones with a specified group
 
@@ -341,8 +341,8 @@
     > 下載最新文件, 更新成功後, 文件會和遠端server中的代碼是一樣的。
       可以指定需要更新的project, 如果不指定任何參數，則會同步整個所有的project。
 
-	> 沒有指定 –local-only 選項, 那麼就對保存在變量 all_projects 中的 AOSP子項目進行網絡更新,
-	  也就是從遠程倉庫中下載更新到本地倉庫來, 這是通過調用Sync類的成員函數_Fetch來完成的
+    > 沒有指定 –local-only 選項, 那麼就對保存在變量 all_projects 中的 AOSP子項目進行網絡更新,
+      也就是從遠程倉庫中下載更新到本地倉庫來, 這是通過調用Sync類的成員函數_Fetch來完成的
 
     + **Options**:
         - `-h, --help`:             show this help message and exit
@@ -376,22 +376,22 @@
 
     - 使用帶有 --amend 參數
 
-		```
-	    $ git add xxx.c
-	    $ git commit --amend [-a]
-		```
+        ```
+        $ git add xxx.c
+        $ git commit --amend [-a]
+        ```
     > 預設的編輯器會出現，裡面會包含上一次提交的訊息內容，將訊息修改/儲存變更並離開編輯器。<br>
-	>
-		```
-		修改預設編輯器
-		$ git config --global core.editor vim
-		```
+    >
+        ```
+        修改預設編輯器
+        $ git config --global core.editor vim
+        ```
 
     - 重新 upload to Gerrit
-	>
-		```
-	    $ repo upload .
-		```
+    >
+        ```
+        $ repo upload .
+        ```
 
 - repo diff [PROJECT_LIST]
     > 顯示尚未commit的改動差異
@@ -399,10 +399,10 @@
 - repo download [target] [revision]
     > 下載指定的修改版本
 
-	```
-	下載修改版本為 1241 的代碼。
-   	$ repo download platform/frameworks/base 1241
-	```
+    ```
+    下載修改版本為 1241 的代碼。
+    $ repo download platform/frameworks/base 1241
+    ```
 
 - repo start new_branch_name [PROJECT_LIST]
     > 在指定的project中建立新的branch，並且切換到該branch上。
@@ -414,36 +414,37 @@
 - repo forall -p [PROJECT_LIST] -c [COMMAND]
     > 針對指定的project執行`-c`所帶入的 command, 這個被執行的命令就不限於僅僅是 git命令了, 而是任何被系統支持的命令, 比如：ls, pwd, cp 等
 
-	```
-	將所有project中的改動全部都清掉。
+    ```
+    將所有project中的改動全部都清掉。
     $ repo forall -p -c git reset --hard HEAD
-	```
+    ```
 
 - repo manifest -r -o xxx.xml
     - generate revision xml file
 
     - manifest.xml Format
 
-    	+ Element `remote`
-    		- Attribute **name**: A short name unique to this manifest file.
-    		- Attribute **fetch**: The Git URL prefix for all projects which use this remote.
-    		- Attribute **push**: The Git URL prefix for all projects which use this remote.
-    		- Attribute **review**: Host-name of the Gerrit server where reviews are uploaded to by "repo upload".
-    	+ Element `default`
-    		- Attribute **remote**: Element <remote->name>
-    		- Attribute **revision**: focus branch name in all project
-    	+ Element `project`
-    		- Attribute **name**:       project name on Remote
-    		- Attribute **path**:       relative path to the .repo
-    		- Attribute **revision**:   The version which wants to track for this project. It can be a branch name(HEAD)/tags/SHA-1.
-    		- ...
+        + Element `remote`
+            - Attribute **name**: A short name unique to this manifest file.
+            - Attribute **fetch**: The Git URL prefix for all projects which use this remote.
+            - Attribute **push**: The Git URL prefix for all projects which use this remote.
+            - Attribute **review**: Host-name of the Gerrit server where reviews are uploaded to by "repo upload".
+        + Element `default`
+            - Attribute **remote**: Element <remote->name>
+            - Attribute **revision**: focus branch name in all project
+        + Element `project`
+            - Attribute **name**:       project name on Remote
+            - Attribute **path**:       relative path to the .repo
+            - Attribute **revision**:   The version which wants to track for this project. It can be a branch name(HEAD)/tags/SHA-1.
+            - Attribute **clone-depth**: history depth when git clone in a project
+        - ...
 
         ```
         e.g.
             <?xml version='1.0' encoding='utf-8'?>
             <manifest>
               <remote fetch="ssh://review.gerrithub.io/Open-TEE" name="origin" review="https://review.gerrithub.io/Open-TEE" />
-              <default remote="origin" revision="master" />
+              <default remote="origin" revision="master" clone-depth="1" />
               <project name="project" path="test_OpenTEE/project" >
                 <copyfile src="README.md" dest="test_OpenTEE/README" />
               </project>
