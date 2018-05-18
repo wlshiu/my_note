@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>30</x>
+      <y>290</y>
+      <w>200</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>CONFIG_CORE1_LD_ADDR
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>100</x>
+      <y>90</y>
+      <w>100</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>520</x>
+      <y>220</y>
+      <w>220</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>CONFIG_CORE1_ER_ADDR
+ (CONFIG_CORE1_ER_SIZE)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>520</x>
+      <y>280</y>
+      <w>210</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>CONFIG_CORE1_RW_ADDR
+ (CONFIG_CORE1_RW_SIZE)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>220</y>
+      <w>70</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>280</y>
+      <w>70</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>230</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Read-Only Region
+(RO)
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>290</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Read/Write Region
+(RW)
+bg=#c07ab8</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>350</y>
+      <w>130</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>390</x>
+      <y>180</y>
+      <w>130</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>SRAM/DRAM
+--
+...
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>220</x>
+      <y>250</y>
+      <w>130</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>FLASH
+--
+...
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>220</x>
+      <y>300</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>CORE 1 
+Customization
+image
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>220</x>
+      <y>360</y>
+      <w>130</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>...</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

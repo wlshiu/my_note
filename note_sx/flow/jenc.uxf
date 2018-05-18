@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>27</x>
+      <y>54</y>
+      <w>180</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>CIS IRQ
+--
+halign=left
+Slice trigger Flag (Slice input)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>288</x>
+      <y>162</y>
+      <w>162</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>CIS Process
+--
+halign=left
+* Check Flag (Slice input)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>171</x>
+      <y>171</y>
+      <w>135</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+callback</panel_attributes>
+    <additional_attributes>130.0;20.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>297</x>
+      <y>396</y>
+      <w>207</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>JEncoder Process
+--
+halign=left
+* Check Flag (Start encoding Flag)
+
+
+
+* set Enc DMA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>0</x>
+      <y>180</y>
+      <w>180</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>CIS_CB
+--
+halign=left
+Set encoder start falg</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>198</x>
+      <y>72</y>
+      <w>288</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+wait enter process</panel_attributes>
+    <additional_attributes>190.0;80.0;190.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>0</x>
+      <y>405</y>
+      <w>180</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>JENC_CB
+--
+halign=left
+fill buf</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>171</x>
+      <y>405</y>
+      <w>144</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+callback</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>90</x>
+      <y>450</y>
+      <w>225</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>230.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>171</x>
+      <y>216</y>
+      <w>342</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+wait enter process</panel_attributes>
+    <additional_attributes>250.0;200.0;250.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>576</x>
+      <y>243</y>
+      <w>144</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>Media MUX Process
+--
+halign=left
+* mux_init
+	- init codec
+	
+* mux_proc
+	- Get_v_source
+	- Encode_one_frame
+	- Empty bs buffer
+
+* mux_deinit</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>657</x>
+      <y>117</y>
+      <w>144</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;220.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>783</x>
+      <y>117</y>
+      <w>180</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>get_v_Source
+--
+halign=left
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>792</x>
+      <y>333</y>
+      <w>180</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>Encode_one_frame
+--
+halign=left
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>315</y>
+      <w>135</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;20.0;130.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>792</x>
+      <y>486</y>
+      <w>180</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>Empty_BS_buffer
+--
+halign=left
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>342</y>
+      <w>144</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;180.0</additional_attributes>
+  </element>
+</diagram>
