@@ -4,7 +4,7 @@
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>27</x>
+      <x>63</x>
       <y>54</y>
       <w>180</w>
       <h>54</h>
@@ -18,7 +18,7 @@ Slice trigger Flag (Slice input)</panel_attributes>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>288</x>
+      <x>216</x>
       <y>162</y>
       <w>162</w>
       <h>63</h>
@@ -32,19 +32,19 @@ halign=left
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>171</x>
+      <x>135</x>
       <y>171</y>
-      <w>135</w>
+      <w>99</w>
       <h>45</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 callback</panel_attributes>
-    <additional_attributes>130.0;20.0;10.0;30.0</additional_attributes>
+    <additional_attributes>90.0;20.0;10.0;30.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>297</x>
+      <x>225</x>
       <y>396</y>
       <w>207</w>
       <h>135</h>
@@ -64,7 +64,7 @@ halign=left
     <coordinates>
       <x>0</x>
       <y>180</y>
-      <w>180</w>
+      <w>144</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>CIS_CB
@@ -76,21 +76,21 @@ Set encoder start falg</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>198</x>
+      <x>234</x>
       <y>72</y>
-      <w>288</w>
+      <w>180</w>
       <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 wait enter process</panel_attributes>
-    <additional_attributes>190.0;80.0;190.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>70.0;80.0;70.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>0</x>
+      <x>18</x>
       <y>405</y>
-      <w>180</w>
+      <w>135</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>JENC_CB
@@ -102,92 +102,93 @@ fill buf</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>171</x>
+      <x>144</x>
       <y>405</y>
-      <w>144</w>
+      <w>99</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 callback</panel_attributes>
-    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>90.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>90</x>
+      <x>108</x>
       <y>450</y>
-      <w>225</w>
+      <w>135</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 </panel_attributes>
-    <additional_attributes>230.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+    <additional_attributes>130.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>171</x>
+      <x>135</x>
       <y>216</y>
-      <w>342</w>
+      <w>306</w>
       <h>198</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 wait enter process</panel_attributes>
-    <additional_attributes>250.0;200.0;250.0;70.0;10.0;10.0</additional_attributes>
+    <additional_attributes>210.0;200.0;210.0;70.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>576</x>
+      <x>459</x>
       <y>243</y>
-      <w>144</w>
+      <w>189</w>
       <h>180</h>
     </coordinates>
     <panel_attributes>Media MUX Process
 --
 halign=left
-* mux_init
++ mux_init
+	- init CIS (init ONCE)
 	- init codec
 	
-* mux_proc
++ mux_proc
 	- Get_v_source
 	- Encode_one_frame
 	- Empty bs buffer
 
-* mux_deinit</panel_attributes>
++ mux_deinit</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>657</x>
-      <y>117</y>
-      <w>144</w>
-      <h>216</h>
+      <x>549</x>
+      <y>342</y>
+      <w>180</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>10.0;220.0;140.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;180.0;30.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>783</x>
-      <y>117</y>
-      <w>180</w>
+      <x>711</x>
+      <y>360</y>
+      <w>270</w>
       <h>81</h>
     </coordinates>
     <panel_attributes>get_v_Source
 --
 halign=left
-</panel_attributes>
++ CIS pocess (When not data, it MUST skip)</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>792</x>
-      <y>333</y>
+      <x>648</x>
+      <y>459</y>
       <w>180</w>
       <h>81</h>
     </coordinates>
@@ -200,20 +201,20 @@ halign=left
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>666</x>
-      <y>315</y>
-      <w>135</w>
-      <h>45</h>
+      <x>576</x>
+      <y>360</y>
+      <w>108</w>
+      <h>117</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>10.0;20.0;130.0;30.0</additional_attributes>
+    <additional_attributes>10.0;10.0;100.0;110.0</additional_attributes>
   </element>
   <element>
     <id>UMLFrame</id>
     <coordinates>
-      <x>792</x>
-      <y>486</y>
+      <x>567</x>
+      <y>567</y>
       <w>180</w>
       <h>81</h>
     </coordinates>
@@ -226,13 +227,55 @@ halign=left
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>666</x>
-      <y>342</y>
-      <w>144</w>
-      <h>180</h>
+      <x>549</x>
+      <y>369</y>
+      <w>54</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
-    <additional_attributes>10.0;10.0;140.0;180.0</additional_attributes>
+    <additional_attributes>10.0;10.0;40.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>702</x>
+      <y>234</y>
+      <w>234</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>Init codec
+--
+halign=left
++ weak up jpg task
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>279</y>
+      <w>180</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>10.0;30.0;180.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>441</x>
+      <y>117</y>
+      <w>333</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>bg=yellow
+halign=left
+Issue:
++ In preview mode, and rut-time encode
++ In preview mode, and run-time stop encoding</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>

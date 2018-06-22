@@ -1,5 +1,99 @@
 Cotex M3
 ---
+# Dual Core sample
+
+[LPCOpen-keil-lpc43xx] (https://github.com/micromint/LPCOpen-keil-lpc43xx)
+
++ architeture, no MMU (physical addrress access)
+    ```
+      core 0       core 1           core 2
+    msgQ  |        msgQ            msgQ  |
+     ^    |           ^               ^  |
+     |    +-----------+               |  |
+     |    | push msg                  |  |
+     |    +---------------------------+  |
+     +-----------------------------------+
+            push msg
+
+    ```
+
+    - Implement IPC with message queue
+    - In multi-processor case, you should select which core you want to communicate
+
++ code flow
+    ```
+    ipc_msg  <->  ipc_example (mw) <-> APP
+
+    ipc_msg: handle msgQ push/pop, semephore from IRQ
+    ipc_example: procedure register, receiving task, callback by procedure ID
+
+    ```
+
+    - trigger IRQ in *ipc_msg*
+        ```
+        void ipc_send_signal(void)
+        {
+            __asm__ __volatile__("dsb");
+            __asm__ __volatile__("sev");
+        }
+
+        ```
+
+        1. `DSB` (Data Synchronization Barrier)
+            > The DSB operation will complete when all explicit memory accesses before this instruction have completed.
+
+        1. `SEV` (Send Event)
+            > Sends an event to all processors in a multi-processor system.
+
+    - procedure callback in *ipc_example*
+        > register callbacks by procedure ID
+
+        ```c
+        // register callback to this table by procedure ID
+        static void (*cb_ipc_procedure_table[IPC_MAX_IDS]) (uint32_t);
+
+        void* task_ipc_recv(void *argv)
+        {
+            ...
+            if( IPC_popMsg(&msg) )
+            {
+                if (cb_ipc_procedure_table[msg.id])
+                    cb_ipc_procedure_table[msg.id](msg.data);
+            }
+            ...
+        }
+        ```
++ ISR of FreeRTOS
+    - xSemaphoreCreateBinary (more like SetEvent/WaitEvent)
+        > Default is `empty` state.
+          It must first be given using the xSemaphoreGive()/xSemaphoreGiveFromISR() before it can subsequently use the xSemaphoreTake().
+
+        1. mutex v.s. binary semaphore
+            > `Mutexes` include a `priority inheritance mechanism`, binary semaphores do not.
+            >> The binary semaphores is the better choice for implementing synchronisation
+                (between tasks or between tasks and an interrupt),
+                and mutexes is the better choice for implementing simple mutual exclusion.
+
+    - portEND_SWITCHING_ISR()
+        > set PendSV to avoid others tasks interrupt with high priorities.
+        >> freeze switch algorithm of the scheduler. After ISR handling, continue the scheduling algorithm
+
+        ```
+                task_cur    task_isr_handler        ISR
+                    |
+                    |
+                    |
+                    +------------------------------->|
+                                                     |
+                                    |<---------------+ portEND_SWITCHING_ISR
+                                    |                   (freeze)
+                                    |
+                                    |
+           continue |<--------------+
+                    |
+                    |
+
+        ```
 
 # Dual Core Communication (My rule)
 
@@ -31,7 +125,7 @@ Cotex M3
             // core_0 -> core_1
             uint32_t        queue_0[4];       // bit-field (for bit-banding) to record the read/write index
             uint32_t        max_queue_0_num;  // set the max queue number by user, but the MAX = 32*4
-            
+
             // core_1 -> core_0
             uint32_t        queue_1[4];       // bit-field (for bit-banding) to record the read/write index
             uint32_t        max_queue_1_num;  // set the max queue number by user, but the MAX = 32*4
