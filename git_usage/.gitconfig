@@ -1,0 +1,31 @@
+[core]
+  excludesfile = ~/.gitignore_global
+  editor = gvim
+  autocrlf = false
+  safecrlf = false
+[user]
+  email = wl@gmail.com
+  name = wl
+[push]
+  default = current
+[alias]
+  st = status --ignore-submodules=all
+  stat = status --ignore-submodules=all
+  ci = commit
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue) <%an>%Creset' --abbrev-commit
+  df = difftool
+[color]
+  ui = true
+[diff]
+  ;tool = vimdiff
+  tool = gvimdiff
+[difftool "gvimdiff"]
+  cmd = "gvim -c 'set columns=250' -c 'wincmd =' -d" "$LOCAL" "$REMOTE"
+[difftool]
+  prompt = false
+[merge]
+  conflictstyle = diff3
+[filter "lfs"]
+  clean = git lfs clean %f
+  smudge = git lfs smudge %f
+  required = true
