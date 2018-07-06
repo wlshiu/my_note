@@ -113,8 +113,18 @@
 
 - Git stash
     ```
-    $ git stash         # 暫存目前所有檔案狀態到 stack, 並 checkout 到 HEAD (概念上就是保存一份 patch)
-    $ git stash pop     # 將暫存的檔案狀態 pop出來 (將保存的 patch打進來)
+    $ git stash                # 暫存目前所有檔案狀態到 stack, 並 checkout 到 HEAD (概念上就是保存一份 patch)
+    $ git stash -u "my Commit" # 將 Untracked的檔案一併暫存起來
+    $ git stash list           # 列出目前暫存的列表
+      stash@{0}: WIP on dog: 053fb21 add dog 2
+      stash@{1}: WIP on cat: b174a5a add cat 2
+      
+    $ git stash pop           # 將暫存的檔案 pop出來(從編號最小的優先),套用成功之後,那個 Stash就會被刪除
+    $ git stash pop stash@{1} # 喚回需要的暫存
+    
+    $ git stash apply stash@{0} # 套用暫存到現在的分支上,但 Stash不會刪除
+    
+    $ git stash drop stash@{0}　# 刪除暫存
     ```
 
 - Git blame
