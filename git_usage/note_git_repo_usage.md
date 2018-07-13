@@ -77,6 +77,10 @@
     $ git commit -a -v                      # -v 可以看到檔案哪些內容有被更改, -a 把所有修改的檔案都 commit
     ```
 
+- Git show
+    $ git show some_branch_name:some_file_name.js     # show 特定檔案在特定分支的內容
+    $ git show some-branch-name:some-file-name.js > deleteme.js
+    
 - Git Tag
 
     ```
@@ -130,7 +134,8 @@
 - Git blame
 
     ```
-    $ git blame filename        # 關於此檔案的所有 commit 紀錄
+    $ git blame filename            # 關於此檔案的所有 commit 紀錄, 可以顯示檔案每行修改的人
+    $ git log -L 1,1:some_file.txt  # 修改 line 1 ~ line 1 的 commit
     ```
 
 - Git reset 還原
@@ -141,6 +146,18 @@
     $ git reset --hard HEAD~3
     $ git reset --soft HEAD~3
     ```
+
+- Git bisect 二分法尋找有錯誤的 commit
+    1. $ git bisect start # 告訴git開始執行2分法。
+    2. $ git bisect good some-commit-hash # 告訴git哪一個commit是正常的(例如在你休假前最後一個commit)。
+    3. $ git bisect bad some-commit-hash # 告訴git哪一個commit是壞掉的(例如目前master分支最新的commit)。git bisect bad HEAD(HEAD表示為最新的commit)。
+        >　此時會切換到好與壞的commit中間點，你必須確認這個中間點commit是否是正常的。
+　　　　　　如果是壞掉的再次執行git bisect bad告訴git這個commit是壞掉的。
+　　　　　　接著會在切換到一個新的commit，再次確認後，確定這個commit是正常的，使用git bisect good告訴git這個commit是正常的。
+　　　　　　當你找到開始出問題的commit，git bisect就已經完成任務了。
+
+    4. $ git bisect reset # 回到你一開始執行git bisect的commit(例如你是在master分支最新的commit執行的)
+    5. $ git bisect log   # 顯示git bisect最後一次成功的紀錄。
 
 - Git remote 維護遠端檔案
 
