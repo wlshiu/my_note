@@ -1,8 +1,80 @@
 Cotex M3
 ---
+# GNU Bootstrap
++ crt is the abbreviation of c runtime
+
+
+## bootstrap flow
+
+master object file `crt1.o`, `crti.o`, `crtbegin.o`, `crtend.o`, and `crtn.o`
+ps. `crti.o` and `crtbegin.o` are for initializing.
+    `crtend.o` and `crtn.o` are for de-initializing.
+
+
++ C process
+
+    ```
+    crt1.o -> crti.o -> main.o -> [system_libraries] -> crtn.o
+    ```
+
+    - `crt1.o`
+        ```
+        $ nm /usr/lib/crt1.o
+        00000000 R _IO_stdin_used
+        00000000 D __data_start
+                 U __libc_csu_fini
+                 U __libc_csu_init
+                 U __libc_start_main
+        00000000 R _fp_hw
+        00000000 T _start
+        00000000 W data_start
+                 U main
+        ```
+
+    - `crti.o`
+        ```
+        $ nm /usr/lib/crti.o
+                 U _GLOBAL_OFFSET_TABLE_
+                 w __gmon_start__
+        00000000 T _fini
+        00000000 T _init
+        ```
+    - flow
+        ```
+        _start
+            -> __libc_start_main (initial libc)
+                -> _init (setup process, e.g. setup global variables)
+                   ps. _init() will put at .init section by linker
+
+                    -> main (user object)
+
+                        -> _fini (clean process)
+                           ps. _fini() will put at .fini section by linker
+        ```
+
++ C++ process
+
+    ```
+    crt1.o -> crtbegin.o -> main.o -> [system_libraries] -> crtend.o
+    ```
+
+    - `crtbegin.o`
+
+    - `crtend.o`
+
+    - flow
+        ```
+        _start
+            -> __libc_start_main (initial glibc)
+                -> _init (setup process, e.g. setup global variables)
+                    -> main (user object)
+                        -> _fini
+        ```
+
+
 # Dual Core sample
 
-[LPCOpen-keil-lpc43xx] (https://github.com/micromint/LPCOpen-keil-lpc43xx)
+[LPCOpen-keil-lpc43xx](https://github.com/micromint/LPCOpen-keil-lpc43xx)
 
 + architeture, no MMU (physical addrress access)
     ```
@@ -179,7 +251,7 @@ Cotex M3
         >  `0 ~ 64k` in SRAM
 
 + scatter file
-    > [scatter-loader] (http://www.keil.com/support/man/docs/armlink/armlink_deb1353594352617.htm)
+    > [scatter-loader](http://www.keil.com/support/man/docs/armlink/armlink_deb1353594352617.htm)
     >> like link script
 
     - format
@@ -238,7 +310,7 @@ Cotex M3
 
             1. if [run time exec address] and [placed address] are the same, skip process of moving data
 
-        3. [attribute] (http://www.keil.com/support/man/docs/armlink/armlink_pge1362075670305.htm)
+        3. [attribute](http://www.keil.com/support/man/docs/armlink/armlink_pge1362075670305.htm)
             > [name] [exec address] [attribute] [data length]
 
             ```
@@ -261,7 +333,7 @@ Cotex M3
         4. region-related symbols
             > like global verable in the img
 
-            a. `Load$$` (http://www.keil.com/support/man/docs/armlink/armlink_pge1362065953229.htm)
+            a. `Load$$`(http://www.keil.com/support/man/docs/armlink/armlink_pge1362065953229.htm)
                 > for each execution region
 
                 ```
