@@ -2,7 +2,7 @@
 ---
 
 You can easily generate source code with compiling `.proto` file (which follow proto2/proto3 rule).
-It also supports backward/forward compatible.
+It also supports `backward/forward` compatible.
 
 + From offical description
     > Protocol buffers are a flexible, efficient, automated mechanism for serializing structured data – think XML,
@@ -30,7 +30,7 @@ Support C++, JAVA, Python, Go languages.
 2. [PBC](https://github.com/cloudwu/pbc/)
 3. [protobuf-c](https://github.com/protobuf-c/protobuf-c)
 
-## Concept
+## Syntax
 
 + Defining A Message Type
     ```
@@ -64,7 +64,11 @@ Support C++, JAVA, Python, Go languages.
         1. `reserved` (Reserved Fields)
             > If you want to reserve some field number or member name for future reusing,
             but maybe conflict with someone's version.
-            Use `reserved` to keep the field number or member name
+            Use `reserved` to reserve the field number or member name.
+            (The protocol buffer compiler will complain if any future users try to use these identifiers.)
+
+            > If you want to delete some members (field numbers) in new version,
+            you should use `reserved` to avoid someone use the same member name (field number) in future version.
 
             ```
             // field number 2, 15, 9 ~ 11, 40 ~ max will be reserved
@@ -75,7 +79,7 @@ Support C++, JAVA, Python, Go languages.
             }
 
             if bar = 2
-            reserved 2, "bar" => NG
+            reserved 2, "bar", 15 => NG
             ```
 
     - [Specifying Field Types](https://developers.google.com/protocol-buffers/docs/proto#scalar)
@@ -129,6 +133,8 @@ Support C++, JAVA, Python, Go languages.
 
     - Enumerations
         > Negative values are inefficient and thus not recommended.
+
+        > the first member MUST be set `0` in `enum`
 
         ```
         message SearchRequest {
@@ -228,9 +234,11 @@ Support C++, JAVA, Python, Go languages.
 
     ```
 
-+ binary format
-    > use `Varint (varying-length integer)` compressing algorithm,
-    >> `Varints` are based on the idea that most numbers are not uniformly distributed.
+## Binary Format
+
+    use `Varint (varying-length integer)` compressing algorithm,
+
++ `Varints` are based on the idea that most numbers are not uniformly distributed.
     Almost always, smaller numbers are more common in computing than larger ones.
     The trade off that varints make is to spend more bits on larger numbers,
     and fewer bits on smaller numbers.
@@ -240,50 +248,51 @@ Support C++, JAVA, Python, Go languages.
         >> `1` means data serializing, and `0` means it is the last byte.
 
     - only `7 bits` of every byte are used for data field
-    - protobuf uses `little-endian` format in a value of aggregative bytes
 
-    - Message Structure
-        > every member is descripted by format of key-value pairs.
++ protobuf uses `little-endian` format in a value of aggregative bytes
 
-        ```
-         <-- member 1 --> <-- member 2 --> <-- member 3 -->
-        +-------+--------+-------+--------+-------+--------+--
-        |  key  |  value |  key  |  value |  key  |  value |
-        +-------+--------+-------+--------+-------+--------+--
++ protobuf Message Structure
+    > every member is descripted by format of key-value pairs.
 
-        key[7:0] = ([Field Number] << 3) | [write type];
-        ```
+    ```
+     <-- member 1 --> <-- member 2 --> <-- member 3 -->
+    +-------+--------+-------+--------+-------+--------+--
+    |  key  |  value |  key  |  value |  key  |  value |
+    +-------+--------+-------+--------+-------+--------+--
 
-        ```
-        // example of key declaration with C code
-        struct key {
-            uint8_t    write_type: 3;
+    key[7:0] = ([Field Number] << 3) | [write type];
+    ```
 
-            // field num in 1 ~ 15 range is efficient or key will be descripted with multi-bytes.
-            uint8_t    field_num: 4;
-            uint8_t    tag: 1;
-        } key_t;
-        ```
+    ```
+    // example of key declaration with C code
+    struct key {
+        uint8_t    write_type: 3;
 
-        ```
-        // example of value encoding
-        uint32  value = 150u
-        binary        : 10010110
-        7-bits context: 000,0001  001,0110
-        little-endian : 001,0110  000,0001
-        MSB tag       : 1001,0110  0000,0001
-        hex           : 96  01
-        ```
+        // field num in 1 ~ 15 range is efficient or key will be descripted with multi-bytes.
+        uint8_t    field_num: 4;
+        uint8_t    tag: 1;
+    } key_t;
+    ```
+
+    ```
+    // example of value encoding
+    uint32  value = 150u
+    binary        : 10010110
+    7-bits context: 000,0001  001,0110
+    little-endian : 001,0110  000,0001
+    MSB tag       : 1001,0110  0000,0001
+    hex           : 96  01
+    ```
 
     - write type
         ```
         Type    Meaning             Used For
-        0       Varint              int32, int64, uint32, uint64, sint32, sint64, bool, enum
-        1       64-bit              fixed64, sfixed64, double
+        0       Varint              int32, int64, uint32, uint64, sint32, sint64, bool, enum (little-endian)
+        1       64-bit              fixed64, sfixed64, double (little-endian)
         2       Length-delimited    string, bytes, embedded messages, packed repeated fields
         3       Start group         groups (deprecated)
         4       End group           groups (deprecated)
-        5       32-bit              fixed32, sfixed32, float
+        5       32-bit              fixed32, sfixed32, float (little-endian)
         ```
 
     - Negative Numbers
@@ -308,11 +317,121 @@ Support C++, JAVA, Python, Go languages.
                             ...
             2147483647                  4294967294
                         -2147483648     4294967295
+
+            sint32:
+            #define ZIGZAG_CONV_32(n)      (((n) << 1) ^ ((n) >> 31))
+
+            sint64:
+            #define ZIGZAG_CONV_64(n)      (((n) << 1) ^ ((n) >> 63))
+
             ```
+    - Non-varint Numbers
+        ```
+        message Test {
+            optional int32 a = 1;
+            optional fixed32 b = 2;
+        }
+
+        set a = (1 << 28)
+        set b = (1 << 28)
+
+        int32  : 08 80 80 80 80 01 (6 bytes)
+        fixed32: fixed 4 bytes length
+        ```
+
+    - Length-delimited type
+
+        ```
+        key (varint format) + length (varint format) + raw data (bytes)
+
+        // example
+        message Test2 {
+            optional string b = 2;
+        }
+
+        set b = "testing"
+
+        key     : 0001,0010 (tag + field number + write type)
+        length  : 0000,0111 (tag + length value)
+        raw data: \74 \65 \73 \74 \69 \6e \67 ('t' + 'e' + 's' + 't' + 'i' + 'n' + 'g')
+        ```
+
+    - Nested
+
+        ```
+        key (varint format) + length (varint format) + nested type data (bytes)
+        => nested type data
+            -> key-value pairs
+
+        // example
+        message Test {
+            optional Test2  t2 = 9; // encode with Length-delimited type
+        }
+
+        set t2.b = "testing"
+
+        key        : 0100,1010 (tag + field num '9' + write type '2')
+        length     : 0000,1001 (tag + t2 length) // only nested member size NOT included self
+        t2.key     : 0001,0010 (tag + field number + write type)
+        t2.length  : 0000,0111 (tag + length value)
+        t2.raw_data: \74 \65 \73 \74 \69 \6e \67 ('t' + 'e' + 's' + 't' + 'i' + 'n' + 'g')
+
+        binary = key + length + t2.key + t2.length + t2.raw_data
+        ```
+
+    - Repeated
+
+        ```
+        key (varint format) + length (varint format) + repeated data (bytes)
+        => repeated data
+            -> key-value pairs * N
+
+        // example
+        message Test4 {
+            repeated int32  d = 4; // encode with Length-delimited type
+        }
+
+        set d[0] = 3
+        set d[1] = 270
+        set d[2] = 86942
+
+        key        : 0010,0010 (tag + field num '4' + write type '2')
+        length     : 0000,1001 (tag + t2 length) // only repeated members size NOT included self
+        d[0].key   : 0011,1000 (tag + field number + write type)
+        d[0].value : 0000,0011 (tag + value)
+        d[1].key   : 0011,1000 (tag + field number + write type)
+        d[1].value : \8E \02 (varint format and little-endian)
+        d[2].key   : 0011,1000 (tag + field number + write type)
+        d[2].value : \9E \A7 \05 (varint format and little-endian)
+
+        d[0].key == d[1].key == d[2].key => dummy
+
+        binary = key + length + d[0].key + d[0].value + d[1].key + d[1].value + d[2].key + d[2].value
+
+        // package
+        message Test4 {
+            repeated int32  d = 4 [packed=true];
+        }
+
+        key        : 0010,0010 (tag + field num '4' + write type '2')
+        length     : 0000,0110 (tag + t2 length) // only repeated members size NOT included self
+        d[0].value : 0000,0011 (tag + value)
+        d[1].value : \8E \02 (varint format and little-endian)
+        d[2].value : \9E \A7 \05 (varint format and little-endian)
+        ```
+
 
 
 # [proto3](https://developers.google.com/protocol-buffers/docs/proto3)
 
 Support C++, JAVA, Python, Go, Ruby, Objective-C, C-sharp languages,
 but proto3 is not completely compatible with proto2.
+
++ Distinction
+    ```
+    // .proto file
+    // In first line, you MUST declare proto3 (defalut is proto2)
+    syntax = "proto3";
+    ```
+
 
