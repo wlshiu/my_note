@@ -80,7 +80,7 @@
 - Git show
     $ git show some_branch_name:some_file_name.js     # show 特定檔案在特定分支的內容
     $ git show some-branch-name:some-file-name.js > deleteme.js
-    
+
 - Git Tag
 
     ```
@@ -122,12 +122,12 @@
     $ git stash list           # 列出目前暫存的列表
       stash@{0}: WIP on dog: 053fb21 add dog 2
       stash@{1}: WIP on cat: b174a5a add cat 2
-      
+
     $ git stash pop           # 將暫存的檔案 pop出來(從編號最小的優先),套用成功之後,那個 Stash就會被刪除
     $ git stash pop stash@{1} # 喚回需要的暫存
-    
+
     $ git stash apply stash@{0} # 套用暫存到現在的分支上,但 Stash不會刪除
-    
+
     $ git stash drop stash@{0}　# 刪除暫存
     ```
 
@@ -247,6 +247,82 @@
         => $ git mv foldername tempname && git mv tempname folderName
     ```
 
+- Git mergetool
+    > when CONFLICT happens
+    >> 修改後存檔離開, 會自動 resolved conflict。
+        若無修改離開也會自動 resolved conflict, 並維持衝突的內容。
+
+    ```
+    <<<<<<< HEAD
+    boycott
+    =======
+    chocolate
+    >>>>>>> C
+
+
+    <<<<<<< 到 ======= 之間為 local branch data
+    ======= 到 >>>>>>> 之間則為 merged branch data
+    ```
+
+    + set diff tool with vimdiff
+        ```
+        $ git config --global merge.tool vimdiff
+        $ git config --global difftool.prompt false
+        $ git config --global alias.d difftool  # optional, set alias cmd 'git d == git difftool'
+        ```
+
+    + layout
+        ```
+        +--------------------------------+
+        | LOCAL  |     BASE     | REMOTE |
+        +--------------------------------+
+        |             MERGED             |
+        +--------------------------------+
+
+        LOCAL : 目前 branch的內容
+        BASE  : 兩個衝突 nodes 的 parent node 內容
+        REMOTE: 要 merge 的 branch內容
+        MERGED: 顯示檔案目前的結果
+        ```
+
+    + Resolving conflict
+        1. move between differences
+            ```
+            // in merged window
+            command
+                [c	            jump to previous hunk
+                ]c	            jump to next hunk
+            ```
+        2. select version
+            > your cursor should between `<<<<<<< HEAD` and `>>>>>>>` in merged window
+            ``` vim
+            :diffget RE  " get from REMOTE
+            :diffget BA  " get from BASE
+            :diffget LO  " get from LOCAL
+            ```
+
+        3. `diffupdate`
+            > Update the diff and restore the cursor position
+
+        4. `:wqa`
+            > a fast way to Save the file and quit
+
+        5. 確定全部都用 remote 的版本為準時
+            ```
+            $ git checkout --theirs <conflict file>
+            ```
+
+        6. 確定全部都用 local 的版本為準時
+            ```
+            $ git checkout --ours <conflict file>
+            ```
+
+        7. 在 pull 遇到衝突時, 確定全部都用 remote 的版本為準時
+            ```
+            $ git checkout origin/master <confilct files>
+            ```
+
+
 - Git apply / Git am  (加入patch)
     + patch 由 git diff 產生
 
@@ -256,11 +332,11 @@
         ```
 
         - 合併 patch
-            $ git apply /xxx/yyy.patch
+            `$ git apply /xxx/yyy.patch`
             ps. git apply會一次性將差異全部補齊
 
             在實際打補丁之前，可以先用 git apply --check 查看補丁是否能夠乾淨順利地應用到當前分支中：
-            $ git apply --check yyy.patch
+            `$ git apply --check yyy.patch`
             error: patch failed: ticgit.gemspec:1
             error: ticgit.gemspec: patch does not apply
             ps. 如果沒有任何輸出，表示我們可以順利採納該補丁。
@@ -268,7 +344,7 @@
 
         - 有error時:
             把沒有衝突的文件先合併了，剩下有衝突的作標記。
-            $ git apply --reject yyy.patch
+            `$ git apply --reject yyy.patch`
 
     + patch 由 format-patch 生成
 
