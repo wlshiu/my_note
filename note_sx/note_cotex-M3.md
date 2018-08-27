@@ -167,6 +167,236 @@ ps. `crti.o` and `crtbegin.o` are for initializing.
 
         ```
 
+# Hard Faul Handle
+
+    To detect problems as early as possible, all Cortex-M processors have a fault exception mechanism included.
+    If a fault is detected, the corresponding fault exception is triggered
+    and one of the fault exception handlers is executed.
+
+You can reference [Using Cortex-M3/M4/M7 Fault Exceptions](http://www.keil.com/appnotes/docs/apnt_209.asp)
+
+
+Fault Exception Handlers
+------------------------
+Fault exceptions trap illegal memory accesses and illegal program behavior.
+The following conditions are detected by fault exception handlers:
+
++ UsageFault_Handler
+    > It detects execution of undefined instructions,
+        unaligned memory access for load/store multiple.
+        When enabled, divide-by-zero and other unaligned memory accesses are detected.
+
++ BusFault_Handler
+    > It detects memory access errors on instruction fetch, data read/write,
+        interrupt vector fetch, and register stacking (save/restore) on interrupt (entry/exit).
+
++ MemMang_Handler
+    > It detects memory access violations to regions that are defined in the Memory Management Unit (MPU).
+        For example, code execution from a memory region with read/write access only.
+
++ HardFault_Handler
+    > It is the default exception and can be triggered because of an error during exception processing,
+        or because an exception cannot be managed by any other exception mechanism.
+
+
+Each exception has an associated `Exception Number` (IRQ numbers) and an associated `Priority Number`.
+
+| Exception       | Exception Number  |  Priority      | IRQ Number  |  Activation
+|-----------------|-------------------|----------------|-------------|----------------------
+| HardFault       |     3             |      -1        |   -13       |  -
+| MemManage fault |     4             |  Configurable  |   -12       |  Synchronous
+| BusFault        |     5             |  Configurable  |   -11       |  Synchronous when precise, asynchronous when imprecise.
+| UsageFault      |     6             |  Configurable  |   -10       |  Synchronous
+
++ The HardFault exception is always enabled and has a fixed priority.
+    > it is higher than other interrupts and exceptions, but lower than NMI (Non-Maskable Interrupt).
+
++ All other fault exceptions (MemManage fault, BusFault, and UsageFault) have a programmable priority.
+    > they can be enable/disable by modifying the `SCB` (System Control Block).
+
+    - System Control Block (SCB)
+        > SCB provides system implementation information, and system control.
+            And it included some registers to cont control fault exceptions.
+
+        1. CCR (Configuration and Control Register) - Address:**0xE000ED14**/RW/privileged
+            > Control the behavior of the UsageFault for divideby-zero and unaligned memory accesses.
+
+        2. SHP (System Handler Priority Registers) - Address:**0xE000ED18**/RW/privileged
+            > Control the exception priority.
+
+        3. SHCSR (System Handler Control and State Register) - Address:**0xE000ED24**/RW/privileged
+            > Enables the system handlers, and indicates the pending status of the BusFault, MemManage fault, and SVC exceptions.
+
++ BusFaults
+    > BusFaults are subdivided into two classes: synchronous and asynchronous bus faults.
+        The fault handler can use the BFSR to determine whether
+        faults are asynchronous (IMPRECISERR) or synchronous (PRECISERR).
+
+    - Synchronous
+        > Synchronous bus faults are also described as a precise bus faults.
+            Exception is trigger immediately when fault happen.
+    - Asynchronous
+        > Asynchronous bus faults are described as imprecise bus faults.
+            Sometiems,the processor pipeline proceeds to the subsequent instruction execution
+            before the bus error response is observed. When an asynchronous bus fault is triggered,
+            the BusFault exception is pended.
+            If another higher priority interrupt event arrived at the same time,
+            the higher priority interrupt handler is executed first,
+            and then the BusFault exception takes place.
+
+
+Supported Fault types
+---------------------
+The bit names are mapping to the bit fields of status registers
+
+| Fault type                                               | Handler    | Status Register  | Bit Name
+|----------------------------------------------------------|------------|------------------|------------
+| Bus error on a vector read error                         | HardFault  |    HFSR          | VECTTBL
+| Fault that is escalated to a hard fault                  | HardFault  |    HFSR          | FORCED
+| Fault on breakpoint escalation                           | HardFault  |    HFSR          | DEBUGEVT
+| Fault on instruction access                              | MemManage  |    MMFSR         | IACCVIOL
+| Fault on direct data access                              | MemManage  |    MMFSR         | DACCVIOL
+| Context stacking, because of an MPU access violation     | MemManage  |    MMFSR         | MSTKERR
+| Context unstacking, because of an MPU access violation   | MemManage  |    MMFSR         | MUNSTKERR
+| During lazy floating-point state preservation            | MemManage  |    MMFSR         | MLSPERR
+| During exception stacking                                | BusFault   |    BFSR          | STKERR
+| During exception unstacking                              | BusFault   |    BFSR          | UNSTKERR
+| During instruction prefetching, precise                  | BusFault   |    BFSR          | IBUSERR
+| During lazy floating-point state preservation            | BusFault   |    BFSR          | LSPERR
+| Precise data access error, precise                       | BusFault   |    BFSR          | PRECISERR
+| Imprecise data access error, imprecise                   | BusFault   |    BFSR          | IMPRECISERR
+| Undefined instruction                                    | UsageFault |    UFSR          | UNDEFINSTR
+| Attempt to enter an invalid instruction set state        | UsageFault |    UFSR          | INVSTATE
+| Failed integrity check on exception return               | UsageFault |    UFSR          | INVPC
+| Attempt to access a non-existing coprocessor             | UsageFault |    UFSR          | NOCPC
+| Illegal unaligned load or store                          | UsageFault |    UFSR          | UNALIGNED
+| Stack overflow                                           | UsageFault |    UFSR          | STKOF
+| Divide By 0                                              | UsageFault |    UFSR          | DIVBYZERO
+
+
+Status and address registers for fault exceptions
+-------------------------------------------------
+
+| Handler    | Status/Address Register |    Address      | Description
+|------------|-------------------------|-----------------|-----------------
+| HardFault  |  HFSR                   |    0xE000ED2C   |  HardFault Status Register
+| MemManage  |  MMFSR                  |    0xE000ED28   |  MemManage Fault Status Register
+| MemManage  |  MMFAR                  |    0xE000ED34   |  MemManage Fault Address Register
+| BusFault   |  BFSR                   |    0xE000ED29   |  BusFault Status Register
+| BusFault   |  BFAR                   |    0xE000ED38   |  BusFault Address Register
+| UsageFault |  UFSR                   |    0xE000ED2A   |  UsageFault Status Register
+| UsageFault |  AFSR                   |    0xE000ED3C   |  Auxiliary Fault Status Register. Implementation defined content
+| UsageFault |  ABFSR                  |    -            |  Auxiliary BusFault Status Register. Only for Cortex-M7
+
+
+Example
+-------
+    It base on CMSIS environment.
+
+
++ HardFault_Handler
+
+    ```c
+    typedef struct stack_frm
+    {
+        unsigned long   r0;
+        unsigned long   r1;
+        unsigned long   r2;
+        unsigned long   r3;
+        unsigned long   r12; // IP, Intra-Procedure-call Scratch Register
+        unsigned long   lr;  // R14, link register
+        unsigned long   pc;  // R15, Program Counter
+        unsigned long   psr;
+    } stack_frm_t;
+
+    void HardFault_Handler()
+    {
+        __asm volatile
+        (
+            "TST lr, #4          \n"
+            "ITE EQ              \n"
+            "MRSEQ r0, MSP       \n"
+            "MRSNE r0, PSP       \n" // put stack frame start address to 1-st argument
+            "MOV r1, lr          \n" // put the LR register value to 2-nd argument
+            "B Hard_Fault_Handler\n" // jump to function Hard_Fault_Handler
+        );
+    }
+
+    void Hard_Fault_Handler(
+        unsigned long   *pStack,
+        unsigned int    lr_value)
+    {
+        stack_frm_t     *pStack_frm = (stack_frm_t*)pStack;
+
+        printf("[HardFault]\n");
+        {
+            unsigned long   cfsr = 0;
+            unsigned long   bus_fault_addr = 0;
+            unsigned long   mem_mgt_fault_addr = 0;
+
+            bus_fault_addr     = SCB->BFAR;
+            mem_mgt_fault_addr = SCB->MMFAR;
+            cfsr               = SCB->CFSR;
+
+            printf("- FSR/FAR:\n");
+            printf("   CFSR = x%x\n", cfsr);
+            printf("   HFSR = x%x\n", SCB->HFSR);
+            printf("   DFSR = x%x\n", SCB->DFSR);
+            printf("   AFSR = x%x\n", SCB->AFSR);
+
+            if (cfsr & 0x0080) printf("   MMFAR = x%x\n", mem_mgt_fault_addr);
+            if (cfsr & 0x8000) printf("   BFAR  = x%x\n", bus_fault_addr);
+        }
+
+        printf("- Stack frame:\n");
+        printf("   R0  = x%x\n", pStack_frm->r0);
+        printf("   R1  = x%x\n", pStack_frm->r1);
+        printf("   R2  = x%x\n", pStack_frm->r2);
+        printf("   R3  = x%x\n", pStack_frm->r3);
+        printf("   R12 = x%x\n", pStack_frm->r12);
+        printf("   LR  = x%x\n", pStack_frm->lr);
+        printf("   PC  = x%x\n", pStack_frm->pc);
+        printf("   PSR = x%x\n", pStack_frm->psr);
+
+        __asm volatile("BKPT #01");  // set breakpoint
+        while(1);
+    }
+    ```
+
+    - Keil IDE
+
+        1. set breakpoint at HardFault_Handler()
+
+        2. check report
+
+            > Memu `Peripherals` -> `Core Peripherals` -> `Fault Reports`
+
+        3. use `backtrace` to find the fault statement
+            > you also can get the next instruction address by checking LR (R14, link register)
+
+            > **Concept**
+            >+ `BL` instruction, Syntax: `BL{cond}{.W} label`
+            >> The `BL` instruction causes a branch to label,
+                and copies the address of the next instruction
+                into LR (R14, link register) for branch return.
+
+
+
+# ARM registers
+
+| Register |   Function                                         | Description
+|----------|----------------------------------------------------|---------------
+| R0       | general-purpose                                    | pass arguments and keep the result when return.
+| R1~R7    | general-purpose                                    | pass arguments to the callee
+| R8~R12   | general-purpose (for all **32-bit** instructions)  | pass arguments to the callee
+| R11 (fp) | Frame Pointer                                      | where the stack **was**
+| R12 (ip) | Scratch register / specialist use by linker        | -
+| R13 (sp) | Lower end of current stack frame                   | where the stack **is**
+| R14 (lr) | Link address / scratch register                    | where you **were**
+| R15 (pc) | Program coutner                                    | where you **are**
+
+
+
 # Dual Core Communication (My rule)
 
 + Two cores are in the same memory space
@@ -404,7 +634,7 @@ ps. `crti.o` and `crtbegin.o` are for initializing.
 
 + ROM code (for boot)
     - function
-        1. Search specific MARK ("SNC7312A") in SPI Flash, and get the BINs loading table
+        1. Search specific MARK ("MyChipName") in SPI Flash, and get the BINs loading table
             > header info of loading table is defined in `LoadTable.s`
 
         2. loading bootloader_bin to `PRAM`
