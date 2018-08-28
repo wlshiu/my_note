@@ -289,6 +289,21 @@ Status and address registers for fault exceptions
 | UsageFault |  ABFSR                  |    -            |  Auxiliary BusFault Status Register. Only for Cortex-M7
 
 
+Bit field of EXC_RETURN
+-----------------------
+When entering an exception handler, the LR register is updated to a special value
+called `EXC_RETURN` with the upper 28 bits all set to 1. This value, when loaded into
+the PC at the end of the exception handler execution, will cause the CPU to perform
+an exception return sequence. Bit 2 of the LR register determines the used stack
+before entering the exception.
+
+
+|bits         |   31:28              | 27:4     | 3                    |   2          | 1        | 0
+|-------------|----------------------|----------|----------------------|--------------|----------|-----------
+|descriptions | EXC_RETURN indicator | reserved | return mode          | return stack | reserved | processor state
+|value        |    0xF               | 0xFFFFFF | 1:thread, 0: handler | 0:MSP, 1:PSP |    0     |  1 (reserved)
+
+
 Example
 -------
     It base on CMSIS environment.
@@ -306,7 +321,7 @@ Example
         unsigned long   r12; // IP, Intra-Procedure-call Scratch Register
         unsigned long   lr;  // R14, link register
         unsigned long   pc;  // R15, Program Counter
-        unsigned long   psr;
+        unsigned long   psr; // Program Status Register
     } stack_frm_t;
 
     void HardFault_Handler()
@@ -381,20 +396,99 @@ Example
                 into LR (R14, link register) for branch return.
 
 
++ Tips
+    - Hard Fault Reasons
+
+        1. Overflow
+            >+ Out of array range
+            >+ Out of memory
+            >+ Stack overflow
+            >+ Error Interrupt Handling
+
+    - Solution
+
+        1. Tip 1: Trace Disassembly
+            > step 1. Brackpoint at HardFault_Handler()
+
+            > step 2. Open CPU Registers Window, and get `EXC_RETURN` value at LR (Link Register)
+            >>   if `0xFFFFFFE9`, check MSP (Main Stack Pointer) <br>
+            >>   if `0xFFFFFFFD`, check PSP (Process Stack Pointer) <br>
+            >
+            > If `bit 2` of the `EXC_RETURN` is `0` then the main stack (MSP is saved) was used,
+            > else the process stack (PSP is saved) was used.
+
+            > step 3. check stack frame data from MSP/PSP in memory window
+            >> We can look up PC and LR values in disassembly to map the sourece code.
+
+            ```c
+            struct stack_frame
+            {
+                volatile uint32_t    r0;  // Register R0
+                volatile uint32_t    r1;  // Register R1
+                volatile uint32_t    r2;  // Register R2
+                volatile uint32_t    r3;  // Register R3
+                volatile uint32_t    r12; // Register R12
+                volatile uint32_t    lr;  // Link register
+                volatile uint32_t    pc;  // Program counter
+
+                union {
+                    volatile uint32_t   byte;
+
+                    struct {
+                        uint32_t     IPSR : 8;  // Interrupt Program Status register (IPSR)
+                        uint32_t     EPSR : 19; // Execution Program Status register (EPSR)
+                        uint32_t     APSR : 5;  // Application Program Status register (APSR)
+                    } bits;
+                } psr; // Program status register.
+
+            } stack_frame_t;
+
+            // cast for getting PC and LR values
+            stack_frame_t   *pStack_frm = (stack_frame_t*)pMSP; //pPSP;
+            ```
+
+            > step 4. look up Address with Disassembly
+
+        2. Tip 2: with Keil IDE
+            > step 1. brackpoint at at HardFault_Handler()
+
+            > step 2. menu `View` -> `Call Stack Window` -> mouse right button `Show Caller Code`
+
+            > setp 3. check the source code
+
+
 
 # ARM registers
 
 | Register |   Function                                         | Description
 |----------|----------------------------------------------------|---------------
 | R0       | general-purpose                                    | pass arguments and keep the result when return.
-| R1~R7    | general-purpose                                    | pass arguments to the callee
-| R8~R12   | general-purpose (for all **32-bit** instructions)  | pass arguments to the callee
+| R1~R7    | general-purpose (support 16/32 bits instructions)  | pass arguments to the callee
+| R8~R12   | general-purpose (support **32-bit** instructions)  | pass arguments to the callee
 | R11 (fp) | Frame Pointer                                      | where the stack **was**
 | R12 (ip) | Scratch register / specialist use by linker        | -
 | R13 (sp) | Lower end of current stack frame                   | where the stack **is**
 | R14 (lr) | Link address / scratch register                    | where you **were**
 | R15 (pc) | Program coutner                                    | where you **are**
 
+
++ official document
+    - [Cortex-M3 Devices Generic User Guide](https://developer.arm.com/docs/dui0552/latest/preface) -> Chapter 2
+    - [Cortex-M4 Devices Generic User Guide](https://developer.arm.com/docs/dui0553/latest/preface)
+
++ stack frame structure
+
+    ```
+               H            |<previous> | <---- SP points here before interrupt
+                | SP + 0x1C |   xPSR    |
+                | SP + 0x18 |    PC     |
+     Decreasing | SP + 0x14 |    LR     |
+      memory    | SP + 0x10 |    R12    |
+      address   | SP + 0x0C |    R3     |
+                | SP + 0x08 |    R2     |
+                V SP + 0x04 |    R1     |
+               L  SP + 0x00 |    R0     | <---- SP points here after interrupt
+    ```
 
 
 # Dual Core Communication (My rule)
