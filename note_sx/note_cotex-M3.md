@@ -386,6 +386,37 @@ Example
 
             > Memu `Peripherals` -> `Core Peripherals` -> `Fault Reports`
 
+            > If the UsageFault handler is not enabled,
+            a UsageFault is escalated to a Hard Fault (FORCED bit will be display).
+
+            ```
+            Fault Reports window
+                        +---------------------+
+                        | MemManage faults    |
+                        |                     |
+                        |                     |
+                        +---------------------+
+                        | Bus Faults          |
+                        |                     |
+                    +---|- IMPRECISERR        |
+                    |   |                     |
+                    |   +---------------------+
+                    |   | UsageFaults         |
+                    |   |                     |
+                    |   |                     |
+                    |   +---------------------+
+                    |   |  Hard Faults        |
+                    |   |                     |
+                    |   |                     |
+                    +---|-> FORCED            |
+                        +---------------------+
+                        |  Debug Faults       |
+                        |                     |
+                        |                     |
+                        +---------------------+
+
+            ```
+
         3. use `backtrace` to find the fault statement
             > you also can get the next instruction address by checking LR (R14, link register)
 
