@@ -117,9 +117,9 @@ GNU ELF
 
 # Analysis
 
-+ object file (before linker to link symbols)
++ Object File (before linker to link symbols)
 
-    ```
+    ```shell
     $ readelf -a xx.o
     ELF Header:
         Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
@@ -173,6 +173,16 @@ GNU ELF
     - section `.rel.text`
         > only for linker, record which one need to re-located
 
+        ```shell
+        Relocation section '.rel.text' at offset 0x2b0 contains 2 entries:
+         Offset     Info    Type            Sym.Value  Sym. Name
+        00000008  00000201 R_386_32          00000000   .data
+        00000017  00000201 R_386_32          00000000   .data
+        ```
+
+        1. `Offset` column
+            > the offset address, which is relative to start address of `.test` section, should be re-located by linker.
+
     - section `.shstrtab`
         > record all section names
 
@@ -182,7 +192,7 @@ GNU ELF
     - section `.symtab`
         > symbol table, record the information of symbols
 
-        ```
+        ```shell
         Symbol table '.symtab' contains 8 entries:
            Num:    Value  Size  Type        Bind   Vis      Ndx     Name
             0: 00000000     0   NOTYPE      LOCAL  DEFAULT  UND
@@ -209,7 +219,7 @@ GNU ELF
     - section `.text`
         > read-only, record machine codes
 
-        ```
+        ```shell
         $ objdump -d xx.o
 
         xx.o:     file format elf32-i386
@@ -237,12 +247,14 @@ GNU ELF
 
         # |<------ machine code ----->|<------- disassemble -------->
 
-        # the symbol address is relative.
+        # The values without prefix '$' are memory address which are relative to text section,
+            and they will be modified with absolute address by linker.
         # Linker will modify the symbol addresst to the real memory address
         ```
 
-+ executable file
-    ```
++ Executable File
+
+    ```shell
     $ readelf -a xx
     ELF Header:
         Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
@@ -313,10 +325,11 @@ GNU ELF
 
     No version information found in this file.
     ```
-    - Program Headers
+
+    - Program Headers (is used at executing time)
         1. segment 1
             > FileSiz 0x9e = 0x74 + 0x2a = ELF header + Program header table + `.text` section
-            >> Map to `Off` colume of Section Headers
+            >> Map to `Off` column of Section Headers
 
         1. segment 2
             > FileSiz 0x38 = `.data` section
@@ -325,11 +338,145 @@ GNU ELF
             > memory page size
 
         1. full flow
-            > Loader put 0x0 ~ 0x9e data, in this executable file, to 0x08048000 of memory,
-            and 0xa0 ~ (0xa0 + 0x38) data, in this executable file, to 0x080490a0 of memory.
+            > Loader put 0x0 ~ (0x0 + 0x9e) data, in this executable file, to 0x08048000 of memory,
+            and 0xa0 ~ (0xa0 + 0x38) data, in this executable file, to (0x08049000 + 0xa0) of memory.
 
             >> + every segment should put at difference memory pages.
-            >> + For simplifying mapping flow, the segment 2 directly maps with offset (not star at head of the memory page)
+            >> + For simplifying mapping flow, the segment 2 directly is mapped with it's offset (not star at head of a memory page)
+
++ Shared Object
+    > Data references from PIC are usually made indirectly,
+    through `Global Offset Tables (GOTs)`, which store the addresses of all accessed global variables.
+    There is one GOT per compilation unit or object module,
+    and it is located at a fixed offset from the code (although this offset is not known until the library is linked).
+    When a Linker links modules to create a shared library, it merges the GOTs and sets the final offsets in code.
+
+    - compiler option `-fPIC` (Position Independent Code)
+        > PIC can be executed at any memory address without modification (except GOTs).
+        And it is commonly used for shared libraries,
+        so that the same library code can be loaded in difference location with difference program.
+
+        1. `.rel.text` section
+            > + `R_386_32`: absolute address re-located
+            > + `R_386_GOTPC`: use relative address and loading time re-located (need to reference Global Offset Table)
+
+            ```shell
+            # without fPIC
+            Relocation section '.rel.text' at offset 0x848 contains 4 entries:
+             Offset     Info    Type            Sym.Value  Sym. Name
+            0000000d  00001001 R_386_32          00000000   top
+            00000015  00001001 R_386_32          00000000   top
+            0000001b  00001001 R_386_32          00000000   top
+            00000025  00001101 R_386_32          00000000   stack
+            ```
+
+            ```shell
+            # with fPIC
+            Relocation section '.rel.text' at offset 0x94c contains 6 entries:
+             Offset     Info    Type            Sym.Value  Sym. Name
+            00000008  00001202 R_386_PC32        00000000   __i686.get_pc_thunk.bx
+            0000000e  0000130a R_386_GOTPC       00000000   _GLOBAL_OFFSET_TABLE_
+            0000001a  00001403 R_386_GOT32       00000000   top
+            00000025  00001403 R_386_GOT32       00000000   top
+            0000002d  00001403 R_386_GOT32       00000000   top
+            00000035  00001503 R_386_GOT32       00000000   stack
+            ```
+
+        1. `disassemble`
+
+            ```shell
+            # without fPIC
+            $ objdump -dS xx.o
+
+                ...
+            80483cc: a1 10 a0 04 08     mov   0x804a010,%eax   # 0x804a010 absolute adress
+            80483d1: 83 c0 01           add   $0x1,%eax        # eax add 0x1
+                ...
+
+            ```
+
+            ```shell
+            # with fPIC
+            $ objdump -dS libxx.so
+
+                ...
+            494:   8b 83 f4 ff ff ff   mov   -0xc(%ebx),%eax  # get 'pointer' and put it to eax
+            49a:   8b 00               mov   (%eax),%eax      # get 'value' with pointer in eax and put it to eax
+            49c:   8d 50 01            lea   0x1(%eax),%edx   # eax add 0x1 and put it to edx
+                ...
+
+            ##### indirect addressing
+
+                    +----------------+
+                    |                |
+            ebx+0xc +----------------+
+                    | pointer to X --|----+
+            ebx+0x8 +----------------+    |
+                    |                |    |
+                    |                |    |
+                    |   ...          |    |
+                    |                |    |
+                    +----------------+    |
+                    |  X address  <--|----+
+                    +----------------+
+                    |                |
+            ```
+    - Tips
+
+        1. `ldd`
+            > simulate dynamic link, you can check the path and `*.so` file
+
+            ```shell
+            $ ldd [executable elf]
+
+            # e.g.
+            $ ldd test
+                linux-gate.so.1 =>  (0xb7f5c000)
+                libstack.so => not found
+                libc.so.6 => /lib/tls/i686/cmov/libc.so.6 (0xb7dcf000)
+                /lib/ld-linux.so.2 (0xb7f42000)     # dynamic-linker
+            ```
+
+        1. search path in running time
+
+            > + `LD_LIBRARY_PATH`
+            >> environment variable.
+            In some situation, `LD_LIBRARY_PATH` will be ignored for security issues.
+            Recommand: Use `LD_LIBRARY_PATH` only for debugging (it is dangerous).
+            >   ```shell
+                $ setenv LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/xxx/
+                    or
+                $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/xxx/
+                ```
+            >> In compiler time, gcc will search path first with option `-L` and then `LD_LIBRARY_PATH`
+            >>  ```shell
+                $ gcc -L./ -L/usr/xxx -ltest *.c
+                ```
+
+            > + `/etc/ld.so.conf` (popular)
+            >> record the search path of shared objects in system level
+            >   ```shell
+                $ sudo vim /etc/ld.so.conf  # add dynamic path to this file
+                $ ldconfig  # re-generate 'ld.so.cache' (note: there is no log to print)
+                ```
+
+            > + default search path `/usr/lib` or `/lib`
+            >> copy your `*.so` to the system default path
+
+            > + hot code in compiler option
+            >>  option `-Wl,-rpath,[path]` (No recommand)
+            >   ```shell
+                $ gcc main.c -g -L. -lstack -Istack -o test -Wl,-rpath,/home/somedir
+                $ readelf -a test
+                    ...
+                Dynamic section at offset 0xf10 contains 23 entries:
+                  Tag        Type                         Name/Value
+                 0x00000001 (NEEDED)                     Shared library: [libstack.so]
+                 0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+                 0x0000000f (RPATH)                      Library rpath: [/home/somedir]  # hot code
+                    ...
+                ```
+
 
 # Notic
 
@@ -359,9 +506,84 @@ GNU ELF
         $ arm-none-eabi-objdump -b binary -m arm uboot.bin
         ```
 
++ `*.a`
+    > static libraries
+
+    ```
+    # generate static lib
+    $ ar –rc libtest.a aa.o bb.o cc.o
+
+    # use static lib
+    $ gcc -o executable-name prog.c libtest.a
+        or
+    $ gcc -o executable-name prog.c -L/path/to/library-directory -ltest
+    ```
+
+    - `-L`
+        > the directory path of libraries
+
+    - `-l`
+        > the name of library without prefix **lib** and suffix **.a**
+
+    - `-I`
+        > the path of header of libraries
+
+
++ `*.so`
+    > shared libraries
+
+    ```
+    # generate shared lib
+    $ gcc -c -fPIC *.c
+    $ gcc -shared -Wl,-soname,libtest.so.1 -o libtest.so.1.1 aa.o bb.o cc.o
+
+    # symbolic link
+    $ ln -s libstack.so.1.0 libstack.so
+
+    # use shared lib
+    $ gcc -Wall -I../ -L/opt/lib prog.c -ltest -o prog
+    ```
+
+    - `-L`
+        > the directory path of the linker name of libraries
+
+    - `-l`
+        > the name of library without prefix **lib** and suffix **.so**
+
+    - Naming
+        1. Soname
+            > The soname has the prefix **lib**, the name of the library, the phrase **.so**,
+            followed by a period and a **version number** that is incremented whenever the interface changes.
+            >> structure: `lib` + `name` + `.so` + `.ver_num`, e.g. libtest.so.1
+
+            ```shell
+            # get soname
+            $ objdump -p libxx.so | grep SONAME
+            ```
+
+        1. Real Name
+            >  The real name is the filename containing the actual library code.
+            It adds to the soname a period, a minor number, another period, and the release number.
+            The last period and release number are optional.
+            >> structure: `soname` + `.minor_num` + `.release_num` (optional), e.g. libtest.so.1.1
+
+        1. Linker name
+            > + The linker name is simply the soname without any version number, e.g. libtest.so.
+            And it is a symbolic link to the soname name.
+            >   ```shell
+                $ cat /usr/lib/libc.so
+                /* GNU ld script
+                   Use the shared library, but some functions are only in
+                   the static library, so try that secondarily.  */
+                OUTPUT_FORMAT(elf32-i386)
+                GROUP ( /lib/libc.so.6 /usr/lib/libc_nonshared.a  AS_NEEDED ( /lib/ld-linux.so.2 ) )
+                ```
+            > + the compiler **ONLY** uses `linker name`
+
+
 + reference
     - SPEC: System V Application Binary Interface - Chapter 4
     - [ELF Document](http://learn.tsinghua.edu.cn/kejian/data/77130/138627/html-chunk/ch18s05.html#ftn.id2770769)
-
+    - [Shared Object](http://learn.tsinghua.edu.cn/kejian/data/77130/138627/html-chunk/ch20s04.html)
 
 
