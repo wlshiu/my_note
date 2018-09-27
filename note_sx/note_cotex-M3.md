@@ -676,61 +676,63 @@ Example
             ```
 
             a. `OVERLAY`
-                > load multiple regions at the same address, link dynamic link
+                load multiple regions at the same address, link dynamic link
 
             a. `FIXED`
-                > put to fixed address
+                put to fixed address
 
             a. `+offset`
-                > to specify a load region base address, which is based on previous section end address + offset
+                to specify a load region base address, which is based on previous section end address + offset
 
 
         4. region-related symbols
             > like global verable in the img
 
-            a. `Load$$`(http://www.keil.com/support/man/docs/armlink/armlink_pge1362065953229.htm)
-                > for each execution region
+            a. [`Load$$`](http://www.keil.com/support/man/docs/armlink/armlink_pge1362065953229.htm)
+                for each execution region
 
-                ```
-                Load$$ [region_name] $$Base:        mean the load address of the region.
-                Load$$ [region_name] $$Length:      mean the region length in bytes.
-                Load$$ [region_name] $$Limit:       mean the address of the byte beyond the end of the execution region.
-                Load$$ [region_name] $$RO$$Base:    mean the address of the RO output section in this execution region.
-                ...
+            ```
+            Load$$ [region_name] $$Base:        mean the load address of the region.
+            Load$$ [region_name] $$Length:      mean the region length in bytes.
+            Load$$ [region_name] $$Limit:       mean the address of the byte beyond the end of the execution region.
+            Load$$ [region_name] $$RO$$Base:    mean the address of the RO output section in this execution region.
+            ...
+            ```
 
-                ```
+            a. [`Image$$`](http://www.keil.com/support/man/docs/armlink/armlink_pge1362065952432.htm)
+                for each execution region
 
-            a. `Image$$` (http://www.keil.com/support/man/docs/armlink/armlink_pge1362065952432.htm)
-                > for each execution region
+            ```
+            Image$$ [region_name] $$Base:           mean the Execution address of the region.
+            Image$$ [region_name] $$Length:         mean the Execution region length in bytes excluding ZI length.
+            Image$$ [region_name] $$Limit:          mean the Address of the byte beyond the end of the non-ZI part of the execution region.
+            Image$$ [region_name] $$RO$$Base:       mean the Execution address of the RO output section in this region.
+            Image$$ [region_name] $$RO$$Length:     mean the Length of the RO output section in bytes.
+            ...
+            ```
 
-                ```
-                Image$$ [region_name] $$Base:           mean the Execution address of the region.
-                Image$$ [region_name] $$Length:         mean the Execution region length in bytes excluding ZI length.
-                Image$$ [region_name] $$Limit:          mean the Address of the byte beyond the end of the non-ZI part of the execution region.
-                Image$$ [region_name] $$RO$$Base:       mean the Execution address of the RO output section in this region.
-                Image$$ [region_name] $$RO$$Length:     mean the Length of the RO output section in bytes.
-                ...
+            a. [`Load$$LR$$`](http://www.keil.com/support/man/docs/armlink/armlink_pge1362065953823.htm)
+                for each load region
 
-                ```
-
-            a. `Load$$LR$$`
-                > for each load region
-
-                ```
-                Load$$LR$$ [load_region_name] $$Base:       mean the Address of the load region.
-                Load$$LR$$ [load_region_name] $$Length:     mean the Length of the load region.
-                Load$$LR$$ [load_region_name] $$Limit:      mean the Address of the byte beyond the end of the load region.
-                ```
+            ```
+            Load$$LR$$ [load_region_name] $$Base:       mean the Address of the load region.
+            Load$$LR$$ [load_region_name] $$Length:     mean the Length of the load region.
+            Load$$LR$$ [load_region_name] $$Limit:      mean the Address of the byte beyond the end of the load region.
+            ```
 
         5. section type
-            a. `+RO`
-                > Read-Only
-            a. `+RW`
-                > Read-and-Write
-            a. `+ZI`
-                > Zero-Initialed
 
-        5. Configure user section (http://www.keil.com/support/man/docs/armlink/armlink_pge1362066000009.htm)
+            a. `+RO`
+                Read-Only
+
+            a. `+RW`
+                Read-and-Write
+
+            a. `+ZI`
+                Zero-Initialed
+
+        5. [Configure user section](http://www.keil.com/support/man/docs/armlink/armlink_pge1362066000009.htm)
+
             a. `__attribute__((section("name")))` in C code
             ```
             int sqr(int n1) __attribute__((section("foo")));
