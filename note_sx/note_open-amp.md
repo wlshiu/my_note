@@ -206,10 +206,37 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
 ## RPMsg
 
 + RPMsg Framework
-    - VirtIO
-    - virtqueue (virtual queue) or vring (virtual ring buffer)
+    - VirtIO Device
+        > A abstraction device for application layer
 
+        1. rpmsg device inherits from VirtIO Device
+        and it is also known as a rpmsg channel.
 
+    - virtqueue (virtual queue)
+        > Involve vring data structure and be used to manage nodes in a queue
+
+    - vring (virtual ring buffer)
+        > ring buffer management for payload
+
+    - endpoint
+        > Provide logical connections on top of RPMsg channel.
+        >> It allows the user to bind multiple Rx callbacks on the same channel.
+
+    - hierarchy
+        ```
+            callback
+            +----------> endpoint
+            |
+        rpmsg device (channel)
+            +-> tx_vq
+                    +->
+                    ...
+            +-> rx_vq
+                    +-> attributes of a node
+                    +-> vring
+                          +-> read pointer
+                          +-> write pointer
+        ```
 
 # Reference
 + [OpenAMP Framework User Reference](https://github.com/OpenAMP/open-amp/blob/master/docs/openamp_ref.pdf)
