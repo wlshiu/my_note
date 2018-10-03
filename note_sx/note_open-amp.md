@@ -238,6 +238,168 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
                           +-> write pointer
         ```
 
+    - program flow
+        ```c
+        struct virtqueue {
+            struct list_head        list;
+            void (*callback)(struct virtqueue *vq);
+            const char              *name;
+            struct virtio_device    *vdev;
+            struct virtqueue_ops    *vq_ops;
+            void *priv;
+        };
+
+        struct virtqueue_ops {
+            /* push buffer to queue */
+            int (*add_buf)(struct virtqueue *vq,
+                            struct scatterlist sg[],
+                            unsigned int out_num,
+                            unsigned int in_num,
+                            void *data);
+
+            /* notify the queue is updated */
+            void (*kick)(struct virtqueue *vq);
+
+            /*  pop bufferf from queue */
+            void *(*get_buf)(struct virtqueue *vq, unsigned int *len);
+
+            void (*disable_cb)(struct virtqueue *vq);
+            bool (*enable_cb)(struct virtqueue *vq);
+        };
+        ```
+
+        1. TX
+        ```
+                        task_vq_tx                isr_vq_tx   app (rpmsg_send)
+                            |                       |          |
+                            |                       |          | try_send
+                            |                       |          | 1. get buffer for transmating
+                            |                       |          |    vq_ops->get_buf()
+                            |                       |          | 2. copy data to vring buffer
+                            |                       |          | 3. vq_ops->add_buf()
+                            |                       |          | 4. trigger device event
+                            |                       |          |    vq_ops->kick()
+                            |                       |<---------|
+                            |   event of msg sent   |          | 5. wait vq complete event
+                            |<----------------------|          |
+            pass to         |                       |          |
+            vq_tx_callback  |                       |          |
+            (trigger vq     |                       |          |
+            complete event) |                       |          |
+                            |                       |          |
+                            |--------------------------------->| 6. leave rpmsg_send()
+                            |                       |          |
+                            |                       |          |
+        ```
+
+        1. RX
+        ```
+                   app   isr_vq_rx              task_vq_rx
+                    |        |                      |
+                    |        | event of recv msg    |
+                    |        |--------------------->|
+                    |        |                      | pass to vq_rx_callback
+                    |        |                      | 1. get buffer
+                    |        |                      |    vqq_ops->get_buf()
+                    |        |                      | 2. get mapped rpmsg device (channel)
+                    |        |                      |    with src/dest addresses
+                    |        |                      |    ps. All channels share the same memory pool
+                    |        |                      | 3. callback to local routing by channel
+                    |<------------------------------| 4. local routing callback to mw/app handlers
+                    |        |                      | 5. act until vq_rx empty
+                    |        |                      |
+        ```
+
++ RPMsg API
+
+    virsion:
+
+    [OpenAMP v2018.04 Release](https://github.com/OpenAMP/open-amp/releases/tag/v2018.04)
+
+    [FreeRTOS_WaRP7](https://github.com/wlshiu/FreeRTOS_WaRP7)
+
+    ```c
+    // example:
+    static struct rpmsg_channel *app_chnl = 0;
+
+    static void
+    rpmsg_channel_created(struct rpmsg_channel *rp_chnl)
+    {
+        app_chnl = rp_chnl;
+    }
+
+    static void
+    rpmsg_channel_deleted(struct rpmsg_channel *rp_chnl)
+    {
+    }
+
+    rpmsg_init(0 /*REMOTE_CPU_ID*/,
+                &hRmotedev,
+                rpmsg_channel_created,
+                rpmsg_channel_deleted,
+                rpmsg_read_cb,
+                RPMSG_MASTER);
+
+    rpmsg_send((struct rpmsg_channel *)app_chnl, &msg, sizeof(THE_MESSAGE));
+
+    rpmsg_deinit(hRmotedev);
+
+    ```
+
+    - rpmsg_init
+        ```c
+        /**
+         * rpmsg_init
+         *
+         * Thus function allocates and initializes the rpmsg driver resources for
+         * given device ID(cpu id). The successful return from this function leaves
+         * fully enabled IPC link.
+         *
+         * @param dev_id            - remote device for which driver is to
+         *                            be initialized
+         * @param rdev              - pointer to newly created remote device
+         * @param channel_created   - callback function for channel creation
+         * @param channel_destroyed - callback function for channel deletion
+         * @param default_cb        - default callback for channel I/O
+         * @param role              - role of the other device, Master or Remote
+         *
+         * @return - status of function execution
+         *
+         */
+        rpmsg_init(0 /*REMOTE_CPU_ID*/,
+                    &hRmotedev,
+                    rpmsg_channel_created, // callback after rpmsg channel created
+                    rpmsg_channel_deleted, // callback after rpmsg channel deleted
+                    rpmsg_read_cb,
+                    RPMSG_MASTER);
+        ```
+
+        -  env_init
+            > Initialize IPC environment
+
+        - rpmsg_rdev_init
+            > Initialize the remote device for given cpu id
+
+            >+ Assign device attributes
+            >+ Initialize the virtio device
+            >+ Setup share memory
+            >+ Initialize rpmsg channel
+
+        - rpmsg_start_ipc
+            >  Kick off IPC with the remote device
+
+            >+ Create virtqueues for remote device
+            >+ Initialize vring.
+
+    - rpmsg_send
+        > blocking (timeout 15 sec) and using internal src/dest addresses of rpdev
+
+    - rpmsg_XXX_`offchannel`
+        > using external src/dest addresses
+
+    - rpmsg_`try`XXX
+        > non-blocking
+
 # Reference
 + [OpenAMP Framework User Reference](https://github.com/OpenAMP/open-amp/blob/master/docs/openamp_ref.pdf)
 + [OpenAMP Framework for Zynq Devices](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug1186-zynq-openamp-gsg.pdf)
