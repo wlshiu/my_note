@@ -400,6 +400,31 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
     - rpmsg_`try`XXX
         > non-blocking
 
+## Misc
++ memory barrier (membar or memory fence)
+    > When compiler do optimization, the order of instructions maybe are not match source code flow.
+    memory barier is used to make sure the order.
+    
+    - mb()/rmb()/wmb()
+    ```c
+    int x, y, r;
+    void foo()
+    {
+        x = r;
+        y = 1;
+    }
+    // when optimizing, "y = 1" maybe do first than "x = r"
+    
+    void foo()
+    {
+        x = r;
+        wmb();
+        y = 1;
+    }
+    // memory barrier can make sure that "x = r" is first than "y = 1"
+    ```
+
+
 # Reference
 + [OpenAMP Framework User Reference](https://github.com/OpenAMP/open-amp/blob/master/docs/openamp_ref.pdf)
 + [OpenAMP Framework for Zynq Devices](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug1186-zynq-openamp-gsg.pdf)
