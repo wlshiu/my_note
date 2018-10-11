@@ -205,6 +205,30 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
 
 ## RPMsg
 
+The whole communication implementation can be separated in three different ISO/OSI layers: <br>
+`Transport (RPMSG)`, `Media Access Control (VirtIO)` and `Physical layer (Shared Memory)`.
+
+Each of them can be implemented separately and
+for example multiple implementations of the Transport Layer
+can share the same implementation of the MAC Layer and the Physical Layer.
+
+```
+    Components                          ISO/OSI
+                +------------------+
+        RPMsg,  |    RPMsg         | Transport layer
+       OpenAmp  |                  |
+                +------------------+
+    VirtIO, vq  |   VirtIO/        | MAC (Media Access Control)
+       vring    |   virtqueue      | layer
+                |                  |
+                +------------------+
+        Shmem   |   share memroy/  | Physical layer
+       MailBox  |   Inter-Core IRQ |
+      IRQ vect  |                  |
+                +------------------+
+
+```
+
 + RPMsg Framework
     - VirtIO Device
         > A abstraction device for application layer
@@ -404,7 +428,7 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
 + memory barrier (membar or memory fence)
     > When compiler do optimization, the order of instructions maybe are not match source code flow.
     memory barier is used to make sure the order.
-    
+
     - mb()/rmb()/wmb()
     ```c
     int x, y, r;
@@ -414,7 +438,7 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
         y = 1;
     }
     // when optimizing, "y = 1" maybe do first than "x = r"
-    
+
     void foo()
     {
         x = r;
@@ -430,4 +454,5 @@ communicate with various software environments (RTOS, bare metal, or even Linux)
 + [OpenAMP Framework for Zynq Devices](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2017_2/ug1186-zynq-openamp-gsg.pdf)
 + [RPMsg Messaging Protocol](https://github.com/OpenAMP/open-amp/wiki/RPMsg-Messaging-Protocol)
 + [RPMsg-lite](https://github.com/NXPmicro/rpmsg-lite)
++ [NOTES on AMP](https://www.kynetics.com/docs/2018/Notes_on_AMP/)
 
