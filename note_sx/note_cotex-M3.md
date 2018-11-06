@@ -758,6 +758,22 @@ Example
     - Now, each project has self `.sct`
         1. `Option for target` -> linker -> Scatter File (edit)
 
++ user section name
+    - in source code
+        ```c
+        #pragma arm section code = ".mytest"  // user RO section start
+        // your source code
+        #pragma arm section // user RO section end
+        ```
+
+    - in scatter file
+        ```
+        RW_IRAM1  0x1FFF8000  0x00008000
+        { ; RW data
+            *(.mytest) ; user section
+            .ANY (+RW +ZI)
+        }
+        ```
 
 + ROM code (for boot)
     - function
