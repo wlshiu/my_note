@@ -4,7 +4,12 @@ VirtualBox
 # lubuntu
 
 + install `Lubuntu minimal installation`
-    > [web] (http://cdimage.ubuntu.com/netboot/) download `mini.iso`
+    > [web] (http://cdimages.ubuntu.com/netboot/) download `mini.iso`
+
++ terminal
+    ```
+    sudo apt-get install LXTerminal
+    ```
 
 + Add new virtual Disk
     1. virtualBox setup
@@ -43,6 +48,7 @@ VirtualBox
             $ ln -sv /data ./work
             ```
 
+
 + update atp-get
     1. edit sources.list
 
@@ -50,10 +56,13 @@ VirtualBox
         $ sudo gedit /etc/apt/sources.list
 
         # replace "http://tw.archive.canonical.com/ubuntu/" with "server_url" in sources.list
+        # original http://tw.archive.ubuntu.com/ubuntu/
 
         ```
         a. [NCHC, Taiwan, 20 Gbps] (http://free.nchc.org.tw/ubuntu/)
         a. [TaiChung County Education Network Center, 1 Gbps] (http://ftp.tcc.edu.tw/Linux/ubuntu/)
+        a. http://ubuntu.stu.edu.tw/ubuntu/
+        a.
 
     1. update list
         ```
@@ -69,8 +78,8 @@ VirtualBox
 
 + Environment
     ```
-    $ sudo apt-get install build-essential make dos2unix automake libtool pkg-config \
-            vim git ctags cscope id-utils texinfo
+    $ sudo apt-get install build-essential make gcc gdb tig dos2unix automake libtool pkg-config \
+            vim git ctags cscope id-utils texinfo global
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
