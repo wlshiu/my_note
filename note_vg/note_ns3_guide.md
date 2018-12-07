@@ -73,11 +73,8 @@ build
         `PointToPointNetDevice` and `PointToPointChannel` objects.
 
 
-    -
-
-    -
-
 + Example code
+
 ```cc
 /* tutorial/first.cc */
 
@@ -86,6 +83,9 @@ int main (int argc, char *argv[])
     CommandLine cmd;
     cmd.Parse (argc, argv);
 
+    /**
+     * Set the time resolution to one nanosecond
+     */
     Time::SetResolution (Time::NS);
     LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
     LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
@@ -123,7 +123,7 @@ int main (int argc, char *argv[])
     address.SetBase ("10.1.1.0", "255.255.255.0");
 
     /**
-     * Assign address to devices and
+     * Assign address (auto-accumulate ip) to devices and
      * Create IP Stack mgr from NetDevice mgr
      */
     Ipv4InterfaceContainer  interfaces = address.Assign (devices);
@@ -131,21 +131,35 @@ int main (int argc, char *argv[])
     /**
      * Application
      */
-    UdpEchoServerHelper     echoServer (9);
+    UdpEchoServerHelper     echoServer (9); // create a UdpEchoServer with port 9
 
-    ApplicationContainer serverApps = echoServer.Install (nodes.Get (1));
-    serverApps.Start (Seconds (1.0));
-    serverApps.Stop (Seconds (10.0));
+    /**
+     * Install UdpEchoServer to node 1 and
+     * Return a APP handler
+     */
+    ApplicationContainer    serverApps = echoServer.Install (nodes.Get (1));
+    serverApps.Start (Seconds (1.0)); // app start at the 1-st second
+    serverApps.Stop (Seconds (10.0)); // app stop at the 10-th second
 
+    /**
+     * Create UdpEchoClient with remote address and remote port
+     */
     UdpEchoClientHelper     echoClient (interfaces.GetAddress (1), 9);
-    echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
-    echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-    echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+    echoClient.SetAttribute ("MaxPackets", UintegerValue (1));        // set client attributes
+    echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));  // set client attributes
+    echoClient.SetAttribute ("PacketSize", UintegerValue (1024));     // set client attributes
 
+    /**
+     * Install UdpEchoClient to node 0 and
+     * Return a APP handler
+     */
     ApplicationContainer    clientApps = echoClient.Install (nodes.Get (0));
-    clientApps.Start (Seconds (2.0));
-    clientApps.Stop (Seconds (10.0));
+    clientApps.Start (Seconds (2.0)); // app start at the 2-ed second
+    clientApps.Stop (Seconds (10.0)); // app stop at the 10-th second
 
+    /**
+     * Start simulation
+     */
     Simulator::Run ();
     Simulator::Destroy ();
     return 0;
@@ -153,6 +167,18 @@ int main (int argc, char *argv[])
 
 ```
 
++ Compiler and Run
+
+```shell
+$ cd ns-allinone-3.29/ns-3.29
+$ cp ./examples/tutorial/first.cc ./scratch/myfirst.cc
+
+# compiler the source in scratch folder
+$ ./waf
+
+# run target (without file extension '.cc')
+$ ./waf --run scratch/myfirst
+```
 
 
 
