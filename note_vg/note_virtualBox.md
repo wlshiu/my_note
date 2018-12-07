@@ -152,7 +152,7 @@ VirtualBox
         $ ls /media/sf_xxxx
 
         # create link for using
-        $ ln /media/sf_xxx ~/sf_share
+        $ ln -s /media/sf_xxx ~/sf_share
         ```
     1. If get `Permission denied`
 
