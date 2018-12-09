@@ -180,6 +180,12 @@ $ ./waf
 $ ./waf --run scratch/myfirst
 ```
 
++ GDB
 
+    [official reference](https://www.nsnam.org/wiki/HOWTO_use_gdb_to_debug_program_errors)
+
+```shell
+$ ./waf --command-template="gdb %s" --run <program-name>
+```
 
 
