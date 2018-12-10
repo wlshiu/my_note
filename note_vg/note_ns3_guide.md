@@ -157,6 +157,9 @@ int main (int argc, char *argv[])
     clientApps.Start (Seconds (2.0)); // app start at the 2-ed second
     clientApps.Stop (Seconds (10.0)); // app stop at the 10-th second
 
+    // output myfirst.pcap
+    pointToPoint.EnablePcapAll ("myfirst", false);
+
     /**
      * Start simulation
      */
@@ -168,24 +171,91 @@ int main (int argc, char *argv[])
 ```
 
 + Compiler and Run
+    - compiler lib
+    ```shell
+    $ ./waf clean
 
-```shell
-$ cd ns-allinone-3.29/ns-3.29
-$ cp ./examples/tutorial/first.cc ./scratch/myfirst.cc
+    # profile: debug or optimized
+    $ ./waf configure --enable-sudo --build-profile=debug --enable-examples --enable-test
+    ```
 
-# compiler the source in scratch folder
-$ ./waf
+    - compiler user code
+    ```shell
+    $ cd ns-allinone-3.29/ns-3.29
+    $ cp ./examples/tutorial/first.cc ./scratch/myfirst.cc
 
-# run target (without file extension '.cc')
-$ ./waf --run scratch/myfirst
-```
+    # compiler the source in scratch folder
+    $ ./waf
+
+    # run target (without file extension '.cc')
+    $ ./waf --run scratch/myfirst
+    ```
 
 + GDB
 
     [official reference](https://www.nsnam.org/wiki/HOWTO_use_gdb_to_debug_program_errors)
 
 ```shell
-$ ./waf --command-template="gdb %s" --run <program-name>
+# manual
+$ ./waf shell
+$ cd build/examples/tutorial
+$ gdb <program-name>
+
+    or
+
+# from waf
+$ ./waf --command-template="gdb -tui %s" --run <program-name>
+    or
+$ ./waf --command-template="cgdb %s" --run <program-name>
 ```
+
++ Log
+
+    NS_LOG=[moudle name]=[level masks]:[moudle name]=[level masks]
+    ps. no white space
+
+    e.g. export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func'
+    e.g. export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func:UdpEchoServerApplication=level_all|prefix_func'
+
+    - module name
+        > The module name is defined in source code.
+
+        ```c
+        NS_LOG_COMPONENT_DEFINE("xxx")
+        ```
+
+    - level masks
+        1. `prefix_time`
+        1. `prefix_func`
+        1. `level_all`
+        1. `info`
+            > NS_LOG_INFO(...)
+
+    - Enable all modules
+    ```shell
+    $ export 'NS_LOG=*=level_all|prefix_func|prefix_time'
+    ```
+
+    - Output log
+    ```
+    $ ./waf –run scratch/myfirst > out.log 2>&1
+    ```
+
++ PCAP Tracing
+    > Dump the `*.pcap` file
+
+    ```c++
+        ...
+    // output pcap file name
+    pointToPoint.EnablePcapAll ("myfirst");
+        ...
+    Simulator::Run()
+    ```
+
+    - View pcap file
+    ```
+    $ tcpdump -nn -tt -r second-0-0.pcap
+    ```
+
 
 
