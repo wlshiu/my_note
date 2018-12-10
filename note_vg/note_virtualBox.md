@@ -79,7 +79,7 @@ VirtualBox
 + Environment
     ```
     $ sudo apt-get install build-essential make gcc gdb tig dos2unix automake libtool pkg-config \
-            vim git ctags cscope id-utils texinfo global
+            vim git ctags cscope id-utils texinfo global libncurses5-dev libreadline6 libreadline6-dev
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
