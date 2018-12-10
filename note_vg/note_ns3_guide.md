@@ -12,14 +12,14 @@ $ ./ns3_pre_build.sh ns-allinone-3.29
 # Software architecture
 ```
 build
-├── bindings
-├── c4che
-├── examples    (obj files of examples)
-├── lib         (ns-3 lib of .so of modules)
-├── ns3         (header files)
-├── scratch     (compiler working space)
-├── src         (obj files of ns-3 modules)
-└── utils       (obj files of utils)
++-- bindings
++-- c4che
++-- examples    (obj files of examples)
++-- lib         (ns-3 lib of .so of modules)
++-- ns3         (header files)
++-- scratch     (compiler working space)
++-- src         (obj files of ns-3 modules)
+\-- utils       (obj files of utils)
 ```
 
 
@@ -238,7 +238,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
 
     - Output log
     ```
-    $ ./waf –run scratch/myfirst > out.log 2>&1
+    $ ./waf --run scratch/myfirst > out.log 2>&1
     ```
 
 + PCAP Tracing
