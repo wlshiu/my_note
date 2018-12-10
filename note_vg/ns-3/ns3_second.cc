@@ -87,7 +87,7 @@ main (int argc, char *argv[])
     csmaNodes.Create (nCsma);
 
     /**
-     *  與first.cc相同, 我們初始化了一個P2P工具類對象, 由此設置了兩個 Devic e屬性: DataRate 和 Delay.
+     *  與first.cc相同, 我們初始化了一個P2P工具類對象, 由此設置了兩個 Device 屬性: DataRate 和 Delay.
      */
     PointToPointHelper      pointToPoint;
     pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
