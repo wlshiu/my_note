@@ -12,14 +12,14 @@ $ ./ns3_pre_build.sh ns-allinone-3.29
 # Software architecture
 ```
 build
-+-- bindings
-+-- c4che
-+-- examples    (obj files of examples)
-+-- lib         (ns-3 lib of .so of modules)
-+-- ns3         (header files)
-+-- scratch     (compiler working space)
-+-- src         (obj files of ns-3 modules)
-\-- utils       (obj files of utils)
+├── bindings
+├── c4che
+├── examples    (obj files of examples)
+├── lib         (ns-3 lib of .so of modules)
+├── ns3         (header files)
+├── scratch     (compiler working space)
+├── src         (obj files of ns-3 modules)
+└── utils       (obj files of utils)
 ```
 
 
@@ -170,6 +170,19 @@ int main (int argc, char *argv[])
 
 ```
 
++ Python lib
+```
+# install pip
+$ sudo apt-get -y install python3-pip python-pip
+
+# upgrade pip
+$ python -m pip install --upgrade pip
+
+# upgrade python lib
+$ sudo pip install pip-review
+$ sudo pip-review --local --interactive
+```
+
 + Compiler and Run
     - compiler lib
     ```shell
@@ -204,6 +217,7 @@ $ gdb <program-name>
     or
 
 # from waf
+# option: --vis to figure
 $ ./waf --command-template="gdb -tui %s" --run <program-name>
     or
 $ ./waf --command-template="cgdb %s" --run <program-name>
@@ -225,20 +239,27 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
         ```
 
     - level masks
-        1. `prefix_time`
-        1. `prefix_func`
-        1. `level_all`
-        1. `info`
+
+        1. `level_error`
+        1. `level_warn`
+        1. `level_debug`
+        1. `level_info`
             > NS_LOG_INFO(...)
+        1. `level_function`
+        1. `level_logic`
+        1. `level_all`
+        1. `all`
 
     - Enable all modules
     ```shell
-    $ export 'NS_LOG=*=level_all|prefix_func|prefix_time'
+    $ NS_LOG="*=level_function" ./waf --run scratch/myfirst
+        or
+    $ export NS_LOG="*=level_function"
     ```
 
     - Output log
     ```
-    $ ./waf --run scratch/myfirst > out.log 2>&1
+    $ ./waf –run scratch/myfirst > out.log 2>&1
     ```
 
 + PCAP Tracing
@@ -257,5 +278,19 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
     $ tcpdump -nn -tt -r second-0-0.pcap
     ```
 
++ gnuplot
+```
+$ sudo apt-get install gnuplot
 
+# generate data
+$ ./waf --run scratch/fifth > cwnd.dat 2>&1
+
+# convert to *.png
+$ gnuplot
+
+  gnuplot> set terminal png size 640,480
+  gnuplot> set output "cwnd.png"
+  gnuplot> plot "cwnd.dat" using 1:2 title 'Congestion Window' with linespoints
+  gnuplot> exit
+```
 
