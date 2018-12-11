@@ -67,7 +67,10 @@ sudo apt-get -y install python-pygraphviz python-kiwi python-pygoocanvas libgooc
 ## For Ubuntu 18.04, python-pygoocanvas is no longer provided.
 ## The ns-3.29 release and later upgrades the support to GTK+ version 3, and requires these packages:
 sudo apt-get -y install gir1.2-goocanvas-2.0 python-gi python-gi-cairo python-pygraphviz gir1.2-gtk-3.0 ipython
-sudo apt-get -y install python3-gi python3-gi-cairo ipython3 ## python3-pygraphviz
+sudo apt-get -y install python3-gi python3-gi-cairo ipython3
+## python3-pygraphviz
+sudo apt-get -y install python3-pip
+sudo pip3 install graphviz
 
 ################
 ## Support for MPI-based distributed emulation
