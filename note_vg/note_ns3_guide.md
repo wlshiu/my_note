@@ -12,14 +12,14 @@ $ ./ns3_pre_build.sh ns-allinone-3.29
 # Software architecture
 ```
 build
-├── bindings
-├── c4che
-├── examples    (obj files of examples)
-├── lib         (ns-3 lib of .so of modules)
-├── ns3         (header files)
-├── scratch     (compiler working space)
-├── src         (obj files of ns-3 modules)
-└── utils       (obj files of utils)
+    +-- bindings
+    +-- c4che
+    +-- examples    (obj files of examples)
+    +-- lib         (ns-3 lib of .so of modules)
+    +-- ns3         (header files)
+    +-- scratch     (compiler working space)
+    +-- src         (obj files of ns-3 modules)
+    \-- utils       (obj files of utils)
 ```
 
 
@@ -171,6 +171,7 @@ int main (int argc, char *argv[])
 ```
 
 + Python lib
+
 ```
 # install pip
 $ sudo apt-get -y install python3-pip python-pip
@@ -185,6 +186,7 @@ $ sudo pip-review --local --interactive
 
 + Compiler and Run
     - compiler lib
+
     ```shell
     $ ./waf clean
 
@@ -193,6 +195,7 @@ $ sudo pip-review --local --interactive
     ```
 
     - compiler user code
+
     ```shell
     $ cd ns-allinone-3.29/ns-3.29
     $ cp ./examples/tutorial/first.cc ./scratch/myfirst.cc
@@ -251,6 +254,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
         1. `all`
 
     - Enable all modules
+
     ```shell
     $ NS_LOG="*=level_function" ./waf --run scratch/myfirst
         or
@@ -258,6 +262,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
     ```
 
     - Output log
+
     ```
     $ ./waf –run scratch/myfirst > out.log 2>&1
     ```
@@ -268,17 +273,31 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
     ```c++
         ...
     // output pcap file name
-    pointToPoint.EnablePcapAll ("myfirst");
+    #if 1
+        pointToPoint.EnablePcapAll ("myfirst");
+    #else
+        // only generate pcap file of NodeId-DeviceId 
+        // pointToPoint::EnablePcap (filename, <NodeId>, <DeviceId>);
+        pointToPoint::EnablePcap ("myfirst", 0, 0);
+    #endif
         ...
     Simulator::Run()
     ```
 
+    - pcap file naming
+
+    ```
+    <Output_name>-<Node_number>-<NetDevice_number>.pcap
+    ```
+
     - View pcap file
+
     ```
     $ tcpdump -nn -tt -r second-0-0.pcap
     ```
 
 + gnuplot
+
 ```
 $ sudo apt-get install gnuplot
 
@@ -293,4 +312,56 @@ $ gnuplot
   gnuplot> plot "cwnd.dat" using 1:2 title 'Congestion Window' with linespoints
   gnuplot> exit
 ```
+
+# MISC
+
++ IPv6
+    - address format
+
+    ```
+    # hex
+    [16 bits] * 8
+    xxxx : xxxx : xxxx : xxxx : xxxx : xxxx : xxxx : xxxx
+    ```
+
+    - address representation
+        1. One or more leading zeroes from any groups of *hexadecimal* digits are removed;
+        For example, the group `0042` is converted to `42`.
+
+        ```
+                        2001:0DB8:0000:0000:0000:0000:1428:57ab
+        abbreviating    2001:DB8:0:0:0:0:1428:57ab
+        ```
+
+        1. Consecutive sections of zeroes are replaced with a double colon `::`.
+        The double colon may only be used once in an address
+
+        ```
+                        2001:0DB8:0000:0000:0000:0000:1428:57ab
+        abbreviating    2001:DB8:0::0:1428:57ab
+        abbreviating    2001:DB8::1428:57ab
+
+        Error abbreviating  2001::25de::cade (two double colon)
+        ```
+    - Loopback address
+
+    ```
+                    0000:0000:0000:0000:0000:0000:0000:0001
+    abbreviating    ::1
+    ```
+
+    - IPv4 convert to IPv6
+
+    ```
+    [IPv4]
+    decimal     : 135.75.43.52
+    hexadecimal : 87.4B.2B.34
+
+    [IPv6]
+    hexadecimal > 0000:0000:0000:0000:0000:ffff:874B:2B34
+    abbreviating> ::ffff:874B:2B34
+    IPv4-compatible address> ::ffff:135.75.43.52
+    ```
+
+
 
