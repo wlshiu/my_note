@@ -111,6 +111,14 @@ VirtualBox
         1. Install 32-bit libraries
             ```
             $ apt-get install libc6:i386 libstdc++6:i386 lib32ncurses5 lib32z1
+
+            ```
+
+        1. codeblocks
+            ```
+            $ sudo add-apt-repository ppa:damien-moore/codeblocks-stable
+            $ sudo apt-get update
+            $ sudo apt-get install codeblocks codeblocks-contrib
             ```
 
 + resolution
