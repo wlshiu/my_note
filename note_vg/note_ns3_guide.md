@@ -7,11 +7,15 @@ $ ./ns3_env_setup.sh
 $ wget https://www.nsnam.org/releases/ns-allinone-3.29.tar.bz2 ~/NS-3
 $ cd ~/NS-3 && tar -jxf ns-allinone-3.29.tar.bz2
 $ ./ns3_pre_build.sh ns-allinone-3.29
+
+    or
+
+$ ./ns3_install-ns3.28.sh
 ```
 
 # Software architecture
 ```
-build
+~ build
     +-- bindings
     +-- c4che
     +-- examples    (obj files of examples)
@@ -20,8 +24,63 @@ build
     +-- scratch     (compiler working space)
     +-- src         (obj files of ns-3 modules)
     \-- utils       (obj files of utils)
+
+~ src (modules source code)
+    +-- antenna
+    ~ aodv                    (Ad Hoc On-Demand Distance Vector)
+        +-- bindings        (bind with python)
+        +-- doc
+        +-- examples
+        +-- helper          (user interface of module)
+        +-- model           (implementation of module)
+        +-- test            (unit test of module)
+            wscript         (waf script)
+    +-- applications
+    +-- bridge
+    +-- brite
+    +-- buildings
+    +-- click
+    +-- config-store
+    +-- core                    (core of NS-3)
+    +-- csma                    (IEEE802.3 ethernet)
+    +-- csma-layout
+    +-- dsdv                    (for MANET, Destination-Sequenced Distance Vector routing protocol)
+    +-- dsr                     (for MANET, Dynamic Source Routing routing protocol)
+    +-- energy                  (power consumption of wireless)
+    +-- fd-net-device
+    +-- flow-monitor
+    +-- internet                (TCP/IPv4/IPv6 modules)
+    +-- internet-apps
+    +-- lr-wpan                 (IEEE 802.15.4 Low-rate wireless personal area network)
+    +-- lte                     (Long Term Evolution)
+    +-- mesh
+    +-- mobility                (mobility models, handle object's position/coordinate, speed, ...etc)
+    +-- mpi
+    +-- netanim                 (Animation)
+    +-- network                 (packet module)
+    +-- nix-vector-routing
+    +-- olsr                    (for MANET, Optimized Link State Routing protocol)
+    +-- openflow
+    +-- point-to-point
+    +-- point-to-point-layout
+    +-- propagation
+    +-- sixlowpan               (6LoWPAN)
+    +-- spectrum
+    +-- stats
+    +-- tap-bridge
+    +-- test
+    +-- topology-read
+    +-- traffic-control
+    +-- uan                     (under-water acoustic network)
+    +-- virtual-net-device
+    +-- visualizer
+    +-- wave                    (for VANET, IEEE  802.11p/1609.1~4)
+    +-- wifi                    (IEEE 802.11 a/b/g)
+    +-- wimax                   (IEEE 802.16)
 ```
 
++ `ns3::Vector`
+    > The base class for a coordinate (x,y,z).
 
 # Concept
 
@@ -228,11 +287,13 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
 
 + Log
 
-    NS_LOG=[moudle name]=[level masks]:[moudle name]=[level masks]
+    `NS_LOG=[moudle name]=[level masks]:[moudle name]=[level masks]`
+
     ps. no white space
 
-    e.g. export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func'
-    e.g. export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func:UdpEchoServerApplication=level_all|prefix_func'
+    e.g. **export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func'**
+
+    e.g. **export 'NS_LOG=UdpEchoClientApplication=level_all|prefix_func:UdpEchoServerApplication=level_all|prefix_func'**
 
     - module name
         > The module name is defined in source code.
@@ -276,7 +337,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
     #if 1
         pointToPoint.EnablePcapAll ("myfirst");
     #else
-        // only generate pcap file of NodeId-DeviceId 
+        // only generate pcap file of NodeId-DeviceId
         // pointToPoint::EnablePcap (filename, <NodeId>, <DeviceId>);
         pointToPoint::EnablePcap ("myfirst", 0, 0);
     #endif
