@@ -113,6 +113,7 @@
     $ git diff new-branch               # 比較目前位置 與 branch(new-branch) 的差別
     $ git diff --stat
     $ git diff --name-only --cached     # get the staged files list
+    $ git diff –-name-only -b branchA branchB  # 列出兩個branch的差異檔案
     ```
 
 - Git stash
@@ -374,6 +375,11 @@
     ```
     利用 git archive 這個 Git 內建命令來產生本次變更的所有檔案
     $ git archive --output=files.tar HEAD $(git diff-tree -r --no-commit-id --name-only --diff-filter=ACMRT HEAD)
+        or
+    $  git archive -o ./updated.tar HEAD $(git diff --name-only HEAD^)
+
+    匯出某兩次commit的差異檔案
+    $ git archive -o ./updated.tar COMMIT_ID_1 $(git diff --name-only COMMIT_ID_1 COMMIT_ID_2)
 
     匯出最新版本
     $ git archive --format=tar.gz --prefix=folder_name/ HEAD > export.tar.gz

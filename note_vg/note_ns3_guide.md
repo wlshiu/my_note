@@ -285,6 +285,66 @@ $ ./waf --command-template="gdb -tui %s" --run <program-name>
 $ ./waf --command-template="cgdb %s" --run <program-name>
 ```
 
++ [Eclipse-cdt](https://www.eclipse.org/cdt/downloads.php)
+
+    - install
+
+    ```
+    $ sudo apt-get install eclipse-cdt
+    ```
+
+    - configure environment
+
+        1. create new project
+            > File  -> New -> project
+        2. select project type
+            > C/C++ -> C++ project
+        3. configure project basic setting
+            > - Project Name: ns328
+            > - Project Type: empty project
+            > - toolchain: linux gcc
+
+        4. configure project detail
+            > project explorer -> ns328 (project name) -> right key -> properties
+
+        5. C/C++ build -> tab **Build Settings**
+            > - disable `Use default build command` and `Generate makefiles automatically`
+            > - Build command: /home/[username]/working/ns3/ns-allinone-3.28/ns-3.28/waf
+            > - Build Directory: /home/[username]/working/ns3/ns-allinone-3.28/ns-3.28/build
+
+        6. C/C++ build -> tab **Behavior**
+            > - Build: build
+            > - Clean: clean
+
+        7. configure Debugger
+            project explorer -> ns328 (project name) -> right key -> debug as -> debug Configuration
+            > double click **C/C++ Application**
+            > + tab **Environment**
+            >> - Name: LD_LIBRARY_PATH
+            >> - Value: /home/[username]/working/ns3/ns-allinone-3.28/ns-3.28/build
+            > + tab **Main**
+            >> - C/C++ Application: build/scratch/fifth
+            > + Peess **Debug**
+
+        8. configure external tool (waf)
+            > + Run -> External Tools -> External Tools Configurations
+            > + Program -> new
+            >> - Name: ns_waf
+            >> - Location: select waf file with **Browse Workspace**
+            >> - Working Directory: select scratch folder with **Browse Workspace**
+            >> - Argument: --run ${string_prompt}
+            >> - Run
+            >> - pop-up window: name of `*.cc` file in scratch without .cc
+
+        9. error fix
+            > - message: `The project was not configured: run "waf configure" first!`
+
+            ```shell
+            $ cd /home/[username]/working/ns3/ns-allinone-3.28/ns-3.28
+            $ ./waf configure
+            ```
+        10. press `run ns_waf` on the menu bar
+
 + Log
 
     `NS_LOG=[moudle name]=[level masks]:[moudle name]=[level masks]`
@@ -325,7 +385,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
     - Output log
 
     ```
-    $ ./waf –run scratch/myfirst > out.log 2>&1
+    $ ./waf --run scratch/myfirst > out.log 2>&1
     ```
 
 + PCAP Tracing
