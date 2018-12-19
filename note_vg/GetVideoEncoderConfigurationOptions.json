@@ -1,0 +1,60 @@
+
+{
+    "cmd" : "GetVideoEncoderConfigurationOptions",
+    "Input" :
+    {
+        "pattern_type" : 1,
+        "Command Length" : "uint32_t",
+        "Command Code" : "uint16_t",
+        "Reserved" : "uint8_t",
+        "User Name" : "string",
+        "Password" : "string",
+        "VideoSource Configuration Token" : "string",
+        "Profile Token" : "string",
+        "CheckSum" : "uint8_t"
+    },
+    "Output" :
+    {
+        "pattern_type" : 1,
+        "Command Length" : "uint32_t",
+        "Command Code" : "uint16_t",
+        "Return Code" : "uint8_t",
+        "User Name" : "string",
+        "Password" : "string",
+        "Encoding Option" : "uint8_t",
+        "Group" : [
+            {
+                "Resolutions Available List Size" : "uint8_t",
+                "Resolutions Available Data" :
+                {
+                    "Width" : "uint16_t",
+                    "Height" : "uint16_t",
+                }
+            }
+        ],
+        "Quality Min" : "uint8_t",
+        "Quality Max" : "uint8_t",
+        "FrameRate Min" : "uint8_t",
+        "FrameRate Max" : "uint8_t",
+        "EncodingInterval Min" : "uint8_t",
+        "EncodingInterval Max" : "uint8_t",
+        "Bitrate Range Min" : "uint16_t",
+        "Bitrate Range Max" : "uint16_t",
+        "RateControlType Options" : "uint8_t",
+        "GovLength Range Min" : "uint8_t",
+        "GovLength Range Max" : "uint8_t",
+        "Profile Options" : "uint8_t",
+        "TargetBitrate Range Min" : "uint16_t",
+        "TargetBitrate Range Max" : "uint16_t",
+        "Group 1" : [
+                {
+                    "AspectRatio Available List Size" : "uint8_t",
+                    "AspectRatio Available Data" :
+                    {
+                        "AspectRatio" : "uint16_t",
+                    }
+                }
+            ],
+        "CheckSum" : "uint8_t"
+    }
+}

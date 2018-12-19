@@ -1,0 +1,137 @@
+
+{
+    "cmd" : "GetRules",
+    "Input" :
+    {
+        "pattern_type" : 0,
+        "Command Length" : "uint32_t",
+        "Command Code" : "uint16_t",
+        "Reserved" : "uint8_t",
+        "User Name" : "string",
+        "Password" : "string",
+        "CheckSum" : "uint8_t"
+    },
+    "Output" :
+    {
+        "pattern_type" : 1,
+        "Command Length" : "uint32_t",
+        "Command Code" : "uint16_t",
+        "Return Code" : "uint8_t",
+        "User Name" : "string",
+        "Password" : "string",
+        "Group" : [
+            {
+                "RuleEngine Parameters List Size" : "uint8_t",
+                "RuleEngine Parameters Data" :
+                {
+                    "Name" : "string",
+                    "RuleToken" : "string",
+                    "Rule type" : "uint8_t",
+                    "RuleEngine Item" : "void",
+                },
+            }
+        ],
+        "Extension Flag" : "border_uint8_t",
+        "Group 1" : [
+            {
+                "GetRules Parameters2 List Size" : "uint8_t",
+                "GetRules Parameters2 Data" :
+                {
+                    "VideoSourceToken" : "string",
+                    "Threshold" : "uint8_t",
+                    "MotionSensitivity" : "uint8_t",
+                },
+            }
+        ],
+        "CheckSum" : "uint8_t",
+        "Switch" : [
+            {
+                "RuleEngine Line Detector" :
+                {
+                    "Direction" : "uint16_t",
+                    "Switch_Group" : [
+                        {
+                            "Polyline List Size" : "uint8_t",
+                            "Polyline Data" :
+                            {
+                                "Polyline x" : "uint16_t",
+                                "Polyline y" : "uint16_t",
+                            },
+                        },
+                    ],
+                    "Metadata Stream" : "uint8_t"
+                }
+            },
+            {
+                "RuleEngine Field Detector" :
+                {
+                    "Switch_Group" : [
+                        {
+                            "Polyline List Size" : "uint8_t",
+                            "Polyline Data" :
+                            {
+                                "Polyline x" : "uint16_t",
+                                "Polyline y" : "uint16_t",
+                            },
+                        },
+                    ],
+                    "Metadata Stream" : "uint8_t"
+                }
+            },
+            {
+                "RuleEngine Declarative Motion Detector" :
+                {
+                    "MotionExpression" : "uint8_t",
+                    "Switch_Group" : [
+                        {
+                            "Polyline List Size" : "uint8_t",
+                            "Polyline Data" :
+                            {
+                                "Polyline x" : "uint16_t",
+                                "Polyline y" : "uint16_t",
+                            },
+                        },
+                    ],
+                    "Metadata Stream" : "uint8_t"
+                }
+            },
+            {
+                "RuleEngine Counting Rule" :
+                {
+                    "ReportTimeInterval" : "uint32_t",
+                    "ResetTimeInterval" : "uint32_t",
+                    "Direction" : "uint16_t",
+                    "Switch_Group" : [
+                        {
+                            "Polyline List Size" : "uint8_t",
+                            "Polyline Data" :
+                            {
+                                "Polyline x" : "uint16_t",
+                                "Polyline y" : "uint16_t",
+                            },
+                        },
+                    ],
+                    "Metadata Stream" : "uint8_t"
+                }
+            },
+            {
+                "RuleEngine Cell Motion Detector" :
+                {
+                    "MinCount" : "uint16_t",
+                    "AlarmOnDelay" : "uint32_t",
+                    "AlarmOffDelay" : "uint32_t",
+                    "ActiveCellsSize" : "uint16_t",
+                    "ActiveCells" : "string",
+                    "Sensitivity" : "uint8_t",
+                    "Layout Bounds x" : "uint16_t",
+                    "Layout Bounds y" : "uint16_t",
+                    "Layout Bounds width" : "uint16_t",
+                    "Layout Bounds height" : "uint16_t",
+                    "Layout Columns" : "uint8_t",
+                    "Layout Rows" : "uint8_t",
+                    "Metadata Stream" : "uint8_t"
+                }
+            }
+        ]
+    }
+}
