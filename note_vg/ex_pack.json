@@ -1,0 +1,26 @@
+{
+	"Version": "bit_field_4",
+	"Original_source_TEI": "bit_field_12",
+	"Original_purpose_TEI": "bit_field_12",
+	"Send_type": "bit_field_4",
+	"Send_limit": "bit_field_5",
+	"Reserved": "bit_field_3",
+	"MSDU_serial_number": "bit_field_16",
+	"MSDU_length": "bit_field_11",
+	"Number_of_restarts": "bit_field_4",
+	"Agent_primary_path_identifier": "bit_field_1",
+	"Total_number_of_hops": "bit_field_4",
+	"Route_remaining_hops": "bit_field_4",
+	"Broadcast_direction": "bit_field_2",
+	"Path_repair_sign": "bit_field_1",
+	"MAC_address_mark": "bit_field_1",
+	"Reserved": "bit_field_12",
+	"Network_serial_number": "bit_field_8",
+	"MSDU_type": "bit_field_8",
+	"group": {
+		"group_exist_flag": "MAC_address_mark",
+		"flag_type": "1",
+		"Original_source_MAC_address": "bit_field_48",
+		"Original_destination_MAC_address": "bit_field_48"
+	}
+}
