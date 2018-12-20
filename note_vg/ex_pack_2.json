@@ -1,0 +1,38 @@
+{
+	"member" : [
+		{
+			"item" : "version",
+			"size" : "bit_field_4",
+			"comment" : "no"
+		},
+		{
+			"item" : "send_type",
+			"size" : "bit_field_4",
+			"comment" : "no"
+		},
+		{
+			"item" : "MAC_address_mark",
+			"size" : "bit_field_1",
+			"comment" : "no"
+		},
+		{
+			"item" : "send_limit",
+			"size" : "bit_field_5",
+			"comment" : "no"
+		},
+		{
+			"item" : "send_limit",
+			"size" : "bit_field_5",
+			"comment" : "no",
+			"exist_flag" : "MAC_address_mark",
+			"flag_type" : "1"
+		},
+		{
+			"item" : "send_limit",
+			"size" : "bit_field_5",
+			"comment" : "no",
+			"exist_flag" : "MAC_address_mark",
+			"flag_type" : "2"
+		}
+	]
+}
