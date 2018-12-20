@@ -1,0 +1,10 @@
+{
+	"member" : [
+		{ "item" : "                  ", "size" : "             ", "comment" : "no" },
+		{ "item" : "                  ", "size" : "             ", "comment" : "no" },
+		{ "item" : "                  ", "size" : "             ", "comment" : "no" },
+		{ "item" : "                  ", "size" : "             ", "comment" : "no" },
+		{ "item" : "                  ", "size" : "             ", "comment" : "no", "exist_flag" : "           ", "flag_type" : "1"},
+		{ "item" : "                  ", "size" : "             ", "comment" : "no", "exist_flag" : "           ", "flag_type" : "2"}
+	]
+}
