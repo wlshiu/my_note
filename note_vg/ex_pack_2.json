@@ -1,5 +1,9 @@
 {
-	"member" : [
+    "type" : "struct",
+	"struct_member" : [
+        {
+            "struct_declaration" : "mac_frame_header"
+        },
 		{
 			"item" : "version",
 			"size" : "bit_field_4",
@@ -8,7 +12,23 @@
 		{
 			"item" : "send_type",
 			"size" : "bit_field_4",
-			"comment" : "no"
+			"comment" : "no",
+			"type" : "enum",
+            "enum_member" : [
+                {
+                    "enum_declaration" : "message_send_type"
+                },
+                {
+                    "enum_item" : "Unicast",
+                    "enum_value" : 0,
+                    "enum_comment" : "none"
+                },
+                {
+                    "enum_item" : "Broadcast",
+                    "enum_value" : 1,
+                    "enum_comment" : "none"
+                }
+            ]
 		},
 		{
 			"item" : "MAC_address_mark",
@@ -21,18 +41,59 @@
 			"comment" : "no"
 		},
 		{
-			"item" : "send_limit",
-			"size" : "bit_field_5",
+			"item" : "Original_source_MAC_address",
+			"size" : "bit_field_48",
 			"comment" : "no",
-			"exist_flag" : "MAC_address_mark",
-			"flag_type" : "1"
+			"dependency" : "MAC_address_mark",
+			"dependency_value" : "1"
 		},
 		{
-			"item" : "send_limit",
-			"size" : "bit_field_5",
+			"item" : "Original_destination_MAC_address",
+			"size" : "bit_field_48",
 			"comment" : "no",
-			"exist_flag" : "MAC_address_mark",
-			"flag_type" : "2"
-		}
+			"dependency" : "MAC_address_mark",
+			"dependency_value" : "1"
+		},
+        {
+			"item" : "version_impl",
+			"size" : "bit_field_68",
+			"comment" : "no",
+            "type" : "union",
+            "union_member" : [
+                {
+                    "union_declaration" : "u"
+                },
+                {
+                    "dependency" : "version",
+                    "dependency_value" : "1",
+                    "type" : "struct",
+                    "struct_member" : [
+                        {
+                            "struct_declaration" : "ggg"
+                        },
+                        {
+                            "item" : "reserved",
+                            "size" : "bit_field_12",
+                            "comment" : "no"
+                        }
+                    ]
+                },
+                {
+                    "dependency" : "version",
+                    "dependency_value" : "2",
+                    "type" : "struct",
+                    "struct_member" : [
+                        {
+                            "struct_declaration" : "bbb"
+                        },
+                        {
+                            "item" : "reserved",
+                            "size" : "bit_field_12",
+                            "comment" : "no"
+                        }
+                    ]
+                }
+            ]
+        }
 	]
 }
