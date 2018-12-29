@@ -320,7 +320,7 @@
 
         7. 在 pull 遇到衝突時, 確定全部都用 remote 的版本為準時
             ```
-            $ git checkout origin/master <confilct files>
+            $ git checkout origin/master <conflict files>
             ```
 
 
@@ -390,6 +390,70 @@
     # from server
     git fetch ssh://name@code.gerrit.com:888/kernel/linux refs/changes/11/64307/1 && git cherry-pick FETCH_HEAD
     ```
++ Git clean
+    ```
+    # 刪除所有不在 repository 內的目錄及檔案
+    $ git clean -fxd
+    ```
+
++ Git clear history
+    ```
+    # Checkout
+    $ git checkout --orphan [new_branch]
+
+    # Add all the files
+    $ git add -A
+
+    # Commit the changes
+    $ git commit -am "commit message"
+
+    # Delete the branch
+    $ git branch -D master
+
+    # Rename the [new_branch] branch to master
+    $ git branch -m master
+
+    Finally, force update your repository
+    $ git push -f origin master
+    ```
+
++ Git rebase
+    ```
+    # current history
+    $ git log --oneline
+    27f6ed6 (HEAD -> master) add dog 2
+    2bab3e7 add dog 1
+    ca40fc9 add 2 cats
+    1de2076 add cat 2
+    cd82f29 add cat 1
+    382a2a5 add database settings
+    bb0c9c2 init commit
+    ```
+
+    - delete commit
+        ```
+        # start at 'bb0c9c2' node
+        $ git rebase -i bb0c9c2
+        pick 382a2a5 add database settings  # the order will be inverse
+        pick cd82f29 add cat 1
+        pick 1de2076 add cat 2
+        pick ca40fc9 add 2 cats
+        pick 2bab3e7 add dog 1
+        pick 27f6ed6 add dog 2
+
+        ps. you should edit the above list (delete node or re-order) and save.
+            It will start rebase when you exit
+        ```
+
+        1. you should care the relation of the creation and modification (create first)
+
+        1. if conflict, you can over write the conflict files and continue re-base flow
+            ```
+            $ cp ~/xxxx/some_files ./conflict_files
+            $ git add/rm <conflicted_files>
+            $ git rebase --continue
+            ```
+
 
 # Repo usage
 ---
