@@ -29,6 +29,8 @@
  * to "Outside the Context of a BSS")."
  */
 
+#include <cstdlib>
+#include <ctime>
 #include "ns3/vector.h"
 #include "ns3/string.h"
 #include "ns3/socket.h"
@@ -50,6 +52,8 @@
 
 #include "ns3/wifi-radio-energy-model-helper.h"
 #include "ns3/energy-module.h"
+
+#include "ns3/netanim-module.h"
 
 using namespace ns3;
 
@@ -135,7 +139,7 @@ void MyExample::SendPacket(uint32_t local_node_id)
 {
     static int          sent_cnt = 0;
     Ptr<NetDevice>      device = DynamicCast<NetDevice> (m_devices.Get (local_node_id));
-    printf("send...%d\n", sent_cnt);
+    printf("\nsend...%d\n", sent_cnt);
 
 #if 0
     std::ostringstream      msg;
@@ -162,7 +166,7 @@ MyExample::CreateNodes (void)
     std::string     phyMode ("OfdmRate6MbpsBW10MHz");
 
     m_nodes = NodeContainer ();
-    m_nodes.Create (2);
+    m_nodes.Create (3);
 
     // The below set of helpers will help us to put together the wifi NICs we want
     YansWifiPhyHelper       wifiPhy =  YansWifiPhyHelper::Default ();
@@ -191,11 +195,22 @@ MyExample::CreateNodes (void)
      *  mobility mode
      */
     MobilityHelper              mobility;
-    Ptr<ListPositionAllocator>  positionAlloc = CreateObject<ListPositionAllocator> ();
-    positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-    positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-    mobility.SetPositionAllocator (positionAlloc);
-    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    // Ptr<ListPositionAllocator>  positionAlloc = CreateObject<ListPositionAllocator> ();
+    // positionAlloc->Add (Vector (0.0, 0.0, 0.0));
+    // positionAlloc->Add (Vector (5.0, 0.0, 0.0));
+    // mobility.SetPositionAllocator (positionAlloc);
+    // mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+
+    mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
+                                 "MinX", DoubleValue (0.0),
+                                 "MinY", DoubleValue (0.0),
+                                 "DeltaX", DoubleValue (50.0),
+                                 "DeltaY", DoubleValue (150.0),
+                                 "GridWidth", UintegerValue (3),
+                                 "LayoutType", StringValue ("RowFirst"));
+
+    mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
+                                "Bounds", RectangleValue (Rectangle (-1000, 1000, -1000, 1000)));
     mobility.Install (m_nodes);
 
 #if 0
@@ -231,11 +246,26 @@ MyExample::SendExample ()
 {
     CreateNodes ();
 
-    Simulator::Schedule (Seconds (1.0), &MyExample::SendPacket, this, 0);
-    Simulator::Schedule (Seconds (1.5), &MyExample::SendPacket, this, 1);
-    Simulator::Schedule (Seconds (2.0), &MyExample::SendPacket, this, 0);
-    Simulator::Schedule (Seconds (2.3), &MyExample::SendPacket, this, 1);
+    Simulator::Stop (Seconds (4.0));
 
+    Ptr<UniformRandomVariable>  uv = CreateObject<UniformRandomVariable> ();
+    for(float act_time = 1.0f; act_time < 3.0f; act_time += 0.1f)
+    {
+        Simulator::Schedule (Seconds(act_time), &MyExample::SendPacket, this, rand() % 3);
+    }
+
+    // Simulator::Schedule (Seconds (1.0), &MyExample::SendPacket, this, 0);
+    // Simulator::Schedule (Seconds (1.2), &MyExample::SendPacket, this, 1);
+    // Simulator::Schedule (Seconds (1.3), &MyExample::SendPacket, this, 0);
+    // Simulator::Schedule (Seconds (1.4), &MyExample::SendPacket, this, 1);
+    // Simulator::Schedule (Seconds (1.5), &MyExample::SendPacket, this, 0);
+    // Simulator::Schedule (Seconds (1.6), &MyExample::SendPacket, this, 1);
+    // Simulator::Schedule (Seconds (1.7), &MyExample::SendPacket, this, 0);
+    // Simulator::Schedule (Seconds (1.8), &MyExample::SendPacket, this, 1);
+    // Simulator::Schedule (Seconds (1.9), &MyExample::SendPacket, this, 0);
+    // Simulator::Schedule (Seconds (2.0), &MyExample::SendPacket, this, 1);
+
+    AnimationInterface  anim("my-80211p.xml");
     Simulator::Run ();
 
 #if 0
@@ -258,6 +288,8 @@ int main (int argc, char *argv[])
     CommandLine     cmd;
     cmd.Parse (argc, argv);
 
+    srand(time(NULL));
+    
     MyExample    example;
     std::cout << "run my case:" << std::endl;
     example.SendExample ();
