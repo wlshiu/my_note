@@ -285,6 +285,40 @@ $ ./waf --command-template="gdb -tui %s" --run <program-name>
 $ ./waf --command-template="cgdb %s" --run <program-name>
 ```
 
++ NetAnim
+
+    - build
+
+    ```
+    $ cd ns-allinone-3.28/netanim-3.108
+
+    $ sudo apt-get install qt4-dev-tools
+    $ make clean
+    $ qmake NetAnim.pro
+    $ make
+    ```
+
+    - Generate input XML file
+
+    ```
+    #include "ns3/netanim-module.h"
+    ...
+    int main()
+    {
+      ...
+      AnimationInterface anim("xxx.xml");
+      Simulator::Run ();
+    }
+    ```
+
+    - run
+
+    ```
+    $ ./NetAnim
+
+    # opne xxx.xml by GUI
+    ```
+
 + [Eclipse-cdt](https://www.eclipse.org/cdt/downloads.php)
 
     - install

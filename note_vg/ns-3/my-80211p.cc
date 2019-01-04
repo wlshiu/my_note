@@ -83,6 +83,19 @@ NS_LOG_COMPONENT_DEFINE ("MyWifiSimpleOcb");
 class MyExample
 {
 public:
+
+    /**
+     * \brief Constructor
+     * \return none
+     */
+    MyExample();
+
+    /**
+     * \brief Destructor
+     * \return none
+     */
+    virtual ~MyExample();
+
     /// Send example function
     void SendExample (void);
 
@@ -105,17 +118,37 @@ private:
     /// Create nodes function
     void CreateNodes (void);
 
-    NodeContainer                   m_nodes; ///< the nodes
+    uint32_t                        m_numNodes; ///< number of nodes
+    NodeContainer                   m_nodeContainer; ///< the nodes
     NetDeviceContainer              m_devices; ///< the devices
     DeviceEnergyModelContainer      m_deviceModels;
 
+    int                             m_nodeSpeed; ///< in m/s
+    int                             m_nodePause; ///< in s
+    double                          m_txp; ///< distance
+    int64_t                         m_streamIndex;
+
 };
+
+MyExample::MyExample()
+    : m_numNodes(40),
+      m_nodeSpeed(20),
+      m_nodePause(0),
+      m_txp(20),
+      m_streamIndex(0)
+{
+}
+
+MyExample::~MyExample()
+{
+}
 
 bool MyExample::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet, uint16_t protocol, const Address &address)
 {
     SeqTsHeader     seqTs;
     packet->PeekHeader (seqTs);
 
+#if 0
     std::cout << "receive a packet: " << std::endl
               << "  sequence = " << seqTs.GetSeq () << "," << std::endl
               << "  sendTime = " << seqTs.GetTs ().GetSeconds () << "s," << std::endl
@@ -123,6 +156,7 @@ bool MyExample::ReceivePacket(Ptr<NetDevice> device, Ptr<const Packet> packet, u
               << "  packet size = " << packet->GetSize() << std::endl;
     std::cout << "  local = " << device->GetAddress() << std::endl;
     std::cout << "  from  = " << address << std::endl;
+#endif
 
 #if 0
     uint8_t     *buffer = new uint8_t[packet->GetSize()];
@@ -165,8 +199,7 @@ MyExample::CreateNodes (void)
 {
     std::string     phyMode ("OfdmRate6MbpsBW10MHz");
 
-    m_nodes = NodeContainer ();
-    m_nodes.Create (3);
+    m_nodeContainer.Create (m_numNodes);
 
     // The below set of helpers will help us to put together the wifi NICs we want
     YansWifiPhyHelper       wifiPhy =  YansWifiPhyHelper::Default ();
@@ -175,6 +208,8 @@ MyExample::CreateNodes (void)
 
     wifiPhy.SetChannel (channel);
     wifiPhy.SetPcapDataLinkType (WifiPhyHelper::DLT_IEEE802_11); // ns-3 supports generate a pcap trace
+    wifiPhy.Set("TxPowerStart", DoubleValue(m_txp));
+    wifiPhy.Set("TxPowerEnd", DoubleValue(m_txp));
 
     NqosWaveMacHelper   wifi80211pMac = NqosWaveMacHelper::Default ();
     Wifi80211pHelper    wifi80211p = Wifi80211pHelper::Default ();
@@ -186,7 +221,7 @@ MyExample::CreateNodes (void)
                                         "DataMode", StringValue (phyMode),
                                         "ControlMode", StringValue (phyMode));
 
-    m_devices = wifi80211p.Install (wifiPhy, wifi80211pMac, m_nodes);
+    m_devices = wifi80211p.Install (wifiPhy, wifi80211pMac, m_nodeContainer);
 
     // Tracing
     wifiPhy.EnablePcap ("simple-80211p", m_devices);
@@ -194,43 +229,34 @@ MyExample::CreateNodes (void)
     /**
      *  mobility mode
      */
-    MobilityHelper              mobility;
-    // Ptr<ListPositionAllocator>  positionAlloc = CreateObject<ListPositionAllocator> ();
-    // positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-    // positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-    // mobility.SetPositionAllocator (positionAlloc);
-    // mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+    ObjectFactory       pos;
+    pos.SetTypeId("ns3::RandomBoxPositionAllocator");
+    pos.Set("X", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=1500.0]"));
+    pos.Set("Y", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=500.0]"));
 
-    mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
-                                 "MinX", DoubleValue (0.0),
-                                 "MinY", DoubleValue (0.0),
-                                 "DeltaX", DoubleValue (50.0),
-                                 "DeltaY", DoubleValue (150.0),
-                                 "GridWidth", UintegerValue (3),
-                                 "LayoutType", StringValue ("RowFirst"));
+    // we need antenna height uniform [1.0 .. 2.0] for loss model
+    pos.Set("Z", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=2.0]"));
 
-    mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-                                "Bounds", RectangleValue (Rectangle (-1000, 1000, -1000, 1000)));
-    mobility.Install (m_nodes);
 
-#if 0
-    /**
-     *  Energy Model
-     */
-    // configure energy source
-    BasicEnergySourceHelper     basicSourceHelper;
-    basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (0.1));
+    Ptr<PositionAllocator>      taPositionAlloc = pos.Create()->GetObject<PositionAllocator>();
+    m_streamIndex += taPositionAlloc->AssignStreams(m_streamIndex);
 
-    // install source
-    EnergySourceContainer       sources = basicSourceHelper.Install (m_nodes);
-    // device energy model
-    WifiRadioEnergyModelHelper  radioEnergyHelper;
-    // configure radio energy model
-    radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.0174));
+    std::stringstream       ssSpeed;
+    ssSpeed << "ns3::UniformRandomVariable[Min=0.0|Max=" << m_nodeSpeed << "]";
 
-    // install device model
-    m_deviceModels = radioEnergyHelper.Install (m_devices, sources);
-#endif
+    std::stringstream       ssPause;
+    ssPause << "ns3::ConstantRandomVariable[Constant=" << m_nodePause << "]";
+
+    //------------------------------
+    MobilityHelper          mobility;
+    mobility.SetMobilityModel("ns3::RandomWaypointMobilityModel",
+                                "Speed", StringValue(ssSpeed.str()),
+                                "Pause", StringValue(ssPause.str()),
+                                "PositionAllocator", PointerValue(taPositionAlloc));
+    mobility.SetPositionAllocator(taPositionAlloc);
+
+    mobility.Install(m_nodeContainer);
+    m_streamIndex += mobility.AssignStreams(m_nodeContainer, m_streamIndex);
 
     /**
      *  attach callback of recv for all nodes
@@ -246,40 +272,16 @@ MyExample::SendExample ()
 {
     CreateNodes ();
 
-    Simulator::Stop (Seconds (4.0));
+    Simulator::Stop (Seconds (5.0));
 
     Ptr<UniformRandomVariable>  uv = CreateObject<UniformRandomVariable> ();
-    for(float act_time = 1.0f; act_time < 3.0f; act_time += 0.1f)
+    for(float act_time = 0.5f; act_time < 4.5f; act_time += 0.5f)
     {
-        Simulator::Schedule (Seconds(act_time), &MyExample::SendPacket, this, rand() % 3);
+        Simulator::Schedule (Seconds(act_time), &MyExample::SendPacket, this, rand() % m_numNodes);
     }
-
-    // Simulator::Schedule (Seconds (1.0), &MyExample::SendPacket, this, 0);
-    // Simulator::Schedule (Seconds (1.2), &MyExample::SendPacket, this, 1);
-    // Simulator::Schedule (Seconds (1.3), &MyExample::SendPacket, this, 0);
-    // Simulator::Schedule (Seconds (1.4), &MyExample::SendPacket, this, 1);
-    // Simulator::Schedule (Seconds (1.5), &MyExample::SendPacket, this, 0);
-    // Simulator::Schedule (Seconds (1.6), &MyExample::SendPacket, this, 1);
-    // Simulator::Schedule (Seconds (1.7), &MyExample::SendPacket, this, 0);
-    // Simulator::Schedule (Seconds (1.8), &MyExample::SendPacket, this, 1);
-    // Simulator::Schedule (Seconds (1.9), &MyExample::SendPacket, this, 0);
-    // Simulator::Schedule (Seconds (2.0), &MyExample::SendPacket, this, 1);
 
     AnimationInterface  anim("my-80211p.xml");
     Simulator::Run ();
-
-#if 0
-    for (DeviceEnergyModelContainer::Iterator iter = m_deviceModels.Begin ();
-            iter != m_deviceModels.End (); iter ++) {
-        double      energyConsumed = (*iter)->GetTotalEnergyConsumption ();
-
-        std::cout <<"End of simulation (" << Simulator::Now ().GetSeconds ()
-                       << "s) Total energy consumed by radio = " << energyConsumed << "J"<< std::endl;
-
-        NS_ASSERT (energyConsumed <= 0.1);
-    }
-#endif
-
     Simulator::Destroy ();
 }
 
@@ -289,7 +291,7 @@ int main (int argc, char *argv[])
     cmd.Parse (argc, argv);
 
     srand(time(NULL));
-    
+
     MyExample    example;
     std::cout << "run my case:" << std::endl;
     example.SendExample ();
