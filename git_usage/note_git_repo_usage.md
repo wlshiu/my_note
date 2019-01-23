@@ -1,5 +1,13 @@
 # Git usage
 ---
+- Upgrade Git version on Ubuntu
+
+    ```
+    $ sudo add-apt-repository ppa:git-core/ppa
+    $ sudo apt-get update
+    $ sudo apt-get install git
+    ```
+
 - handle MS Word files (https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes)
 
     1. 新增 .gitattributes file
