@@ -465,92 +465,92 @@
 
 # Repo usage
 ---
-- repo help
++ repo help
     > repo help COMMAND
 
-- repo status
++ repo status
     > 顯示所有project的狀態
 
-- repo init -u URL
++ repo init -u URL
     > 用來在目前目錄安裝下載整個Android repository，會下建立一個".repo"的目錄。
 
-    + **-u**: 用來指定一個URL，從這個URL中獲取repository的manifest文件。
+    - **-u**: 用來指定一個URL，從這個URL中獲取repository的manifest文件。
         例如：repo init -u git://android.git.kernel.org/platform/manifest.git，獲取的manifest文件放在.repo目錄中，命名為manifest.xml。
         這個文件的內容其實就是Android work space下所有被git管理的git repository的列表！
 
         如果你有仔細看，可以發現到.repo/manifests是個被git管理的repository，裡面放著所有的manifest文件 (*.xml)。
         而透過參數的設定，則可以指定要使用哪個manifest文件，甚至是該文件的不同branch。
 
-    + **-m**：用來選擇獲取 repository 中的某一個特定的 manifest 文件。如果不具體指定，那麼表示為預設的 manifest 文件 (default.xml)
+    - **-m**：用來選擇獲取 repository 中的某一個特定的 manifest 文件。如果不具體指定，那麼表示為預設的 manifest 文件 (default.xml)
 
         ```
         repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
         or
-    repo init -m proj20151031.xml  # You must put proj20151031.xml to .repo/manifests/
+        repo init -m proj20151031.xml  # You must put proj20151031.xml to .repo/manifests/
         ```
-    + **-b**：用來指定某個manifest 分支。
+    - **-b**：用來指定某個manifest 分支。
 
         ```
         repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
         ```
 
-    + **options**:
-        - `-u URL, --manifest-url=URL`:
+    - **options**:
+        1. `-u URL, --manifest-url=URL`:
                             manifest repository location
 
-        - `-b REVISION, --manifest-branch=REVISION`:
+        1. `-b REVISION, --manifest-branch=REVISION`:
                             manifest branch or revision
 
-        - `-m NAME.xml, --manifest-name=NAME.xml`:
+        1. `-m NAME.xml, --manifest-name=NAME.xml`:
                             initial manifest file
 
-        - `--mirror`:            mirror the forrest
+        1. `--mirror`:            mirror the forrest
 
-        - `--reference=DIR`:     location of mirror directory
+        1. `--reference=DIR`:     location of mirror directory
 
-        - `--depth=DEPTH`:       create a shallow clone with given depth; see git clone
+        1. `--depth=DEPTH`:       create a shallow clone with given depth; see git clone
 
-        - `-g GROUP, --groups=GROUP`: restrict manifest projects to ones with a specified group
+        1. `-g GROUP, --groups=GROUP`: restrict manifest projects to ones with a specified group
 
-        - `-p PLATFORM, --platform=PLATFORM`:
+        1. `-p PLATFORM, --platform=PLATFORM`:
                             restrict manifest projects to ones with a
                             specifiedplatform group
                             [auto|all|none|linux|darwin|...]
 
 
-- repo sync [PROJECT_LIST]
++ repo sync [PROJECT_LIST]
     > 下載最新文件, 更新成功後, 文件會和遠端server中的代碼是一樣的。
       可以指定需要更新的project, 如果不指定任何參數，則會同步整個所有的project。
 
     > 沒有指定 –local-only 選項, 那麼就對保存在變量 all_projects 中的 AOSP子項目進行網絡更新,
       也就是從遠程倉庫中下載更新到本地倉庫來, 這是通過調用Sync類的成員函數_Fetch來完成的
 
-    + **Options**:
-        - `-h, --help`:             show this help message and exit
-        - `-f, --force-broken`:     continue sync even if a project fails to sync
-        - `-l, --local-only`:       only update working tree, don't fetch
-        - `-n, --network-only`:     fetch only, don't update working tree
-        - `-d, --detach`:           detach projects back to manifest revision
-        - `-c, --current-branch`:   fetch only current branch from server
-        - `-q, --quiet`:            be more quiet
-        - `-j JOBS, --jobs=JOBS`:   projects to fetch simultaneously (default 1)
+    - **Options**:
+        1. `-h, --help`:             show this help message and exit
+        1. `-f, --force-broken`:     continue sync even if a project fails to sync
+        1. `-l, --local-only`:       only update working tree, don't fetch
+        1. `-n, --network-only`:     fetch only, don't update working tree
+        1. `-d, --detach`:           detach projects back to manifest revision
+        1. `-c, --current-branch`:   fetch only current branch from server
+        1. `-q, --quiet`:            be more quiet
+        1. `-j JOBS, --jobs=JOBS`:   projects to fetch simultaneously (default 1)
 
-        - `-m NAME.xml, --manifest-name=NAME.xml`:
+        1. `-m NAME.xml, --manifest-name=NAME.xml`:
                                     temporary manifest to use for this sync
 
-        - `--no-clone-bundle`:      disable use of /clone.bundle on HTTP/HTTPS
-        - `-s, --smart-sync`:       smart sync using manifest from a known good build
+        1. `--no-clone-bundle`:      disable use of /clone.bundle on HTTP/HTTPS
+        1. `-s, --smart-sync`:       smart sync using manifest from a known good build
 
-        - `-t SMART_TAG, --smart-tag=SMART_TAG`:
+        1. `-t SMART_TAG, --smart-tag=SMART_TAG`:
                                     smart sync using manifest from a known tag
 
-        - `-u MANIFEST_SERVER_USERNAME, --manifest-server-username=MANIFEST_SERVER_USERNAME`:
+        1. `-u MANIFEST_SERVER_USERNAME, --manifest-server-username=MANIFEST_SERVER_USERNAME`:
                                     username to authenticate with the manifest server
 
-        - `-p MANIFEST_SERVER_PASSWORD, --manifest-server-password=MANIFEST_SERVER_PASSWORD`:
+        1. `-p MANIFEST_SERVER_PASSWORD, --manifest-server-password=MANIFEST_SERVER_PASSWORD`:
                                     password to authenticate with the manifest server
 
-- repo upload [PROJECT_LIST]
++ repo upload [PROJECT_LIST]
     > 上傳修改的代碼 ，如果你的代碼有所修改，那麼在運行 repo sync 的時候，會提示你上傳修改的代碼。
       所有修改的代碼分支會上傳到 Gerrit，Gerrit 收到上傳的代碼，會轉換為一個改動，從而可以讓人們來review 修改的代碼。
 
@@ -574,10 +574,10 @@
         $ repo upload .
         ```
 
-- repo diff [PROJECT_LIST]
++ repo diff [PROJECT_LIST]
     > 顯示尚未commit的改動差異
 
-- repo download [target] [revision]
++ repo download [target] [revision]
     > 下載指定的修改版本
 
     ```
@@ -585,14 +585,14 @@
     $ repo download platform/frameworks/base 1241
     ```
 
-- repo start new_branch_name [PROJECT_LIST]
++ repo start new_branch_name [PROJECT_LIST]
     > 在指定的project中建立新的branch，並且切換到該branch上。
     >> --all：代表指定所有的git projects
 
-- repo prune [PROJECT_LIST]
++ repo prune [PROJECT_LIST]
     > 刪除已經 merge好的project。
 
-- repo forall -p [PROJECT_LIST] -c [COMMAND]
++ repo forall -p [PROJECT_LIST] -c [COMMAND]
     > 針對指定的project執行`-c`所帶入的 command, 這個被執行的命令就不限於僅僅是 git命令了, 而是任何被系統支持的命令, 比如：ls, pwd, cp 等
 
     ```
@@ -600,7 +600,7 @@
     $ repo forall -p -c git reset --hard HEAD
     ```
 
-- repo manifest -r -o xxx.xml
++ repo manifest -r -o xxx.xml
     - generate revision xml file
 
     - manifest.xml Format
@@ -634,7 +634,181 @@
             </manifest>
         ```
 
-- misc
++ misc
+    - install repo
+
+        ```shell
+        $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        $ chmod a+x ~/bin/repo
+        $ ~/bin/repo
+            error: repo is not installed.  Use "repo init" to install it here. # repo be not installed
+        $ repo init
+            Get https://gerrit.googlesource.com/git-repo/clone.bundle
+            fatal: manifest url (-u) is required.                               # install success but need a url of manifest repository
+        ```
+
+        1. repo commands (after installed)
+
+            ```shell
+            $ repo help
+            usage: repo COMMAND [ARGS]
+            The most commonly used repo commands are:
+              abandon        Permanently abandon a development branch
+              branch         View current topic branches
+              branches       View current topic branches
+              checkout       Checkout a branch for development
+              cherry-pick    Cherry-pick a change.
+              diff           Show changes between commit and working tree
+              diffmanifests  Manifest diff utility
+              download       Download and checkout a change
+              grep           Print lines matching a pattern
+              info           Get info on the manifest branch, current branch or unmerged branches
+              init           Initialize repo in the current directory
+              list           List projects and their associated directories
+              overview       Display overview of unmerged project branches
+              prune          Prune (delete) already merged topics
+              rebase         Rebase local branches on upstream branch
+              smartsync      Update working tree to the latest known good revision
+              stage          Stage file(s) for commit
+              start          Start a new branch for development
+              status         Show the working tree status
+              sync           Update working tree to the latest revision
+              upload         Upload changes for code review
+            See 'repo help <command>' for more information on a specific command.
+            See 'repo help --all' for a complete list of recognized commands.
+            ```
+        1. manifests.git
+            > 建立 manifest.xml 的 repository, 並用 git 管理
+            >> you can reference the directory of android
+
+                ```shell
+                # google example
+                $ repo init -u https://android.googlesource.com/platform/manifest.git
+                    or
+                $ repo init -u ssh://[user-name]@repo_url
+                ```
+
+        1. manifest format 說明
+            ```xml
+            <!-- example default.xml-->
+
+            <?xml version="1.0" encoding="UTF-8"?>
+            <manifest>
+                <remote name="aosp"
+                        fetch=".."
+                        review="https://android-review.googlesource.com/" />
+                <default revision="master"
+                         remote="aosp"
+                         sync-j="4" />
+
+                <include name="base.xml" />
+
+                <project path="adk1/board" name="device/google/accessory/arduino" />
+                <project path="adk1/app" name="device/google/accessory/demokit" />
+                <project path="adk2012/app" name="device/google/accessory/adk2012" />
+                <project path="adk2012/board" name="device/google/accessory/adk2012_demo" />
+                <project path="external/ide" name="platform/external/arduino-ide" />
+                <project path="external/toolchain" name="platform/external/codesourcery" />
+                <remove-project name="adk1/app" />
+            </manifest>
+            ```
+
+            a. manifest
+                > 這個是配置的頂層元素，即根標誌
+
+            a. remote
+                > + name
+                >> 在每一個.git/config 文件的 remote 項中用到這個 name，
+                即表示每個 git 的 remote name (這個名字很關鍵，如果多個 remote 屬性的話，default 屬性中需要指定 default remote, 可用 `$ git remote -v` 來確認)。
+                git pull and get fetch的時候會用到這個 remote name。
+
+                > + alias
+                >> 可以覆蓋之前定義的 remote name，name 必須是固定的，但是 alias 可以不同，可以用來指向不同的 remote url
+
+                > + fetch
+                >> 所有 git url 真正路徑的前綴，所有 git 的 project name 加上這個前綴，就是 git url 的真正路徑
+
+                > + review
+                >> 指定Gerrit的服務器名，用於 repo upload 操作。如果沒有指定，則 repo upload 沒有效果
+
+            a. default
+                > 設定所有　projects　的默認屬性值，如果在　project　元素裡沒有指定一個屬性，則使用　default　元素的屬性值。
+
+                > + remote
+                >> 遠程服務器的名字(上面 remote 屬性中提到過，多個 remote 的時候需要指定 default remote，就是這裡設置了)
+
+                > + revision
+                >> 所有 git 的默認 branch，後面 project 沒有特殊指出 revision 的話，就用這個branch
+
+                > + sync_j
+                >> 在 repo sync 中默認並行的數目
+
+                > + sync_c
+                >> 如果設置為 true，則只同步指定的分支(revision 屬性指定)，而不是所有的 ref 內容
+
+                > + sync_s
+                >> 如果設置為 true，則會同步 git 的子項目
+
+            a. project
+                > 需要 clone 的單獨 git
+
+                > + name
+                >> git 的名稱，用於生成 git url。
+                URL 格式是：${remote fetch}/${project name}.git 其中的 fetch 就是上面提到的 remote 中的 fetch 元素，name 就是此處的 name
+
+                > + path
+                >> clone 到本地的 git 的工作目錄，如果沒有配置的話，跟 name 一樣
+
+                > + remote
+                >> 定義 remote name，如果沒有定義的話就用 default 中定義的 remote name
+
+                > + revision
+                >> 指定需要獲取的 git 提交點，可以定義成固定的 branch，或者是明確的 commit 哈希值
+
+                > + groups
+                >> 列出 project 所屬的組，以空格或者逗號分隔多個組名。所有的 project 都自動屬於`all`組。
+                每一個 project 自動屬於 `name:'name'` 和 `path:'path'`組。
+                例如 <project name="monkeys" path="barrel-of"/>，
+                它自動屬於 `default`, `name:monkeys`, and `path:barrel-of` 組。
+                如果一個 project 屬於 notdefault 組，則，repo sync 時不會下載
+
+                > + sync_c
+                >> 如果設置為 true，則只同步指定的分支(revision 屬性指定)，而不是所有的 ref 內容。
+
+                > + sync_s
+                >> 如果設置為 true，則會同步 git 的子項目
+
+                > + upstream
+                >> 在哪個 git 分支可以找到一個 SHA1。用於同步 revision 鎖定的 manifest(-c 模式)。該模式可以避免同步整個ref空間
+
+                > + annotation
+                >> 可以有 0 個或多個 annotation，格式是 name-value，`repo forall` 命令是會用來定義環境變量
+
+            a. include
+                > 通過 name 屬性可以引入另外一個 manifest 文件(路徑相對與當前的 manifest.xml 的路徑)
+
+                > + name
+                >> 另一個需要導入的 manifest 文件名字
+
+            a. remove-project
+                > 從內部的 manifest 表中刪除指定的 project。經常用於本地的 manifest 文件，用戶可以替換一個 project 的定義
+                >> remove 前述已設定的 project, 搭配 `include` 使用
+
+                > + name
+                >> 要移除的 project name
+
+            a. manifest-server
+                > 它的 url 屬性用於指定 manifest 服務的 URL，通常是一個 XML RPC 服務
+
+                > 它要支持一下RPC方法
+                > + GetApprovedManifest(branch, target)
+                >> 返回一個manifest用於指示所有projects的分支和編譯目標。
+                    target 參數來自環境變量 TARGET_PRODUCT 和 TARGET_BUILD_VARIANT，組成 $TARGET_PRODUCT-$TARGET_BUILD_VARIANT
+
+                > + GetManifest(tag)
+                >> 返回指定tag的manifest
+
+
     - The major purpose of repo and git is one issue one branch, so this is what I do when I fix a bug or modify a new issue.
       and I think will decrease problem during operating repo and git. This is only my work flow, you can still use your own flow too.
       but if use only one branch all the time, please be sure your git tree always synchronous with server to reduce repo problem.
@@ -646,6 +820,7 @@
       >5. modify code you want
       >6. $ git commit -a
       >7. $ repo upload .  <-- upload current git project to amcode review board.
+
 
 
 
