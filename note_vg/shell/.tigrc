@@ -1,14 +1,11 @@
 #
 # Base configuration
-#
+#  tig 2.4.1
 # Syntax: set <option> = <value>
 
-set show-rev-graph = yes    # Show revision graph?
-set line-number-interval = 5    # Interval between line numbers
 set tab-size = 4        # Number of spaces pr tab
 set history-size = 500
-set main-view = id date author commit-title:graph=yes,refs=yes
-set show-line-numbers = yes
+set main-view = id date author line-number:yes,interval=1 commit-title:graph=yes,refs=yes
 
 
 
@@ -39,21 +36,23 @@ color diff-add          green   default
 color diff-del          red     default
 color diff-oldmode      yellow  default
 color diff-newmode      yellow  default
-color diff-copy-from    yellow  default
-color diff-copy-to      yellow  default
-color diff-rename-from  yellow  default
-color diff-rename-to    yellow  default
 color diff-similarity   yellow  default
-color diff-dissimilarity yellow  default
-color diff-tree         blue    default
+
+color "copy from "      yellow  default
+color "copy to "        yellow  default
+color "rename from "    yellow  default
+color "rename to "      yellow  default
+color "dissimilarity "  yellow  default
+color "diff-tree "      blue    default
 
 # Pretty print commit header
-color pp-author     cyan    default
-color pp-commit     magenta default
 color pp-merge      blue    default
-color pp-date       yellow  default
-color pp-adate      yellow  default
-color pp-cdate      yellow  default
+
+color "Author: "        cyan    default
+color "Commit: "        magenta default
+color "Date: "          yellow  default
+color "AuthorDate: "    yellow  default
+color "CommitDate: "    yellow  default
 
 # Raw commit header
 color commit        green   default
@@ -63,7 +62,7 @@ color author        yellow  default
 color committer     magenta default
 
 # Misc
-color signoff       yellow  default
+color "    Signed-off-by"   yellow  default
 
 # UI colors
 color default       default default
@@ -72,10 +71,7 @@ color cursor        white   green
 color status        green   default
 color title-blur    white   blue
 color title-focus   white   blue    bold
-color main-date     blue    default
-color main-author   green   default
 color main-commit   default default
-color main-delim    magenta default
 color main-tag      magenta default bold
 color main-ref      cyan    default bold
 color date          cyan    default
