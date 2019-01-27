@@ -1,0 +1,32 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+    module = bld.create_ns3_module('sw', ['network'])
+    module.source = [
+        'model/sw-channel.cc',
+        'model/sw-phy.cc',
+        'model/sw-mac-header.cc',
+        'model/sw-mac-csma.cc',
+        'model/sw-net-device.cc',
+        'helper/sw-helper.cc',
+        'helper/sw-phy-basic-helper.cc',
+        'helper/sw-mac-csma-helper.cc',
+        ]
+    headers = bld.new_task_gen('ns3header')
+    headers.module = 'sw'
+    headers.source = [
+        'model/sw-channel.h',
+        'model/sw-phy.h',
+        'model/sw-mac.h',
+        'model/sw-mac-header.h',
+        'model/sw-mac-csma.h',
+        'model/sw-net-device.h',
+        'helper/sw-helper.h',
+        'helper/sw-phy-basic-helper.h',
+        'helper/sw-mac-csma-helper.h',
+        ]
+
+    if (bld.env['ENABLE_EXAMPLES']):
+      bld.add_subdirs('examples')
+
+    bld.ns3_python_bindings()

@@ -1,0 +1,9 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+  obj = bld.create_ns3_program('sw-simple-ex', ['core', 'mobility', 'propagation', 'applications', 'sw'])
+  obj.source = 'sw-simple-ex.cc'
+
+  obj = bld.create_ns3_program('sw-linear-multihop-ex', ['core', 'propagation', 'applications', 'aodv', 'mobility', 'sw'])
+  obj.source = 'sw-linear-multihop-ex.cc'
+
