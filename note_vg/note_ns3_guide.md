@@ -253,7 +253,7 @@ $ sudo pip-review --local --interactive
     $ ./waf configure --enable-sudo --build-profile=debug --enable-examples --enable-test
     ```
 
-    - compiler user code
+    - compiler and run user code
 
     ```shell
     $ cd ns-allinone-3.29/ns-3.29
@@ -264,6 +264,12 @@ $ sudo pip-review --local --interactive
 
     # run target (without file extension '.cc')
     $ ./waf --run scratch/myfirst
+    ```
+
+    - only compiler
+
+    ```shell
+    $ ./waf build
     ```
 
 + GDB
@@ -283,6 +289,16 @@ $ gdb <program-name>
 $ ./waf --command-template="gdb -tui %s" --run <program-name>
     or
 $ ./waf --command-template="cgdb %s" --run <program-name>
+
+    or
+
+# run with shell
+$ ./waf shell
+$ cd ./ns-3.28/build
+$ gdb scratch/first
+
+# leave shell
+$ exit
 ```
 
 + NetAnim
@@ -294,7 +310,7 @@ $ ./waf --command-template="cgdb %s" --run <program-name>
 
     $ sudo apt-get install qt4-dev-tools
     $ make clean
-    $ qmake NetAnim.pro
+    $ qmake-qt4 NetAnim.pro     # qmake NetAnim.pro
     $ make
     ```
 
