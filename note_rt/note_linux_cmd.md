@@ -204,6 +204,10 @@ Linux cmd
         1. `LD_LIBRARY_PATH`
             > define the search path for *so* files
 
+            ```shell
+            $ LD_LIBRARY_PATH=$HOME/my_so_libs:${LD_LIBRARY_PATH} gdb ./a.out
+            ```
+
         1. `LD_PRELOAD`
             > define the soruce code path
 
