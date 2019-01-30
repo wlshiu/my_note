@@ -186,6 +186,35 @@ GDB_CMD
 
 # debug tips
 
++ `.gdbinit`
+    > GDB user configuration
+
+    - alias cmd
+    ```shell
+    define [command]
+        # scenario
+    end
+    document [command]
+        # help description
+    end
+    ```
+
+    ```shell
+    # example
+    define save-bt
+        if $argc != 1
+            help save-bt
+        else
+            set logging file $arg0
+            set logging on
+            set logging off
+        end
+    end
+    document save-bt
+    Usage: save-bt ~/bt.rec
+    end
+    ```
+
 + disassembly code maps to source code
 
     ```
