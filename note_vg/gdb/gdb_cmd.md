@@ -234,6 +234,19 @@ GDB_CMD
     (gdb) source ~/.breakpoints.rec
     ```
 
++ save backtrace log
+
+    ```shell
+    (gdb) set logging file gdb_bt.log
+    (gdb) set logging on
+    Copying output to gdb_bt.log
+    (gdb) bt
+    #0  0x0000003000eb7472 in __select_nocancel () from /lib/libc.so.6
+    ...
+    (gdb) set logging off
+    Done logging to backtrace.log.
+    ```
+
 # cgdb (need to install)
 
 + bind cross gdb in toolchain
