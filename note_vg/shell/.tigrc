@@ -6,7 +6,9 @@
 set tab-size = 4        # Number of spaces pr tab
 set history-size = 500
 set main-view = id date author line-number:yes,interval=1 commit-title:graph=yes,refs=yes
-
+set vertical-split = false
+set ignore-case = true
+set tab-size = 4
 
 
 #
