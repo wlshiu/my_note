@@ -58,6 +58,10 @@ VirtualBox
         # replace "http://tw.archive.canonical.com/ubuntu/" with "server_url" in sources.list
         # original http://tw.archive.ubuntu.com/ubuntu/
 
+        # add to the end of sources.list
+        deb http://dk.archive.ubuntu.com/ubuntu/ xenial main
+        deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
+
         ```
         a. [NCHC, Taiwan, 20 Gbps](http://free.nchc.org.tw/ubuntu/)
         a. [TaiChung County Education Network Center, 1 Gbps](http://ftp.tcc.edu.tw/Linux/ubuntu/)
@@ -78,7 +82,7 @@ VirtualBox
 
 + Environment
     ```
-    $ sudo apt-get install build-essential make gcc gdb tig dos2unix automake libtool pkg-config \
+    $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake libtool pkg-config \
             vim git ctags cscope id-utils texinfo global libncurses5-dev libreadline6 libreadline6-dev
     ```
     - svn
@@ -200,6 +204,10 @@ VirtualBox
 
         # ubuntu 14.04 and lastest version
         $ sudo apt-get install net-tools samba cifs-utils smbclient
+
+        # ubuntu 18.04
+        $ sudo apt install tasksel
+        $ sudo tasksel install samba-server
         ```
 
     - VirtualBox: Enable network card
@@ -241,6 +249,33 @@ VirtualBox
 
             a. shutdown
             a. In VirtualBox Network -> Adapter 2 -> Reflash MAC address (maybe don't need)
+
+        1. ubuntu 18.04
+            ```
+            $ sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml_backup
+            $ sudo vim /etc/netplan/01-netcfg.yaml
+                # This file describes the network interfaces available on your system
+                # For more information, see netplan(5).
+                network:
+                  version: 2
+                  renderer: networkd
+                  ethernets:
+                    enp0s3:
+                      dhcp4: yes
+                    enp0s8:
+                      addresses: [192.168.56.2/24]
+                      routes:
+                        - to: 192.168.56.0/24
+                          via: 192.168.56.0
+
+            $ sudo reboot
+            ```
+
+            ```
+            # samba configure
+            $ sudo cp /etc/samba/smb.conf /etc/samba/smb.conf_backup
+            $ sudo bash -c 'grep -v -E "^#|^;" /etc/samba/smb.conf_backup | grep . > /etc/samba/smb.conf'
+            ```
 
     - check connection
         1. in lubuntu
@@ -293,12 +328,16 @@ VirtualBox
 
     - Set Samba account and password
         ```
+        $ sudo touch /etc/samba/smbpasswd # maybe don't need
         $ sudo smbpasswd -a [User name]
         ```
 
     - Restart Samba to enable setting
         ```
         $ sudo /etc/init.d/smbd restart
+
+        # ubuntu 18.04
+        $ sudo service smbd restart
         ```
 
     - Connect to lubuntu from Windows
