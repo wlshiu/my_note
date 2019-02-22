@@ -463,6 +463,31 @@
             ```
 
 
+# tig
+
++ `q`
+    > leave
+
++ tree view
+    > 直接查看 commit 當時的 repo 檔案內容, 省去 git checkout 的麻煩
+
+    - main view 底下對選中的 commit 按 `t`
+
++ status view
+
+    - `u`
+        > 檔案加入或移出這次的 commit
+
+    - `@`
+        > 往下選 chunk
+
+    - `1`
+        > 只加入單行的修改
+
++ ref
+    - [Tig: text-mode interface for Git](https://jonas.github.io/tig/)
+    - [tig - git 的命令列好夥伴](http://blog.kidwm.net/388)
+
 # Repo usage
 ---
 + repo help
