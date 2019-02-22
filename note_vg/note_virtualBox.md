@@ -348,6 +348,62 @@ VirtualBox
 
     - [reference](https://bryceknowhow.blogspot.tw/2013/10/virtualbox-samba-ubuntu-host-onlywin7.html#more)
 
++ locale
+
+    - list local language setting
+
+        ```shell
+        $ locale
+        LANG=en_US.UTF-8
+        LANGUAGE=
+        LC_CTYPE="en_US.UTF-8"
+        LC_NUMERIC="en_US.UTF-8"
+        LC_TIME="en_US.UTF-8"
+        LC_COLLATE="en_US.UTF-8"
+        LC_MONETARY="en_US.UTF-8"
+        LC_MESSAGES="en_US.UTF-8"
+        LC_PAPER="en_US.UTF-8"
+        LC_NAME="en_US.UTF-8"
+        LC_ADDRESS="en_US.UTF-8"
+        LC_TELEPHONE="en_US.UTF-8"
+        LC_MEASUREMENT="en_US.UTF-8"
+        LC_IDENTIFICATION="en_US.UTF-8"
+        LC_ALL=
+        ```
+
+    - change language
+
+        ```shell
+        $ sudo locale-gen zh_TW
+        $ sudo locale-gen zh_TW.UTF-8
+        $ sudo dpkg-reconfigure locales
+        $ sudo update-locale LANG="zh_TW.UTF-8" LANGUAGE="zh_TW"
+        # you should re-login
+        ```
+
+    - terminal show chinese
+
+        ```shell
+        $ sudo update-locale LANG="en_US.UTF-8" LANGUAGE="en_US"
+
+        # in ~/.vimrc
+        set fileencodings=utf-8,ucs-bom,gb2312,gbk,gb18030,cp936
+        ```
+
+        ```
+        # maybe this is not necessary
+        $ sudo vim /var/lib/locales/supported.d/en
+            # add to the end
+            zh_TW.UTF-8 UTF-8
+            zh_CN.GB18030 GB18030
+        ```
+
+    - font
+
+        ```shell
+        $ sudo apt-get install fonts-cns11643-kai fonts-cns11643-sung
+        $ sudo apt-get install fonts-droid-fallback ttf-wqy-zenhei ttf-wqy-microhei fonts-arphic-ukai fonts-arphic-uming
+        ```
 
 + Network File System (NFS)
     - VirtualBox
