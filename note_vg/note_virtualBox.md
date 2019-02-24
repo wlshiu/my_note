@@ -170,14 +170,17 @@ VirtualBox
 
         a. Add to group
             ```
-            $ sudo adduser yourusername vboxsf
+            $ sudo adduser [yourusername] vboxsf
             ```
     1. auto mount share folder
         a. Add setting `vboxsf.conf`
             ```
-            $ touch /etc/modules-load.d/vboxsf.conf
+            $ sudo touch /etc/modules-load.d/vboxsf.conf
             ```
         a. type `vboxsf` to vboxsf.conf
+            ```
+            $ sudo echo 'vboxsf' > /etc/modules-load.d/vboxsf.conf
+            ```
 
     1. MUST reboot system
 
