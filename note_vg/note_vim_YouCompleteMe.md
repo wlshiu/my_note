@@ -3,13 +3,13 @@ Vim YouCompleteMe
 
 # Dependency
 
-    ```
-    # Ubuntu 14.04
-    $ sudo apt-get -y install build-essential cmake3 python3-dev llvm-3.9 clang-3.9 libclang-3.9-dev libboost-all-dev
+```
+# Ubuntu 14.04
+$ sudo apt-get -y install build-essential cmake3 python3-dev llvm-3.9 clang-3.9 libclang-3.9-dev libboost-all-dev
 
-    # Ubuntu 16.04 and later:
-    $ sudo apt-get -y install build-essential cmake python3-dev llvm-3.9 clang-3.9 libclang-3.9-dev libboost-all-dev
-    ```
+# Ubuntu 16.04 and later:
+$ sudo apt-get -y install build-essential cmake python3-dev llvm-3.9 clang-3.9 libclang-3.9-dev libboost-all-dev
+```
 
 + Vim versio 7.4.143 or later
 
@@ -99,3 +99,11 @@ Vim YouCompleteMe
     $ ./install.py --clang-completer
     ```
 
++ manual
+    - [libclang](https://www.projectiwear.org/home/svn/iwear/src/trunk/vim/_vim/bundle/YouCompleteMe/third_party/ycmd/clang_archives/libclang-7.0.0-x86_64-unknown-linux-gnu.tar.bz2)
+
+    ```shell
+    $ cp ~/Downloads/libclang-7.0.0-x86_64-unknown-linux-gnu.tar.bz2 ~/.vim/bundle/YouCompleteMe/third_party/ycmd/clang_archives
+    $ cd ~/.vim/bundle/YouCompleteMe
+    $ ./install.py --clang-completer    
+    ```
