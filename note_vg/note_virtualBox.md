@@ -125,6 +125,12 @@ VirtualBox
             $ sudo apt-get install codeblocks codeblocks-contrib
             ```
 
+    - web browser lite
+
+        ```
+        $ sudo apt-get install Midori
+        ```
+
 + resolution
     1. Install `VboxGuestAdditions`
 
