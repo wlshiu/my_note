@@ -127,9 +127,19 @@ VirtualBox
 
     - web browser lite
 
-        ```
+        ```shell
         $ sudo apt-get install Midori
         ```
+        
+    - ccache (compiler cache)
+
+        ```shell
+        $ sudo apt install ccache
+        $ export PATH=/usr/lib/ccache:$PATH
+        ```
+
+        1. [compiler cache](https://ccache.samba.org/)
+        2. [other reference](http://www.bitsnbites.eu/faster-c-builds/)
 
 + resolution
     1. Install `VboxGuestAdditions`
