@@ -200,6 +200,37 @@ VirtualBox
 
     1. MUST reboot system
 
++ X11
+
+    ```
+    $ sudo apt-get install xorg openbox xauth
+    ```
+    
+    - windows side
+        
+        1. [XMing for Windows](http://sourceforge.net/projects/xming/) 
+        2. putty
+            
+            ```
+            Putty -> SSH -> X11 forwarding
+            * enable X11 forwarding
+            * X display location: localhost:10.0
+            ```
+            
+    - ubuntu side
+    
+        1. setting
+        
+            ```
+            $ sudo vi /etc/ssh/sshd_config
+                # modify
+                X11Forwarding yes
+                X11DisplayOffset 10
+                X11UseLocalhost yes
+
+            $ sudo service sshd restart            
+            ```
+
 + Change graphic/text UI login
     - Text login
         > F1 ~ F6 is txet mode in Linux
