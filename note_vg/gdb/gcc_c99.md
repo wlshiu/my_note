@@ -44,6 +44,21 @@ C99
     }
     ```
 
++ local declare struct
+
+    ```c
+    int foo()
+    {
+        struct info_ {
+            uint32_t    uid;
+        } info;
+
+        info.uid = 0x1234;
+
+        return 0;
+    }
+    ```
+
 + macro return
 
     ```c
