@@ -1,4 +1,4 @@
-NU ARM assemble
+GNU ARM assemble
 ---
 
 # format
@@ -278,34 +278,70 @@ NU ARM assemble
 
 # embedding to C
 
-    ```c
-    asm(
-        "
-        instruction 1 ...
-        instruction 2 ...
-                :
-        "
-        : 輸出列表
-        : 輸入列表
-        : 被更改的resource
-        );
-    ```
+```c
+asm(
+    "
+    instruction 1 ...
+    instruction 2 ...
+            :
+    "
+    : 輸出列表
+    : 輸入列表
+    : 被更改的resource
+    );
+```
 
-    ```c
-       void  function(void){
-             unsigned int var1= 123;
-             unsigned int var2= 456;
-               asm (
-                    "ldr  r0 , = %0 ;"  /* %0 代表輸入參數第一項,即var1 */
-                    "ldr  r1 , = %1 ;"  /* %1 代表輸入參數第二項,即var2 */
-                              :
-                    "\n"
+```c
+   void  function(void){
+         unsigned int var1= 123;
+         unsigned int var2= 456;
+           asm (
+                "ldr  r0 , = %0 ;"  /* %0 代表輸入參數第一項,即var1 */
+                "ldr  r1 , = %1 ;"  /* %1 代表輸入參數第二項,即var2 */
+                          :
+                "\n"
 
-                    :  無
-                    : "=r" (var1) , "=r" (var2) /* 輸入為var變數 , 'r' 代表暫存器 r0~r15, '='代表唯寫 */
-                     : "r0" ,"r1"               /* 表示 r0 和 r1 會被更改到 */
-                );
-            }
+                :  無
+                : "=r" (var1) , "=r" (var2) /* 輸入為var變數 , 'r' 代表暫存器 r0~r15, '='代表唯寫 */
+                 : "r0" ,"r1"               /* 表示 r0 和 r1 會被更改到 */
+            );
+        }
 
-    ```
+```
 
+# example 
+
+```asm
+                    ;進入main程式
+141A:01FA 55            PUSH    BP          ;儲存暫存器現場
+141A:01FB 8BEC          MOV     BP,SP
+
+141A:01FD B80200        MOV     AX,0002     ;將2個位元組的2h入棧
+141A:0200 50            PUSH    AX
+141A:0201 B061          MOV     AL,61       ;將1個位元組的'a'入棧
+141A:0203 50            PUSH    AX
+141A:0204 E80400        CALL    020B        ;呼叫子程式
+141A:0207 59            POP     CX          ;釋放區域性變數的空間
+141A:0208 59            POP     CX
+141A:0209 5D            POP     BP          ;恢復暫存器現場
+141A:020A C3            RET                 ;main函式返回
+
+                    ;進入子程式
+141A:020B 55            PUSH    BP          ;儲存暫存器現場
+141A:020C 8BEC          MOV     BP,SP
+141A:020E 8A4604        MOV     AL,[BP+04]  ;讀出字元'a'
+141A:0211 BB00B8        MOV     BX,B800     ;寫入到b800:0690h
+141A:0214 8EC3          MOV     ES,BX
+141A:0216 BB9006        MOV     BX,0690
+141A:0219 26            ES:
+141A:021A 8807          MOV     [BX],AL
+141A:021C 8A4606        MOV     AL,[BP+06]  ;讀出資料2h
+141A:021F BB00B8        MOV     BX,B800     ;寫入到b800:0691h
+141A:0222 8EC3          MOV     ES,BX
+141A:0224 BB9106        MOV     BX,0691
+141A:0227 26            ES:
+141A:0228 8807          MOV     [BX],AL
+141A:022A 5D            POP     BP          ;恢復暫存器現場
+141A:022B C3            RET                 ;子程式返回
+141A:022C C3            RET
+```
