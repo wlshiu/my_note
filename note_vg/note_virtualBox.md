@@ -130,7 +130,7 @@ VirtualBox
         ```shell
         $ sudo apt-get install Midori
         ```
-        
+
     - ccache (compiler cache)
 
         ```shell
@@ -200,27 +200,84 @@ VirtualBox
 
     1. MUST reboot system
 
++ USB
+
+    - windows side
+        1. install `VirtualBox x.x.x Oracle VM VirtualBox Extension Pack`
+        1. Virtualbox  enable USB
+            > + USB 2.0
+            > + Add USB device (The USB device MUST be plugged in)
+
+    - ubuntu side
+        1. add to vboxusers
+
+        ```shell
+        $ sudo usermod -a -G vboxusers [your name]
+        The group 'vboxusers' does not exist # if no vboxusers, add it
+
+        $ sudo groupadd vboxusers
+        $ sudo usermod -a -G vboxusers [your name]
+        $ sudo reboot
+        ```
+
+    - troubleshoot
+
+        1. Can't attach USB device
+
+            Maybe the `USBPcap` in `Wireshark` confuses VirtualBox USB detect.
+
+            When attach USB device, it gets the error message from VirtualBox as below:
+
+            ```
+            Failed to attach the USB device OnePlus A0001 [0232] to the virtual machine Ubuntu.
+
+            USB device 'OnePlus A0001' with UUID {544e5582-9e77-4301-a538-5326cf2250c0} is busy with a previous request. Please try again later.
+
+            Result Code: E_INVALIDARG (0x80070057)
+            Component: HostUSBDeviceWrap
+            Interface: IHostUSBDevice {c19073dd-cc7b-431b-98b2-951fda8eab89}
+
+            Callee: IConsole {872da645-4a9b-1727-bee2-5585105b9eed}
+
+            USB device  with UUID  is busy with a previous request. Please try again later.
+            ```
+
+            > + Delete problematic system configuration.
+            >> Press the key combination `Win` + `R` to pop up the Run prompt.
+                Type `regedit` in the input box and hit the `Enter` key.
+
+            > + Navigate to the following location
+            `HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}`
+
+            > + Select the `UpperFilters` entry, right click it and select `Delete`
+            >> When a prompt window appear asks you to confirm that you want to delete the value, click `Yes`.
+
+            > + Manually re-install VirtualBox USB drivers
+            >> enter to `C:\Program Files\Oracle\VirtualBox\drivers\USB\filter`
+            and Right click the file `VBoxUSBMon.inf` and select `Install`
+
+            > + Restart your machine
 + X11
 
     ```
     $ sudo apt-get install xorg openbox xauth
     ```
-    
+
     - windows side
-        
-        1. [XMing for Windows](http://sourceforge.net/projects/xming/) 
+
+        1. [XMing for Windows](http://sourceforge.net/projects/xming/)
         2. putty
-            
+
             ```
             Putty -> SSH -> X11 forwarding
             * enable X11 forwarding
             * X display location: localhost:10.0
             ```
-            
+
     - ubuntu side
-    
+
         1. setting
-        
+
             ```
             $ sudo vi /etc/ssh/sshd_config
                 # modify
@@ -228,7 +285,7 @@ VirtualBox
                 X11DisplayOffset 10
                 X11UseLocalhost yes
 
-            $ sudo service sshd restart            
+            $ sudo service sshd restart
             ```
 
 + Change graphic/text UI login
