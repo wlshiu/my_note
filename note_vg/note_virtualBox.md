@@ -220,6 +220,12 @@ VirtualBox
         $ sudo reboot
         ```
 
+        ```shell
+        $ sudo apt-get -y insatll libusb-dev libftdi-dev
+        $ sudo adduser [your name] dialout
+        $ sudo chmod 666 /dev/ttyUSB0
+        ```
+
     - troubleshoot
 
         1. Can't attach USB device
