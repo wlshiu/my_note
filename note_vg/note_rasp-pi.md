@@ -31,6 +31,55 @@ rasp-pi
     $ sudo reboot
     ```
 
+    - fix wifi UP
+
+        ```shell
+        # add setting, stuffix commant should delete
+        $ sudo vim /etc/network/interfaces
+        ...
+            source-directory /etc/network/interfaces.d
+
+            auto lo
+            iface lo inet loopback
+            iface eth0 inet dhcp
+
+            allow-hotplug wlan0
+            auto wlan0
+            iface wlan0 inet static
+            address 192.168.0.12    # IP your want
+            gateway 192.168.0.1
+            netmask 255.255.255.0
+            network 192.168.0.1
+            broadcast 192.168.0.255
+            wpa-ssid "ssid"     # wifi AP
+            wpa-psk "password"  # password
+        ```
+
+
++ samba
+
+    ```shell
+    $ sudo apt-get install samba
+
+    # add pi [username] to sambashare group
+    $ sudo usermod -a -G sambashare pi
+
+    # set password
+    $ sudo pdbedit -a -u pi
+
+    # add setting
+    $ sudo vim /etc/samba/smb.conf
+    ...
+    [pi]
+      comment = pi's home
+      path = /home/pi
+      read only = no
+      guest ok = no
+      browseable = yes
+      create mask = 0644
+      directory mask = 0755
+    ```
+
 + enable uart port
 
     樹莓派包含兩個串口，一個稱之為硬件串口(/dev/ttyAMA0)，一個稱之為 mini 串口(/dev/ttyS0).
@@ -81,6 +130,13 @@ rasp-pi
     ```
 
 # misc
+
++ libraries
+
+    ```shell
+    $ sudo apt-get update
+    $ sudo apt-get install -y vim exuberant-ctags global tig git binutils gcc gdb automake autoconf pkgconfig libtool tree
+    ```
 
 + autotool error: `Authentication issue instant is too old or in the future`
 
