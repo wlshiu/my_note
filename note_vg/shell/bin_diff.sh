@@ -19,13 +19,18 @@ if [ $# != 2 ]; then
     help
 fi
 
+#################
+# show all data
+# diff -y <(xxd -g 1 $1) <(xxd -g 1 $2) | colordiff
 
-# diff -y <(xxd -g 1 $1) <(xxd -g 1 $2)
+#################
+# only show the difference part
+diff <(xxd -g 1 $1) <(xxd -g 1 $2) | colordiff
 
 # colordiff -y <(xxd -g 1 $1) <(xxd -g 1 $2)
 
 # vimdiff <(xxd -g 1 -o 0 -l 100 $1) <(xxd -g 1 -o 0 -l 100 $2)
-vimdiff <(xxd -g 1 $1) <(xxd -g 1 $2)
+# vimdiff <(xxd -g 1 $1) <(xxd -g 1 $2)
 
 # cmp -l $1 $2 | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}'
 
