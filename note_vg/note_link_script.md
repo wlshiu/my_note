@@ -1,8 +1,9 @@
-# Link Script
+Link Script
 ---
 
-+ 用 `;` 結尾
-+ 用 `/* */` 註解
+    + 用 `;` 結尾
+    + 用 `/* */` 註解
+    + 可使用 Regular Expression, 支援 wildcard `*`
 
 # Definitions
 
@@ -53,9 +54,56 @@
         $ nm [object file]
         ```
 
++ operator
+    >  基本與C語言一致
+    
+    - priority (數字小越高)
+        1. `!` `–` `~` (0)
+        1. `*` `/` `%`
+        1. `+` `-`
+        1. `>>`  `=`
+        1. `&`
+        1. `|`
+        1. `&&`
+        1. `||`
+        1. `? :`
+        1. `&=` `+=` `-=` `*=` `/=`(10)
+
 # Commands
 
 + `MEMORY`
+
+    ```ld
+    MEMORY
+    {
+        REGION_1 [(ATTR)] : ORIGIN = start_addr_1, LENGTH = len1
+        REGION_2 [(ATTR)] : ORIGIN = start_addr_2, LENGTH = len2
+        ...
+    }
+    ```
+    > 定義 memory region
+    >> + `ORIGIN` 區域的開始地址, 可簡寫成 `org` 或 `o`
+    >> + `LENGTH` 區域的大小, 可簡寫成 `len` 或 `l`
+    >> + `ATTR` 屬性內可以出現以下 7 個 types，
+    >>> 1. `R` 只讀section
+    >>> 1. `W` 讀/寫section
+    >>> 1. `X` 可執行section
+    >>> 1. `A` 可分配的section
+    >>> 1. `I` 初始化了的section
+    >>> 1. `L` 同I
+    >>> 1. `!` 不滿足該字符之後的任何一個屬性的section
+
+    - example
+
+        ```ld
+        MEMORY
+        {
+            rom (rx)        : ORIGIN = 0, LENGTH = 256K
+            ram (!rx)       : org = 0×40000000, l = 4M
+            IRAM_STACK (rw) : ORIGIN = 0x00007d00, LENGTH = 0x00300
+        }
+        ```
+
 
 + `ENTRY(symbol)`
     > 程式第一個執行的 symbol
@@ -113,11 +161,29 @@
 
         >> 當 `FLASH == IMG_INIT`, 則表示儲存跟執行都在相同 memroy region (在 flash 上直接執行)
 
++ `KEEP`
+    > ld 使用 `--gc-sections`後, linker 可能將某些它認為沒用的 section 過濾掉,
+    因此用 `KEEP()` 強制 linker 保留一些特定的 section
 
+    ```
+    KEEP(*(.text))
+        or
+    KEEP(SORT(*)(.text))
+    ```
 
++ `OVERLAY`
+
++ `ALIGN`
+
++ `ADDR(section_name)`
+    > 返回某 section 的 `VMA`值
+
++ `SIZEOF(section_name)`
+    > 返回 section 的大小. 當 section 沒有被分配時, 即此時 section 的大小還不能確定時, 連接器會報錯
 
 
 # Reference
 
 + [GNU Linker Scripts](https://sourceware.org/binutils/docs/ld/Scripts.html#Scripts)
 + [Linker Script](http://wen00072.github.io/blog/categories/linker-script/)
++ [Linux下的lds鏈接腳本詳解](https://www.cnblogs.com/li-hao/p/4107964.html)
