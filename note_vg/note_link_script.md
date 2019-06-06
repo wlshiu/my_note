@@ -145,6 +145,7 @@ Link Script
     > + `[]`內的內容為可選選項, 一般不需要.
     > + section_name `左右的空白`, `{}`, `:` 是必須的
     > + 換行符和其他空格是可選的.
+    > + `=fillexp` value of dummy data if necessary
 
     - example
 
