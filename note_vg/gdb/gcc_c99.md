@@ -85,3 +85,67 @@ C99
         return 0;
     }
     ```
+
+# Linking symbols to fixed addresses
+
++ GNU
+    - use symbol file
+        > `--just-symbols=symbolfile`
+
+        1. format of symbol file
+            > The spaces seem to be required, as otherwise 'ld' reports
+            'file format not recognized; treating as linker script.'
+
+            ```
+            symbolname1 = address;
+            symbolname2 = address;
+            ...
+            ```
+
+    - single symbol link
+        > `--defsym symbol=address`
+
+        ```
+        -Wl,--defsym=bar=0x00400481 -Wl,--defsym=foo=0x00400476 -Wl,--defsym=main=0x0040048
+        ```
+
+        ```
+        $ gcc -Wl,--defsym,foobar=0x76543210 file.c
+
+        // in file.c
+        extern int foobar;
+        ```
+
+        1. pre-generate symbol file
+
+            ```
+            $ readelf -sW a.out | grep GLOBAL | awk '{print $8 " " $2 }' | grep -v '^_' > symdef.lst
+            $ LDFLAGS=$(cat symdef.lst | awk '{print "-Wl,--defsym=" $1 "=" $2}' | tr '\n' ' ')
+            ```
+
++ Keil
+    > `--symdefs=symbolfile`
+
+    - This example shows a typical symdefs file format
+
+        ```
+        #<SYMDEFS># ARM Linker, 5050169: Last Updated: Date
+        ;value type name, this is an added comment
+        0x00008000 A __main
+        0x00008004 A __scatterload
+        0x000080E0 T main
+        0x0000814D T _main_arg
+        0x0000814D T __argv_alloc
+        0x00008199 T __rt_get_argv
+        ...
+
+           # This is also a comment, blank lines are ignored
+        ...
+        0x0000A4FC D __stdin
+        0x0000A540 D __stdout
+        0x0000A584 D __stderr
+        0xFFFFFFFD N __SIG_IGN
+        ```
+
+    - [Creating a symdefs file](http://www.keil.com/support/man/docs/armlink/armlink_pge1362065959198.htm)
+    - [Symdefs file format](http://www.keil.com/support/man/docs/armlink/armlink_pge1362065960682.htm)
