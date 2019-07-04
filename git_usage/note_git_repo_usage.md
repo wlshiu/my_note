@@ -49,7 +49,12 @@
 
     ```
 
+- git save password
 
+    ```
+    $ git config --global credential.helper 'cache --timeout 86400'
+    ```
+    
 - 檢查目前 Git 的狀態
 
     ```
