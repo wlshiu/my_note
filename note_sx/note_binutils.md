@@ -85,7 +85,25 @@ ARM GNU Binutils
     $ size.exe ap_mode.axf
     ```
 
+## objcopy
++ bfdName list
+
+    ```
+    $ objcopy --info
+    ```
     
++ insert binary file to ELF section
+
+    ```
+    $ $ objcopy --readonly-text -I binary -O elf32-i386 -B i386 ally.jpg ally.o
+    $ objdump -x ally.o | grep ally
+    ally.o:     format elf32-i386
+    ally.o
+    00000000 g       .data  00000000 _binary_ally_jpg_start
+    00006e27 g       .data  00000000 _binary_ally_jpg_end
+    00006e27 g       *ABS*  00000000 _binary_ally_jpg_size
+    ```
+
 ## objdump
 + Display the contents of the symbol table
 
