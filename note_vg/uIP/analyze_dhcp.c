@@ -1,15 +1,16 @@
 /**
  * PT_INIT(pt)                     初始化任務變量，只在初始化函數中執行一次就行
- * PT_BEGIN(pt)                    啟動任務處理，放在函數開始處
- * PT_END(pt)                      結束任務，放在函數的最後
- * PT_WAIT_UNTIL(pt, condition)    等待某個條件（條件可以為時鐘或其它變量，IO等）成立，否則直接退出本函數，下一次進入本     函數就直接跳到這個地方判斷
- * PT_WAIT_WHILE(pt, cond)         和上面一個一樣，只是條件取反了
- * PT_WAIT_THREAD(pt, thread)      等待一個子任務執行完成
+ * PT_BEGIN(pt)                    申明一個 protothread 的開始位置。該函數應該放置在protothread運行開始的位置 (所有放置在PT_BEGIN()之前的語句，在每次protothread被調度時，都會運行。)
+ * PT_END(pt)                      申明一個protothread的結束位置。該函數應該與PT_BEGIN()成對出現。
+ * PT_WAIT_UNTIL(pt, condition)    等待某個條件(條件可以為時鐘或其它變量，IO等)）成立，否則直接退出本函數，下一次進入本函數就直接跳到這個地方判斷
+ * PT_WAIT_WHILE(pt, cond)         當 condition 條件成立， protothread 處於阻塞狀態。
+ * PT_WAIT_THREAD(pt, thread)      protothread處於阻塞狀態，直到子線程thread完成。
  * PT_SPAWN(pt, child, thread)     新建一個子任務，並等待其執行完退出
- * PT_RESTART(pt)                  重新啟動某個任務執行
+ * PT_RESTART(pt)                  重新啟動任務處理
  * PT_EXIT(pt)                     任務後面的部分不執行，直接退出重新執行
  * PT_YIELD(pt)                    鎖死任務
- * PT_YIELD_UNTIL(pt, cond)        鎖死任務並在等待條件成立，恢復執行
+ * PT_YIELD_UNTIL(pt, cond)        退出本函數並在下一次進入本函數時, 等待條件成立恢復執行
+ * PT_SCHEDULE(f)                  調度一個protothread。
  *
  * 在pt中一共定義四種線程狀態，在任務函數退出到上一級函數時返回其狀態
  * PT_WAITING      等待
