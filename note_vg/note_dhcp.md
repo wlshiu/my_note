@@ -86,6 +86,10 @@ DHCP
 
     ```
     $ sudo systemctl status isc-dhcp-server
+      or
+    $ netstat -anu | grep :67
+    udp        0      0 0.0.0.0:67              0.0.0.0:*
+    udp        0      0 0.0.0.0:67              0.0.0.0:*
     ```
 
 + list assigned addresses
