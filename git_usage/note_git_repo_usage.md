@@ -54,7 +54,7 @@
     ```
     $ git config --global credential.helper 'cache --timeout 86400'
     ```
-    
+
 - 檢查目前 Git 的狀態
 
     ```
@@ -663,6 +663,69 @@
               <project name="libtee_pkcs11" path="test_OpenTEE/libtee_pkcs11" />
             </manifest>
         ```
+
+# git server authentication
+
+manifests of projects
+
++ generate SSH key
+
+    ```
+    $ ssh-keygen -t rsa -C "your mail address"
+    ```
+
++ add SSH key (**id_rsa.pub**) to gitlab server
+    > profile settings -> SSH Key
+
++ try to communicate gitlab server
+
+    ```
+    $ ssh -T git@gitlabserver.vangotech.com
+    ...
+    Welcome to GitLab
+    ```
+
++ download `repo`
+
+    ```
+    $ mkdir ~/.bin
+    $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
+    $ sudo chmod a+x ~/.bin/repo
+    $ PATH=$PATH:~/.bin
+    ```
+
++ download source code
+
+    ```
+    $ repo init -u git@gitlabserver.vangotech.com:SW/manifests.git -b master -m phoenix.xml
+    $ repo sync
+    $ repo start local --all
+    ```
+
+# windows download code
+
++ install `python2.7` to `C:\\`
+    - [python 2.7](https://www.python.org/ftp/python/2.7/python-2.7.amd64.msi)
+    - add python to environment `PATH`
+        > `C:\Python27` and `C:\Python27\Scripts`
+
++ download `repo` command
+
+    ```
+    $ curl https://storage.googleapis.com/git-repo-downloads/repo > /C/Users/[user-name]/AppData/Local/Programs/Git/mingw64/bin
+        or
+    $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~[your-git-path]/Git/mingw64/bin
+    ```
+
++ execute `~[your-git-path]/Git/git-bash.exe` with `Administrator` permission
+
++ download source code
+
+    ```
+    $ repo init -u git@gitlabserver.vangotech.com:SW/manifests.git -b master -m phoenix.xml
+    $ repo sync
+    $ repo start local/test --all
+    ```
 
 + misc
     - install repo
