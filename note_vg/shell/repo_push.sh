@@ -1,4 +1,8 @@
 #!/bin/bash
+# Copyright (c) 2019, All Rights Reserved.
+# @file    gen_test_kconfig.sh
+# @author  Wei-Lun Hsu
+# @version 0.1
 
 #
 # repo_push is used to commit code with code review server (e.g. github, gitlab)
@@ -55,7 +59,8 @@ if [ ${project_name} == "all" ]; then
     repo status > ${project_list}
 
     # root dir
-    echo -e ${Yellow}'\nproject ./ ...' ${NC}
+    echo -e ${Yellow}'\nproject ./ ...' ${NC}.
+    patt=./
     grep -A 3 'build_system' ${project_info} > ${tmp_file}
     revision=$(cat ${tmp_file} | grep 'Current revision:' | awk -F ": " '{print $2}')
     l_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
