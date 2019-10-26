@@ -37,3 +37,7 @@ esac
 
 echo "result = $?"
 
+
+###################
+# uncrustify -c .${uncrustify_cfg} -F ${file_list} --prefix tmp # output to tmp folder
+# diff --color -p -u ./_printf.c ./tmp/_printf.c
