@@ -2,6 +2,14 @@ ARM GNU Binutils
 ---
 [GNU Binary Utilities] (https://sourceware.org/binutils/docs-2.30/binutils/index.html)
 
+## ar
++ replace or append object file
+    ```
+    # replace the same object file if exsit or append object file
+    # ar -rv [output file] [object files...]
+    $ ar -rv ./libfoo_new.a ./version.o ./libfoo.a
+    ```
+
 ## nm
 + symbol type
     - `A`
