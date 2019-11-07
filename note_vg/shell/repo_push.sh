@@ -1,8 +1,4 @@
 #!/bin/bash
-# Copyright (c) 2019, All Rights Reserved.
-# @file    gen_test_kconfig.sh
-# @author  Wei-Lun Hsu
-# @version 0.1
 
 #
 # repo_push is used to commit code with code review server (e.g. github, gitlab)
@@ -36,19 +32,25 @@ tmp_file=___tmp
 project_info=___proj_info
 project_list=___proj_list
 
+l_branch=$(repo branches | grep 'in all projects' | awk '{print $2}')
+
 push_code()
 {
     proj_path=$1
-    local_branch=$2
+    l_act_branch=$2
     remote_branch=$3
 
-    git push origin ${local_branch}:${remote_branch}
-    # echo -e "push origin ${local_branch}:${remote_branch}"
+    if [ "${l_branch}" = "${l_act_branch}" ]; then
+        git push origin ${l_act_branch}:${remote_branch}
+        # echo -e "push origin ${l_act_branch}:${remote_branch}"
 
-    if [ $? != 0 ]; then
-        result="${result}[${Red}FAIL  ${NC}] ${proj_path}:${Green}${local_branch} -> ${remote_branch}${NC}\n"
+        if [ $? != 0 ]; then
+            result="${result}[${Red}FAIL${NC}] ${proj_path}:${Green}${l_act_branch} -> ${remote_branch}${NC}\n"
+        else
+            result="${result}[  OK  ] ${proj_path}:${Green}${l_act_branch} -> ${remote_branch}${NC}\n"
+        fi
     else
-        result="${result}[OK    ] ${proj_path}:${Green}${local_branch} -> ${remote_branch}${NC}\n"
+        result="${result}[${Red}FAIL${NC}] ${proj_path}:${Red}Wrong branch, please switch to '${l_branch}' branch\n${NC}"
     fi
 }
 
@@ -63,9 +65,11 @@ if [ ${project_name} == "all" ]; then
     patt=./
     grep -A 3 'build_system' ${project_info} > ${tmp_file}
     revision=$(cat ${tmp_file} | grep 'Current revision:' | awk -F ": " '{print $2}')
-    l_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
+    # l_act_sub_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
     rm -f ${tmp_file}
-    push_code ${patt} ${l_branch} ${revision}
+
+    l_act_sub_branch=$(git branch | grep '*' | awk '{print $2}')
+    push_code ${patt} ${l_act_sub_branch} ${revision}
 
     patterns=($(cat ${project_list} | grep '.*project.*branch' | awk '{print $2}' | sed 's:\./::' | sed 's:/$::'))
 
@@ -75,12 +79,13 @@ if [ ${project_name} == "all" ]; then
 
         # get the branch name of projects from remote
         revision=$(cat ${tmp_file} | grep 'Current revision:' | awk -F ": " '{print $2}')
-        l_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
+        # l_act_sub_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
         rm -f ${tmp_file}
 
         cd ${patt}
 
-        push_code ${patt} ${l_branch} ${revision}
+        l_act_sub_branch=$(git branch | grep '*' | awk '{print $2}')
+        push_code ${patt} ${l_act_sub_branch} ${revision}
         cd ${cur_dir}
 
     done
@@ -99,12 +104,13 @@ else
 
     # get the branch name of projects from remote
     revision=$(cat ${tmp_file} | grep 'Current revision:' | awk -F ": " '{print $2}')
-    l_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
+    # l_act_sub_branch=$(cat ${tmp_file} | grep 'Local Branches:' | awk -F ":" '{print $2}' | awk -F " " '{print $2}' | sed 's:\[::' | sed 's:\]::')
     rm -f ${tmp_file}
 
     cd ${patt}
 
-    push_code ${patt} ${l_branch} ${revision}
+    l_act_sub_branch=$(git branch | grep '*' | awk '{print $2}')
+    push_code ${patt} ${l_act_sub_branch} ${revision}
     cd ${cur_dir}
 fi
 
