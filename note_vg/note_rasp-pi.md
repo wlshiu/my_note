@@ -129,6 +129,50 @@ rasp-pi
     /dev/spidev0.1
     ```
 
++ Python
+
+    - GPIO
+
+        ```shell
+        $ sudo dpkg -i rpi.gpio-common_0.6.5-1_armhf.deb python-rpi.gpio_0.6.5-1_armhf.deb
+        ```
+
+        ```python
+        #!/usr/bin/env python
+        # encoding: utf-8
+
+        import RPi.GPIO
+        import time
+
+        # 指定GPIO port 的選定模式為GPIO引腳編號模式(而非主板編號模式)
+        RPi.GPIO.setmode(RPi.GPIO.BCM)
+
+        # 指定GPIO14(就是LED長針連接的GPIO針腳)的模式為輸出模式
+        # 如果上面GPIO port 的選定模式指定為主板模式的話,這里就應該指定8號而不是14號.
+        RPi.GPIO.setup(14, RPi.GPIO.OUT)
+
+        # 循環10次
+        for i in range(0, 10):
+            RPi.GPIO.output(14, True) # GPIO14 pull high
+            time.sleep(0.5)
+            RPi.GPIO.output(14, False) # GPIO14 pull low
+            time.sleep(0.5)
+
+        # clean GPIO port
+        RPi.GPIO.cleanup()
+        ```
+
+    - Uart
+
+        ```shell
+        # download pip source from 'https://pypi.python.org/pypi/pip#downloads'
+        # un-tar gz file and enter to source code
+        $ python setup.py install
+
+        # pyserial module
+        $ sudo pip install pyserial-3.4-py2.py3-none-any.whl
+        ```
+
 # misc
 
 + libraries
@@ -150,7 +194,7 @@ rasp-pi
 ```shell
 $ sudo dpkg -i *.deb
 ```
-
++ [raspbian-packages](http://raspbian.raspberrypi.org/raspbian/pool/main/)
 + [libsigseg](http://raspbian.raspberrypi.org/raspbian/pool/main/libs/libsigsegv/libsigsegv2_2.10-5_armhf.deb)
 + [autoconf](http://raspbian.raspberrypi.org/raspbian/pool/main/a/autoconf/autoconf_2.69-10_all.deb)
 + [autotools-dev](http://raspbian.raspberrypi.org/raspbian/pool/main/a/autotools-dev/autotools-dev_20161112.1_all.deb)
@@ -158,6 +202,7 @@ $ sudo dpkg -i *.deb
 + [libltdl-dev](http://raspbian.raspberrypi.org/raspbian/pool/main/libt/libtool/libltdl-dev_2.4.6-2_armhf.deb)
 + [libtool](http://raspbian.raspberrypi.org/raspbian/pool/main/libt/libtool/libtool_2.4.6-2_all.deb)
 + [m4](http://raspbian.raspberrypi.org/raspbian/pool/main/m/m4/m4_1.4.18-1_armhf.deb)
+
 
 # reference
 
