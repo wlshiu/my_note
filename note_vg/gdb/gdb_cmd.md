@@ -94,6 +94,12 @@ GDB_CMD
 + step (s)
     > 單步執行.但遇到 frame 時則會進入 frame 中單步執行.
 
++ nexti (ni)
+    > 單步執行下一個 assembly code
+
++ stepi (si)
+    > 單步執行 assembly code, 但遇到可跳轉赴程式時, 則跳轉過去
+
 + until
     > 直接跑完一個 while 迴圈.
 
@@ -101,7 +107,8 @@ GDB_CMD
     > 中止執行該 frame(視同該 frame 已執行完畢)，並返回上個 frame 的呼叫點.功用類似 C 裡的 return 指令.
 
 + finish
-    > 執行完這個 frame.當進入一個過深的 frame 時，如:C 函式庫，可能必須下達多個 finish 才能回到原來的進入點.
+    > 直接退出當前函數(執行完這個 frame).
+    當進入一個過深的 frame 時，如:C 函式庫，可能必須下達多個 finish 才能回到原來的進入點.
 
 + up
     > 直接回到上一層的 frame，並顯示其 stack 資訊，如進入點及傳入的參數等.
@@ -183,6 +190,15 @@ GDB_CMD
 + `Enter`
     > 直接執行上個指令
 
++ watch
+    > 觀察到變量變化時,停止程序
+    >> watchpoint 和 breakpoint 類似,但是斷點是 **program 執行前**設置,觀察點是**program 執行中**設置,只能是變量
+
+- rwatch
+    > 觀察到變量被讀時,停止程序
+
+- awatch
+    > 觀察到變量被讀或者被寫時,停止程序
 
 # debug tips
 
@@ -276,7 +292,133 @@ GDB_CMD
     Done logging to backtrace.log.
     ```
 
+# gdb tui
+
+GDB Terminal User Interface
+
++ enter GDB TUI mode
+    - start gdb wiht option `--tui`
+    - enter gdb and enable/disabe tui mode
+        > press `Ctrl+x, a` or `Ctrl+x, Ctrl+a`
+
++ cursor moving in GDB console
+    - `Ctrl+p` : 上一命令行
+    - `Ctrl+n` : 下一命令行
+    - `Ctrl+b` : 命令行光標前移
+    - `Ctrl+f` : 命令行光標後移
+
++ reflash layout
+    > `Ctrl+L`
+
++ window layout
+    > GDB console alwsys exist
+
+    - only one window
+        > `Ctrl+1`
+
+    - two windows layout
+        > `Ctrl+2`
+        >> 使TUI顯示兩個窗口,連接使用此快捷鍵可在三種窗口組合(source/disassembly/register window只能同時顯示兩個,共3種組合)中不斷切換
+
++ Single Key mode
+    > `Ctrl+x, s`
+    >> 不需要 press enter, 即可執行快捷鍵, e.g. c(continue), r(run), v(infolocal), ...etc.
+
+    - `c` : continue
+    - `u` : up
+    - `d` : down
+    - `f` : finish
+    - `n` : next
+    - `o` : nexti. The shortcut letter 'o' stands for "step Over".
+    - `q` : 退出單鍵模式
+    - `r` : run
+    - `s` : step
+    - `i` : stepi. The shortcut letter 'i' stands for "step Into".
+    - `v` : info locals
+    - `w` : where
+    + switch active window
+        > `Ctrl+x, o`
+
++ active window moving in TUI mode
+    > 只在 TUI mode 有效
+
+    - `PgUp` : 激活窗口的內容向上滾動一頁
+        > Scroll the active window one page up. 
+    - `PgDn` : 激活窗口的內容向下滾動一頁
+        > Scroll the active window one page down. 
+    - `Up` : 激活窗口的內容向上滾動一行
+        > Scroll the active window one line up. 
+    - `Down` : 激動窗口的內容向下滾動一行
+        > Scroll the active window one line down. 
+    - `Left` : 激活窗口的內容向左移動一列
+        > Scroll the active window one column left. 
+    - `Right` : 激活窗口的內容向右移動一列
+        > Scroll the active window one column right. 
+    - `C-L` : 更新屏幕
+        > Refresh the screen. 
+
++ TUI-specific Commands
+    > 當處理GDB console mode時,下列的大多數命令會自動切換到 TUI mode
+
+    - info win：顯示正在顯示的窗口大小信息
+        > Listand give the size of all displayed windows. 
+    - layout next：顯示下一個窗口
+        > Displaythe next layout. 
+    - layout prev：顯示上一個窗口
+        > Displaythe previous layout. 
+    - layout src：顯示源代碼窗口
+        > Displaythe source window only. 
+    - layout asm：顯示彙編窗口
+        > Displaythe assembly window only. 
+    - layout split：顯示源代碼和彙編窗口
+        > Displaythe source and assembly window. 
+    - layout regs：顯示寄存器窗口
+        > Displaythe register window together with the source or assembly window. 
+    - focus next：將一個窗口置為激活狀態
+        > Make the next window active for scrolling. 
+    - focus prev：將上一個窗口置為激活狀態
+        > Make the previous window active for scrolling. 
+    - focus src：將源代碼窗口置為激活狀態
+        > Make the source window active for scrolling. 
+    - focus asm：將彙編窗口置為激活狀態
+        > Make the assembly window active for scrolling. 
+    - focus regs：將寄存器窗口置為激活狀態
+        > Make the register window active for scrolling. 
+    - focus cmd：將命令行窗口置為激活狀態
+        > Make the command window active for scrolling. 
+    - refresh：更新窗口，與C-L快捷鍵同
+        > Refresh the screen. This is similar to typing C-L.
+    - tuireg float：寄存器窗口顯示內容為浮點寄存器
+        > Showthe floating point registers in the register window. 
+    - tuireg general：寄存器窗口顯示內容為普通寄存器
+        > Show the general registers in the register window. 
+    - tuireg next：顯示下一組寄存器
+        > Show the next register group. 
+        The list of register groups as well astheir order is target specific. 
+        The predefined register groups are the following:
+        **general**, **float,system**, **vector**, **all**, **save**, **restore**. 
+
+    - tuireg system ：顯示上一組寄存器
+        > Show the system registers in the register window. 
+    - update ：更新源代碼窗口到當前運行點
+        > Update the source window and the current execution point. 
+    - winheight winname `+count`：增加指定窗口的高度
+    - winheight winname `-count`：減小指定窗口的高度
+        > Changethe height of the window name by count lines.Positive counts increase the height, while negative counts decreaseit. 
+    - tabset nchars
+        > Set the width of tab stops to be nchars characters. 
+
 # cgdb (need to install)
+
+[CGDB中文手冊](https://leeyiw.gitbooks.io/cgdb-manual-in-chinese/content/index.html)
+
++ MSYS2 build
+
+    - `makeinfo` not found
+
+    ```shell
+    $ pacman -S texinfo
+    ```
 
 + bind cross gdb in toolchain
     ```
@@ -392,5 +534,67 @@ GDB_CMD
 + attach pid
     ```
     $ gdb -p [PID]
+    ```
+
+
+# Vim plugin
+
++ [NeoDebug](https://github.com/cpiger/NeoDebug)
+    > vim 8.0 or laster
+
+    - start debug (in VIM editor)
+
+    ```vim
+    :NeoDebug
+    ```
+
+    - commands
+
+    ```vim
+    :NeoDebug         "start gdb and open a gdb console buffer in vim
+
+    :DBGOpenConsole       "open neodebug console window
+    :DBGCloseConsole      "close neodebug console window
+    :DBGToggleConsole     "toggle neodebug console window
+
+    :DBGOpenLocals        "open  [info locals] window
+    :DBGOpenRegisters     "open  [info registers] window
+    :DBGOpenStacks        "open  [backtrace] window
+    :DBGOpenThreads       "open  [info threads] window
+    :DBGOpenBreaks        "open  [info breakpoints] window
+    :DBGOpenDisas         "open  [disassemble] window
+    :DBGOpenExpressions   "open  [Exressions] window
+    :DBGOpenWatchs        "open  [info watchpoints] window
+    ```
+
+    - hot key
+
+    ```
+    <F5>    - run or continue
+    <S-F5>  - stop debugging (kill)
+    <F6>    - toggle console window
+    <F10>   - next
+    <F11>   - step into
+    <S-F11> - step out (finish)
+    <C-F10> - run to cursor (tb and c)
+    <F9>    - toggle breakpoint on current line
+    <C-S-F10> - set next statement (tb and jump)
+    <C-P>   - view variable under the cursor
+    <TAB>   - trigger complete
+    ```
+
+    ```vim
+    ; keymaps
+    let g:neodbg_keymap_toggle_breakpoint  = '<F9>'         " toggle breakpoint on current line
+    let g:neodbg_keymap_next               = '<F10>'        " next
+    let g:neodbg_keymap_run_to_cursor      = '<C-F10>'      " run to cursor (tb and c)
+    let g:neodbg_keymap_jump               = '<C-S-F10>'    " set next statement (tb and jump)
+    let g:neodbg_keymap_step_into          = '<F11>'        " step into
+    let g:neodbg_keymap_step_out           = '<S-F11>'      " setp out
+    let g:neodbg_keymap_continue           = '<F5>'         " run or continue
+    let g:neodbg_keymap_print_variable     = '<C-P>'        " view variable under the cursor
+    let g:neodbg_keymap_stop_debugging     = '<S-F5>'       " stop debugging (kill)
+    let g:neodbg_keymap_toggle_console_win = '<F6>'         " toggle console window
+    let g:neodbg_keymap_terminate_debugger = '<C-C>'        " terminate debugger
     ```
 
