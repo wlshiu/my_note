@@ -49,6 +49,16 @@ Qt (sound like cute)
         ps. press 'Set now'
         ```
 
+    - Set global variables
+        > [Setting]->[Global variables]->[New]
+
+        ```
+        base    = C:\Qt\5.12.6\mingw73_32
+        include = C:\Qt\5.12.6\mingw73_32\include
+        lib     = C:\Qt\5.12.6\mingw73_32\lib
+        bin     = C:\Qt\5.12.6\mingw73_32\bin
+        ```
+
     - Set debugger
         > [Setting]->[Debugger]->[GDB/CDB debugger]
 
