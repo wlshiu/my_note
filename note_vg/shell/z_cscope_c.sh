@@ -31,3 +31,8 @@ ignore="$ignore ( -path ${srctree}tools ) -prune -o"
 
 find ${srctree} $ignore -name config -prune -o -name "$file_ext" -not -type l -print > cscope.files
 find ${srctree} $ignore -name '*.ld' -not -type l -print >> cscope.files
+
+# out_file=cscope.files
+# PATTERN='\(.*Makefile.*\|.*\.\(c\|h\|s\|S\|cpp\|hpp\|ld\|lds\)\)'
+# OPTIONS="-type f -regex $PATTERN"
+# find . ${OPTIONS} > ${out_file}
