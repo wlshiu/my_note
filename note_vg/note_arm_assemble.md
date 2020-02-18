@@ -280,6 +280,7 @@ GNU ARM assemble
     > 在記憶體中配置 4bytes 的空間,並且可以初始化數值
 
     ```asm
+    /* 在 '_label' 的記憶體位置放入 '__vector_reset'的值, 其長度為 4bytes */
     _label:   .word   __vector_reset
     ```
 
