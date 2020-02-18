@@ -325,6 +325,10 @@ GNU ARM assemble
     ldr  r0 , = 0x123    @ 立即值放入r0
     ldr  r0 , [r1,#4]    @ 將 (r1+4)地址中的內容值放入r0
     ldr  r0, [r1],#4     @ 將 (r1+0)地址中的內容值放入r0,並且 --> r1=r1+4
+    
+    @ 跳轉到對應的絕對地址去執行
+    ldr pc, 0xAABBCCDD   @ 這是uboot中的用法
+    ldr pc, do_und       @ symbol name    
     ldr  pc, =main       @ ldr偽指令可以在立即數前加上 '=', 以表示把一個地址寫到某寄存器中
     ```
 
