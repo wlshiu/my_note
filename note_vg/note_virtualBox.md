@@ -170,6 +170,14 @@ VirtualBox
     ```
     $ sudo shutdown -h now
     ```
+    
+    - icdiff
+        > compare text (layout link WinMerge)
+
+    ```
+    $ pip install icdiff
+    $ git icdiff
+    ```
 
 + Share Folder
     > Need to Install `VboxGuestAdditions`
