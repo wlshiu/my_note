@@ -134,3 +134,25 @@ GCC
             return 0;
         }
         ```
+
+# Linker
+
++ force linking symbols (always include symbols)
+
+    - `--whole-archive` and `--no-whole-archive`
+        > 在這兩個option之間, 會把靜態庫的symbol提前link進來, 平常只有被call到在會link進去
+
+    ```Makefile
+    LDFLAGS = -Wl,--whole-archive -lfoo.a -Wl,--no-whole-archive
+    LDFLAGS += -Wl,--whole-archive $(OUT)/foo.o -Wl,--no-whole-archive
+    ```
+
+    - `-u [symbol_name]` or `--undefined [symbol_name]`
+        > 強制保留該 symbol
+
+    ```
+    LDFLAGS += -u foo
+    ```
+
+
+
