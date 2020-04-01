@@ -524,6 +524,12 @@
         repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
         ```
 
+    - download tag projects
+    
+        ```
+        repo init -u git@url_manifest.git -b refs/tags/tag_v1.3
+        ```
+
     - **options**:
         1. `-u URL, --manifest-url=URL`:
                             manifest repository location
@@ -630,6 +636,31 @@
     $ repo forall -p -c git reset --hard HEAD
     ```
 
+    - create tag for all projects
+
+        ```
+        repo forall -p -c git tag tag_v1.3
+        repo forall -p -c git push origin --tags        
+        ```
++ create manifest
+
+    ```
+    $ cd manifest
+    $ cp default.xml target_manifest.xml
+    $ vi ./target_manifest.xml
+        # modify target_manifest.xml
+        # revision="refs/tags/tag_v1.3"
+
+        # you also can add to default attribute of xml
+        <default revision="refs/tags/tag_v1.3"
+                remote="aosp"
+                sync-j="4" />        
+
+    $ git add target_manifest.xml
+    $ git commit -m "release v1.3"
+    $ git push original master
+    ```
+
 + repo manifest -r -o xxx.xml
     - generate revision xml file
 
@@ -697,7 +728,7 @@ manifests of projects
 + download source code
 
     ```
-    $ repo init -u git@gitlabserver.vangotech.com:SW/manifests.git -b master -m phoenix.xml
+    $ repo init -u git@gitlabserver.com:My/manifests.git -b master -m default.xml
     $ repo sync
     $ repo start local --all
     ```
