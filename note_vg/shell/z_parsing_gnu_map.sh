@@ -44,4 +44,37 @@ for patt in "${patt_list[@]}" ; do
     grep "[ ]*${tag_end}" ${__tmp} | awk '{printf "%20s = %s\n\n",$2,$1}'
 done
 
+patt_var=(
+'__text_start__'
+'__exidx_start'
+'__exidx_end'
+'__test_pool_start__'
+'__test_pool_end__'
+'__cli_cmd_pool_start__'
+'__cli_cmd_pool_end__'
+'__reloc_lma_start__'
+'__reloc_vma_start__'
+'__reloc_vma_end__'
+'__text_end__'
+'__data_start__'
+'__data_end__'
+'__os_heap_start__'
+'__os_heap_end__'
+'__bss_start__'
+'__bss_end__'
+'__end__'
+'__HeapBase'
+'__HeapLimit'
+'__StackTop'
+'__StackLimit'
+)
+
+__tmp2=var.tmp
+for patt in "${patt_var[@]}" ; do
+    grep "[ ]*${patt} = " ${__tmp} | awk '{print $1" "$2}' | sed 's/0x00000000//' >> ${__tmp2}
+done
+
+cat ${__tmp2} | sort
+
 rm -f ${__tmp}
+rm -f ${__tmp2}
