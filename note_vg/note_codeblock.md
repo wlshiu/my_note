@@ -91,3 +91,17 @@ CodeBlocks
     Add:
         the dirctory path of the dll file
     ```
+
++ map file
+
+    ```
+    menu bar Project -> build options -> link setting -> other linker options
+    Add '-Wl,-Map=${TARGET_OUTPUT_FILE}.map'
+    ```
+
++ size target
+
+    ```
+    menu bar Project -> build options -> Pre/Post build steps -> Post-build steps
+    Add 'size ${TARGET_OUTPUT_FILE}'
+    ```
