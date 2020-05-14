@@ -234,6 +234,85 @@ push/merge... |          |    | 1. parsing '.gitlab ci.yml'     |   |     | (tag
     - [JB的git之旅--.gitlab-ci.yml介绍](https://juejin.im/post/5b1a4438e51d4506d1680ee9)
 
 
+# 設定要通過測試才能進行 Merge
+
+`master` usually is used as maintrunk.
+
++ enable function
+    > Setting >> General >> Merge checks >> Pipelines must succeed
+
++ flow
+
+    - Create a new branch at local
+    - Commit your changes to the new branch
+    - Push this new branch to Gitlab
+    - On Gitlab side, go to the original repository and `Create merge request`
+        1. set `Source branch` item to the new branch
+        1. set `Target branch` item to master or the breach you interest
+        1. auto connect to **Issue Number**
+            > - GitLab 在 `Description` 或 `Comment Message` 的線上編輯器具備即時提示的功能,
+            只要輸入 `#` 就會立即顯示有哪些 Issue
+            > - 只要以 `#` 搭配 Issue 編號, GitLab 就會自動將 Commit 與 Issue 建立連結.
+            > - 只要在 `Commit Message` 提及 Issue 的編號, GitLab 便會自動在 Issue 的詳細內容顯示,
+            有哪一個 Branch 與此 Issue 相關.
+            同時 Issue 的異動歷史資訊也會自動顯示有哪些 Commit 與此 Issue 相關
+
+        1. auto connect **Account**
+            > - GitLab 在 `Assignee` 以游標去點選目標 account,
+            也可以直接在 `Description` 中用 `/assign` 標注目標 account
+            > - 被 Assignee 處理 Merge request 的 account, 在他的 `To-Do List` 上, 就會自動列出這項工作
+
+        1. `Merge request` 的介面一樣有提供 User 討論的空間,
+        在 `Merge request` 的 `Changes` tab, 直接針對修改的程式碼撰寫 `Comment`
+            > 會自動產生待解決的 `thread or discussion` (0/1 discussion resolved)
+
+        1. 由於 `Merge request` 被打回票, 需要解決 `thread or discussion`, 因此申請者在修正之後, 又送了一次 Commit,
+        並且在 `Discussion` 表明自己已解決 `thread or discussion`
+            > 後續送上來的 Commit 一樣會自動關聯在 `Discussion` tab 中, 方便 User 查看.
+            `thread or discussion` 提及的程式碼如果有產生異動, 也同樣會自動顯示歷史資訊於 `Discussion` tab 中
+
+        1. 確認 `thread or discussion` 已被解決, 將 `Mark as relsoved` enable
+            > 待解決的 `thread or discussion` (1/1 discussion resolved)
+
+        1. 再次 Code review 確認沒有問題之後, 按下 `Merge` 按鈕, 程式碼順利合併
+            > 只要在 `Commit message` 或 `Merge request` 的 `Discussion` 中有撰寫 `Close + Issue` 編號的字串, GitLab 就會在 `Merge request` 順利通過的時候, 自動幫你把 Issue close
+
++ [GitLab Quick Actions](https://docs.gitlab.com/ee/user/project/quick_actions.html)
+    > The Quick Actions are for `issues` or `merge requests`
+    > and they SHOULD be used in `Description` item
+
+    - `#` + number
+        > Issue number in this repository
+
+    - `/todo`
+        > Add a To Do
+
+    - `/done`
+        > Mark To Do as done
+
+    - `/close`
+        > Close
+
+    - `/reopen`
+        > Reopen
+
+    - `/assign @Account`
+        > Assign one user
+
+    - `/assign @Account1 @Account2`
+        > Assign multiple users
+
+    - `/reassign @user1 @user2`
+        > Change assignee
+
+    - `/unassign @user1 @user2`
+        > Remove assignee(s)
+
++ Reference
+
+    - [GitLab: Commit & Merge Request](https://ithelp.ithome.com.tw/articles/10222704)
+    - [和艦長一起 30 天玩轉 GitLab](https://ithelp.ithome.com.tw/users/20120986/ironman/2733)
+
 # Docker
 
 Use `Docker` to build-up test environment
@@ -402,4 +481,36 @@ Use `Docker` to build-up test environment
     - [Docker 筆記 Part 2 | 指令操作](https://medium.com/@VisonLi/docker-%E5%85%A5%E9%96%80-%E7%AD%86%E8%A8%98-part-2-91e4dfa2b365)
     - [<Docker - 從入門到實踐> 正體中文版](https://philipzheng.gitbooks.io/docker_practice/content/basic_concept/container.html)
     - [指令基礎 | 全面易懂的Docker指令大全](https://joshhu.gitbooks.io/dockercommands/content/Containers/ContainersBasic.html)
+    - [GitLab: Commit & Merge Request](https://ithelp.ithome.com.tw/articles/10222704)
+    - [和艦長一起 30 天玩轉 GitLab](https://ithelp.ithome.com.tw/users/20120986/ironman/2733)
 
+
+# Misc
+
++ git
+
+    - show user name
+
+    ```
+    $ git config user.name
+    ```
+
++ repo
+
+    - new a branch
+
+    ```
+    $ repo start [branch name] --all
+    ```
+
+    - switch to the other branch
+
+    ```
+    $ repo start --all [target branch name]
+    ```
+
+    - delete branch
+
+    ```
+    $ repo abandon [branch name]
+    ```
