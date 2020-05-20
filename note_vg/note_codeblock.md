@@ -1,20 +1,26 @@
 CodeBlocks
 ---
 
-# Linux
+# Linux (lubuntu 18.04)
 
 + install
 
     ```shell
-    sudo add-apt-repository ppa:damien-moore/codeblocks-stable
-    sudo apt-get update
-    sudo apt-get install codeblocks codeblocks-contrib
+    # $ sudo add-apt-repository ppa:damien-moore/codeblocks-stable
+    # $ sudo apt-get update
+    $ sudo apt-get install codeblocks codeblocks-contrib
+    ```
+
++ uninstall
+
+    ```sh
+    $ sudo apt-get autoremove codeblocks
     ```
 
 + disable full screen hot key F11
 
     ```
-    vi ~/.config/openbox/lubuntu-rc.xml
+    $ vi ~/.config/openbox/lubuntu-rc.xml
         mark F11 item
     ```
 
