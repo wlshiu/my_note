@@ -169,6 +169,12 @@ GDB_CMD
 + set
     > 設定特定參數.如:set env，設定環境變數.也可以拿來修改變數的值.
 
+    - 設定 input arguments of a program
+
+    ```
+    gdb) set args -type f
+    ```
+
 + unset
     > 取消特定參數.如:unset env，刪除環境變數.
 
@@ -194,11 +200,48 @@ GDB_CMD
     > 觀察到變量變化時,停止程序
     >> watchpoint 和 breakpoint 類似,但是斷點是 **program 執行前**設置,觀察點是**program 執行中**設置,只能是變量
 
-- rwatch
++ rwatch
     > 觀察到變量被讀時,停止程序
 
-- awatch
++ awatch
     > 觀察到變量被讀或者被寫時,停止程序
+
++ 直接看到 console 訊息 (stdout)
+
+    - re-direct output
+
+        1. 開啟兩個 telnet session
+
+        ```
+        # who
+        root    pts/0   00:00   Oct  7 08:49:55  [::ffff:192.168.0.101]:31109
+        root    pts/1   00:01   Oct  7 08:53:55  [::ffff:192.168.0.101]:31133
+        ```
+        1. 在 pts/0 畫面輸入指令，接著便可以在 pts/1 畫面看到與 console 相同的除錯訊息
+
+        ```
+        # pts/0  side
+        $ tail -f /var/adm/messages > /dev/pts/1 &"
+        ```
+
+    - gdbserver
+
+        1. open a telnet session and execute `gdbserver`
+
+        ```
+        $ gdbserver localhost:55555 [executable file]
+        ```
+
+        1. open the other telnet session
+
+        ```
+        $ gdb [executable file]
+        gdb) target remote localhost:55555
+        Remote debugging using localhost:55555
+        ...
+        gdb) b main()
+        gdb) c
+        ```
 
 # debug tips
 
