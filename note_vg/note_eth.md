@@ -21,7 +21,7 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
   ----------+--------------+
     |       | Data link    |
     |       |  (MAC)       |
-    v       +--------------+  <---  MII/RMII/GMII interface
+    v       +--------------+  <---  MII/RMII/GMII interface + MDIO interface
     H/w     |   PHY        |
             +--------------+
 
@@ -30,6 +30,30 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
 # MAC
 
 + CSMA/CD (Carrier Sense Multiple Access/Collision Detection)
+
+    - algorithm
+        1. Adapter(MAC) 從 Network layer 取得 datagram(資料封包), 建立 frame.
+        1. 如果 adapter(MAC) sences(感測) channel(通道) is idle(閒置的), 便傳送frame.
+        若是 busy, 則等到 channel 為 idle 後再傳送.
+        1. 當沒有 collision 時: 如果該 adapter(MAC) 正在傳送 frame 時,
+        沒有其他 adapter 在傳送(即也在使用channel), 則該 adapter 便完成該 frame 的傳送.
+        1. 當有 collision 時: 有其他 adapter(MAC) 在傳送, 該 adapter 便會 aborts (停止傳送frame),
+        並且送出一個 jam signal(擁擠訊號, 48 bits).
+        1. 送出 jam signal 後, 該 adapter 便會進入exponential backoff.
+        第 n 次 collision, adapter(MAC) 便從 0 ~ 2^(n-1) 中隨機選一k值, 並 wait `K*512` 個 bit times,
+        然後再去重新 sences channel.
+        e.g. 第3次 collision, 從0,1,2,3,4,5,6,7中隨機選一值
+
+    - efficiency
+
+    ```
+    d_prop = 在 TX 和 RX 的 adapters(MAC) 之間的最大傳播delay
+    d_trans = 傳送最大的 frame 所需的時間
+
+    efficiency = 1 / ((1 + 5*d_prop) / d_trans)
+    當 d_prop 趨近於 0 或當 d_trans 非常大時, Efficiency(效率)趨近於 1
+    ```
+
 
 + Ethernet II frame (packet)
 
@@ -55,11 +79,12 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
     > + use S/w command queue (tx/rx descriptor, link-list implementation)
     and locate at system memory area
     > + TXMAC and RXMAC are indepandent.
-    >> The clock of RXMAC is from PHY.
+    >> The clock of RXMAC is from PHY. (TBD)
     > support Wake-On-LAN
     >> - Link status change
     >> - magic packet
     >> - wake-up frame
+    > + support IEEE-1588 PTP (Precision Time Protocol)
 
     - Transmission
         1. TXDMA fetchs the tx_desc info and move the packet data to TXFIFO
@@ -82,13 +107,112 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
             trigger RXDMA to move packet data from RXFIFO to the buffer of rx_desc
         1. RXDMA writes the status to rx_desc
 
+    - Registers
+
+        1. `Normal Priority Transmit Ring Base Address`
+            > the S/w command queue base address (tx_np_desc) with Normal Priority.
+
+        1. `Receive Ring Base Address`
+            > the S/w command queue base address (rx_desc).
+
+        1. `High Priority Transmit Ring Base Address`
+            > the S/w command queue base address (tx_hp_desc) with High Priority.
+
+        1. `High Priority Transmit Poll Demand`
+            > manually trigger TXDMA
+
+        1. `Normal Priority Transmit Poll Demand`
+            > manually trigger TXDMA
+
+        1. `TX Interrupt Timer Control`
+            > tune the TX IRQ times (include waiting time, packets count) for performance
+            >> allows the S/w to pend the number of TX IRQ (ISR[4], TxPKT2Ethernet).
+            This lowers the CPU utilization for handling a large number of IRQs
+            > + TXINT_THR and TXINT_THR_UNIT
+            >> if tx packet conut == (TXINT_THR * TXINT_THR_UNIT), trigger IRQ
+            > + TXINT_CYC and TXINT_TIME_SEL
+            >> after transmit a packate, delay time to trigger IRQ (waiting time = TXINT_CYC * TXINT_TIME_SEL)
+
+        1. `RX Interrupt Timer Control`
+            > tune the RX IRQ times (include waiting time, packets count) for performance
+            >> allows the S/w to pend the number of TX IRQ (ISR[0],RxPKT2Buf).
+            This lowers the CPU utilization for handling a large number of IRQs
+            > + RXINT_THR and RXINT_THR_UNIT
+            >> if rx packet conut == (RXINT_THR * RXINT_THR_UNIT), trigger IRQ
+            > + TXINT_CYC and TXINT_TIME_SEL
+            >> after received a packate, delay time to trigger IRQ (waiting time = RXINT_CYC * RXINT_TIME_SEL)
+
+        1. `Automatic Polling Timer Control`
+            > automatic trigger TXDMA/RXDMA with S/w command queue (tx/rx descriptors)
+
+        1. `DMA Burst Length and Arbitration Control`
+            > + configure priorities of TXDMA/RXDMA accessing FIFO
+            >> if **RXFIFO >= RXFIFO_HTHR**, priority `RXDMA > TXDMA` until **RXFIFO <= RXFIFO_LTHR**
+            > + DMA configuration of burst
+            > + IFG (Inter Frame Gap) setting
+
+            a. Inter Frame Gap (IFG)
+                > 在 PYH 所傳輸的單位稱為 Ethernet frame, frame 與 frame 間,
+                必須要有間隔, 否則會無法分辨 Ethernet frame 的結束,
+                這個間隔稱為 Inter Frame Gap (IFG) or Inter Packet Gap (IPG),
+                長度最小為 `12 bytes`的傳輸時間.
+                依不同的 SPEED, 而有不同的 delay time (10Mbps: 9.6ms, 100Mbps: 960ns, 1Gbps: 96ns)
+
+            ```
+            Data-link layer throughput:
+
+            the min Ethernet fram = 72 bytes
+            PHY layer frame = 72 + 7 + 1 + 12 = 92 bytes
+            ps. Preamble (7 bytes), Start of frame delimiter(SFD, 1 byte)
+
+            In 10Mbps case:
+            10,000,000 / (92 * 8) = 13586 frames ---> PHY layer
+            13586 * 72 * 8 = 7,825,536 bps       ---> Data-link layer
+            ```
+
+        1. `MAC Control`
+            > the master functions configuration
+
+        1. `PHY Control`
+            > communicate PHY with MII/RMII/GMII
+            >> support to change MDC cycle (MDC period = MDC_CYCTHR * 400ns)
+
+    - Registers to report information
+
+        1. `Normal Priority Transmit Ring Pointer`
+            > current active tx S/w cmdq (tx_np_desc)
+
+        1. `High Priority Transmit Ring Pointer`
+            > current active tx S/w cmdq (tx_hp_desc)
+
+        1. `Receive Ring Pointer`
+            > current active rx S/w cmdq (rx_hp_desc)
+
+        1. `TPKT_CNT Counter`
+            > Counter for counting packets `transmitted` successfully
+        1. `RPKT_CNT Counter`
+            > Counter for counting the packets `received` successfully
+        1. `BROPKT_CNT Counter`
+            > Counter for counting the received `broadcast` packets
+        1. `MULPKT_CNT Counter`
+            > Counter for counting the received `multicast` packets
+        1. `Feature`
+            > H/w feature configuration
+
+        1. `GMAC Interface Selection`
+            > select MII/RMII/RGMII interface
+
+
+
 # PHY
 
-# MII Interface
+# MII Interface (Data handle)
 
     MII 標準介面用於連接 Ethernet的 MAC 與 PHY.
     `介質無關(Media Independent)` 表明在不更換 MAC 硬體的情況下, 任何類型的 PHY 設備都可以正常工作.
-    在其他速率下工作的與 MII等效的介面有: AUI(10M乙太網), GMII(Gigabit乙太網)和XAUI(10-Gigabit乙太網)
+    在其他速率下工作的與 MII等效的介面有: AUI(10M乙太網), GMII(Gigabit乙太網) 和 XAUI(10-Gigabit乙太網)
+
+    ps. the role is like RTP
 
 + RMII (Reduced Media Independent Interface)
     > 簡化媒體獨立介面, 是標準的乙太網介面之一, 比MII有更少的I/O傳輸.
@@ -137,6 +261,47 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
             > 接收資料出錯指示
         1. COL
             > 衝突檢測(僅用於半雙工狀態)
+
+# Serial Management Interface (SMI, control handle)
+
+    通常直接被稱為 MDIO接口(Management Data I/O Interface),
+    主要被應用於 ethernet 的 MAC 和 PHY 層之間,
+    MAC device 通過讀寫 registers 來實現對 PHY device 的操作與管理.
+
+    ps. the role is like RTCP
+
++ Concept
+    > MDIO主機(即產生 MDC clock 的設備)通常被稱為STA(Station Management Entity),
+    而 MDIO從機通常被稱為 MMD(MDIO Management Device).
+    通常 STA 都是 `MAC device` 的一部分, 而 MMD 則是 `PHY device` 的一部分.
+    MDIO接口包括兩條線, `MDIO`和`MDC`, 其中MDIO是雙向數據線, 而 MDC 是由 STA驅動的時鐘線.
+    MDC時鐘的最高速率一般為 `2.5MHz`, MDC 也可以是非固定頻率
+
+    - IEEE 802.3 clause 22
+        > MDIO接口最多支持連接 `32`個MMD(PHY層設備), 每個設備最多支持 `32 個 registers`
+
+        ```
+        typedef struct mdio22_frame
+        {
+            uitn32_t    ST      : 2; // start of frame
+            uitn32_t    OP      : 2; // opcode, b10 = read, b01 = write
+            uitn32_t    PHY_addr: 5;
+            uitn32_t    reg_addr: 5; // registers of PPHY
+            uitn32_t    ta      : 2; // turn-around time for slave to start driving read data if read opcode
+            uitn32_t    data    : 16;
+        } mdio22_frame_t;
+        ```
+
+    - IEEE 802.3 clause 45
+        > MDIO接口最多支持連接 `32`個MMD, 32個設備類型, 每個設備最多支持 `64K 個registers`
+
++ PINs
+
+    - MDC
+        > the clock signal of SMI
+    - MDIO
+        > I/O signal for read/write registers of PHY
+
 
 # Simplex vs Duplex
 
