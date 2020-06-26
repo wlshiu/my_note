@@ -370,4 +370,13 @@ Ethernet使用方式為廣播模式, 傳出的資料`每一節點皆會接收並
 
 
 
+# reference
+
++ [Ethernet(乙太網路): Frame, CSMA/CD](https://sls.weco.net/node/10698)
++ [乙太網路](https://zh.wikipedia.org/wiki/%E4%BB%A5%E5%A4%AA%E7%BD%91)
++ [ethernet-mac-phy](http://blog.gitdns.org/2016/06/17/ethernet-mac-phy/)
++ [IEEE 802.3 CSMA/CD網路](http://www.cs.nthu.edu.tw/~nfhuang/chap04.htm)
++ [Linux網絡子系統學習筆記](http://docs.ifjy.me/contents/linux/003/linux%E5%86%85%E6%A0%B8%E7%BD%91%E7%BB%9C%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%88%86%E6%9E%90.html)
++ [linux- Enabling and Disabling Transmissions](http://www.embeddedlinux.org.cn/linux_net/0596002556/understandlni-CHP-11-SECT-1.html)
++ [netif_start_queue/netif_wake_queue/netif_stop_queue](https://www.cnblogs.com/zxc2man/p/4105652.html)
 
