@@ -1162,6 +1162,96 @@ deferable task, 具體如何推遲執行, 可分成下面幾種情況:
         1. 當系統太繁忙了, 不斷產生中斷 (raise softirq), 由於 bottom half 的優先級高, 從而導致進程無法調度執行。
         這種情況下, softirq 會推遲到 softirqd 這個 kernel thread 中去執行
 
+        1. `SKLET_SOFTIRQ` 類型的 softirq handler -> `tasklet_action()`
+
+        ```c
+        static void tasklet_action(struct softirq_action *a)
+        {
+            struct tasklet_struct *list;
+
+            /**
+             *  從本 cpu 的 tasklet list 中取出全部的 tasklet,
+             *  保存在 list 這個臨時變量中, 同時重新初始化本 cpu 的 tasklet list, 使該鏈表為空.
+             *  由於 bottom half 是開中斷執行的, 因此在操作 tasklet list 的時候需要使用關中斷保護
+             */
+            local_irq_disable();
+            list = __this_cpu_read(tasklet_vec.head);
+            __this_cpu_write(tasklet_vec.head, NULL);
+            __this_cpu_write(tasklet_vec.tail, this_cpu_ptr(&tasklet_vec.head));
+            local_irq_enable();
+
+            // 遍歷 tasklet list
+            while (list) {
+                struct tasklet_struct *t = list;
+
+                list = list->next;
+
+                /**
+                 *  tasklet_trylock() 主要是用來設定該 tasklet 的 state 為 TASKLET_STATE_RUN,
+                 *  同時判斷該 tasklet 是否已經處於執行狀態, 這個狀態很重要, 它決定了後續的代碼邏輯
+                 */
+                if (tasklet_trylock(t)) {
+                    /**
+                     *  檢查該 tasklet 是否處於 enable 狀態,
+                     *  如果是, 說明該 tasklet 可以真正進入執行狀態了
+                     *  主要的動作就是清除 TASKLET_STATE_SCHED 狀態, 執行 tasklet callback function。
+                     */
+                    if (!atomic_read(&t->count)) {
+                        if (!test_and_clear_bit(TASKLET_STATE_SCHED, &t->state))
+                            BUG();
+                        t->func(t->data);
+                        tasklet_unlock(t);
+
+                        // 處理下一個 tasklet
+                        continue;
+                    }
+
+                    // 清除 TASKLET_STATE_RUN 標記
+                    tasklet_unlock(t);
+                }
+
+                /**
+                 *  如果該 tasklet 已經在別的 cpu 上執行了,
+                 *  那麼我們將其掛入該 cpu 的 tasklet list 的尾部,
+                 *  這樣, 在下一個 tasklet 執行時機到來的時候,
+                 *  kernel 會再次嘗試執行該 tasklet,
+                 *  在這個時間點, 也許其他 cpu 上的該 tasklet 已經執行完畢了.
+                 *  通過這樣代碼邏輯, 保證了特定的 tasklet 只會在一個 cpu上 執行, 不會在多個 cpu 上並發
+                 */
+                local_irq_disable();
+                t->next = NULL;
+                *__this_cpu_read(tasklet_vec.tail) = t;
+                __this_cpu_write(tasklet_vec.tail, &(t->next));
+
+                // 再次觸發softirq, 等待下一個執行時機
+                __raise_softirq_irqoff(TASKLET_SOFTIRQ);
+                local_irq_enable();
+            }
+        }
+        ```
+
+        > 你也許會對 `tasklet_trylock()`的部分覺得奇怪, 為何這裡從 tasklet 的 list 中摘下一個本 cpu 要處理的 tasklet ndoe,
+        而這個 list 中的 tasklet 已經處於 running 狀態了, 會有這種情況嗎 ?
+
+        > 當 device driver 使用 tasklet 機制並且在中斷 top half 中, 將靜態定義的 tasklet 調度執行.
+        device H/w 中斷 signal 首先送達 cpu0 處理, 因此該 driver 的 tasklet 被掛入 CPU0 對應的 tasklet list, 並在適當的時間點上開始執行該 tasklet.
+        這時候, cpu0 的硬件中斷又來了, 該 driver 的 tasklet callback function 被搶佔, 雖然 tasklet 仍然處於 running 狀態.
+        與此同時, device 又一次觸發中斷並在 cpu1 上執行, 這時候, 該 driver 的 tasklet 處於 running 狀態,
+        並且 `TASKLET_STATE_SCHED` 已經被清除,
+        因此, 調用 tasklet_schedule() 將會使得該 driver 的 tasklet 掛入 cpu1 的 tasklet list 中。
+        由於 cpu0 在處理其他硬件中斷, 因此, cpu1 的 tasklet 後發先至, 進入 tasklet_action() 調用,
+        這時候, 當從 cpu1 的 tasklet 摘取所有需要處理的 tasklet list 中, device 對應的 tasklet 實際上已經是在 cpu0 上處於執行狀態了.
+
+        > 在設計 tasklet 的時候就規定, 同一種類型的 tasklet 只能在一個 cpu 上執行,
+        因此 `tasklet_trylock()` 就是起這個作用的.
+
+        ```c
+        static inline int tasklet_trylock(struct tasklet_struct *t)
+        {
+            return !test_and_set_bit(TASKLET_STATE_RUN, &(t)->state);
+        }
+        ```
+
 + example
     > 假設 Core A 處理了這個網卡(NIC)中斷事件, 很快的完成了基本的 HW 操作後,
     執行 schedule tasklet (同時也 trigger TASKLET_SOFTIRQ softIRQ).
@@ -1215,5 +1305,13 @@ interrupt H/w controller 的拓撲結構, 以及其 interrupt request line (sign
 + [Linux 核心設計: 中斷處理和現代架構考量](https://hackmd.io/@sysprog/linux-interrupt)
 + [Linux kernel的中斷子系統之(一):綜述](http://www.wowotech.net/irq_subsystem/interrupt_subsystem_architecture.html)
 + [Linux kernel的中斷子系統之(二):IRQ Domain介紹](http://www.wowotech.net/linux_kenrel/irq-domain.html)
++ [linux kernel的中斷子系統之(三):IRQ number和中斷描述符](http://www.wowotech.net/irq_subsystem/interrupt_descriptor.html)
++ [linux kernel的中斷子系統之(四):High level irq event handler](http://www.wowotech.net/irq_subsystem/High_level_irq_event_handler.html)
++ [Linux kernel的中斷子系統之(五):驅動申請中斷API](http://www.wowotech.net/irq_subsystem/request_threaded_irq.html)
++ [Linux kernel的中斷子系統之(六):ARM中斷處理過程](http://www.wowotech.net/linux_kenrel/irq_handler.html)
++ [linux kernel的中斷子系統之(七):GIC代碼分析](http://www.wowotech.net/linux_kenrel/gic_driver.html)
++ [linux kernel的中斷子系統之(八):softirq](http://www.wowotech.net/irq_subsystem/soft-irq.html)
++ [linux kernel的中斷子系統之(九):tasklet](http://www.wowotech.net/irq_subsystem/tasklet.html)
++ [Concurrency Managed Workqueue之(一):workqueue的基本概念](http://www.wowotech.net/irq_subsystem/workqueue.html)
 + [linux gic驅動](https://blog.csdn.net/rikeyone/article/details/51538414)
 
