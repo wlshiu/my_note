@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>99</x>
+      <y>209</y>
+      <w>143</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>297</x>
+      <y>209</y>
+      <w>143</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>605</x>
+      <y>209</y>
+      <w>143</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>374</x>
+      <y>22</y>
+      <w>176</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff_head*
+
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+{innerclass
+qlen
+(sk_buff number)
+innerclass}
+{innerclass
+spinlock
+innerclass}
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>451</y>
+      <w>165</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>154</x>
+      <y>66</y>
+      <w>275</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0;230.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>231</x>
+      <y>253</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>198</y>
+      <w>110</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>80.0;10.0;50.0;10.0;50.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>407</x>
+      <y>198</y>
+      <w>110</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>80.0;10.0;50.0;10.0;50.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>187</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>*...*
+fontsize=20
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>517</x>
+      <y>242</y>
+      <w>33</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>*...*
+fontsize=20
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>517</x>
+      <y>198</y>
+      <w>110</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>80.0;10.0;50.0;10.0;50.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>539</x>
+      <y>253</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>429</x>
+      <y>253</y>
+      <w>88</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>506</x>
+      <y>88</y>
+      <w>198</w>
+      <h>143</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=2</panel_attributes>
+    <additional_attributes>160.0;110.0;160.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>99</x>
+      <y>462</y>
+      <w>143</w>
+      <h>275</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+...
+{innerclass
+*head
+innerclass}
+{innerclass
+*data
+innerclass}
+{innerclass
+*tail
+innerclass}
+{innerclass
+*end
+innerclass}
+{innerclass
+len
+innerclass}
+{innerclass
+data_len
+innerclass}
+...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>352</x>
+      <y>462</y>
+      <w>154</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>head area</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>352</x>
+      <y>495</y>
+      <w>154</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Data</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>561</x>
+      <y>561</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>transport_header
+TCP/UDP (L4)
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>352</x>
+      <y>638</y>
+      <w>154</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>padding
+align</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>352</x>
+      <y>605</y>
+      <w>154</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>tail area</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>352</x>
+      <y>418</y>
+      <w>154</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>memory
+layout
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>495</x>
+      <y>462</y>
+      <w>88</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>484</y>
+      <w>165</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>594</y>
+      <w>165</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>638</y>
+      <w>165</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>130.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>561</x>
+      <y>517</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>network_header
+IP (L3)
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>561</x>
+      <y>473</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>mac_header
+ethernet (L2)
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>495</x>
+      <y>594</y>
+      <w>88</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>209</x>
+      <y>528</y>
+      <w>165</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>130.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>913</y>
+      <w>341</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>+ data will point to the base with L2/L3/L4
+
+fontsize=16</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>561</x>
+      <y>605</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>payload ???
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>352</x>
+      <y>693</y>
+      <w>154</w>
+      <h>187</h>
+    </coordinates>
+    <panel_attributes>*struct*
+*skb_shared_info*
+{innerclass
+frags
+*(Buffers*
+*of a fragment)*
+innerclass}
+{innerclass
+frag_list
+*(Fragments*
+*of a packet)*
+innerclass}
+...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>561</x>
+      <y>660</y>
+      <w>154</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>*struct*
+*skb_frag_struct*
+{innerclass
+frags[0]
+innerclass}
+{innerclass
+frags[1]
+innerclass}
+...</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>649</y>
+      <w>110</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>748</x>
+      <y>539</y>
+      <w>154</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>mem_page 0
+--
+offset alignment
+-.
+payload
+
+-.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>748</x>
+      <y>671</y>
+      <w>154</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>mem_page 1
+--
+offset alignment
+-.
+payload
+
+-.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>682</x>
+      <y>528</y>
+      <w>88</w>
+      <h>209</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>682</x>
+      <y>660</y>
+      <w>88</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>759</y>
+      <w>88</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>60.0;50.0;60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>517</x>
+      <y>814</y>
+      <w>143</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+...
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>704</x>
+      <y>814</y>
+      <w>143</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>*struct sk_buff*
+{innerclass
+next
+innerclass}
+{innerclass
+prev
+innerclass}
+...
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>616</x>
+      <y>803</y>
+      <w>110</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;50.0;10.0;50.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>385</y>
+      <w>209</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>*Data structure of a packet*
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>66</x>
+      <y>341</y>
+      <w>891</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;790.0;10.0</additional_attributes>
+  </element>
+</diagram>
