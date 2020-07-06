@@ -227,6 +227,344 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 # skb (socket buffer)
 
 
+# Socket work flow
+
+```
+     [server]            [client]
+
+     socket()            socket()
+        |                   |
+        v                   |
+      bind()                |
+        |                   |
+        v                   |
+     listen()               |
+        |                   |
+        v                   v
+     accept()  <------- connect()
+        |                   |
+        v                   v
+      recv()   <-------   send()
+        |                   |
+        v                   v
+     close()             close()
+
+```
+
+
+## net init flow of kernel booting
+
+```
+// linux at /init/main.c
+start_kernel()
+    - rest_init()
+        - kernel_init() with kernel thread
+            - kernel_init_freeable()
+                - do_basic_setup()
+                    - do_initcalls()
+                        + core_initcall(sock_init); // init_lv 1, at /net/socket.c
+                        - fs_initcall(inet_init);   // inti_lv 5, at /net/ipv4/af_inet.c
+                            + arp_init/ip_init/tcp_init/icmp_init
+```
+
+
++ `inet_init()` at `/net/ipv4/af_inet.c`
+
+    - regitster interface of protocols of `transport layer (L4)` to `socket layer (user)`
+        > methods
+        > + `connect`
+        > + `bind`
+        > + `ioctl`
+        > + `setsockopt/getsockopt`
+        > + `shutdown`
+
+        ```c
+        proto_register(&tcp_prot, 1);
+        proto_register(&udp_prot, 1);
+        proto_register(&raw_prot, 1);
+        proto_register(&ping_prot, 1);
+
+        (void)sock_register(&inet_family_ops);
+        ```
+
+    - register recv_handler of protocols of `transport layer (L4)` to `IP layser (L3)`
+        > IP layer parses the IP header (get protocol type) and pass packets to upper layer
+
+        ```c
+        inet_add_protocol(&icmp_protocol, IPPROTO_ICMP); // for ping function
+        inet_add_protocol(&udp_protocol, IPPROTO_UDP);
+        inet_add_protocol(&tcp_protocol, IPPROTO_TCP);
+        ```
+
+    - 
+        ```c
+        static struct inet_protosw  inetsw_array[];
+        ```
+
+## BSD socket API
+
++ `socket()`
+    > create network handle
+
+    ```c
+    // linux at net/socket.c
+    SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)
+    {
+        int retval;
+        struct socket *sock;
+        int flags;
+
+        flags = type & ~SOCK_TYPE_MASK;
+        if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
+            return -EINVAL;
+        type &= SOCK_TYPE_MASK;
+
+        if (SOCK_NONBLOCK != O_NONBLOCK && (flags & SOCK_NONBLOCK))
+            flags = (flags & ~SOCK_NONBLOCK) | O_NONBLOCK;
+
+        retval = sock_create(family, type, protocol, &sock);
+        if (retval < 0)
+            goto out;
+
+        /**
+         *  將 socket handle 掛上 socket_file_ops, 並封裝成 fd
+         */
+        retval = sock_map_fd(sock, flags & (O_CLOEXEC | O_NONBLOCK));
+        if (retval < 0)
+            goto out_release;
+
+    out:
+        /* It may be already another descriptor 8) Not kernel problem. */
+        return retval;
+
+    out_release:
+        sock_release(sock);
+        return retval;
+    }
+    ```
+
+    - `socket_file_ops`
+        > 標準 file description
+
+        ```c
+        // linux at net/socket.c
+        static const struct file_operations     socket_file_ops = {
+            owner =         THIS_MODULE,
+            llseek =        no_llseek,
+            read_iter =     sock_read_iter,
+            write_iter =    sock_write_iter,
+            poll =          sock_poll,
+            unlocked_ioctl = sock_ioctl,
+        #ifdef CONFIG_COMPAT
+            compat_ioctl =  compat_sock_ioctl,
+        #endif
+            mmap =          sock_mmap,
+            release =       sock_close,
+            fasync =        sock_fasync,
+            sendpage =      sock_sendpage,
+            splice_write =  generic_splice_sendpage,
+            splice_read =   sock_splice_read,
+        };
+        ```
+
+    - sock create
+
+        ```c
+        // linux at net/socket.c
+        int sock_create(int family, int type, int protocol, struct socket **res)
+        {
+            return __sock_create(current->nsproxy->net_ns, family, type, protocol, res, 0);
+        }
+
+        int __sock_create(struct net *net, int family, int type, int protocol,
+                     struct socket **res, int kern)
+        {
+            ...
+
+            /* Compatibility.
+
+               This uglymoron is moved from INET layer to here to avoid
+               deadlock in module load.
+             */
+            if (family == PF_INET && type == SOCK_PACKET) {
+                pr_info_once("%s uses obsolete (PF_INET,SOCK_PACKET)\n",
+                         current->comm);
+                /**
+                 *  為了向後相容, 強制修改地址族為PF_PACKET
+                 */
+                family = PF_PACKET;
+            }
+
+            /**
+             *  SELinux相關的安全檢查
+             */
+            err = security_socket_create(family, type, protocol, kern);
+            if (err)
+                return err;
+
+            ...
+
+            /**
+             *  從系統 global array 'net_families' 中,
+             *  獲取指定協議族定義的 struct net_proto_family 結構,
+             *  每個協議族在初始化過程中, 都會向系統註冊一個這樣的結構
+             *  IPv4 在 inet_init() 中完成註冊
+             */
+            rcu_read_lock();
+            pf = rcu_dereference(net_families[family]);
+            err = -EAFNOSUPPORT;
+            if (!pf)
+                goto out_release;
+
+            /*
+             * We will call the ->create function, that possibly is in a loadable
+             * module, so we have to bump that loadable module refcnt first.
+             */
+            if (!try_module_get(pf->owner))
+                goto out_release;
+
+            /* Now protected by module ref count */
+            rcu_read_unlock();
+
+            /**
+             *  呼叫協議族提供的 create() method 完成協議族相關的套接字建立工作,
+             *  對於AF_INET, 該函式為 inet_create()
+             */
+            err = pf->create(net, sock, protocol, kern);
+            if (err < 0)
+                goto out_module_put;
+
+            ...
+        }
+        ```
+
++ `bind()`
+    > 為 socket handle 綁定本機 IP 地址和一個沒被佔用的 port number
+
+    ```c
+    // linux at net/socket.c
+    SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __user *, umyaddr, int, addrlen)
+    {
+        struct socket *sock;
+        struct sockaddr_storage address;
+        int err, fput_needed;
+
+        sock = sockfd_lookup_light(fd, &err, &fput_needed);
+        if (sock) {
+            err = move_addr_to_kernel(umyaddr, addrlen, &address);
+            if (err >= 0) {
+                err = security_socket_bind(sock,
+                               (struct sockaddr *)&address,
+                               addrlen);
+                if (!err)
+                    err = sock->ops->bind(sock,
+                                  (struct sockaddr *)
+                                  &address, addrlen);
+            }
+            fput_light(sock->file, fput_needed);
+        }
+        return err;
+    }
+    ```
+
+    - `port number` 的目的是為了實現複用(Multiplexing), 屬於 TCP/UDP layer (L4)
+        > 用來區分不同進程設置的標識.
+        這些進程都使用 network layer (IP layer, L3) 收發封包(復用),
+        port number 就是用來確定正在發送/收到的封包屬於哪個進程.
+
+
++ `listen()`
+    > server side. 用來等待 client 的連接
+
+    ```
+    // linux at net/socket.c
+    SYSCALL_DEFINE2(listen, int, fd, int, backlog)
+    {
+        struct socket *sock;
+        int err, fput_needed;
+        int somaxconn;
+
+        sock = sockfd_lookup_light(fd, &err, &fput_needed);
+        if (sock) {
+            somaxconn = sock_net(sock->sk)->core.sysctl_somaxconn;
+            if ((unsigned int)backlog > somaxconn)
+                backlog = somaxconn;
+
+            err = security_socket_listen(sock, backlog);
+            if (!err)
+                err = sock->ops->listen(sock, backlog);
+
+            fput_light(sock->file, fput_needed);
+        }
+        return err;
+    }
+    ```
+
++ `connect()`
+    > client side. 用來請求與指定的 server (IP and port number)連接
+
+    ```
+    // linux at net/socket.c
+    SYSCALL_DEFINE3(connect, int, fd, struct sockaddr __user *, uservaddr,
+            int, addrlen)
+    {
+        struct socket *sock;
+        struct sockaddr_storage address;
+        int err, fput_needed;
+
+        sock = sockfd_lookup_light(fd, &err, &fput_needed);
+        if (!sock)
+            goto out;
+        err = move_addr_to_kernel(uservaddr, addrlen, &address);
+        if (err < 0)
+            goto out_put;
+
+        err =
+            security_socket_connect(sock, (struct sockaddr *)&address, addrlen);
+        if (err)
+            goto out_put;
+
+        err = sock->ops->connect(sock, (struct sockaddr *)&address, addrlen,
+                     sock->file->f_flags);
+    out_put:
+        fput_light(sock->file, fput_needed);
+    out:
+        return err;
+    }
+    ```
+
++ `accept()`
+    > server side. 獲得 client 的 IP 和 port number 信息.
+    接受 client 連接請求, 並生成一個新的 socket handle
+    >> 一個 client 連線進來, 就會產生一個獨立的 socket handle
+
+    ```c
+    SYSCALL_DEFINE3(accept, int, fd, struct sockaddr __user *, upeer_sockaddr,
+            int __user *, upeer_addrlen)
+    ```
+
++ `recv()/send()`
+    > 收發封包
+
+    ```c
+    // linux at net/socket.c
+    SYSCALL_DEFINE4(send, int, fd, void __user *, buff, size_t, len,
+            unsigned int, flags)
+    SYSCALL_DEFINE4(recv, int, fd, void __user *, ubuf, size_t, size,
+            unsigned int, flags)
+    ```
+
++ `close()`
+    > 關閉 socket handle, 並釋放資源
+    > + socket handle of client incoming
+    >> 僅僅關閉 client 連線, server 持續運作
+    > + socket handle of a server
+    >> 關閉 server 運作
+
+
+
+
+
 
 
 
@@ -234,8 +572,15 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 
 + [NAPI機制分析](http://abcdxyzk.github.io/blog/2015/08/27/kernel-net-napi/)
 + [NAPI(New API)的一些淺見](https://www.jianshu.com/p/6292b3f4c5c0)
++ [Linux協議棧--IPv4協議的註冊](http://cxd2014.github.io/2017/09/02/inet-register/)
+    > htag: network
++ [內核收發包分析（二）----inet_init函數、arp_init函數](https://www.twblogs.net/a/5b82282e2b717737e032ba5d)
++ [LINUX 套接字文件系統（sockfs）分析之二 相關結構體分析](https://kknews.cc/zh-tw/code/y5ql82j.html)
+
 
 
 + [Linux內核網絡數據包處理流程](https://www.cnblogs.com/muahao/p/10861771.html)
 + [網卡收包流程](https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/697653/)
 + [NAPI 之（三）——技術在 Linux 網絡驅動上的應用和完善](https://www.itdaan.com/tw/fb05ad962549e1d9e0da79f648296af1)
++ [Linux kernel 之 socket 創建過程分析](https://www.cnblogs.com/chenfulin5/p/6927040.html)
++ [從socket應用到網卡驅動：Linux網絡子系統分析概述](https://freemandealer.github.io/2016/03/08/tcp-ip-internal/)
