@@ -226,6 +226,8 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 
 # skb (socket buffer)
 
+主要操作會在 IP layer (L3)
+
 
 # Socket work flow
 
@@ -250,6 +252,231 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
      close()             close()
 
 ```
+
+```
+                    +--------------------+
+                    |    application     |
+                    |   socket()/bind()  |
+    user            |    send()/recv()   |
+    space           +--------------------+
+   ___________________________|___________________________________
+                              v
+    kernel      +----------------------------+
+    space       | VFS (Virtual File System)  |
+                +----------------------------+
+                    +------------------------+      --+
+                    |           INET         |        |
+                    +------------------------+        |
+                    +-----+ +-------+ +------+        |
+                    | TCP | | IP    | | ICMP |        |
+                    +-----+ |       | |      |        |
+                    +-------+       | |      |        | TCP/IP stack
+                    | reouting      | |      |        |
+                    |      system   | |      |        |
+                    +---------------+ +------+        |
+                    +-----+ +----------------+        |
+                    | ARP | | Neighbour      |        |
+                    |     | |     sub-system |        |
+                    +-----+ +----------------+      --+
+                    +------------------------+
+                    |      Device driver     |
+                    +------------------------+
+   ___________________________|___________________________________
+                              v
+    H/w                    MAC/PHY
+```
+
++ `INET`
+    > 是 Linux 網絡子系統的一個抽象層次, 向上提供了操作的接口,
+    但實際還需要調用下層的功能才能完成數據發收, 監聽等任務.
+    具體調用下層的什麼功能, 要根據通信類別(TCP/UDP/RAW)來選擇.
+    >> `RAW`從某種意義上說, 並不是額外的應用層通信方式, 它只是告訴應用層不用理會,
+    直接把數據傳遞到下一層即可, 由網絡層直接處理.
+    `ICMP` 是基於 `RAW` 方式的一個重要協議, 只不過它有一些特殊的性質, 所以單獨列出.
+
+    - 核心數據結構, 就是 `struct socket`.
+    每一個 socket 文件都有一個 socket 控制實體(數據結構 struct socket 的 instance)與之對應.
+    這個 socket 控制實體, 自身以及其成員包含了 socket 的所有信息,
+    包括狀態, 標誌, 操作, 數據緩衝區信息等.
+
+
++ `ARP` (Address Resolution Protocol)
+    > ARP 的功能, 是將 IP 地址映射成 MAC address 的**過程**
+    >> 位址解析(address resolution)就是主機在傳送 frame 前,
+    將 destination IP 位址轉換成 dastination MAC 位址的過程.
+
+    - 運作方式
+        > 當主機 A(163.15.2.1)欲透過 Ethernet 網路傳送訊息給 IP = 163.15.2.4 主機,
+        則發送出 ARP Request(查問 163.15.2.4)廣播到所屬網路區段內.
+        所有主機都會接收到該 ARP Request 封包, 並分解是否詢問自己, 如果不是就不予理會而拋棄.
+        主機 C(163.15.2.4)收到 ARP Request 後, 發現詢問自己則回應 ARP Reply(包含 MAC 位址)給發問者(163.15.2.1)
+
++ `Neighbour sub-system`
+    > 將 IP 地址映射成 data link 硬件地址
+    >> MAC 地址是硬件地址的一種. 對於非以太網設備, 其硬件地址不一定是 MAC 地址.
+    ARP 可以看成是 Neighbour sub-system 的一個特殊情況.
+
+
+
+## data structure
+
+對網際網路協議而言, 包含很多協議簇(Protocal Families, PF)或是地址簇(Address Families, AF),
+像是 `AX25` 協議簇, `INET4` 協議簇, `INET6` 協議簇,
+`IPX(Internetwork Packet Exchange)` 協議簇, `DNNET`協議簇等.
+
+而每一個協議簇中又包含多個協議,
+以 INET4 協議簇為例, 又包含`ipv4`, `tcp`, `udp`, `icmp`等協議.
+
+針對網路協議簇與網路協議之間的關係, linux sockfs的架構也按此進行了劃分.
+
+Normal structure:
+```
+    +--> struct socket         +------> struct proto_ops
+    |       * ops   -----------+            * connect
+    |    +- * sock                          * accept
+    |    |                                  * listen      ops of system
+    |    |                                  * bind         ^
+    |    |                                  * sendmsg      |
+    |    |                                  * recvmsg      |
+    |    |   ___________________________________________________________
+    |    v
+    |   struct sock              +----> struct proto       |
+    +------ * sk_socket          |          * connect      |
+            * sk_prot -----------+          * accept       v
+                (struct sock_common         * bind        ops of transport (L4)
+                    -> skc_prot)            * sendmsg
+                                            * recvmsg
+```
+
+在 `/net/ipv4/af_inet.c` 中, 使用 `strcut inet_protosw  inetsw_array[]` 定義了所支援的 protocols,
+另外定義了 global inetsw, 用於串接 inet4 相關的所有 `strcut inet_protosw` 類型
+af_inet4 註冊的變量如下所示, 包含了 `tcp`, `udp`, `icmp`, `raw socket` 等.
+
+```
+/* This is used to register socket interfaces for IP protocols.  */
+struct inet_protosw {
+    struct list_head list;
+
+        /* These two fields form the lookup key.  */
+    unsigned short   type;     /* This is the 2nd argument to socket(2). */
+    unsigned short   protocol; /* This is the L4 protocol number.  */
+
+    struct proto            *prot;
+    const struct proto_ops  *ops;
+
+    unsigned char    flags;      /* See INET_PROTOSW_* below.  */
+};
+
+static struct list_head  inetsw[SOCK_MAX];
+
+// 依照 type 分類串接
+inetsw[SOCK_DGRAM] -----------+
+inetsw[SOCK_STREAM]---+        |
+inetsw[SOCK_RAW]      |        |
+                      |        |
+                      |        |
+        --------------+        |
+        |                      v
+        |  +------------------------------------+      +-------------------------------------+
+        |  | struct inet_protosw inetsw_udp = { | <--> | struct inet_protosw inetsw_icmp = { |
+        |  |     type     = SOCK_DGRAM,         |      |     type     = SOCK_DGRAM,          |
+        |  |     protocol = IPPROTO_UDP,        |      |     protocol = IPPROTO_ICMP,        |
+        |  |     prot     = &udp_prot,          |      |     prot     = &ping_prot,          |
+        |  |     ops      = &inet_dgram_ops,    |      |     ops      = &inet_sockraw_ops,   |
+        |  | }                                  |      | }                                   |
+        |  +------------------------------------+      +-------------------------------------+
+        |
+        v
+    +---------------------------------------+
+    | struct inet_protosw inetsw_stream = { |
+    |     type     = SOCK_STREAM,           |
+    |     protocol = IPPROTO_TCP,           |
+    |     prot     = &tcp_prot,             |
+    |     ops      = &inet_stream_ops,      |
+    | }                                     |
+    +---------------------------------------+
+```
+
+
++ `struct socket`
+    > 主要 socket handle
+
++ `struct sock`
+    > 包括 source/distination ip address, socket 收發的 queue 等信息
+
+
++ `struct net_proto_family`
+    > 該結構體主要用於說明網絡協議簇, 即針對ax25協議簇,inet4協議簇,inet6協議簇,ipx協議簇等.
+
+    ```c
+    struct net_proto_family {
+        int family;
+        int (*create)(struct net *net, struct socket *sock,
+                        int protocol, int kern);
+        struct module *owner;
+    };
+    ```
+
+    - `family` 用於說明協議簇的類型,
+        > 目前linux支持的協議簇類型包括
+        > + AF_UNIX
+        > + AF_LOCAL
+        > + AF_INET
+        > + AF_INET6
+        > + AF_NETLINK
+
+    - `create()`, 用於初始化 `strcut sock`類型,
+    根據傳遞的協議號, 掛上協議相關的 description.
+
++ `struct inet_protosw`
+    > 定義主要 inet 相關的實現
+
+    ```c
+    enum sock_type
+    {
+        SOCK_STREAM = 1,
+        SOCK_DGRAM = 2,
+        SOCK_RAW = 3,
+        SOCK_RDM = 4,
+        SOCK_SEQPACKET = 5,
+        SOCK_DCCP = 6,
+        SOCK_PACKET = 10,
+    };
+
+    struct inet_protosw
+    {
+        struct list_head list;
+
+        /* These two fields form the lookup key. */
+        unsigned short  type; /* This is the 2nd argument to socket(2). */
+        unsigned short  protocol; /* This is the L4 protocol number. */
+        struct proto    *prot;
+        const struct proto_ops *ops;
+        char            no_check; /* checksum on rcv/xmit/none? */
+        unsigned char   flags; /* See INET_PROTOSW_* below. */
+
+    };
+    ```
+
+    - `type` 用於指示socket的類型
+        > socket 的類型包括 `SOCK_STREAM`, `SOCK_DGRAM`
+        具體的類型 `enum sock_type`
+    - `protocol` 用於說明協議的類型
+        > 包括 `ip`, `tcp`, `udp`, `icmp`, `dccp`等
+
+    - `prot` 用於指向協議相關的處理接口
+    - `proto_ops` 用於指向 socket 類型的 interface(SOCK_STREAM/SOCK_DGRAM 等對應的interface)
+
++ `struct proto_ops`
+    > 主要用於描述 socket 類型(SOCK_STREAM/SOCK_DGRAM 等)的 interface,
+    其中 `family` 用於說明協議簇的類型;
+    而 `release`, `bind`, `connect`, `accept`, `poll`, `ioctl`, `listen`, `shutdown`, `setsockopt` 等,
+    則與 sockfs 提供的系統調用 interface 對應.
+
++ `struct proto`
+    > 主要用於具體協議相關的 description, 對於大多數協議的 socket 而言,
+    只需要使用註冊的 `struct proto_ops` 所提供的 description, 即可完成對 sockfs 的系統調用的實現;
+    而對一些特定的協議(e.g. udp, icmp, tcp), 則需要使用 `struct proto` 來進行定義.
 
 
 ## net init flow of kernel booting
@@ -296,10 +523,41 @@ start_kernel()
         inet_add_protocol(&tcp_protocol, IPPROTO_TCP);
         ```
 
-    - 
-        ```c
-        static struct inet_protosw  inetsw_array[];
-        ```
+    - 在 `struct inet_protosw inetsw_array[]` 中,
+    每個元素的 `struct proto_ops` 和`struct proto`都會被初始化,
+    並且透過 `inet_register_protosw()`,
+    將每個元素註冊到全域 `static struct list_head inetsw[SOCK_MAX];`
+
+
+## send/recv flow
+
++ send
+
+```
+// linux at net/socket.c
+sock_sendmsg()
+    + __sock_sendmsg()
+        + struct socket *sock;
+        + sock->ops->sendmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
+            + inet_sendmsg
+                + struct sock *sk = sock->sk;
+                + sk->sk_prot->sendmsg() // 這個 ops 是 struct sock 結構體中的 struct proto
+                    e.g. tcp_sendmsg()
+```
+
++ recv
+
+```
+// linux at net/socket.c
+sock_recvmsg()
+    + __sock_recvmsg()
+        + struct socket *sock;
+        + sock->ops->recvmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
+            + sock_common_recvmsg()
+                + struct sock *sk = sock->sk;
+                + sk->sk_prot->recvmsg() //這個 ops 是 struct sock 結構體中的 struct proto
+                    e.g. tcp_recvmsg()
+```
 
 ## BSD socket API
 
@@ -390,7 +648,7 @@ start_kernel()
                 pr_info_once("%s uses obsolete (PF_INET,SOCK_PACKET)\n",
                          current->comm);
                 /**
-                 *  為了向後相容, 強制修改地址族為PF_PACKET
+                 *  為了向後相容, 強制修改地址族為 PF_PACKET
                  */
                 family = PF_PACKET;
             }
@@ -564,9 +822,65 @@ start_kernel()
 
 
 
+# MISC
 
++ OSI vs TCP/IP Model
 
+    ```
+            OSI                   TCP/IP
+        Application  --+
+            |          |
+            v          | ---->  Application
+        Presentation   |             |
+            |          |             |
+            v          |             |
+         Session     --+             |
+            |                        |
+            v                        v
+         Transport    ---->      Transport (TCP/UDP, L4)
+            |                        |
+            v                        v
+         Network      ---->      Internet  (IP, L3)
+            |                        |
+            v                        v
+        Data link     ---->      Data link (L2)
+          (MAC)                    (MAC)
+            |                        |
+            v                        v
+         Physical     ---->      Physical (L1)
 
+    ```
+
+    - Transport layer (只看 IP address)
+        > QoS (Quality of Service) maintain
+        > + control the reliability of a link
+        through `flow control`, `error control`, and `segmentation` or `de-segmentation`
+
+    - Network(Internet) layer (只看 IP address)
+        > IP layer should handle
+        > + Routing protocols
+        > + Multicast group management
+        >> IGMP (用來管理多播資料)
+        > + Network-layer address assignment.
+        > + ICMP (Internet Control Message Protocol) handle
+        >> 用來傳送關於 IP 傳送的診斷資訊,
+        `ping` 則是用 ICMP 的'Echo request(8)'和 'Echo reply(0)' 訊息來實現的.
+
+    - Data link layer (只看 MAC address)
+        > 可細分成兩層 LLC 和 MAC
+
+        1. LLC (Logical Link Control)
+        1. MAC (Media Access Control)
+            > 使用 MAC address 定址 (MAC address 是唯一的)
+            > + 碰撞處理 (CSMA/CD)
+
+            >> 早期網路發展時以 MAC 判別個網路介面之位置,
+            但後來網際網路發展後, 才有 IP 的制定與使用
+
+    - Physical layer
+        > + modulation and demodulation
+        > + error correlation
+        > + Analog and digital converter
 
 # reference
 
@@ -574,13 +888,17 @@ start_kernel()
 + [NAPI(New API)的一些淺見](https://www.jianshu.com/p/6292b3f4c5c0)
 + [Linux協議棧--IPv4協議的註冊](http://cxd2014.github.io/2017/09/02/inet-register/)
     > htag: network
-+ [內核收發包分析（二）----inet_init函數、arp_init函數](https://www.twblogs.net/a/5b82282e2b717737e032ba5d)
-+ [LINUX 套接字文件系統（sockfs）分析之二 相關結構體分析](https://kknews.cc/zh-tw/code/y5ql82j.html)
++ [內核收發包分析(二)----inet_init/arp_init函數](https://www.twblogs.net/a/5b82282e2b717737e032ba5d)
++ [LINUX 套接字文件系統(sockfs)分析之二 相關結構體分析](https://kknews.cc/zh-tw/code/y5ql82j.html)
++ [LINUX VFS分析之SOCKFS分析一(ockfs註冊及相關結構體說明)](https://daydaynews.cc/zh-hant/technology/165624.html)
++ [Linux協議棧--NAPI機制](http://cxd2014.github.io/2017/10/15/linux-napi/)
 
 
 
++ [(譯) Linux 網絡棧監控和調優:發送數據(2017)](http://arthurchiao.art/blog/tuning-stack-tx-zh/)
++ [網卡適配器收發數據幀流程](https://www.iambigboss.top/post/54107_1_1.html)
 + [Linux內核網絡數據包處理流程](https://www.cnblogs.com/muahao/p/10861771.html)
 + [網卡收包流程](https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/697653/)
-+ [NAPI 之（三）——技術在 Linux 網絡驅動上的應用和完善](https://www.itdaan.com/tw/fb05ad962549e1d9e0da79f648296af1)
++ [NAPI 之(三)——技術在 Linux 網絡驅動上的應用和完善](https://www.itdaan.com/tw/fb05ad962549e1d9e0da79f648296af1)
 + [Linux kernel 之 socket 創建過程分析](https://www.cnblogs.com/chenfulin5/p/6927040.html)
 + [從socket應用到網卡驅動：Linux網絡子系統分析概述](https://freemandealer.github.io/2016/03/08/tcp-ip-internal/)
