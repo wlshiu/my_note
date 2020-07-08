@@ -475,12 +475,14 @@ Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
         ## only kernel and rootfs and start GDB server
         sudo qemu-system-arm \
-        -M vexpress-a9 -cpu cortex-a9 -m 256M \
+        -M vexpress-a9 -cpu cortex-a9 -smp 4 -m 256M \
         -kernel ./output/images/zImage \
         -serial stdio \
         -sd ./output/images/rootfs.ext2 \
         -dtb ./output/images/vexpress-v2p-ca9.dtb \
         -nographic \
+        -net nic,model=lan9118 \
+        -net user \
         -append "root=/dev/mmcblk0 console=ttyAMA0" \
         -gdb tcp::1234 \
         -S
@@ -527,5 +529,11 @@ Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
 + leave Qemu
     > ctrl-A + X
+
+    1. the other terminal
+
+    ```
+    $ killall qemu-system-arm
+    ```
 
 
