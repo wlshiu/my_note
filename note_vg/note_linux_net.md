@@ -533,32 +533,609 @@ start_kernel()
 
 + send
 
-```
-// linux at net/socket.c
-sock_sendmsg()
-    + __sock_sendmsg()
-        + struct socket *sock;
-        + sock->ops->sendmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
-            + inet_sendmsg
-                + struct sock *sk = sock->sk;
-                + sk->sk_prot->sendmsg() // 這個 ops 是 struct sock 結構體中的 struct proto
-                    e.g. tcp_sendmsg()
-```
+    - socket (app) to transpot layer
+        > app to L4
+
+        ```
+        // linux at net/socket.c
+        sock_sendmsg()
+            + __sock_sendmsg()
+                + struct socket *sock;
+                + sock->ops->sendmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
+                    + inet_sendmsg
+                        + struct sock *sk = sock->sk;
+                        + sk->sk_prot->sendmsg() // 這個 ops 是 struct sock 結構體中的 struct proto
+                            e.g. udp_sendmsg()
+        ```
+
+    - transport layer (L4) to network layer (L3)
+
+        ```
+        // linux at net/ipv4/udp.c
+        udp_sendmsg()
+            + ip_route_output_flow()
+            + ip_make_skb()
+                + udp_send_skb(skb, fl4)
+        ```
+
+        1. `udp_sendmsg`
+            > udp 模塊發送數據包的入口, 在該函數中會先調用 `ip_route_output_flow()` 獲取路由信息(主要包括 Src IP 和網卡),
+            然後調用 `ip_make_skb()` 構造 skb 結構體, 最後將網卡的信息和該 skb 連結.
+
+        1. `ip_route_output_flow()`
+            > 該函數會根據路由表和目的 IP, 找到這個數據包應該從哪個設備發送出去.
+            > + 如果該 socket 沒有綁定 Src IP, 該函數還會根據路由表找到一個最合適的 Src IP 給它.
+            > + 如果該 socket 已經綁定了 Src IP, 但根據路由表, 從這個 Src IP 對應的網卡沒法到達目的地址,
+            則該包會被丟棄, 於是數據發送失敗, `sendto()` 將返回錯誤.
+            `ip_route_output_flow()`最後會將找到的設備和 Src IP 塞進 flowi4 結構體並返回給 `udp_sendmsg()`
+
+        1. `ip_make_skb()`
+            > 該函數的功能是構造 skb 包, 構造好的 skb 包裡面已經分配了 IP header,
+            並且初始化了部分信息(IP header 的 Src IP 就在這裡被設置進去),
+            同時會呼叫 `__ip_append_dat()`, 如果需要 fragment 的話, 會在 `__ip_append_data()` 中進行分片,
+            同時還會檢查 socket 的 **send buffer** 是否已經用光, 如果被用光的話, 返回 **ENOBUFS**.
+
+        1. `udp_send_skb(skb, fl4)`
+            > 主要是往 skb 裡面填充 UDP header, 同時處理 checksum, 然後調用 IP 層的相應函數.
+
+    - network layer (L3) to data link layer (L2)
+
+        ```
+        udp_send_skb(skb, fl4)
+            // linux at net/ipv4/ip_output.c
+            + ip_send_skb()
+                + ip_local_out()
+                    +__ip_local_out()
+                        + nf_hook(NF_INET_LOCAL_OUT)
+                            -> dst_output() at /include/net/dst.h
+                                |
+                        +-------+
+                        |
+                        v
+                    + ip_output()
+                        + NF_HOOK_COND(NF_INET_POST_ROUTING)
+                            -> ip_finish_output()
+                                |
+                        +-------+
+                        |
+                        v
+                    + ip_finish_output2
+                        + neigh_output()
+                            + neigh_hh_output()
+                                + dev_queue_xmit()
+                                + n->output(n, skb)
+                                    -> neigh_resolve_output() at net/ipv4/arp.c
+
+        ps. n->output(n, skb) 和 n->nud_state 有關,
+            屬鄰居子系統的範疇, 最後他們的出口都是 dev_queue_xmit()
+        ```
+
+        1. `ip_send_skb()`
+            > IP 模塊發送數據包的入口, 該函數只是簡單的調用一下後面的函數
+
+        1. `__ip_local_out_sk()`
+            > 設置 IP header 的長度和 checksum, 然後調用下面 **netfilter** 的鉤子(hook)
+
+        1. `nf_hook(..., NF_INET_LOCAL_OUT)`
+            > netfilter 的 hook, 可以通過 iptables 來配置怎麼處理該數據包,
+            如果該數據包沒被丟棄, 則繼續往下走
+
+        1. `dst_output()`
+            > 該函數根據 skb 裡面的信息, 調用相應的 output 函數, 在我們 UDP IPv4 這種情況下,
+            會調用 `ip_output()`
+
+        1. `ip_output()`
+            > 將上面 udp_sendmsg 得到的網卡信息寫入 skb, 然後調用 NF_INET_POST_ROUTING 的鉤子
+
+            ```c
+            int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+            {
+                struct net_device *dev = skb_dst(skb)->dev;
+
+                IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
+
+                /* 設置輸出設備和協議 */
+                skb->dev = dev;
+                skb->protocol = htons(ETH_P_IP);
+
+                /* 經過NF的POST_ROUTING鉤子點 */
+                return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
+                                    net, sk, skb, NULL, dev,
+                                    ip_finish_output,
+                                    !(IPCB(skb)->flags & IPSKB_REROUTED));
+            }
+            ```
+
+        1. `NF_HOOK_COND(..., NF_INET_POST_ROUTING)`
+            > 在這裡, 用戶有可能配置了 SNAT, 從而導致該 skb 的路由信息發生變化
+
+        1. `ip_finish_output()`
+            > 這裡會判斷經過了上一步後, 路由信息是否發生變化,
+            如果發生變化的話, 需要重新調用 `dst_output()`, 否則往下走
+
+            > 重新調用`dst_output()`時, 可能就不會再走到 `ip_output()`,
+            而是走到被 netfilter 指定的 output 函數裡,
+            這裡有可能是 xfrm4_transport_output()
+
+            ```c
+            static int ip_finish_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+            {
+                unsigned int mtu;
+                int ret;
+
+                ret = BPF_CGROUP_RUN_PROG_INET_EGRESS(sk, skb);
+                if (ret) {
+                    kfree_skb(skb);
+                    return ret;
+                }
+
+                #if defined(CONFIG_NETFILTER) && defined(CONFIG_XFRM)
+                /* Policy lookup after SNAT yielded a new policy */
+                if (skb_dst(skb)->xfrm) {
+                    IPCB(skb)->flags |= IPSKB_REROUTED;
+                    return dst_output(net, sk, skb);
+                }
+                #endif
+                /* 獲取mtu */
+                mtu = ip_skb_dst_mtu(sk, skb);
+
+                /* 是gso, 則調用gso輸出 */
+                if (skb_is_gso(skb))
+                    return ip_finish_output_gso(net, sk, skb, mtu);
+
+                /* 長度>mtu或者設置了IPSKB_FRAG_PMTU標記, 則分片 */
+                if (skb->len > mtu || (IPCB(skb)->flags & IPSKB_FRAG_PMTU))
+                    return ip_fragment(net, sk, skb, mtu, ip_finish_output2);
+
+                /* 輸出數據包 */
+                return ip_finish_output2(net, sk, skb);
+            }
+            ```
+
+        1. `ip_finish_output2()`
+            > 根據 dest IP 到路由表裡面找到下一跳(nexthop)的地址,
+            然後調用 `__ipv4_neigh_lookup_noref()`去 arp表裡面找下一跳的 neighbor 信息,
+            沒找到的話會調用 `__neigh_create()`構造一個空的 neigh 結構體
+
+            ```c
+            static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *skb)
+            {
+                struct dst_entry *dst = skb_dst(skb);
+                struct rtable *rt = (struct rtable *)dst;
+                struct net_device *dev = dst->dev;
+                unsigned int hh_len = LL_RESERVED_SPACE(dev);
+                struct neighbour *neigh;
+                u32 nexthop;
+
+                if (rt->rt_type == RTN_MULTICAST) {
+                    IP_UPD_PO_STATS(net, IPSTATS_MIB_OUTMCAST, skb->len);
+                }
+                else if (rt->rt_type == RTN_BROADCAST)
+                    IP_UPD_PO_STATS(net, IPSTATS_MIB_OUTBCAST, skb->len);
+
+                /* Be paranoid, rather than too clever. */
+                /* skb頭部空間不能存儲鏈路頭 */
+                if (unlikely(skb_headroom(skb) < hh_len && dev->header_ops)) {
+                    struct sk_buff *skb2;
+
+                    /* 重新分配skb */
+                    skb2 = skb_realloc_headroom(skb, LL_RESERVED_SPACE(dev));
+                    if (!skb2) {
+                        kfree_skb(skb);
+                        return -ENOMEM;
+                    }
+                    /* 關聯控制塊 */
+                    if (skb->sk)
+                        skb_set_owner_w(skb2, skb->sk);
+
+                    /* 釋放skb */
+                    consume_skb(skb);
+
+                    /* 指向新的skb */
+                    skb = skb2;
+                }
+
+                if (lwtunnel_xmit_redirect(dst->lwtstate))
+                {
+                    int res = lwtunnel_xmit(skb);
+
+                    if (res <  || res == LWTUNNEL_XMIT_DONE)
+                        return res;
+                }
+
+                rcu_read_lock_bh();
+                /* 獲取下一跳 */
+                nexthop = (__force u32) rt_nexthop(rt, ip_hdr(skb)->daddr);
+                /* 獲取鄰居子系統 */
+                neigh = __ipv4_neigh_lookup_noref(dev, nexthop);
+
+                /* 創建鄰居子系統 */
+                if (unlikely(!neigh))
+                    neigh = __neigh_create(&arp_tbl, &nexthop, dev, false);
+
+                /* 成功 */
+                if (!IS_ERR(neigh)) {
+                    int res;
+
+                    /* 更新路由緩存確認 */
+                    sock_confirm_neigh(skb, neigh);
+
+                    /* 通過鄰居子系統輸出 */
+                    res = neigh_output(neigh, skb);
+
+                    rcu_read_unlock_bh();
+                    return res;
+                }
+                rcu_read_unlock_bh();
+
+                net_dbg_ratelimited("%s: No header cache and no neighbour!\n",
+                                    __func__);
+                /* 釋放skb */
+                kfree_skb(skb);
+                return -EINVAL;
+            }
+            ```
+
+        1. `neigh_output()`
+            > 在該函數中, 如果上一步 `ip_finish_output2()` 得到 neigh 信息,
+            將直接調用 `neigh_hh_output()`進行快速輸出, 否則調用鄰居子系統的輸出回調函數進行慢速輸出
+            >> 將 neigh 信息裡面的 mac 地址填到 skb 中, 然後調用 `dev_queue_xmit()` 發送數據包
+
+            > 否則調用鄰居子系統的輸出回調函數進行慢速輸出
+
+            ```c
+            static inline int neigh_hh_output(const struct hh_cache *hh, struct sk_buff *skb)
+            {
+                unsigned int seq;
+                unsigned int hh_len;
+
+                /* 拷貝二層頭到skb */
+                do {
+                    seq = read_seqbegin(&hh->hh_lock);
+                    hh_len = hh->hh_len;
+                    /* 二層頭部 < DATA_MOD, 直接使用該長度拷貝 */
+                    if (likely(hh_len <= HH_DATA_MOD)) {
+                        /* this is inlined by gcc */
+                        memcpy(skb->data - HH_DATA_MOD, hh->hh_data, HH_DATA_MOD);
+                    }
+                    /* >= DATA_MOD, 對齊頭部, 拷貝 */
+                    else {
+                        unsigned int hh_alen = HH_DATA_ALIGN(hh_len);
+
+                        memcpy(skb->data - hh_alen, hh->hh_data, hh_alen);
+                    }
+                } while (read_seqretry(&hh->hh_lock, seq));
+
+                skb_push(skb, hh_len);
+
+                /* 發送 */
+                return dev_queue_xmit(skb);
+            }
+
+            static inline int neigh_output(struct neighbour *n, struct sk_buff *skb)
+            {
+                const struct hh_cache *hh = &n->hh;
+
+                /* 連接狀態  && 緩存的頭部存在, 使用緩存輸出 */
+                if ((n->nud_state & NUD_CONNECTED) && hh->hh_len)
+                    return neigh_hh_output(hh, skb);
+                /* 使用鄰居項的輸出回調函數輸出, 在連接或者非連接狀態下有不同的輸出函數 */
+                else
+                    return n->output(n, skb);
+            }
+            ```
+    - data link layer (netdevice)
+
+        ```
+                        |
+                        v
+               +------------------+
+        +------| dev_queue_xmit() |
+        |      +------------------+
+        |                   |
+        |                   v
+        |            +----------------–+
+        |            | Traffic Control |
+        |            +----------------–+
+        | loopback          |
+        |   or              +------------------------------------------------------–+
+        | IP tunnels        |                                                       |
+        |                   v                                                       v
+        |     +-----------------------+  Failed +----------------+      +-----------------+
+        +---–>| dev_hard_start_xmit() | ----->  | raise          | ---> | net_tx_action() |
+              +-----------------------+         | NET_TX_SOFTIRQ |      +-----------------+
+                            |                   +----------------+
+                            +-------------------------+
+                            |                         |
+                            v                         v
+                    +------------------+     +------------------------+
+                    | ndo_start_xmit() |     | packet taps(AF_PACKET) |
+                    +------------------+     +------------------------+
+        ```
+
+        1. `dev_queue_xmit()`
+            > netdevice 子系統的入口函數, 它會先獲取設備對應的 qdisc,
+            如果沒有的話(e.g. loopback 或者 IP tunnels), 就直接調用 `dev_hard_start_xmit()`,
+            否則數據包將經過 Traffic Control 模塊進行處理
+
+        1. Traffic Control
+            > 這裡主要是進行一些過濾和優先級處理, 在這裡, 如果隊列滿了的話, 數據包會被丟掉,
+            詳情請參考文檔, 這步完成後也會走到 `dev_hard_start_xmit()`
+
+        1. `dev_hard_start_xmit()`
+            > 該函數中, 首先是拷貝一份 skb 給 `packet taps()`(tcpdump 就是從這裡得到數據的),
+            然後調用 `ndo_start_xmit()`.
+            如果 `dev_hard_start_xmit()` 返回 Failed 的話(大部分情況可能是 NETDEV_TX_BUSY),
+            調用它的函數會把 skb 放到一個地方, 然後拋出軟中斷 `NET_TX_SOFTIRQ`,
+            交給 softIRQ 處理程序 `net_tx_action()` 稍後重試
+            (如果是 loopback 或者 IP tunnels 的話, 失敗後不會有重試的邏輯)
+
+            ```c
+            static inline netdev_tx_t __netdev_start_xmit(const struct net_device_ops *ops,
+                    struct sk_buff *skb, struct net_device *dev,
+                    bool more)
+            {
+                skb->xmit_more = more ? 1 : 0;
+                return ops->ndo_start_xmit(skb, dev);
+            }
+
+            static inline netdev_tx_t netdev_start_xmit(struct sk_buff *skb, struct net_device *dev,
+                    struct netdev_queue *txq, bool more)
+            {
+                const struct net_device_ops *ops = dev->netdev_ops;
+                int rc;
+                /* __netdev_start_xmit 裏面就完全是使用driver 的ops去發包了, 其實到此爲止, 一個 skb 已經從 netdevice
+                 * 這個層面送到 driver 層了, 接下來會等待 driver 的返回*/
+                rc = __netdev_start_xmit(ops, skb, dev, more);
+
+                /*如果返回 NETDEV_TX_OK, 那麼會更新下 Txq 的 trans 時間戳哦, txq->trans_start = jiffies;*/
+                if (rc == NETDEV_TX_OK)
+                    txq_trans_update(txq);
+
+                return rc;
+            }
+
+            static int xmit_one(struct sk_buff *skb, struct net_device *dev,
+                                struct netdev_queue *txq, bool more)
+            {
+                unsigned int len;
+                int rc;
+
+                /* 如果有抓包的工具的話, 這個地方會進行抓包, such as Tcpdump */
+                if (!list_empty(&ptype_all))
+                    dev_queue_xmit_nit(skb, dev);
+
+                len = skb->len;
+                trace_net_dev_start_xmit(skb, dev);
+                /* 調用 netdev_start_xmit, 快到driver的tx函數了 */
+                rc = netdev_start_xmit(skb, dev, txq, more);
+                trace_net_dev_xmit(skb, rc, dev, len);
+
+                return rc;
+            }
+
+            struct sk_buff *dev_hard_start_xmit(struct sk_buff *first, struct net_device *dev,
+                                                struct netdev_queue *txq, int *ret)
+            {
+                struct sk_buff *skb = first;
+                int rc = NETDEV_TX_OK;
+                /*此處skb爲什麼會有鏈表呢？*/
+                while (skb) {
+                    /*取出skb的下一個數據單元*/
+                    struct sk_buff *next = skb->next;
+                    /*置空, 待發送數據包的next*/
+                    skb->next = NULL;
+
+                    /*將此數據包送到driver Tx函數, 因爲dequeue的數據也會從這裏發送, 所以會有netx！*/
+                    rc = xmit_one(skb, dev, txq, next != NULL);
+
+                    /*如果發送不成功, next還原到 skb->next 退出*/
+                    if (unlikely(!dev_xmit_complete(rc))) {
+                        skb->next = next;
+                        goto out;
+                    }
+                    /*如果發送成功, 把next置給skb, 一般的next爲空 這樣就返回, 如果不爲空就繼續發！*/
+                    skb = next;
+
+                    /*如果txq被stop, 並且skb需要發送, 就產生TX Busy的問題！*/
+                    if (netif_xmit_stopped(txq) && skb) {
+                        rc = NETDEV_TX_BUSY;
+                        break;
+                    }
+                }
+
+            out:
+                *ret = rc;
+                return skb;
+            }
+            ```
+
+        1. `packet taps(AF_PACKET)`
+            > 當第一次發送數據包和重試發送數據包時, 都會經過這裡
+
+        1. `ndo_start_xmit()`
+            > 會綁定到具體網卡驅動的相應函數, 到這步之後, 就歸網卡 driver 管了
 
 + recv
 
-```
-// linux at net/socket.c
-sock_recvmsg()
-    + __sock_recvmsg()
-        + struct socket *sock;
-        + sock->ops->recvmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
-            + sock_common_recvmsg()
-                + struct sock *sk = sock->sk;
-                + sk->sk_prot->recvmsg() //這個 ops 是 struct sock 結構體中的 struct proto
-                    e.g. tcp_recvmsg()
-```
+    - socket (app) to transpot layer
+        > app to L4
 
+        ```
+        // linux at net/socket.c
+        sock_recvmsg()
+            + __sock_recvmsg()
+                + struct socket *sock;
+                + sock->ops->recvmsg() // 這個 ops 是 struct socket 結構體中的 struct proto_ops
+                    + sock_common_recvmsg()
+                        + struct sock *sk = sock->sk;
+                        + sk->sk_prot->recvmsg() //這個 ops 是 struct sock 結構體中的 struct proto
+                            e.g. udp_recvmsg()
+        ```
+
+    - data link layer (L2) to network layer (L3)
+        > 從 `netif_receive_skb(struct sk_buff *skb)` 開始, 網卡收到數據包後產生中斷通知 CPU 有數據到達,
+        在中斷服務函數中觸發接收軟中斷, 等待內核在適當的時間調度 NAPI 方式的接收函數完成數據的接收,
+        並非所有網卡或者 MAC 控制器都是支持 NAPI方法(需要硬件能支持)的,
+        NAPI 服務函數最重要的工作就是調用 `netif_receive_skb` 將數據從 data link 層 (L2)送到 network 層 (L3).
+
+        > 收到的數據最終能不能送到應用層, 是和擁塞控制/路由/協議層如何處理該數據包相關的,
+        由於該函數是在軟中斷(softIRQ)中調用的, 所以該函數執行時硬件中斷是開啟的,
+        這就意味著可能前一次 MAC 接收到的數據還沒有傳遞到網絡層時, MAC 又接收到數據又產生新中斷,
+        而新的數據需要存放在一個通常被稱為 DMA 緩衝區的地方, 這也意味著要支持NAPI方式就需要多個緩衝區,
+        這也是硬件為支持NAPI方式必須支持的一個特性.
+
+
+        ```c
+        // linux at /net/core/dev.c
+        netif_receive_skb()
+            + netif_receive_skb_internal()
+                + __netif_receive_skb()
+                    + __netif_receive_skb_core()
+                        + deliver_skb()
+        ```
+
+        1. `deliver_skb()`
+
+            ```c
+            static inline int deliver_skb(struct sk_buff *skb,
+                              struct packet_type *pt_prev,
+                              struct net_device *orig_dev)
+            {
+                if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC)))
+                    return -ENOMEM;
+                refcount_inc(&skb->users);
+                return pt_prev->func(skb, skb->dev, pt_prev, orig_dev);
+            }
+
+            /* register at inet_init() of net/ipv4/af_inet.c */
+            dev_add_pack(&ip_packet_type);
+            static struct packet_type   ip_packet_type __read_mostly = {
+                .type = cpu_to_be16(ETH_P_IP),
+                .func = ip_rcv,
+            };
+            ```
+
+    - network layer (L3) to transport layer (L4)
+
+        ```
+        ip_rcv() at net/ipv4/ip_input.c (Main IP Receive routine)
+            + NF_HOOK(..., NF_INET_PRE_ROUTING)
+                -> ip_rcv_finish()
+                    + ip_route_input_noref()
+                        + ip_route_input_rcu()
+                            + ip_route_input_slow()
+                                + ip_mkroute_input()
+                                    + __mkroute_input()
+                                        + rt_dst_alloc() at net/ipv4/route.c // routine table
+                                            [dst.output = ip_output]
+                                            # [dst.input  = ip_local_deliver]
+                                        + [dst.input = ip_forward]
+                    + dst_input()
+                        |
+                +-------+
+                |
+                v
+            skb_dst(skb)->input(skb) // skb->dst->input()
+            ps. skb->dst->input 在 ip_route_input_noref() 中完成了賦值
+
+        ```
+
+        1. `ip_route_input_noref()`
+        1. `ip_forward()`
+
+            ```c
+            /* 單播轉發處理, 負責處理轉發相關的所有動作 */
+            ip_forward() at net/ipv4/ip_forward.c
+                +  NF_HOOK(..., NF_INET_FORWARD)
+                    -> ip_forward_finish() //
+                        + dst_output
+                            |
+                +-----------+
+                |
+                v
+           + ip_output()
+            ```
+
+        1. `ip_local_deliver()`
+
+            ```
+            ip_local_deliver() at net/ipv4/ip_input.c
+                + NF_HOOK(..., NF_INET_LOCAL_IN)
+                    -> ip_local_deliver_finish()
+                            |
+                +-----------+
+                |
+                v
+            ret = ipprot->handler(skb);
+
+            /* transport layer (L4) protocol */
+            static const struct net_protocol tcp_protocol = {
+                .handler =	tcp_v4_rcv, /*TCP*/
+            };
+
+            static const struct net_protocol udp_protocol = {
+                .handler =	udp_rcv, /*UDP*/
+            };
+
+            static const struct net_protocol icmp_protocol = {
+                .handler =	icmp_rcv, /*ICMP*/
+            };
+
+            static const struct net_protocol igmp_protocol = {
+                .handler =	igmp_rcv, /*IGMP*/
+            };
+            ```
+
+        1. `ip_local_deliver_finish()`
+
+            ```c
+            static int ip_local_deliver_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+            {
+                ...
+                resubmit:
+                    /* 如果是RAW-IP報文, 送往 RAW-IP 對應的處理??? */
+                    raw = raw_local_deliver(skb, protocol);
+
+                    /* IP層上的 ipprot 負責管理所有的傳輸協議 */
+                    ipprot = rcu_dereference(inet_protos[protocol]);
+                    if (ipprot) {
+                        int ret;
+
+                        if (!ipprot->no_policy) {
+                            if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb)) {
+                                kfree_skb(skb);
+                                goto out;
+                            }
+                            nf_reset(skb);
+                        }
+                        ret = ipprot->handler(skb);
+                        if (ret < 0) {
+                            protocol = -ret;
+                            goto resubmit;
+                        }
+                        __IP_INC_STATS(net, IPSTATS_MIB_INDELIVERS);
+                    } else {
+                        if (!raw) {
+                            if (xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb)) {
+                                __IP_INC_STATS(net, IPSTATS_MIB_INUNKNOWNPROTOS);
+                                /**
+                                 * 是RAW-IP報文,會在RAW-IP處理例程???
+                                 * 就丟棄, 並向對端發送 ICMP_DEST_UNREACH, ICMP_PROT_UNREACH
+                                 */
+                                icmp_send(skb, ICMP_DEST_UNREACH,
+                                      ICMP_PROT_UNREACH, 0);
+                            }
+                            kfree_skb(skb);
+                        } else {
+                            __IP_INC_STATS(net, IPSTATS_MIB_INDELIVERS);
+                            consume_skb(skb);
+                        }
+                    }
+                }
+                ...
+            }
+            ```
 ## BSD socket API
 
 + `socket()`
@@ -884,6 +1461,7 @@ sock_recvmsg()
 
 # reference
 
+
 + [NAPI機制分析](http://abcdxyzk.github.io/blog/2015/08/27/kernel-net-napi/)
 + [NAPI(New API)的一些淺見](https://www.jianshu.com/p/6292b3f4c5c0)
 + [Linux協議棧--IPv4協議的註冊](http://cxd2014.github.io/2017/09/02/inet-register/)
@@ -893,9 +1471,15 @@ sock_recvmsg()
 + [LINUX VFS分析之SOCKFS分析一(ockfs註冊及相關結構體說明)](https://daydaynews.cc/zh-hant/technology/165624.html)
 + [Linux協議棧--NAPI機制](http://cxd2014.github.io/2017/10/15/linux-napi/)
 
++ [***(譯) Linux 網絡棧監控和調優:接收數據(2016)](http://arthurchiao.art/blog/tuning-stack-rx-zh/)
++ [***(譯) Linux 網絡棧監控和調優:發送數據(2017)](http://arthurchiao.art/blog/tuning-stack-tx-zh/)
++ [學習Linux-4.12內核網路協議棧(2.4)——接口層數據包的發送](https://www.twblogs.net/a/5b872d9d2b71775d1cd66bf4)
+
++ [***Linux網絡協議棧--IP](https://blog.csdn.net/wearenoth/article/details/7819925)
 
 
-+ [(譯) Linux 網絡棧監控和調優:發送數據(2017)](http://arthurchiao.art/blog/tuning-stack-tx-zh/)
+
+
 + [網卡適配器收發數據幀流程](https://www.iambigboss.top/post/54107_1_1.html)
 + [Linux內核網絡數據包處理流程](https://www.cnblogs.com/muahao/p/10861771.html)
 + [網卡收包流程](https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/697653/)

@@ -118,6 +118,12 @@ $ vim ~/.tmux.conf
             > 切換 session
         1. `<C+b> [`
             > 進入複製模式
+            > + select range in vim
+            > + copy
+            >> `ctrl + b + [`
+            > + paste
+            >> `ctrl + b + ]`
+
         1. `<C+b> :`
             > 進入命令模式
         1. `<C+b> ?`
