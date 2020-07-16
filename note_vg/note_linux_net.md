@@ -10,6 +10,9 @@ linux network sub-system
     > 每個 Core 都各自存一份, 當其中一個 Core 更動時,
     會自動同步到其他 Cores 的那一份
 
++ kernel version
+    > 大部分為 `kernel v4.14.136`
+
 
 # NAPI(New API) mechanism
 
@@ -152,7 +155,7 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 
 ## API
 
-+ `netif_napi_add()`  
++ `netif_napi_add()`
     > NIC driver 告訴內核要使用 napi 的機制
     > + 初始化響應參數
     > + 註冊 poll 的 callback function
@@ -195,7 +198,7 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 + `napi_schedule_prep()`
     >  check if napi can be scheduled or not
 
-+ `__napi_schedule()`   
++ `__napi_schedule()`
     > NIC driver 告訴內核開始調度 napi 的機制, 稍後 poll callback function 會被調用
     >> switch to polling mode
 
@@ -212,7 +215,7 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
     }
     ```
 
-+ `net_rx_action()`     
++ `net_rx_action()`
     > 內核初始化註冊的 softIRQ, 註冊進去的 poll callback function 會被其呼叫
 
 + `napi_enable/disable`
@@ -226,7 +229,303 @@ NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
 
 # skb (socket buffer)
 
-主要操作會在 IP layer (L3)
+主要操作會在 IP layer (L3), 借鏡 stack 概念, 讓資料往上長.
+App layer 在最底下, 每下去一層, 資料就往上長 protocol header
+
+```
+    +------------------+     sk_buff mem layout 0
+    | struct sk_buff 0 |     +-----------------+
+    |  +-------------+ |     | header room     |
+    |  | next        | |     +-----------------+
+    |  +-------------+ |     |  linear         |
+    |  | prev        | |     |  data area      |
+    |  +-------------+ |     |    (l0_0)       |
+    |  | head/end    | |     +-----------------+
+    |  +-------------+ |     | tail room       |
+    |  | len = l0    | |     +-----------------+
+    |  +-------------+ |     | skb_shared_info |
+    +------------------+     | +------------+  |
+                             | | frags      |  |          non-linear data area
+                             | |          -----+----->  +----------------------+
+                             | +------------+  |        | struct skb_frag l0_1 |
+                             | | frag_list  |  |        +----------------------+
+                +------------+----          |  |        | struct skb_frag l0_2 |
+                |            | +------------+  |        +----------------------+
+                |            +-----------------+        |   ...                |
+                v                                       +----------------------+
+    +------------------+                                | struct skb_frag l0_n |
+    | struct sk_buff 1 |     sk_buff mem layout 1       +----------------------+
+    |  +-------------+ |     +-----------------+
+ +------- next       | |     |  header room    |
+ |  |  +-------------+ |     +-----------------+
+ |  |  | prev        | |     |linear data area |
+ |  |  +-------------+ |     |    (l1_0)       |
+ |  |  | head/end    | |     +-----------------+
+ |  |  +-------------+ |     |  tail room      |
+ |  |  | len = l1    | |     +-----------------+
+ |  |  +-------------+ |     | skb_shared_info |
+ |  +------------------+     | +------------+  |           non-linear data area
+ \__________                 | | frags    -----+----->  +----------------------+
+            |                | +------------+  |        | struct skb_frag l1_1 |
+            v                | | frag_list  |  |        +----------------------+
+    +------------------+     | +------------+  |        | struct skb_frag l1_2 |
+    | struct sk_buff 2 |     +-----------------+        +----------------------+
+    |  +-------------+ |                                |    ...               |
+ +-------  next      | |                                +----------------------+
+ |  |  +-------------+ |                                | struct skb_frag l1_m |
+ |  |  | prev        | |                                +----------------------+
+ |  |  +-------------+ |
+ |  |  | head/end    | |
+ |  |  +-------------+ |
+ |  |  | len = l2    | |
+ |  |  +-------------+ |
+ |  +------------------+
+ |
+ v
+```
+
+```c
+// linux 4.16 at include/linux/skbuff.h
+struct sk_buff {
+...
+    struct sk_buff  *next;
+    struct sk_buff  *prev;
+
+    struct sock		*sk;
+...
+	unsigned int    len, data_len;
+	__u16           mac_len, hdr_len;
+
+...
+	__be16          protocol;
+	__u16           transport_header; // L4, record the offset between head to L4 header
+	__u16           network_header;   // L3, record the offset between head to L3 header
+	__u16           mac_header;       // L2, record the offset between head to L2 header
+...
+	sk_buff_data_t  tail;
+	sk_buff_data_t  end;
+	unsigned char   *head, *data;
+};
+
+struct skb_shared_info {
+    atomic_t        dataref;        // 物件被引用次數
+    unsigned short  nr_frags;       // 分頁段數目, 即 frags 陣列的元素個數
+    unsigned short  tso_size;
+    unsigned short  tso_segs;
+    unsigned short  ufo_size;
+    unsigned int    ip6_frag_id;
+    struct sk_buff  *frag_list;     // 用於分段
+    skb_frag_t      frags[MAX_SKB_FRAGS]; // 儲存的 memory pages 資料
+                                          // skb->data_len = 所有的陣列資料長度之和
+};
+```
+
++ data struct
+
+    - `len`
+        > 整個資料區域的長度.
+
+        ```
+        l1 = l1_0 + (l1_1 + l1_2 + ... + l1_m) + l2
+        l0 = l0_0 + (l0_1 + l0_2 + ... + l0_n) + l1
+
+        In struct sk_buff 0
+        len = l0
+        ```
+
+    - `data_len`
+        > fragment 中數據大小
+
+        ```
+        l1 = l1_0 + (l1_1 + l1_2 + ... + l1_m) + l2
+        l0 = l0_0 + (l0_1 + l0_2 + ... + l0_n) + l1
+
+        In struct sk_buff 0
+        data_len = (l0_1 + l0_2 + ... + l0_n) + l1
+                 = l0 - l0_0
+        ```
+
+    - `head`
+        > head pointer of `header room` of sk_buff memory layout
+        >> 指向 memory buffer 的開端
+
+    - `data`
+        > the current position in **linear data area**
+        >> 指向實際數據的開頭 (linear data area)
+
+    - `tail`
+        > the tail position in **linear data area**
+        >> 指向實際數據的結尾 (linear data area)
+
+    - `end`
+        > the end pointer of `end room` of sk_buff memory layout
+        >> 指向 memory buffer 的尾端
+
++ API
+
+    - `alloc_skb(size)` at include/linux/skbuff.h
+        > 建立 struct sk_buff 並分配 sk_buff 的 mem layout
+        (head room + linear data area + end room + skb_shared_info)
+        >> `size` 包括所有協議層 (L4 ~ L2) 的總和
+
+        > head, data 和 tail 都指向記憶體的開始位置 (len = data_len = 0),
+        `head` 在這個位置始終不變, 它表示的是分配的記憶體的開始位置.
+        `end` 的位置也是不變的, 表示的是分配的記憶體的結束位置.
+        >> `data` 和 `tail` 會隨著資料的加入和減少變化, 總之表示的是放入資料的記憶體區域
+
+        ```
+        skb->mac_header = (typeof(skb->mac_header))~0U;
+            等同
+        skb->mac_header = (__u16)~0U;
+        ```
+
+    - `skb_reserve(len)`
+        > 為 protocol header 預留空間, 以最大的空間預留.
+        因為很多 header 都會有可選項, 所以只能是按照最大的分配
+
+        ```c
+        static inline void skb_reserve(struct sk_buff *skb, int len)
+        {
+            skb->data += len;
+            skb->tail += len;
+        }
+        ```
+
+        ```
+        skb_reserve(m)
+
+        +------------+  <------ head
+        |            |      ^
+        |            |      |
+        | head room  |      | m
+        |            |      |
+        |            |      |
+        |            |      v
+        +------------+  <------ tail/data
+        | tail room  |
+        |            |
+        +------------+  <------ end
+        ```
+
+    - `skb_put()`
+        > 用於操作線性資料區域 `tail room` 的資料, 可以在數據包的末尾追加數據
+        >> `tail room` 指 `tail` 到 `end` 的區域
+
+        ```c
+        void *skb_put(struct sk_buff *skb, unsigned int len)
+        {
+            void *tmp = skb_tail_pointer(skb);
+            SKB_LINEAR_ASSERT(skb);
+            skb->tail += len;   // 縮小 tail room
+            skb->len  += len;   // 資料空間增大 len
+            if (unlikely(skb->tail > skb->end)) // 如果 tail 指標超過end指標了,那麼處理錯誤
+                skb_over_panic(skb, len, __builtin_return_address(0));
+            return tmp;
+        }
+        ```
+        ```
+        skb_put(x)
+        len = n + x
+
+        +------------+  <------ head
+        |            |
+        | head room  |
+        |            |
+        +------------+  <------ data
+        |  data of   |      ^
+        |  app layer |      | n bytes
+        |            |      v
+        +------------+   ------  (prev_tail)
+        |  padding   |      ^
+        |            |      | x bytes
+        |            |      v
+        +------------+  <------ tail
+        | tail room  |
+        +------------+  <------ end
+        ```
+
+    - `skb_push()`
+        > 用於操作 `head room` 區域的協議頭
+        >> 用來加入 protocol header
+
+        > 只修改相關的變數, **需額外自行填值到 data area**
+
+        ```
+        void *skb_push(struct sk_buff *skb, unsigned int len)
+        {
+            skb->data -= len;   // 向上移動指標, 縮小 head room
+            skb->len  += len;   // 資料長度增加
+            if (unlikely(skb->data<skb->head)) // data指標超過head那麼就是處理錯誤
+                skb_under_panic(skb, len, __builtin_return_address(0));
+            return skb->data;
+        }
+        ```
+
+        ```
+        skb_push(n) // push n bytes
+        len = n
+
+        +------------+  <------ head
+        |            |
+        | head room  |
+        |            |
+        +------------+  <------ data
+        |  data of   |      ^
+        |  app layer |      | n bytes
+        |            |      v
+        +------------+  <------ tail
+        | tail room  |
+        +------------+  <------ end
+        ```
+        ```
+        skb_push(sizeof(tcp_hdr)) // push sizeof(tcp_hdr) bytes
+        len = n + sizeof(tcp_hdr)
+
+        +------------+  <------ head
+        |            |
+        | head room  |
+        |            |
+        +------------+  <------ data
+        |            |      ^
+        |  tcp_hdr   |      | sizeof(tcp_hdr) bytes
+        |            |      v
+        +------------+   ------
+        |  data of   |      ^
+        |  app layer |      | n bytes
+        |            |      v
+        +------------+  <------ tail
+        | tail room  |
+        +------------+  <------ end
+        ```
+
+    - `skb_pull()`
+        > 與 `skb_push()`對應, 一般用在解包的時候
+        >> 用來去除 protocol header, 增大 head room 剩餘的空間
+
+        ```c
+        static inline void *__skb_pull(struct sk_buff *skb, unsigned int len)
+        {
+            skb->len -= len;    // 剝去 header 的大小, 長度減小
+            BUG_ON(skb->len < skb->data_len);
+            return skb->data += len; // 往下移動指標, 去除一層 protocol header
+        }
+
+        static inline void *skb_pull_inline(struct sk_buff *skb, unsigned int len)
+        {
+            return unlikely(len > skb->len) ? NULL : __skb_pull(skb, len);
+        }
+
+        void *skb_pull(struct sk_buff *skb, unsigned int len)
+        {
+            return skb_pull_inline(skb, len);
+        }
+        ```
+
+    - `skb_reset_transport_header()`
+        > record the offset of head to transport header
+    - `skb_reset_network_header()`
+        > record the offset of head to network header
+
 
 
 # Socket work flow
@@ -530,6 +829,11 @@ start_kernel()
 
 
 ## send/recv flow
+
+TODO draw flow chart
+* [Linux內核二層數據包接收流程](https://blog.csdn.net/eric_liufeng/article/details/10286593)
+* [Linux內核數據包的發送傳輸](https://blog.csdn.net/eric_liufeng/article/details/10252857)
+
 
 + send
 
@@ -958,6 +1262,42 @@ start_kernel()
 
 + recv
 
+```
+                tcp_v4_rcv()
+                udp_rcv()
+                icmp_rcv()
+                    ^
+    transport       |
+    layer           |
+    ________________|___________________________________
+    network         |
+    layer           |
+                    |
+            ip_local_deliver()
+                    ^
+                    | local host
+                    |               not host
+          ip_route_input_noref() --------------+
+              [路由節點查找]                   |
+                    ^                          |
+                    |                          v
+                    |                    ip_forward()
+             ip_rcv_finish()                   |
+                    ^                          |
+                    | Yes                      |
+                    |                 No       |
+        NF_HOOK(NF_INET_PRE_ROUTING) ----+     |
+                    ^                    |     |
+                    |                    |     |
+                    |                    v     |
+                 ip_rcv()               drop   |
+                    ^                          |
+                    |                          |
+    ________________|__________________________v________
+    device
+    driver             MAC/PHY
+
+```
     - socket (app) to transpot layer
         > app to L4
 
@@ -1029,8 +1369,9 @@ start_kernel()
                                     + __mkroute_input()
                                         + rt_dst_alloc() at net/ipv4/route.c // routine table
                                             [dst.output = ip_output]
-                                            # [dst.input  = ip_local_deliver]
                                         + [dst.input = ip_forward]
+                            + rt_dst_alloc()
+                                [dst.input  = ip_local_deliver]
                     + dst_input()
                         |
                 +-------+
@@ -1397,6 +1738,18 @@ start_kernel()
     >> 關閉 server 運作
 
 
+# netfilter
+> netfilter 是 kernel 的防火牆框架, 該框架可實現:
+> + 數據包過濾
+> + 數據包處理
+> + 地址偽裝
+> + 透明代理
+> + 動態網絡地址轉換(Network Address Translation, NAT),
+> + 以及基於用戶及媒體訪問控制(Media Access Control, MAC)地址的過濾和基於狀態的過濾, 包速率限制等
+
++ [Netfilter 之 五個鉤子點](http://www.linuxtcpipstack.com/685.html)
++ [第十一章 Linux包過濾防火牆-netfilter--基於Linux3.10](https://blog.csdn.net/shichaog/article/details/44629715)
+
 
 
 # MISC
@@ -1479,10 +1832,20 @@ start_kernel()
 
 
 
++ [shichaog linux 3.10-網絡](https://blog.csdn.net/shichaog/category_2433909.html)
++ [Linux內核二層數據包接收流程](https://blog.csdn.net/eric_liufeng/article/details/10286593)
 
++ [第十一章 Linux包過濾防火牆-netfilter--基於Linux3.10](https://blog.csdn.net/shichaog/article/details/44629715)
 + [網卡適配器收發數據幀流程](https://www.iambigboss.top/post/54107_1_1.html)
 + [Linux內核網絡數據包處理流程](https://www.cnblogs.com/muahao/p/10861771.html)
 + [網卡收包流程](https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/697653/)
 + [NAPI 之(三)——技術在 Linux 網絡驅動上的應用和完善](https://www.itdaan.com/tw/fb05ad962549e1d9e0da79f648296af1)
 + [Linux kernel 之 socket 創建過程分析](https://www.cnblogs.com/chenfulin5/p/6927040.html)
 + [從socket應用到網卡驅動：Linux網絡子系統分析概述](https://freemandealer.github.io/2016/03/08/tcp-ip-internal/)
+
+## lwip
+
++ [lwIP TCP/IP 協議棧筆記之十九:JPerf 工具測試網速](https://www.twblogs.net/a/5d8ca92bbd9eee541c34c03e)
++ [Lwip之IP/MAC地址衝突檢測](https://blog.csdn.net/tianjueyiyi/article/details/51097447)
++ [TCP/IP協議棧之LwIP(三)-網際尋址與路由(IPv4 + ARP + IPv6)](https://blog.csdn.net/m0_37621078/article/details/94646591)
+
