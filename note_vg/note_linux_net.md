@@ -379,9 +379,15 @@ struct skb_shared_info {
         skb->mac_header = (__u16)~0U;
         ```
 
+    - `kfree_skb()`
+        > free an sk_buff,
+        >> 使用 ref_cnt 來判定是否真的 free
+
     - `skb_reserve(len)`
         > 為 protocol header 預留空間, 以最大的空間預留.
-        因為很多 header 都會有可選項, 所以只能是按照最大的分配
+        因為很多 header 都會有可選項, 所以只能是按照最大的分配.
+        只能用於 buffer 為空時 (len = 0)
+        >> 只調整 linear data start address, 可用來 align start address
 
         ```c
         static inline void skb_reserve(struct sk_buff *skb, int len)
@@ -520,12 +526,89 @@ struct skb_shared_info {
             return skb_pull_inline(skb, len);
         }
         ```
-
+    - `skb_reset_tail_pointer()`
+        > 對齊 `tail` 和 `data`
     - `skb_reset_transport_header()`
         > record the offset of head to transport header
     - `skb_reset_network_header()`
         > record the offset of head to network header
+    - `skb_reset_mac_header()`
+        > record the offset of head to mac header
 
+    - `skb_headroom()`
+        > get head room length
+        >> head room 還剩多少空間
+
+    - `skb_tailroom()`
+        > get the tail room
+        >> tail room 還剩多少空間 (only linear data area)
+
+    - `skb_clone()`
+        > 只複製 struct skb 而不複製 data buffer
+
+        ```
+                                                                       clone
+        +---------------+            sk_buff mem layout           +---------------+
+        |struct sk_buff |  +------> +-----------------+ <-----+   | struct sk_buff|
+        |               |  |        |  header room    |       |   |               |
+        |    head   -------+  +---> +-----------------+ <--+  +-------- head      |
+        |    data   ----------+     |linear data area |    +----------- data      |
+        |    tail   -----------+    |    (l1_0)       |     +---------- tail      |
+        |    end    -------+   +--> +-----------------+ <---+  +------- end       |
+        +---------------+  |        |  tail room      |        |  |               |
+                           +------> +-----------------+ <------+  +---------------+
+                                    | skb_shared_info |
+                                    +-----------------+
+        ```
+
+    - `pskb_copy()`
+        > 只複製 skb 的 linear data area, skb_shared_info 的部分則共用
+
+        ```
+           skb                                                                         skb
+        +------+             sk_buff mem layout      sk_buff mem layout           +------+
+        | head -----------> +-----------------+     +-----------------+ <---------- head |
+        | data -------+     |  header room    |     |  header room    |     +------ data |
+        | tail ----+  +---> +-----------------+     +-----------------+ <---+ +---- tail |
+        | end  --+ |        |linear data area |     |linear data area |       | +-- end  |
+        |      | | |        |    (l1_0)       |     |    (l1_0)       |       | | |      |
+        +------+ | +------> +-----------------+     +-----------------+ <-----+ | +------+
+                 |          |  tail room      |     |  tail room      |         |
+                 +--------> +-----------------+     +-----------------+ <-------+
+                            | skb_shared_info ---+--- skb_shared_info |
+                            +-----------------+  |  +-----------------+
+                                                 |
+                                                 v
+                                          +---------------+
+                                          | fragment buff |
+                                          +---------------+
+        ```
+
+    - `skb_copy()`
+        > 整個 skb 都複製, 包括 linear data area 及 skb_shared_info (non-linear data area)
+
+        ```
+           skb                                                                      skb
+        +------+             sk_buff mem layout      sk_buff mem layout           +------+
+        | head -----------> +-----------------+     +-----------------+ <---------- head |
+        | data -------+     |  header room    |     |  header room    |     +------ data |
+        | tail ----+  +---> +-----------------+     +-----------------+ <---+ +---- tail |
+        | end  --+ |        |linear data area |     |linear data area |       | +-- end  |
+        |      | | |        |    (l1_0)       |     |    (l1_0)       |       | | |      |
+        +------+ | +------> +-----------------+     +-----------------+ <-----+ | +------+
+                 |          |  tail room      |     |  tail room      |         |
+                 +--------> +-----------------+     +-----------------+ <-------+
+                            | skb_shared_info |     | skb_shared_info |
+                            +--------|--------+     +------|----------+
+                                     |                     |
+                                     v                     v
+                              +---------------+     +---------------+
+                              | fragment buff |     | fragment buff |
+                              +---------------+     +---------------+
+        ```
+
+    - `skb_trim()`
+        > cut buffer 到一個長度
 
 
 # Socket work flow
@@ -1829,6 +1912,10 @@ TODO draw flow chart
 + [學習Linux-4.12內核網路協議棧(2.4)——接口層數據包的發送](https://www.twblogs.net/a/5b872d9d2b71775d1cd66bf4)
 
 + [***Linux網絡協議棧--IP](https://blog.csdn.net/wearenoth/article/details/7819925)
+
+
++ [sk_buff數據結構圖](https://blog.csdn.net/aaa6695798/article/details/4878461)
++ [sk_buff 詳解(一)](https://blog.csdn.net/farmwang/article/details/54234176)
 
 
 
