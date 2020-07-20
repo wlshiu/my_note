@@ -40,6 +40,24 @@ ps. 經過連續兩次對 NAPI 的重構, 因此 2.6 version 和 later version �
 這時候, 分離的 NAPI 信息只需存一份, 同時被所有的 port 來共享,
 這樣, 代碼框架上更好地適應了真實的硬件能力.
 
+ps. 簡單說, NAPI 提供了一個可以在 interrupt 跟 poll 兩個模式切換的 framework
+
++ Pros
+    > NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
+
+    - 中斷緩和 (Interrupt mitigation)
+        > 由上面的例子可以看到, 在高流量下, 網卡產生的中斷可能達到每秒幾千次,
+        而如果每次中斷都需要系統來處理, 是一個很大的壓力,
+        而 NAPI 使用輪詢時是禁止了網卡的接收中斷的,
+        這樣會減小系統處理中斷的壓力.
+
+    - 數據包節流 (Packet throttling)
+        > NAPI 之前的 Linux NIC driver 總在接收到數據包之後產生一個 IRQ,
+        接著在 ISR 裡將這個 skb 加入本地的 `softnet`, 然後觸發本地 `NET_RX_SOFTIRQ` 軟中斷後續處理.
+        如果包速過高, 因為 IRQ 的優先級高於 SoftIRQ, 導致系統的大部分資源都在響應中斷,
+        但 softnet 的隊列大小有限, 接收到的超額數據包也只能丟掉, 所以這時這個模型是在用寶貴的系統資源做無用功.
+        而 NAPI 則在這樣的情況下, 直接把 packets 丟掉, 不會繼續將需要丟掉的 packets 扔給內核去處理,
+        這樣, 網卡將需要丟掉的 packets 儘早丟掉, 內核將不需要處理要丟掉的 packets, 這樣也減少了內核的壓力.
 
 + data structure
 
@@ -134,26 +152,213 @@ ps. 經過連續兩次對 NAPI 的重構, 因此 2.6 version 和 later version �
         > + reorder
 
 
-## Pros
-
-NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
-
-+ 中斷緩和 (Interrupt mitigation)
-    > 由上面的例子可以看到, 在高流量下, 網卡產生的中斷可能達到每秒幾千次,
-    而如果每次中斷都需要系統來處理, 是一個很大的壓力,
-    而 NAPI 使用輪詢時是禁止了網卡的接收中斷的,
-    這樣會減小系統處理中斷的壓力.
-
-+ 數據包節流 (Packet throttling)
-    > NAPI 之前的 Linux NIC driver 總在接收到數據包之後產生一個 IRQ,
-    接著在 ISR 裡將這個 skb 加入本地的 `softnet`, 然後觸發本地 `NET_RX_SOFTIRQ` 軟中斷後續處理.
-    如果包速過高, 因為 IRQ 的優先級高於 SoftIRQ, 導致系統的大部分資源都在響應中斷,
-    但 softnet 的隊列大小有限, 接收到的超額數據包也只能丟掉, 所以這時這個模型是在用寶貴的系統資源做無用功.
-    而 NAPI 則在這樣的情況下, 直接把 packets 丟掉, 不會繼續將需要丟掉的 packets 扔給內核去處理,
-    這樣, 網卡將需要丟掉的 packets 儘早丟掉, 內核將不需要處理要丟掉的 packets, 這樣也減少了內核的壓力.
-
-
+## Non-NAPI
+## NAPI
 ## API
+
+[Linux NAPI處理流程分析](https://www.cnblogs.com/ck1020/p/6838234.html)
+
+[Linux 內核網絡協議棧 ------ 數據從接收到ip層](https://blog.csdn.net/shanshanpt/article/details/20377657)
+
+[NAPI/非NAPI收包分析](https://chengqian90.com/Linux%E5%86%85%E6%A0%B8/NAPI-%E9%9D%9ENAPI%E6%94%B6%E5%8C%85%E5%88%86%E6%9E%90.html)
+
+
+
++ `net_dev_init()`
+
+    ```c
+    // linux at net/core/dev.c
+    static int __init net_dev_init(void)
+    {
+        int i, rc = -ENOMEM;
+    ...
+
+        /*
+         *  Initialise the packet receive queues.初始化話數據包的接收隊列
+         */
+
+        for_each_possible_cpu(i) {  // 對於每一個 CPU 都會進行處理
+            struct work_struct *flush = per_cpu_ptr(&flush_works, i);
+            struct softnet_data *sd = &per_cpu(softnet_data, i); // 每個 CPU 中都有一個 softnet_data 結構
+
+            INIT_WORK(flush, flush_backlog);
+
+            skb_queue_head_init(&sd->input_pkt_queue);  // 初始化接收數據隊列
+            skb_queue_head_init(&sd->process_queue);
+    #ifdef CONFIG_XFRM_OFFLOAD
+            skb_queue_head_init(&sd->xfrm_backlog);
+    #endif
+            INIT_LIST_HEAD(&sd->poll_list);  // 初始化設備隊列(注意poll_list在處理數據的時候會被遍歷)
+            sd->output_queue_tailp = &sd->output_queue;
+    #ifdef CONFIG_RPS
+            sd->csd.func = rps_trigger_softirq;
+            sd->csd.info = sd;
+            sd->cpu = i;
+    #endif
+
+            /**
+             *  這個很重要!
+             *  在以後的處理這個 device 上的數據時,
+             *  使用 sd->backlog.poll 這個 callback
+             */
+            sd->backlog.poll = process_backlog;
+            sd->backlog.weight = weight_p;
+        }
+
+        netdev_dma_register();
+
+        dev_boot_phase = 0;
+
+        /**
+         *  建立 bottom self handler of napi
+         */
+        open_softirq(NET_TX_SOFTIRQ, net_tx_action, NULL);
+        open_softirq(NET_RX_SOFTIRQ, net_rx_action, NULL);
+
+        hotcpu_notifier(dev_cpu_callback, 0);
+        dst_init();
+        dev_mcast_init();
+        rc = 0;
+    out:
+        return rc;
+    }
+    ```
+
++ `netif_rx()`
+    > 在傳統(不支援 NAPI) NIC device driver 中的 ISR 呼叫
+
+    ```c
+    // linux at net/core/dev.c
+    /**
+     *  netif_rx()
+     *      + netif_rx_internal()
+     *          + enqueue_to_backlog()
+     */
+    static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+                      unsigned int *qtail)
+    {
+        struct softnet_data *sd;
+        unsigned long flags;
+        unsigned int qlen;
+
+        sd = &per_cpu(softnet_data, cpu); // 取得當前 CPU 的 softnet_data
+
+        local_irq_save(flags);  // 關中斷，禁止中斷
+
+        rps_lock(sd);
+        if (!netif_running(skb->dev))
+            goto drop;
+        qlen = skb_queue_len(&sd->input_pkt_queue);
+
+        // 每個 CPU 都有輸入隊列的最大長度,如果超過, 則丟棄該數據幀
+        if (qlen <= netdev_max_backlog && !skb_flow_limit(skb, qlen)) {
+            if (qlen) { // 如果隊列中有元素
+    enqueue:
+                /**
+                 *  將 skb 添加到隊列的末尾
+                 *  注意這裡產生軟中斷 NET_RX_SOFTIRQ, 進一步處理包
+                 */
+                __skb_queue_tail(&sd->input_pkt_queue, skb);
+                input_queue_tail_incr_save(sd, qtail);
+                rps_unlock(sd);
+
+                /**
+                 *  開中斷
+                 *  同時需要知道, NET_RX_SOFTIRQ 是由 net_rx_action() 處理
+                 */
+                local_irq_restore(flags);
+                return NET_RX_SUCCESS;
+            }
+
+            /* Schedule NAPI for backlog device
+             * We can use non atomic operation since we own the queue lock
+             */
+            if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state)) {
+                if (!rps_ipi_queued(sd))
+                    /**
+                     *  如果 qlen == 0, 說明 sd->backlog 可能已經從當前 CPU 的 poll-list 中移除了,
+                     *  要重新加入 list_add_tail(&n->poll_list, &__get_cpu_var(softnet_data).poll_list);
+                     *  其實就是讓後面 action 中循環能夠找到這個設備,
+                     *  然後 goto 到上面重新將包放入隊列
+                     */
+                    ____napi_schedule(sd, &sd->backlog);
+            }
+            goto enqueue;
+        }
+
+    drop:
+        sd->dropped++; // 紀錄 drop 數量
+        rps_unlock(sd);
+
+        local_irq_restore(flags); // 開中斷, 允許中斷
+
+        atomic_long_inc(&skb->dev->rx_dropped);
+
+        /**
+         *  因為丟包才能才第到此處,
+         *  所以將 skb free 掉並 return NET_RX_DROP
+         */
+        kfree_skb(skb);
+        return NET_RX_DROP;
+    }
+    ```
+
++ `process_backlog()`
+
+    ```
+    static int process_backlog(struct napi_struct *napi, int quota)
+    {
+        struct softnet_data *sd = container_of(napi, struct softnet_data, backlog);
+        bool again = true;
+        int work = 0;
+
+        /* Check if we have pending ipi, its better to send them now,
+         * not waiting net_rx_action() end.
+         */
+        if (sd_has_rps_ipi_waiting(sd)) {
+            local_irq_disable();
+            net_rps_action_and_irq_enable(sd);
+        }
+
+        napi->weight = dev_rx_weight;
+        while (again) {
+            struct sk_buff *skb;
+
+            // 從隊裡獲取一個 skb
+            while ((skb = __skb_dequeue(&sd->process_queue))) {
+                rcu_read_lock();
+                __netif_receive_skb(skb);  // 處理接收數據
+                rcu_read_unlock();
+                input_queue_head_incr(sd);
+                if (++work >= quota)
+                    return work;
+
+            }
+
+            local_irq_disable();
+            rps_lock(sd);
+            if (skb_queue_empty(&sd->input_pkt_queue)) {
+                /*
+                 * Inline a custom version of __napi_complete().
+                 * only current cpu owns and manipulates this napi,
+                 * and NAPI_STATE_SCHED is the only possible flag set
+                 * on backlog.
+                 * We can use a plain write instead of clear_bit(),
+                 * and we dont need an smp_mb() memory barrier.
+                 */
+                napi->state = 0;
+                again = false;
+            } else {
+                skb_queue_splice_tail_init(&sd->input_pkt_queue,
+                               &sd->process_queue);
+            }
+            rps_unlock(sd);
+            local_irq_enable();
+        }
+
+        return work;
+    }
+    ```
 
 + `netif_napi_add()`
     > NIC driver 告訴內核要使用 napi 的機制
@@ -291,13 +496,36 @@ struct sk_buff {
     struct sk_buff  *next;
     struct sk_buff  *prev;
 
+    /**
+     *  struct sock		*sk;
+     *  表示從屬於那個 socket, 主要是被 L4 用到.
+     *  由本機發出或者由本機進程接收時才有效, 因為插口相關的信息被L4(TCP或 UDP)或者用戶空間程序使用.
+     *  如果 sk_buff 只在轉發中使用(src addr 和dest addr 都不是本機地址), 這個指針是 NULL
+     */
     struct sock		*sk;
+...
+
+    /**
+     *  _skb_refdst,
+     *  其實應該是 struct dst_entry, 但最後一個 bit (LSB) 被偷去當 refcount.
+     *  主要用於路由子系統, 這個數據結構保存了一些路由相關信息
+     */
+    unsigned long	_skb_refdst;
+
+    /**
+     *  skb 的析構函數, 一般都是設置為 sock_rfree 或者 sock_wfree
+     */
+    void            (*destructor)(struct sk_buff *skb);
+
 ...
 	unsigned int    len, data_len;
 	__u16           mac_len, hdr_len;
 
 ...
-	__be16          protocol;
+    __u32	priority;   // 優先級, 主要用於 QOS
+
+...
+	__be16          protocol;         //這個表示 L3 層的協議, 比如 IP, IPV6 等等
 	__u16           transport_header; // L4, record the offset between head to L4 header
 	__u16           network_header;   // L3, record the offset between head to L3 header
 	__u16           mac_header;       // L2, record the offset between head to L2 header
@@ -305,6 +533,13 @@ struct sk_buff {
 	sk_buff_data_t  tail;
 	sk_buff_data_t  end;
 	unsigned char   *head, *data;
+
+    /**
+     *  refcount_t  users
+     *  reference conut, 只保護 sk_buff 結構本身
+     *  通常還是使用函數 skb_get() 和 kfree_skb() 來操作這個變量
+     */
+    refcount_t      users;
 };
 
 struct skb_shared_info {
@@ -361,12 +596,18 @@ struct skb_shared_info {
         > the end pointer of `end room` of sk_buff memory layout
         >> 指向 memory buffer 的尾端
 
+    - `struct skb_shared_info`
+        > 為了減少 copy 的次數, 資料會被對映到多個 memory pages, 稱做 `paged data`.
+        使用 `struct skb_grag_struct` 來記錄一個 paged data 資訊,
+        而 `skb_shared_info->frags[]` 則用來管理所包含的 `paged datas`
+
 + API
 
     - `alloc_skb(size)` at include/linux/skbuff.h
-        > 建立 struct sk_buff 並分配 sk_buff 的 mem layout
+        > 建立 struct sk_buff 並分配 sk_buff 對應的 mem layout
         (head room + linear data area + end room + skb_shared_info)
-        >> `size` 包括所有協議層 (L4 ~ L2) 的總和
+        >> `size` 包括所有協議層 (L4 ~ L2) 的總和,
+        `struct skb_shared_info`則用於管理 paged data 及 fragments
 
         > head, data 和 tail 都指向記憶體的開始位置 (len = data_len = 0),
         `head` 在這個位置始終不變, 它表示的是分配的記憶體的開始位置.
@@ -417,6 +658,12 @@ struct skb_shared_info {
         > 用於操作線性資料區域 `tail room` 的資料, 可以在數據包的末尾追加數據
         >> `tail room` 指 `tail` 到 `end` 的區域
 
+        > 使用限制
+        > + 不能用於有 `paged data` (non-linear data) 的情況
+        >> user 需自行判斷是否有 `paged data`
+        > + 加入的資料不能超過 buffer 實際大小
+        >> user 需自行計算大小
+
         ```c
         void *skb_put(struct sk_buff *skb, unsigned int len)
         {
@@ -449,6 +696,9 @@ struct skb_shared_info {
         | tail room  |
         +------------+  <------ end
         ```
+
+    - `pskb_put()`
+        > 和 skb_put() 相同, 但用於有 `paged data` 的情況
 
     - `skb_push()`
         > 用於操作 `head room` 區域的協議頭
@@ -502,6 +752,14 @@ struct skb_shared_info {
         +------------+  <------ tail
         | tail room  |
         +------------+  <------ end
+        ```
+
+    - `pskb_may_pll(skb, len)`
+        > 判斷是否有足夠的 tata
+
+        ```
+        if( !pskb_may_pll(skb, sizeof(struct iphdr)) )
+            return err; // skb 不足一個 ip header
         ```
 
     - `skb_pull()`
@@ -562,7 +820,7 @@ struct skb_shared_info {
         ```
 
     - `pskb_copy()`
-        > 只複製 skb 的 linear data area, skb_shared_info 的部分則共用
+        > 只複製 skb 的 struct skb 及 linear data area, skb_shared_info 的部分則共用
 
         ```
            skb                                                                         skb
@@ -609,6 +867,69 @@ struct skb_shared_info {
 
     - `skb_trim()`
         > cut buffer 到一個長度
+        >> 有 `paged data`時, 則需使用 `pskb_trim()`
+
+    - `skb_shinfo()`
+        > 獲得 `skb_shared_info`的 pointer
+
+        ```
+        // 直接 cast skb->end to pointer of struct skb_shared_info
+        #define skb_shinfo(SKB)         ((struct skb_shared_info *)(skb_end_pointer(SKB)))
+        ```
+
++ sk_buff using behavior
+
+    - create skb structure
+
+        ```
+        len = sizeof(struct sk_buff)
+        ```
+
+    - create skb data buffer (sk_buff mem layout)
+
+        ```
+        size = (size of L2 header)
+             + (size of L3 header)
+             + (size of L4 header)
+             + (size of payload)
+             + sizeof(struct skb_shared_info)
+        ```
+
+    - reserve the max protocol header size (L2 + L3 + L4)
+
+        ```
+        sk_reserve(skb, header_len);
+        ```
+
+    - copy payload to tail room
+        > payload 往下擴充
+
+        ```
+        skb_put(skb, user_data_len);
+        csum_and_copy_from_user()  // calculate checksum and copy user data to sk_buff
+        ```
+
+    - request head room to set UDP header
+        > protocol header 往上設置
+
+        ```
+        pUdp_hdr = skb_push(skb, udp_header_len);
+        ```
+
+    - request head room to set IP header
+        > protocol header 往上設置
+
+        ```
+        pIp_hdr = skb_push(skb, ip_header_len);
+        ```
+
+    - request head room to set MAC header
+        > protocol header 往上設置
+
+        ```
+        pMac_hdr = skb_push(skb, mac_header_len);
+        ```
+
 
 
 # Socket work flow
@@ -1935,4 +2256,3 @@ TODO draw flow chart
 + [lwIP TCP/IP 協議棧筆記之十九:JPerf 工具測試網速](https://www.twblogs.net/a/5d8ca92bbd9eee541c34c03e)
 + [Lwip之IP/MAC地址衝突檢測](https://blog.csdn.net/tianjueyiyi/article/details/51097447)
 + [TCP/IP協議棧之LwIP(三)-網際尋址與路由(IPv4 + ARP + IPv6)](https://blog.csdn.net/m0_37621078/article/details/94646591)
-
