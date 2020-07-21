@@ -14,6 +14,302 @@ linux network sub-system
     > 大部分為 `kernel v4.14.136`
 
 
+# softnet_data
+
+每個 CPU 都有隊列, 用來接收進來的幀.
+因為每個 CPU 都有其 softnet_data 用來處理 input 和 output 流量, 故不同 CPU 之間沒必要使用上鎖機制.
+此隊列的數據結構 softnet_data 定義在 include/linux/netdevice.h
+
++ data structure
+
+    - `struct softnet_data`
+        > 這是一個 `PER_CPU` 的 queue, 更準確地說是每個 CPU 各自綁定一份,
+        屬於該 CPU 的 data queue (incoming packets are placed on per-CPU queues).
+
+        ```c
+        struct softnet_data {
+            /**
+             *  poll_list:
+             *      設備有數據要傳輸時,
+             *      napi->poll_list 結構掛到這個 poll_list,
+             *      包括 NAPI interface 的 driver 以及 non-NAPI interface 的 driver,
+             *      都可以統一加入到這個 poll_list
+             */
+            struct list_head    poll_list;
+            struct sk_buff_head process_queue;  // 要處理的 skb
+
+            /* stats */
+            unsigned int        processed;  // 已處理的 skb
+
+            /**
+             *  如果'ksoftirq'進程在 cpu-time 啟動之前,
+             *  無法處理網絡設備環形緩衝區中, 所有可用的數據包,
+             *  則會更新'time_squeeze'
+             */
+            unsigned int        time_squeeze;
+            unsigned int        received_rps;   // RPS 收到的包
+        #ifdef CONFIG_RPS
+            struct softnet_data *rps_ipi_list;  // 本地 RPS 隊列
+        #endif
+        #ifdef CONFIG_NET_FLOW_LIMIT
+            struct sd_flow_limit __rcu *flow_limit;
+        #endif
+            struct Qdisc        *output_queue;  // 輸出隊列
+            struct Qdisc        **output_queue_tailp;
+
+            /**
+             *  completion_queue 緩衝區列表,
+             *  其中的緩衝已成功傳輸, 因此可以釋放掉
+             */
+            struct sk_buff      *completion_queue;
+
+        #ifdef CONFIG_RPS
+            /* input_queue_head should be written by cpu owning this struct,
+             * and only read by other cpus. Worth using a cache line.
+             */
+            unsigned int        input_queue_head ____cacheline_aligned_in_smp;
+
+            /* Elements below can be accessed between CPUs for RPS/RFS */
+            call_single_data_t  csd ____cacheline_aligned_in_smp;
+            struct softnet_data rps_ipi_next;
+            unsigned int        cpu;                // 字段所屬 cpu
+            unsigned int        input_queue_tail;
+        #endif
+            unsigned int        dropped;            // 丟包計數
+            struct sk_buff_head input_pkt_queue;    // 保存進來的幀
+            struct napi_struct  backlog;            // 虛擬的NAPI設備
+        };
+        ```
+
+        > `struct softnet_data` 在處理 data 時, 最小單位為 `struct napi_struct`(綁定在 poll_list).
+        所以一個 `struct napi_struct` 在 softnet_data 的 poll list 只會發生
+        > + enqueue
+        > + dequeue
+        > + reorder
+
+
++ `net_dev_init()`
+
+    ```c
+    // linux at net/core/dev.c
+    static int __init net_dev_init(void)
+    {
+        int i, rc = -ENOMEM;
+    ...
+
+        /*
+         *  Initialise the packet receive queues.
+         *  初始化數據包的接收隊列
+         */
+
+        for_each_possible_cpu(i) {  // 對於每一個 CPU 都會進行處理
+            struct work_struct *flush = per_cpu_ptr(&flush_works, i);
+            struct softnet_data *sd = &per_cpu(softnet_data, i); // 每個 CPU 中都有一個 softnet_data 結構
+
+            INIT_WORK(flush, flush_backlog);
+
+            skb_queue_head_init(&sd->input_pkt_queue);  // 初始化接收數據隊列
+            skb_queue_head_init(&sd->process_queue);
+    #ifdef CONFIG_XFRM_OFFLOAD
+            skb_queue_head_init(&sd->xfrm_backlog);
+    #endif
+            INIT_LIST_HEAD(&sd->poll_list);  // 初始化設備隊列(注意poll_list在處理數據的時候會被遍歷)
+            sd->output_queue_tailp = &sd->output_queue;
+    #ifdef CONFIG_RPS
+            sd->csd.func = rps_trigger_softirq;
+            sd->csd.info = sd;
+            sd->cpu = i;
+    #endif
+
+            /**
+             *  這個很重要!
+             *  在以後的處理這個 device 上的數據時,
+             *  使用 sd->backlog.poll 這個 callback
+             */
+            sd->backlog.poll = process_backlog;
+            sd->backlog.weight = weight_p; // weight_p 為全局變量, 默認為 64
+        }
+
+        netdev_dma_register();
+
+        dev_boot_phase = 0;
+
+        /**
+         *  建立 bottom self handler of napi
+         */
+        open_softirq(NET_TX_SOFTIRQ, net_tx_action, NULL);
+        open_softirq(NET_RX_SOFTIRQ, net_rx_action, NULL);
+
+        hotcpu_notifier(dev_cpu_callback, 0);
+        dst_init();
+        dev_mcast_init();
+        rc = 0;
+    out:
+        return rc;
+    }
+    ```
+
+## Non-NAPI (pure IRQ)
+
+Non-NAPI 是每中斷一次就將 packet 往上送,
+當流量突增時, 則中斷增多, CPU處理時間變少.
+
+```
+// Top half example
+vortex_interrupt()  // at drivers/net/ethernet/3com/3c59x.c
+    + vortex_rx()   // at drivers/net/ethernet/3com/3c59x.c
+        + netif_rx()    // at net/core/dev.c
+            + netif_rx_internal()
+                + enqueue_to_backlog()
+                    + ____napi_schedule() // raise softIRQ
+                            |
+                +-----------+
+                | bottom half
+                v
+        + net_rx_action()
+            + napi_poll()
+                    |
+                +---+
+                | default handler be set at net_dev_init()
+                v
+        + process_backlog()
+            + __netif_receive_skb() // send to up layer (protocol stack)
+                + deliver_skb()
+```
+
++ API
+
+    - `enqueue_to_backlog()`
+
+        ```c
+        static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
+                          unsigned int *qtail)
+        {
+            struct softnet_data *sd;
+            unsigned long flags;
+            unsigned int qlen;
+
+            sd = &per_cpu(softnet_data, cpu);
+
+            local_irq_save(flags);
+
+            rps_lock(sd);
+            if (!netif_running(skb->dev))
+                goto drop;
+            qlen = skb_queue_len(&sd->input_pkt_queue);
+
+            // 每個 CPU 都有輸入隊列的最大長度,如果超過, 則丟棄該數據幀
+            if (qlen <= netdev_max_backlog && !skb_flow_limit(skb, qlen)) {
+                if (qlen) {
+        enqueue:
+                    /**
+                     *  設備已得到調度, 將 skb 添加到隊列的末尾
+                     *  注意這裡產生軟中斷 NET_RX_SOFTIRQ, 進一步處理包
+                     */
+                    __skb_queue_tail(&sd->input_pkt_queue, skb);
+                    input_queue_tail_incr_save(sd, qtail);
+                    rps_unlock(sd);
+
+                    /**
+                     *  開中斷
+                     *  同時需要知道, NET_RX_SOFTIRQ 是由 net_rx_action() 處理
+                     */
+                    local_irq_restore(flags);
+                    return NET_RX_SUCCESS;
+                }
+
+                /* Schedule NAPI for backlog device
+                 * We can use non atomic operation since we own the queue lock
+                 *  本 CPU 默認的 NAPI 加入要處理的 poll_list 隊列;
+                 *  之後觸發軟中斷, 但是由於處於硬中斷中, 所以軟中斷暫時失效, 繼續 enqueue
+                 */
+                if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state)) {
+                    if (!rps_ipi_queued(sd))
+                        ____napi_schedule(sd, &sd->backlog);
+                }
+                goto enqueue;
+            }
+
+        drop:
+            sd->dropped++;  // drop 計數
+            rps_unlock(sd);
+
+            local_irq_restore(flags);
+
+            atomic_long_inc(&skb->dev->rx_dropped);
+
+            /**
+             *  因為丟包才能才第到此處,
+             *  所以將 skb free 掉並 return NET_RX_DROP
+             */
+            kfree_skb(skb);
+            return NET_RX_DROP;
+        }
+        ```
+
+    - `process_backlog()`
+        > defalut poll handler and it be set at `net_dev_init()`
+
+        ```c
+        static int process_backlog(struct napi_struct *napi, int quota)
+        {
+            struct softnet_data *sd = container_of(napi, struct softnet_data, backlog);
+            bool again = true;
+            int work = 0;
+
+            /* Check if we have pending ipi, its better to send them now,
+             * not waiting net_rx_action() end.
+             */
+            if (sd_has_rps_ipi_waiting(sd)) {
+                local_irq_disable();
+                net_rps_action_and_irq_enable(sd);
+            }
+
+            napi->weight = dev_rx_weight;
+            while (again) {
+                struct sk_buff *skb;
+
+                while ((skb = __skb_dequeue(&sd->process_queue))) {
+                    rcu_read_lock();
+                    /**
+                     *  將每個包依序往上層送 (protocol stack)
+                     */
+                    __netif_receive_skb(skb);
+                    rcu_read_unlock();
+                    input_queue_head_incr(sd); // 增加處理 head 計數
+                    if (++work >= quota)
+                        return work;
+
+                }
+
+                local_irq_disable();
+                rps_lock(sd);
+                if (skb_queue_empty(&sd->input_pkt_queue)) {
+                    /*
+                     * Inline a custom version of __napi_complete().
+                     * only current cpu owns and manipulates this napi,
+                     * and NAPI_STATE_SCHED is the only possible flag set
+                     * on backlog.
+                     * We can use a plain write instead of clear_bit(),
+                     * and we dont need an smp_mb() memory barrier.
+                     */
+                    napi->state = 0;
+                    again = false;
+                } else {
+                    /**
+                     *  獲取接收隊列包數量並將其插入 process_queue 隊列
+                     */
+                    skb_queue_splice_tail_init(&sd->input_pkt_queue,
+                                   &sd->process_queue);
+                }
+                rps_unlock(sd);
+                local_irq_enable();
+            }
+
+            return work;
+        }
+        ```
+
 # NAPI(New API) mechanism
 
 NAPI 的核心概念在於:
@@ -40,7 +336,11 @@ ps. 經過連續兩次對 NAPI 的重構, 因此 2.6 version 和 later version �
 這時候, 分離的 NAPI 信息只需存一份, 同時被所有的 port 來共享,
 這樣, 代碼框架上更好地適應了真實的硬件能力.
 
-ps. 簡單說, NAPI 提供了一個可以在 interrupt 跟 poll 兩個模式切換的 framework
+ps. 簡單說, NAPI 提供了一個可以在 interrupt 跟 poll 兩個模式切換的 framework.
+    NAPI 混合了中斷事件和輪詢(poll), 而不使用純粹的中斷事件驅動模型.
+    如果接收到新幀時, 內核還沒完成處理前幾個幀的工作, 驅動程序就沒必要產生其他中斷事件:
+    讓內核一直處理設備輸入隊列中的數據, 會比較簡單並有效率(該設備中斷功能關閉),
+    然後當隊列為空時, 再重新開啟中斷功能.
 
 + Pros
     > NAPI 適合處理高速率數據包的處理, 而帶來的好處如下
@@ -72,24 +372,23 @@ ps. 簡單說, NAPI 提供了一個可以在 interrupt 跟 poll 兩個模式切�
              * to the per-CPU poll_list, and whoever clears that bit
              * can remove from the list right before clearing the bit.
              */
-            struct list_head    poll_list;      // 用於加入處於 polling 狀態的設備隊列
+            struct list_head	poll_list;  // 用於加入處於 polling 狀態的設備隊列
 
-            unsigned long       state;          // 設備的狀態
-            int>                weight;         // 每次處理的該設備的最大 skb 數量
-            unsigned int        gro_count;
-            int>        (*poll)(struct napi_struct *, int); // polling method
+            unsigned long		state;      // 設備的狀態
+            int			        weight;     // 每次處理的該設備的最大 skb 數量
+            unsigned int		gro_count;
+            int			(*poll)(struct napi_struct *, int);
         #ifdef CONFIG_NETPOLL
-            int>        poll_owner;
+            int			poll_owner;
         #endif
-            struct net_device   *dev;
-            struct sk_buff      *gro_list;
-            struct sk_buff      *skb;
-            struct hrtimer      timer;
-            struct list_head    dev_list;
-            struct hlist_node   napi_hash_node;
-            unsigned int        napi_id;
+            struct net_device	*dev;
+            struct sk_buff		*gro_list;
+            struct sk_buff		*skb;
+            struct hrtimer		timer;
+            struct list_head	dev_list;
+            struct hlist_node	napi_hash_node;
+            unsigned int		napi_id;
         };
-
         ```
 
         > 與之前的 NAPI 實現的最大的區別是, 該結構體不再是 net_device 的一部分,
@@ -98,339 +397,445 @@ ps. 簡單說, NAPI 提供了一個可以在 interrupt 跟 poll 兩個模式切�
         因為現在越來越多的硬件已經開始支持多接收隊列(multiple receive queues),
         如此多個 `struct napi_struct` 的實現使得多隊列的使用也更加的有效.
 
-    - `struct softnet_data`
-        > 這是一個 `PER_CPU` 的 queue, 更準確地說是每個 CPU 各自綁定一份,
-        屬於該 CPU 的 data queue (incoming packets are placed on per-CPU queues).
+        ```c
+        struct net_device {
+            ...
+            struct list_head    napi_list; // 支持 NAPI 傳輸的網絡設備鏈表
+
+            ..
+        };
+
+        // linux at net/core/dev.c
+        struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+                void (*setup)(struct net_device *),
+                unsigned int txqs, unsigned int rxqs)
+        {
+            ...
+            INIT_LIST_HEAD(&dev->napi_list);
+
+            ...
+        }
+        ```
+
++ Example of flow
+
+```
+ixgb_probe() // at drivers/net/ethernet/intel/ixgb/ixgb_main.c
+    + netif_napi_add() // add poll callback, ixgb_clean()
+
+ixgb_open()
+    + ixgb_setup_rx_resources() // 分配收包資源
+    + ixgb_up()
+        + napi_enable()     // enable NAPI
+        + ixgb_irq_enable() // enable H/w interrupt
+
+ixgb_intr()
+    + __napi_schedule()
+        + ____napi_schedule()
+            + __raise_softirq_irqoff(NET_RX_SOFTIRQ) // raise NET_RX_SOFTIRQ flag
+                    |
+            +-------+
+            |
+            v
+    + net_rx_action()
+        + n->poll()
+                |
+        +-------+
+        |
+        v
+ixgb_clean()
+    + ixgb_clean_tx_irq()
+    + ixgb_clean_rx_irq()
+        + netif_receive_skb()
+            + netif_receive_skb_internal()
+                + __netif_receive_skb()
+                    + __netif_receive_skb_core()
+                        + deliver_skb()
+                            + ip_rcv()
+    + napi_complete()
+```
+
+    - resource structure
 
         ```c
-        struct softnet_data {
-            /**
-             *  poll_list:
-             *      napi->poll_list 結構掛到這個 poll_list,
-             *      包括 NAPI interface 的 driver 以及 non-NAPI interface 的 driver ,
-             *      都可以統一加入到這個 poll_list
-             */
-            struct list_head    poll_list;
-            struct sk_buff_head process_queue;
+        /* 封裝一個指向套接字緩衝區的指針, 所以一個 DMA handle 可以和緩衝區一起存儲 */
+        struct ixgb_buffer {
+            struct sk_buff  *skb;
+            dma_addr_t      dma;
+            unsigned long   time_stamp;
+            u16             length;
+            u16             next_to_watch;
+            u16             mapped_as_page;
+        };
 
-            /* stats */
-            unsigned int        processed;
-            unsigned int        time_squeeze;
-            unsigned int        received_rps;
-        #ifdef CONFIG_RPS
-            struct softnet_data *rps_ipi_list;
-        #endif
-        #ifdef CONFIG_NET_FLOW_LIMIT
-            struct sd_flow_limit __rcu *flow_limit;
-        #endif
-            struct Qdisc        *output_queue;
-            struct Qdisc        **output_queue_tailp;
-            struct sk_buff      *completion_queue;
-
-        #ifdef CONFIG_RPS
-            /* input_queue_head should be written by cpu owning this struct,
-             * and only read by other cpus. Worth using a cache line.
-             */
-            unsigned int        input_queue_head ____cacheline_aligned_in_smp;
-
-            /* Elements below can be accessed between CPUs for RPS/RFS */
-            call_single_data_t  csd ____cacheline_aligned_in_smp;
-            struct softnet_data rps_ipi_next;
-            unsigned int        cpu;
-            unsigned int        input_queue_tail;
-        #endif
-            unsigned int        dropped;
-            struct sk_buff_head input_pkt_queue;
-            struct napi_struct  backlog;
+        struct ixgb_desc_ring {
+            void *desc;							/* 指向描述符ring的指針 */
+            dma_addr_t dma;						/* 描述符環的物理地址; dna_addr_t 32 位系統為 u32 */
+            unsigned int size;					/* 描述符 ring 的長度, 以 byte 為單位 */
+            unsigned int count;					/* ring 之後描述符的數量 */
+            unsigned int next_to_use;			/* 下一個關聯緩衝區的描述符 */
+            unsigned int next_to_clean;			/* 下一個要處理的描述符, 需要檢查 DD 狀態位 */
+            struct ixgb_buffer *buffer_info;	/* 緩衝區信息結構數組 */
         };
         ```
 
-        > `struct softnet_data` 在處理 data 時, 最小單位為 `struct napi_struct`(綁定在 poll_list).
-        所以一個 `struct napi_struct` 在 softnet_data 的 poll list 只會發生
-        > + enqueue
-        > + dequeue
-        > + reorder
+    - `ixgb_probe()`
+        > 建立 net device
 
+        ```c
+        static int
+        ixgb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+        {
+        ...
+            // 分配 net_device 結構
+            netdev = alloc_etherdev(sizeof(struct ixgb_adapter));
+            if (!netdev) {
+                err = -ENOMEM;
+                goto err_alloc_etherdev;
+            }
 
-## Non-NAPI
-## NAPI
-## API
+        ...
 
-[Linux NAPI處理流程分析](https://www.cnblogs.com/ck1020/p/6838234.html)
-
-[Linux 內核網絡協議棧 ------ 數據從接收到ip層](https://blog.csdn.net/shanshanpt/article/details/20377657)
-
-[NAPI/非NAPI收包分析](https://chengqian90.com/Linux%E5%86%85%E6%A0%B8/NAPI-%E9%9D%9ENAPI%E6%94%B6%E5%8C%85%E5%88%86%E6%9E%90.html)
-
-
-
-+ `net_dev_init()`
-
-    ```c
-    // linux at net/core/dev.c
-    static int __init net_dev_init(void)
-    {
-        int i, rc = -ENOMEM;
-    ...
-
-        /*
-         *  Initialise the packet receive queues.初始化話數據包的接收隊列
-         */
-
-        for_each_possible_cpu(i) {  // 對於每一個 CPU 都會進行處理
-            struct work_struct *flush = per_cpu_ptr(&flush_works, i);
-            struct softnet_data *sd = &per_cpu(softnet_data, i); // 每個 CPU 中都有一個 softnet_data 結構
-
-            INIT_WORK(flush, flush_backlog);
-
-            skb_queue_head_init(&sd->input_pkt_queue);  // 初始化接收數據隊列
-            skb_queue_head_init(&sd->process_queue);
-    #ifdef CONFIG_XFRM_OFFLOAD
-            skb_queue_head_init(&sd->xfrm_backlog);
-    #endif
-            INIT_LIST_HEAD(&sd->poll_list);  // 初始化設備隊列(注意poll_list在處理數據的時候會被遍歷)
-            sd->output_queue_tailp = &sd->output_queue;
-    #ifdef CONFIG_RPS
-            sd->csd.func = rps_trigger_softirq;
-            sd->csd.info = sd;
-            sd->cpu = i;
-    #endif
+            netdev->netdev_ops = &ixgb_netdev_ops; // 設定 adapter 為設備私有數據
+            ixgb_set_ethtool_ops(netdev);
+            netdev->watchdog_timeo = 5 * HZ;
 
             /**
-             *  這個很重要!
-             *  在以後的處理這個 device 上的數據時,
-             *  使用 sd->backlog.poll 這個 callback
+             *  adapter->napi 初始化並加入 netde->napi_list 鏈表
+             *  weight 為 64
              */
-            sd->backlog.poll = process_backlog;
-            sd->backlog.weight = weight_p;
+            netif_napi_add(netdev, &adapter->napi, ixgb_clean, 64);
+        ...
+
+            INIT_WORK(&adapter->tx_timeout_task, ixgb_tx_timeout_task);
+        ...
         }
 
-        netdev_dma_register();
+        ```
 
-        dev_boot_phase = 0;
+    - `ixgb_open()`
+        > initialize ixgb module
 
-        /**
-         *  建立 bottom self handler of napi
-         */
-        open_softirq(NET_TX_SOFTIRQ, net_tx_action, NULL);
-        open_softirq(NET_RX_SOFTIRQ, net_rx_action, NULL);
+        ```
+        static int
+        ixgb_open(struct net_device *netdev)
+        {
+            struct ixgb_adapter *adapter = netdev_priv(netdev);
+            int err;
 
-        hotcpu_notifier(dev_cpu_callback, 0);
-        dst_init();
-        dev_mcast_init();
-        rc = 0;
-    out:
-        return rc;
-    }
-    ```
+            /* allocate transmit descriptors */
+            err = ixgb_setup_tx_resources(adapter);
+            if (err)
+                goto err_setup_tx;
 
-+ `netif_rx()`
-    > 在傳統(不支援 NAPI) NIC device driver 中的 ISR 呼叫
+            netif_carrier_off(netdev);
 
-    ```c
-    // linux at net/core/dev.c
-    /**
-     *  netif_rx()
-     *      + netif_rx_internal()
-     *          + enqueue_to_backlog()
-     */
-    static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
-                      unsigned int *qtail)
-    {
-        struct softnet_data *sd;
-        unsigned long flags;
-        unsigned int qlen;
+            /* allocate receive descriptors */
+            err = ixgb_setup_rx_resources(adapter);
+            if (err)
+                goto err_setup_rx;
 
-        sd = &per_cpu(softnet_data, cpu); // 取得當前 CPU 的 softnet_data
+            err = ixgb_up(adapter);
+            if (err)
+                goto err_up;
 
-        local_irq_save(flags);  // 關中斷，禁止中斷
+            netif_start_queue(netdev);
+        ...
+            return err;
+        }
+        ```
 
-        rps_lock(sd);
-        if (!netif_running(skb->dev))
-            goto drop;
-        qlen = skb_queue_len(&sd->input_pkt_queue);
+    - `ixgb_setup_rx_resources()`
+        > 分配 RX resourece
 
-        // 每個 CPU 都有輸入隊列的最大長度,如果超過, 則丟棄該數據幀
-        if (qlen <= netdev_max_backlog && !skb_flow_limit(skb, qlen)) {
-            if (qlen) { // 如果隊列中有元素
-    enqueue:
-                /**
-                 *  將 skb 添加到隊列的末尾
-                 *  注意這裡產生軟中斷 NET_RX_SOFTIRQ, 進一步處理包
-                 */
-                __skb_queue_tail(&sd->input_pkt_queue, skb);
-                input_queue_tail_incr_save(sd, qtail);
-                rps_unlock(sd);
+        ```c
+        int
+        ixgb_setup_rx_resources(struct ixgb_adapter *adapter)
+        {
+            struct ixgb_desc_ring *rxdr = &adapter->rx_ring;
+            struct pci_dev *pdev = adapter->pdev;
+            int size;
 
-                /**
-                 *  開中斷
-                 *  同時需要知道, NET_RX_SOFTIRQ 是由 net_rx_action() 處理
-                 */
-                local_irq_restore(flags);
-                return NET_RX_SUCCESS;
-            }
+            /* 一次緩存的 buffer 個數 */
+            size = sizeof(struct ixgb_buffer) * rxdr->count;
 
-            /* Schedule NAPI for backlog device
-             * We can use non atomic operation since we own the queue lock
+            /* vzalloc 虛擬連續, 物理位置可以不連續 */
+            rxdr->buffer_info = vzalloc(size);
+            if (!rxdr->buffer_info)
+                return -ENOMEM;
+
+            /* Round up to nearest 4K, ixgb_rx_desc 描述符分配, 4K對齊 */
+            rxdr->size = rxdr->count * sizeof(struct ixgb_rx_desc);
+            rxdr->size = ALIGN(rxdr->size, 4096);
+
+            /**
+             *  desc 為分配的虛擬地址, rxdr->size 為大小,
+             *  而 rxdr->dma 為其物理地址
              */
-            if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state)) {
-                if (!rps_ipi_queued(sd))
-                    /**
-                     *  如果 qlen == 0, 說明 sd->backlog 可能已經從當前 CPU 的 poll-list 中移除了,
-                     *  要重新加入 list_add_tail(&n->poll_list, &__get_cpu_var(softnet_data).poll_list);
-                     *  其實就是讓後面 action 中循環能夠找到這個設備,
-                     *  然後 goto 到上面重新將包放入隊列
-                     */
-                    ____napi_schedule(sd, &sd->backlog);
-            }
-            goto enqueue;
-        }
+            rxdr->desc = dma_alloc_coherent(&pdev->dev, rxdr->size, &rxdr->dma,
+                            GFP_KERNEL);
 
-    drop:
-        sd->dropped++; // 紀錄 drop 數量
-        rps_unlock(sd);
-
-        local_irq_restore(flags); // 開中斷, 允許中斷
-
-        atomic_long_inc(&skb->dev->rx_dropped);
-
-        /**
-         *  因為丟包才能才第到此處,
-         *  所以將 skb free 掉並 return NET_RX_DROP
-         */
-        kfree_skb(skb);
-        return NET_RX_DROP;
-    }
-    ```
-
-+ `process_backlog()`
-
-    ```
-    static int process_backlog(struct napi_struct *napi, int quota)
-    {
-        struct softnet_data *sd = container_of(napi, struct softnet_data, backlog);
-        bool again = true;
-        int work = 0;
-
-        /* Check if we have pending ipi, its better to send them now,
-         * not waiting net_rx_action() end.
-         */
-        if (sd_has_rps_ipi_waiting(sd)) {
-            local_irq_disable();
-            net_rps_action_and_irq_enable(sd);
-        }
-
-        napi->weight = dev_rx_weight;
-        while (again) {
-            struct sk_buff *skb;
-
-            // 從隊裡獲取一個 skb
-            while ((skb = __skb_dequeue(&sd->process_queue))) {
-                rcu_read_lock();
-                __netif_receive_skb(skb);  // 處理接收數據
-                rcu_read_unlock();
-                input_queue_head_incr(sd);
-                if (++work >= quota)
-                    return work;
-
+            if (!rxdr->desc) {
+                vfree(rxdr->buffer_info);
+                return -ENOMEM;
             }
 
-            local_irq_disable();
-            rps_lock(sd);
-            if (skb_queue_empty(&sd->input_pkt_queue)) {
-                /*
-                 * Inline a custom version of __napi_complete().
-                 * only current cpu owns and manipulates this napi,
-                 * and NAPI_STATE_SCHED is the only possible flag set
-                 * on backlog.
-                 * We can use a plain write instead of clear_bit(),
-                 * and we dont need an smp_mb() memory barrier.
+            /* 初始化 */
+            memset(rxdr->desc, 0, rxdr->size);
+
+            rxdr->next_to_clean = 0;
+            rxdr->next_to_use = 0;
+            return 0;
+        }
+        ```
+
+    - `ixgb_up()`
+        > enable network interface
+
+        ```c
+        int
+        ixgb_up(struct ixgb_adapter *adapter)
+        {
+        ...
+            /**
+             *  驅動層最大 MTU 為 netdev->mut (一般為1500) + 14(二層頭)+ 4 (vlan)
+             */
+            int max_frame = netdev->mtu + ENET_HEADER_SIZE + ENET_FCS_LENGTH;
+        ...
+            /* 完成 skb 到 DMA 的對映 */
+            ixgb_alloc_rx_buffers(adapter, IXGB_DESC_UNUSED(&adapter->rx_ring));
+
+        ...
+            /* 分配中斷號, flags為 SHARED */
+            err = request_irq(adapter->pdev->irq, ixgb_intr, irq_flags,
+                              netdev->name, netdev);
+        ...
+
+            clear_bit(__IXGB_DOWN, &adapter->flags); /* 開啟設備 */
+            napi_enable(&adapter->napi);    /* 開啟 NAPI */
+            ixgb_irq_enable(adapter);       /* 開啟 module 中斷*/
+
+            netif_wake_queue(netdev);
+
+            mod_timer(&adapter->watchdog_timer, jiffies);
+
+            return 0;
+        }
+        ```
+
+    - `ixgb_intr()`
+        > the Top half of interrupt of device driver
+
+        ```c
+        static inline void ____napi_schedule(struct softnet_data *sd,
+                             struct napi_struct *napi)
+        {
+            /* 設備的 poll_list 加入到 CPU 的鏈表中並觸發 RX 軟中斷 */
+            list_add_tail(&napi->poll_list, &sd->poll_list);
+            __raise_softirq_irqoff(NET_RX_SOFTIRQ);
+        }
+
+        void __napi_schedule(struct napi_struct *n)
+        {
+            unsigned long flags;
+            local_irq_save(flags);
+            ____napi_schedule(&__get_cpu_var(softnet_data), n);
+            local_irq_restore(flags);
+        }
+
+        static irqreturn_t
+        ixgb_intr(int irq, void *data)
+        {
+            struct net_device *netdev = data;
+            struct ixgb_adapter *adapter = netdev_priv(netdev);
+            ...
+
+            /* 判斷 NAPI 是否可以使用 */
+            if (napi_schedule_prep(&adapter->napi)) {
+
+                /**
+                 *  Disable interrupts and register for poll.
+                 *  The flush of the posted write is intentionally left out.
+                 *  禁中斷並處理 NAPI
                  */
-                napi->state = 0;
-                again = false;
-            } else {
-                skb_queue_splice_tail_init(&sd->input_pkt_queue,
-                               &sd->process_queue);
+                IXGB_WRITE_REG(&adapter->hw, IMC, ~0);
+                __napi_schedule(&adapter->napi);
             }
-            rps_unlock(sd);
+            return IRQ_HANDLED;
+        }
+        ```
+
+    - `ixgb_clean()`
+        > the poll callback of ixgb module
+
+        ```
+        static int
+        ixgb_clean(struct napi_struct *napi, int budget)
+        {
+            struct ixgb_adapter *adapter = container_of(napi, struct ixgb_adapter, napi);
+            int work_done = 0;
+
+            ixgb_clean_tx_irq(adapter); /* Tx 完成後回收資源 */
+            ixgb_clean_rx_irq(adapter, &work_done, budget);   /* 向 IP layer 發送收到的數據 */
+
+            /* If budget not fully consumed, exit the polling mode */
+            if (work_done < budget) {
+                napi_complete_done(napi, work_done);    /* 說明包已經處理完, 則退出 napi 模式 */
+                if (!test_bit(__IXGB_DOWN, &adapter->flags))
+                    ixgb_irq_enable(adapter);   /* 開啟中斷, 驅動繼續收包 */
+            }
+
+            return work_done;
+        }
+        ```
+
+    - `ixgb_clean_rx_irq()`
+        > + process DMA rx cmdq of ixgb (NIC)
+        > + encapsulate to skb node
+        > + forward skb to ip layer
+        >> call `netif_receive_skb()`
+
++ API of NAPI
+
+    - `netif_napi_add()`
+        > 一般在 NIC driver 中調用, 告訴內核要使用 napi 的機制
+        > + 初始化響應參數
+        > + 註冊 poll 的 callback function
+
+        ```c
+        // at /net/core/dev.c
+        void netif_napi_add(struct net_device *dev, struct napi_struct *napi,
+                            int (*poll)(struct napi_struct *, int), int weight)
+        {
+            INIT_LIST_HEAD(&napi->poll_list);
+            hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+            napi->timer.function = napi_watchdog;
+            napi->gro_count = 0;
+            napi->gro_list = NULL;
+            napi->skb = NULL;
+
+            /**
+             *  註冊 poll method
+             */
+            napi->poll = poll;
+            if (weight > NAPI_POLL_WEIGHT)
+                pr_err_once("netif_napi_add() called with weight %d on device %s\n",
+                            weight, dev->name);
+
+            /**
+             *  weight 該值並沒有一個非常嚴格的要求, 實際上是個經驗數據,
+             *  一般 10Mb 的網卡, 我們設置處理 packet 的數量為 16,
+             *  而更快的網卡, 我們則設置為 64.
+             */
+            napi->weight = weight;
+            list_add(&napi->dev_list, &dev->napi_list); // dev_list 插入 dev->napi_list 鏈表
+            napi->dev = dev;
+        #ifdef CONFIG_NETPOLL
+            napi->poll_owner = -1;
+        #endif
+            set_bit(NAPI_STATE_SCHED, &napi->state);
+            napi_hash_add(napi);
+        }
+        ```
+
+    + `napi_schedule_prep()`
+        >  check if napi can be scheduled or not
+
+    + `__napi_schedule()`
+        > NIC driver 告訴內核開始調度 napi 的機制, 稍後 poll callback function 會被調用
+        >> switch to polling mode
+
+        > NAPI 是中斷時利用 `__napi_schedule()` 將設備 poll_list 加到 cpu 的處理鏈表,
+        之後喚醒 bottom half, 在 bottom half 繼續調用驅動層的處理函數 poll(),
+        其中一次處理多個 skb, 而非傳統的一個 skb 進行一次中斷, 達到了網絡性能的提升。
+
+    + `napi_complete()`
+        > NIC driver 告訴內核其工作不飽滿即中斷不多, 數據量不大,
+        改變 napi 的狀態機, 後續將採用**純中斷**方式響應數據.
+        >> switch to interrupt mode
+
+        ```c
+        // at include/linux/netdevice.h
+        static inline bool napi_complete(struct napi_struct *n)
+        {
+            return napi_complete_done(n, 0);
+        }
+        ```
+
+    + `net_rx_action()`
+        > 內核初始化註冊的 softIRQ, 註冊進去的 poll callback 會被其呼叫
+
+        ```c
+        static __latent_entropy void net_rx_action(struct softirq_action *h)
+        {
+            struct softnet_data *sd = this_cpu_ptr(&softnet_data);
+            unsigned long time_limit = jiffies +
+                usecs_to_jiffies(netdev_budget_usecs);
+            int budget = netdev_budget;  /* netdev_budget 默認值為 300 */
+            LIST_HEAD(list);
+            LIST_HEAD(repoll);
+
+            local_irq_disable();
+            list_splice_init(&sd->poll_list, &list);
+
+            /**
+             *  中斷啟用, 此時訪問依然安全,
+             *  因為中斷只能將 new item 加入此列表尾部,
+             *  且只有在 napi_poll() 中才能刪除條目
+             */
             local_irq_enable();
+
+            for (;;) {
+                struct napi_struct *n;
+
+                if (list_empty(&list)) {
+                    if (!sd_has_rps_ipi_waiting(sd) && list_empty(&repoll))
+                        goto out;
+                    break;
+                }
+
+                /* 獲取第一個 poll_list */
+                n = list_first_entry(&list, struct napi_struct, poll_list);
+                budget -= napi_poll(n, &repoll);  /* 執行 poll callback */
+
+                /* If softirq window is exhausted then punt.
+                 * Allow this to run for 2 jiffies since which will allow
+                 * an average latency of 1.5/HZ.
+                 * 窗口耗盡 或 時間過長則重新觸發軟中斷
+                 */
+                if (unlikely(budget <= 0 ||
+                         time_after_eq(jiffies, time_limit))) {
+                    sd->time_squeeze++;
+                    break;
+                }
+            }
+
+            local_irq_disable();
+
+            list_splice_tail_init(&sd->poll_list, &list);
+            list_splice_tail(&repoll, &list);
+            list_splice(&list, &sd->poll_list);
+            if (!list_empty(&sd->poll_list))
+                __raise_softirq_irqoff(NET_RX_SOFTIRQ); /* 觸發 RX 軟中斷 */
+
+            net_rps_action_and_irq_enable(sd);
+        out:
+            __kfree_skb_flush();
         }
+        ```
 
-        return work;
-    }
-    ```
+    + `napi_enable/disable`
+        > 可能存在多個 `napi_struct` instances, 因此需要每個 instances 都能獨立的開關.
+        當 NIC interface 關閉時, 需要 NIC driver 保證有 disable 所有的 napi_struct instances
 
-+ `netif_napi_add()`
-    > NIC driver 告訴內核要使用 napi 的機制
-    > + 初始化響應參數
-    > + 註冊 poll 的 callback function
+        ```
+        void napi_enable(struct napi *napi);
+        void napi_disable(struct napi *napi);
+        ```
 
-    ```c
-    // at /net/core/dev.c
-    void netif_napi_add(struct net_device *dev, struct napi_struct *napi,
-                        int (*poll)(struct napi_struct *, int), int weight)
-    {
-        INIT_LIST_HEAD(&napi->poll_list);
-        hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-        napi->timer.function = napi_watchdog;
-        napi->gro_count = 0;
-        napi->gro_list = NULL;
-        napi->skb = NULL;
+    + `napi_gro_receive()`
+        > 使用 GRO 來 forward 資料到上層 (IP layer, L3)
 
-        /**
-         *  註冊 poll method
-         */
-        napi->poll = poll;
-        if (weight > NAPI_POLL_WEIGHT)
-            pr_err_once("netif_napi_add() called with weight %d on device %s\n",
-                        weight, dev->name);
-
-        /**
-         *  weight 該值並沒有一個非常嚴格的要求, 實際上是個經驗數據,
-         *  一般 10Mb 的網卡, 我們設置為 16, 而更快的網卡, 我們則設置為 64.
-         */
-        napi->weight = weight;
-        list_add(&napi->dev_list, &dev->napi_list);
-        napi->dev = dev;
-    #ifdef CONFIG_NETPOLL
-        napi->poll_owner = -1;
-    #endif
-        set_bit(NAPI_STATE_SCHED, &napi->state);
-        napi_hash_add(napi);
-    }
-    ```
-
-+ `napi_schedule_prep()`
-    >  check if napi can be scheduled or not
-
-+ `__napi_schedule()`
-    > NIC driver 告訴內核開始調度 napi 的機制, 稍後 poll callback function 會被調用
-    >> switch to polling mode
-
-+ `napi_complete()`
-    > NIC driver 告訴內核其工作不飽滿即中斷不多, 數據量不大,
-    改變 napi 的狀態機, 後續將採用**純中斷**方式響應數據.
-    >> switch to interrupt mode
-
-    ```c
-    // at include/linux/netdevice.h
-    static inline bool napi_complete(struct napi_struct *n)
-    {
-        return napi_complete_done(n, 0);
-    }
-    ```
-
-+ `net_rx_action()`
-    > 內核初始化註冊的 softIRQ, 註冊進去的 poll callback function 會被其呼叫
-
-+ `napi_enable/disable`
-    > 可能存在多個 `napi_struct` instances, 因此需要每個 instances 都能獨立的開關.
-    當 NIC interface 關閉時, 需要 NIC driver 保證有 disable 所有的 napi_struct instances
-
-    ```
-    void napi_enable(struct napi *napi);
-    void napi_disable(struct napi *napi);
-    ```
 
 # skb (socket buffer)
 
@@ -2158,6 +2563,23 @@ TODO draw flow chart
 
 # MISC
 
++ GRO (Generic Receive Offload)
+    > 將多個 TCP  數據聚合在一個 skb 結構, 然後作為一個大數據包交付給上層的網絡協議棧,
+    以減少上層協議棧處理 skb 的開銷, 提高系統接收TCP數據包的性能. 這個功能需要網卡驅動程序的支持.
+    合併了多個skb的超級 skb 能夠一次性通過 network layer(L3), 從而減輕CPU負載
+    >> GRO 是針對網絡收包流程進行改進的, 並且**只有 NAPI 類型的驅動才支持此功能**.
+    因此如果要支持 GRO, 不僅要內核支持, 驅動也必須調用相應的接口來開啟此功能.
+    用 `ethtool -K gro on` 來開啟 GRO, 如果報錯就說明網卡驅動本身就不支持 GRO
+
+    - GRO 的基本原理是將MAC層, IP層, 和TCP層都能合併的包的頭只留一個,
+    數據部分在 `frag[]`或 `frag_list` 中存儲, 這樣大大提高了包攜帶數據的效率.
+    在完成GRO處理後, skb 會被交付到 Linux 網絡協議棧入口進行協議處理.
+    聚合後的 skb 在被送入到網絡協議棧後, 在網絡層協議、TCP協議處理函數中,
+    調用 `pskb_may_pull()` 將GRO skb的數據整合到線性空間
+
+
+    - [GRO(Generic Receive Offload)](https://blog.csdn.net/u011130578/article/details/44676125)
+
 + OSI vs TCP/IP Model
 
     ```
@@ -2218,7 +2640,7 @@ TODO draw flow chart
 
 # reference
 
-
++ [***NAPI/非NAPI收包分析](https://chengqian90.com/Linux%E5%86%85%E6%A0%B8/NAPI-%E9%9D%9ENAPI%E6%94%B6%E5%8C%85%E5%88%86%E6%9E%90.html)
 + [NAPI機制分析](http://abcdxyzk.github.io/blog/2015/08/27/kernel-net-napi/)
 + [NAPI(New API)的一些淺見](https://www.jianshu.com/p/6292b3f4c5c0)
 + [Linux協議棧--IPv4協議的註冊](http://cxd2014.github.io/2017/09/02/inet-register/)
@@ -2250,6 +2672,13 @@ TODO draw flow chart
 + [NAPI 之(三)——技術在 Linux 網絡驅動上的應用和完善](https://www.itdaan.com/tw/fb05ad962549e1d9e0da79f648296af1)
 + [Linux kernel 之 socket 創建過程分析](https://www.cnblogs.com/chenfulin5/p/6927040.html)
 + [從socket應用到網卡驅動：Linux網絡子系統分析概述](https://freemandealer.github.io/2016/03/08/tcp-ip-internal/)
+
+
++ [Linux NAPI處理流程分析](https://www.cnblogs.com/ck1020/p/6838234.html)
+
++ [Linux 內核網絡協議棧 ------ 數據從接收到ip層](https://blog.csdn.net/shanshanpt/article/details/20377657)
+
+
 
 ## lwip
 
