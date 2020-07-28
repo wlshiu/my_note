@@ -220,6 +220,72 @@
         #2  0x5655f366 in zephyr_app_main () at ../src/main.c:70
         ```
 
+    - simulation with radio activity
+        > BableSim `2G4 (2.4GHz)` physical layer simulation (phy)
+        >> `${BSIM_OUT_PATH}/bin/bs_2G4_phy_v1` is the simulater of `2.4GHz PHY`
+
+        1. build application
+
+            ```
+            $ cd samples/bluetooth/central_hr/
+            $ mkdir out && cd out
+            $ cmake -G"Unix Makefiles" -DBOARD=nrf52_bsim ..
+
+            $ cd samples/bluetooth/peripheral/
+            $ mkdir out && cd out
+            $ cmake -G"Unix Makefiles" -DBOARD=nrf52_bsim ..
+
+            $ cp samples/bluetooth/central_hr/out/zephyr/zephyr.exe \
+                ${BSIM_OUT_PATH}/bin/nrf52_bsim_samples_bt_central_hr
+
+            $ cp samples/bluetooth/peripheral/out/zephyr/zephyr.exe \
+                ${BSIM_OUT_PATH}/bin/nrf52_bsim_samples_bt_peripheral
+            ```
+
+        1. BabbleSim's `2G4(2.4GHz)` simulation
+            > run them together
+            >> Run `-help` for more information.
+
+            ```
+            $ ${BSIM_OUT_PATH}/bin/nrf52_bsim_samples_bt_peripheral -s=trial_sim -d=0 &
+            $ ${BSIM_OUT_PATH}/bin/nrf52_bsim_samples_bt_central_hr -s=trial_sim -d=1 &
+            $ ${BSIM_OUT_PATH}/bin/bs_2G4_phy_v1 -s=trial_sim -D=2 -sim_length=10e6 &
+            ```
+
+            > + `-s` option provides a string which uniquely identifies this simulation
+            > + `-D` option tells the Phy how many devices will be run in this simulation
+            > + `-d` option tells each device which is its device number in the simulation
+            > + `-sim_length` option specifies the length of the simulation in microseconds,
+            e.g. `10e6` is `10us`, `100e3` is 100ms
+
+        1. stop simulation
+            > the script will stop all your ongoing simulations,
+            or provide to it a simulation ID as its only paramter,
+            in which case it will only stop the processes linked to that simulation
+
+            ```
+            $ ${BSIM_COMPONENTS_PATH}/common/stop_bsim.sh
+            ```
+
+        1. dump phy log
+            > The `bs_2G4_phy_v1` can dump all radio activity to files.
+            You control this with the `-dump` command line options.
+            This radio activity can be easily imported for analysis into the Ellisys Bluetooth Analyzer SW.
+
+        1. convert output for analysis
+
+            ```
+            $ ${BSIM_OUT_PATH}/components/ext_2G4_phy_v1/dump_post_process/convert_results_to_ellisysv2.sh results/<sim_id>/d_2G4*.Tx.csv > ~/Trace.bttrp
+            ```
+
+        1. [Ellisys Bluetooth Analyzer SW](https://www.ellisys.com/products/bex400/index.php#screenshots)
+            > The trace can then be imported into the Ellisys SW
+
+            ```
+            File > Import ; Select Bluetooth packets ; Click Next ; Click Browse ; and select/open the file.
+            ```
+
+
 # reference
 
 + [Getting Started with Zephyr RTOS on Nordic nRF52832 hackaBLE](https://electronut.in/getting-started-with-zephyr-rtos-on-nordic-nrf52832-hackable/)
