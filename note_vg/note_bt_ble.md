@@ -49,6 +49,7 @@
 # Bluetooth LE (Low Energy)
 
 Bluetooth v4.2 第一次出現 LE
+ps. this note is follow v4.2
 
 ## Definition
 
@@ -60,6 +61,22 @@ Bluetooth v4.2 第一次出現 LE
     > 4 bits
 + `PDU`
     > Packet Data Unit
+
++ Clock Accuracy (ppm)
+    > `ppm` 為和系統 clock 相對比例
+
+    ```
+    system clock = 32.768 KHz. Frequency Tolerance= 20 ppm
+
+    Tolerance = 32.768kHz * 20/1000000 = 32.768kHz * 0.000002 = 0.065536Hz
+
+    32.768 KHz - 0.065536Hz < Frequency < 32.768 KHz + 0.065536Hz
+    ```
+
++ Duty Cycle
+    > 表示在一個周期內, **工作時間**與**總時間**的比值
+    > + `Low Duty Cycle`: long duration **sleep** state and short **active** states
+    > + `High Duty Cycle`: long duration **active** state and short **sleep** states
 
 ## PHY
 
@@ -203,10 +220,10 @@ Advertiser 嘗試廣播數據, Scanner 接收到廣播數據後嘗試進行掃�
     >> master 需要發 `empty packet` (只有 header 沒有 data), 來讓 slave 回傳資料
 
 + Client role
-    > 發出 request
+    > 發出 REQ(request)
 
 + Server role
-    > 發出 response 來回應 request
+    > 發出 RSP(response) 來回應 request
 
 
 ## Packet Format at Link Layer
@@ -247,27 +264,368 @@ LSB                                                                   MSB
     - Access Address of advertising packet
         > fix at `0x8E89BED6` (broadcast)
 
-+ PDU
+### PDU
+
++ Advertising channel
+    > 在 Advertising state 時, 同一個 Advertising packet 會照 Advertising channel 的順序發送
+    `37Ch -> 38Ch -> 39Ch`
+
+    ```
+    LSB                               MSB
+    +------------+---------------------+
+    |   header   |       Payload       |
+    | (16 bits)  |  (length in header) |
+    +------------+---------------------+
+
+    header
+    LSB                                                             MSB
+    +-----------+----------+---------+---------+----------+---------+
+    | PDU Type  |    RFU   |  TxAdd  |  RxAdd  |  Length  |  RFU    |
+    | (4 bits)  | (2 bits) | (1 bit) | (1 bit) | (6 bits) |(2 bits) |
+    +-----------+----------+---------+---------+----------+---------+
+
+    * RFU is reserved for future use.
+    ```
+
+    - PDU Type
+
+        1. ADV_IND (0000b)
+            > connectable undirected advertising event,
+            用於常規的廣播, 可攜帶不超過 31-bytes 的廣播數據,
+            可被連接(rx SCAN_REQ), 可被掃瞄(rx CONNECT_REQ)
+
+            ```
+            PDU格式
+            AdvA(6 octets) + AdvData(0~31 octets)
+
+            * AdvA   : 6bytes的廣播者地址, 並由 PDU Header 的 TxAdd bit決定地址的類型(0 public, 1 random)
+            * AdvData: 廣播數據
+            ```
+
+        1. ADV_DIRECT_IND (0001b)
+            > connectable directed advertising event,
+            專門用於點對點連接, 且已經知道雙方的藍牙地址,
+            不可攜帶廣播數據, 可被指定的設備連接(rx CONNECT_REQ), 不可被掃瞄
+
+            ```
+            PDU格式
+            AdvA(6 octets) + InitA(6 octets)
+
+            * AdvA : 6-bytes的廣播者地址, 並由 PDU Header 的 TxAdd bit 決定地址的類型(0 public, 1 random)
+            * InitA: 6-bytes的接收者(也是連接發起者)地址, 並由 PDU Header 的 RxAdd bit 決定地址的類型(0 public, 1 random)
+            ```
+
+        1. ADV_NONCONN_IND (0010b)
+            > 和 ADV_IND 類似,
+            但不可以被連接, 不可以被掃瞄
+
+            ```
+            PDU格式
+            AdvA(6 octets) + AdvData(0~31 octets)
+            ```
+
+        1. SCAN_REQ (0011b)
+            > 當接收到 ADV_IND 或者 ADV_SCAN_IND 類型的廣播數據的時候,
+            可以通過該 PDU, 請求廣播者廣播更多的信息
+
+            ```
+            PDU格式
+            ScanA(6 octets) + AdvA(6 octets)
+
+            * ScanA: 6-bytes的本機地址, 並由 PDU Header 的 TxAdd  決定地址的類型(0 public, 1 random)
+            * AdvA : 6-bytes的廣播者地址, 並由 PDU Header 的 RxAdd 決定地址的類型(0 public, 1 random)
+            ```
+
+        1. SCAN_RSP (0100b)
+            > 廣播者收到 SCAN_REQ 請求後,
+            通過 SCAN_RSP 響應, 把更多的數據傳送給接受者
+
+            ```
+            PDU格式
+            AdvA(6 octets) + ScanRspData(0~31 octets)
+
+            * AdvA       : 6-bytes的本機地址, 並由 PDU Header 的 TxAdd  決定地址的類型(0 public, 1 random)
+            * ScanRspData: scan 的應答數據
+            ```
+
+        1. CONNECT_REQ (0101b)
+            > 當接收到 ADV_IND 或者 ADV_DIRECT_IND 類型的廣播數據的時候,
+            可以通過 CONNECT_REQ, 請求和對方建立連接
+
+            ```
+            PDU格式
+            InitA (6 octets) + AdvA (6 octets) + LLData (22 octets)
+
+            * InitA : 6-bytes的本機地址, 並由 PDU Header 的 TxAdd 決定地址的類型(0 public, 1 random)
+            * AdvA  : 6-bytes的廣播者地址, 並由 PDU Header 的 RxAdd 決定地址的類型(0 public, 1 random)
+            * LLData: BLE 連接有關的參數信息
+            ```
+
+        1. ADV_SCAN_IND (0110b)
+            > 和 ADV_IND 類似,
+            但不可以被連接, 可以被掃瞄(rx SCAN_REQ)
+
+            ```
+            PDU格式
+            AdvA(6 octets) + AdvData(0~31 octets)
+            ```
+
+    - CONNECT_REQ
+        > Initiator send to Advertiser.
+        >> LLData descripts the rule of transmission
+
+        ```
+        Payload = InitA (6 octets) + AdvA (6 octets) + LLData (22 octets)
+
+        unit: octets
+        +------+----------+---------+-----------+----------+---------+---------+-----+----------+----------+
+        |  AA  | CRCInit  | WinSize | WinOffset | Interval | Latency | Timeout | ChM | Hop      | SCA      |
+        | (4 ) |  (3)     |  (1)    | (2)       | (2)      | (2)     | (2)     | (5) | (5 bits) | (3 bits) |
+        +------+----------+---------+-----------+----------+---------+---------+-----+----------+----------+
+        ```
+
+        1. `AA (Access Address)`
+        1. `CRCInit` is initialization value for the CRC
+        1. `WinSize` is the transmitWindowSize value
+
+            ```
+            transmitWindowSize = WinSize * 1.25 ms
+            ```
+
+        1. `WinOffset` is the transmitWindowOffset value
+
+            ```
+            transmitWindowOffset = WinOffset * 1.25 ms
+            ```
+
+        1. `Interval` is the connInterval value
+
+            ```
+            connInterval = Interval * 1.25 ms
+            ```
+        1. `Latency` is the connSlaveLatency value
+
+            ```
+            connSlaveLatency = Latency
+            ```
+
+        1. `Timeout` is the connSupervisionTimeout value
+
+            ```
+            connSupervisionTimeout = Timeout * 10 ms
+            ```
+
+        1. `ChM` contains the channel bit map indicating `Used` and `Unused` data channels.
+        1. `Hop` is the the hopIncrement
+            > used in the data channel selection algorithm.
+            It shall have a **random value** in the range of **5 to 16**.
+
+        1. `SCA` is the masterSCA
+            > determine the worst case Master's sleep clock accuracy
+
+    - 使用情境
+        1. 如果只需要定時傳輸一些簡單的數據(如某一個溫度節點的溫度信息),
+        後續不需要建立連接, 則可以使用 `ADV_NONCONN_IND`.
+        廣播者只需要週期性的廣播該類型的 PDU 即可, 接收者按照自己的策略掃瞄/接收,
+        二者不需要任何額外的數據交互.
+
+        1. 如果除了廣播數據之外, 還有一些額外的數據需要傳輸,
+        由於種種原因, 如廣播數據的長度限制, 私密要求等, 可以使用`ADV_SCAN_IND`.
+        廣播者在週期性廣播的同時, 會監聽 `SCAN_REQ`請求.
+        接收者在接收到廣播數據之後, 可以通過 `SCAN_REQ PDU`, 請求更多的數據.
+
+        1. 如果後續需要建立點對點的連接, 則可使用 `ADV_IND`.
+        廣播者在週期性廣播的同時, 會監聽 `CONNECT_REQ` 請求.
+        接收者在接收到廣播數據之後, 可以通過 `CONNECT_REQ PDU`, 請求建立連接.
+
+        1. 通過 `ADV_IND/CONNECT_REQ`的組合建立連接, 花費的時間比較長.
+        如果雙方不關心廣播數據, 而只是想快速建立連接,
+        恰好如果連接發起者又知道對方(廣播者)的藍牙地址(如通過掃碼的方式獲取),
+        則可以通過 `ADV_DIRECT_IND/CONNECT_REQ`的方式
+
+
++ Data channel
+
+    ```
+    LSB                                             MSB
+    +------------+---------------------+ +-----------+
+    |   header   |       Payload       | |    MIC    |
+    | (16 bits)  |  (length in header) | | (32 bits) |
+    +------------+---------------------+ +-----------+
+                                           (optional)
+
+    header
+    LSB                                                             MSB
+    +-----------+----------+---------+---------+----------+---------+
+    | LLID      |   NESN   |  SN     |  MD     |  RFU     | Length  |
+    | (2 bits)  | (1 bits) | (1 bit) | (1 bit) | (3 bits) |(8 bits) |
+    +-----------+----------+---------+---------+----------+---------+
+
+    * RFU is reserved for future use.
+    ```
+
+    - header
+        1. LLID
+            > The LLID indicates whether the packet isan LL Data PDU or an LL Control PDU.
+            > + `00b` = Reserved
+            > + `01b` = LL Data PDU: Continuation fragment of an L2CAP message, or an Empty PDU.
+            > + `10b` = LL Data PDU: Start of an L2CAP message or a complete L2CAP message with no fragmentation.
+            > + `11b` = LL Control PDU
+
+        1. NESN
+            > Next Expected Sequence Number
+        1. SN
+            > Sequence Number
+        1. MD
+            > More Data
+        1. Length
+            > The Length field indicates the size, in octets, of the Payload and MIC, if included.
+
+    - Payload
+
+        ```
+        +-----------+-----------------+
+        |   Opcode  |     CtrData     |
+        | (1 octet) | (0 – 26 octets) |
+        +-----------+-----------------+
+        ```
+
+        1. Opcode
+            > + `0x00` = LL_CONNECTION_UPDATE_REQ
+            > + `0x01` = LL_CHANNEL_MAP_REQ
+            > + `0x02` = LL_TERMINATE_IND
+            > + `0x03` = LL_ENC_REQ
+            > + `0x04` = LL_ENC_RSP
+            > + `0x05` = LL_START_ENC_REQ
+            > + `0x06` = LL_START_ENC_RSP
+            > + `0x07` = LL_UNKNOWN_RSP
+            > + `0x08` = LL_FEATURE_REQ
+            > + `0x09` = LL_FEATURE_RSP
+            > + `0x0A` = LL_PAUSE_ENC_REQ
+            > + `0x0B` = LL_PAUSE_ENC_RSP
+            > + `0x0C` = LL_VERSION_IND
+            > + `0x0D` = LL_REJECT_IND
+            > + `0x0E` = LL_SLAVE_FEATURE_REQ
+            > + `0x0F` = LL_CONNECTION_PARAM_REQ
+            > + `0x10` = LL_CONNECTION_PARAM_RSP
+            > + `0x11` = LL_REJECT_IND_EXT
+            > + `0x12` = LL_PING_REQ
+            > + `0x13` = LL_PING_RSP
+            > + `0x14` = LL_LENGTH_REQ
+            > + `0x15` = LL_LENGTH_RSP
+
+
+## bitstream processing schemes
 
 ```
-LSB                               MSB
-+------------+---------------------+
-|   header   |       Payload       |
-| (16 bits)  |  (length in header) |
-+------------+---------------------+
-
-header
-LSB                                                             MSB
-+-----------+----------+---------+---------+----------+---------+
-| PDU Type  |    RFU   |  TxAdd  |  RxAdd  |  Length  |  RFU    |
-| (4 bits)  | (2 bits) | (1 bit) | (1 bit) | (6 bits) |(2 bits) |
-+-----------+----------+---------+---------+----------+---------+
-
-* RFU is reserved for future use.
+Tx payload (LSB first) -> encryption -> CRC generation -> whitening
+                                                                |
+                                                            RF interface
+Rx payload <- ecryption <- CRC checking <- dewhitening    <-----+
 ```
 
+## Air interface protocol
 
-## zephyr directory
++ The `Inter Frame Space` (T_IFS) shall be `150 µs`.
+    > The time interval between two consecutive packets
+    on the same channel index is called the Inter Frame Space
+
+### Advertising state
+
++ Advertising Event
+    > Each advertising event is composed of
+    one or more advertising PDUs sent on used advertising channel indices.
+    >> BLE 廣播的過程中, 根據使用場景的不同,
+    會在被使用的每一個物理 Channel 上, 發送(或接收)多種 PDU types.
+    而 `Advertising Event` 是指在所有被使用的物理Channel上, 發送的 Advertising PDU 的組合.
+    一個 `Advertising Event` type 相當於一種場景.
+
+    - BLE 設備處於 Advertising 狀態的目的, 就是要廣播數據.
+        > 根據應用場景的不同, 可廣播 4種類型的 Advertising Event type
+        > + Connectable Undirected Event (with ADV_IND PDU)
+        > + Connectable Directed Event (with ADV_DIRECT_IND PDU)
+        >> Low/High Duty Cycle
+        > + Non-connectable Undirected Event (with ADV_NONCONN_IND PDU)
+        > + Scannable Undirected Event (with ADV_SCAN_IND PDU)
+
+        > 另外, BLE 設備最多可以在 3 個物理 Channel 上廣播數據.
+        也就是說, 同一種數據 (4種類型中的一種), 需要在多個 Channel 上**依序廣播**.
+        因此, 這樣依序在多個 Channel 上廣播的過程, 就叫做一個 `Advertising Event`.
+
+    - 有些 Advertising Event (如可連接, 可掃瞄)發送出去之後,
+    允許接收端在對應的 Channel 上, 回應一些請求(如連接請求, 掃瞄請求).
+    並且, 廣播者接收到掃瞄請求後, **需要在同樣的 Adv Channel 上回應**.
+    這些過程, 也會計算在一個 Advertising Event 中.
+
+    - 一個 `Advertising Event` 通常開始於發送 PDU 到第一個 Channel(37Ch), 結束於發送到最後一個 Channel(39Ch).
+        > 也可能結束在**同一個 Adv Channel上, 完成一對 REQ(request) 和 RSP (response)的發送**
+        >>
+
+
++ Advertising Event Interval
+
+    ```
+    T_advEvent = advInterval + advDelay
+
+    Advertising State entered
+    ^
+    |                          |
+    |   Advertising Events 0   |   Advertising Events 1   |
+    |--------------------------|--------------------------|--------
+    |<------- T_advEvent ----->|<------- T_advEvent ----->|
+    |<--- advInterval --->     |                          |
+    |                     <--->|                          |
+                       advDelay
+
+     _________________________ Advertising Events 0 _____________________________
+    /                                                                            \
+    |-------------------------|-------------------------|-------------------------|
+    |<- ADV_IND PDU ->        |<- ADV_IND PDU ->        |<- ADV_IND PDU ->        |
+    |<--- 37Ch ----------->   |<--- 38Ch ----------->   |<--- 38Ch ----------->   |
+    |<--- less than 10 ms --->|<--- less than 10 ms --->|<--- less than 10 ms --->|
+    |                                                                             |
+    v                                                                             v
+    advertising                                                              advertising
+    event Start                                                               event End
+
+    ```
+
+    - `advInterval`
+        > It should be `20 ms < (n * 0.625 ms) < 10.24 s`
+        >> advInterval 是一個可由 Host 設定的參數:
+        >> + 對於 `Scannable Undirected` 和 `Non-connectable Undirected`兩種 Advertising Event,
+        該值**不能小於 100ms** (從功耗的角度考慮的, 也決定了廣播數據的速率)
+        >> + 對於 `Connectable Undirected` 和 `Low Duty Cycle Connectable Directed` 兩種 Advertising Event,
+        該值**不能小於 20ms** (建立連接嘛, 要快點)
+
+        1. `High Duty Cycle Connectable Directed Event`則是一個比較狂暴的傢伙,
+        其 Advertising 週期不受上面的參數控制, 可以小到 `3.75ms`.
+        不過, BLE 協議也同時規定, Link Layer 必須在 `1.28s` 內退出這種狂暴狀態.
+
+    - `advDelay`
+        > It is a pseudo-random value with a range of `0 ~ 10 ms`
+        generated by the Link Layer for **each advertising event**
+
+
++ 我們可以從上面的時間信息推斷出, BLE 協議對廣播通信的期望, 是非常明確的(不在乎速率、只在乎功耗).
+一般的廣播通信(不以連接為目的), 最高速率也就是 `31-bytes / 100 ms = 2.48kbps`.
+如果再算上可掃瞄的那段數據, 也就是double, 4.96kbps.
+
++ 對於連接來說, 如果事先不知道連接發起者的設備地址, 則最快的連接速度可能是 `20ms`.
+如果事先知道地址, 使用 High Duty Cycle Connectable Directed Event 的話, 則可能在`3.75ms`內建立連接.
+由此可以看出, BLE 的連接建立時間, 比傳統藍牙少了很多, 這也是 BLE 設備之間不需要保持連接的原因.
+
+
+### Scanning State
+
++ `scanWindow` and `scanInterval`
+
+### Initiating State
+### Connection State
+
+# Bluetooth Classic  (BR/EDR)
+
+# zephyr directory
 
 ```
                     Application
@@ -340,7 +698,7 @@ LSB                                                             MSB
     > the source code of host, invole gatt, att, hci, ...etc.
 
 
-# Bluetooth Classic  (BR/EDR)
+
 
 
 # reference
@@ -348,6 +706,7 @@ LSB                                                             MSB
 + [Bluetooth Stack Architecture](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/bluetooth/bluetooth-arch.html)
 + [Bluetooth Specification](https://www.bluetooth.com/specifications/archived-specifications/)
 + [淺顯易懂講解藍牙協議棧軟體框架](https://kknews.cc/tech/zaxoplq.html)
++ [藍牙協議分析(5)_BLE廣播通信相關的技術分析](http://www.wowotech.net/bluetooth/ble_broadcast.html)
 
 ## Open source
 + [zephyr](https://github.com/zephyrproject-rtos/zephyr)
