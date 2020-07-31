@@ -618,7 +618,45 @@ Rx payload <- ecryption <- CRC checking <- dewhitening    <-----+
 
 ### Scanning State
 
-+ `scanWindow` and `scanInterval`
+Scanning State 是掃瞄和接收廣播數據的狀態,
+該狀態的掃瞄行為是由 `scanWindow`和 `scanInterval`兩個參數決定的
+
+```
+|----------------------------------|-------------------------
+|<- scanWindow ->                  |<- scanWindow ->
+|                <- scanInterval ->|                <- scanInterval ->
+
+condition:
+1. scanWindow < scanInterval
+2. (scanWindow <= 10.24 sec) and (scanInterval <= 10.24 sec)
+3. if (scanWindow == scanInterval) => Never stop scanning
+```
+
++ Parameters
+
+    - `scanWindow`
+        > the duration of the scan window
+        >> 一次掃瞄的時間(即可以理解為 RF-RX 打開的時間)
+
+    - `scanInterval`
+        > the interval between the start of two consecutive scan windows
+        >> 兩次掃瞄之間的間隔
+
+
++ Scanning type
+
+不管哪個type, 目的都是把接收到的數據(包括Advertiser地址, Advertiser數據等), 往上報給 Host
+
+    - Passive Scanning
+        > the Link Layer will only receive packets, it shall not send any packets.
+        >> 只接收 `ADV_DIRECT_IND`, `ADV_IND`, `ADV_SCAN_IND`, `ADV_NONCONN_IND`等類型的 PDU,
+        並不發送 SCAN_REQ
+
+    - Active Scanning
+        > the Link Layer shall listen for advertising PDUs and
+        depending on the advertising PDU type it may request an advertiser
+        to send additional information
+        >> 依照收到的 PDU, 發出 SCAN_REQ, 並接收後續的 SCAN_RSP
 
 ### Initiating State
 ### Connection State
