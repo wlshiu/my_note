@@ -325,13 +325,191 @@ make cscope
 
 # MISC
 
-## definition
 
-+ `MBR` in FAT file system
-    > Master Boot Record
+## ext2/ext3 file system
 
-+ `PBR` in FAT file system
-    > Private Boot Record
+ext2 和 ext3 格式是完全相同的, 只是 ext3 file system 會在硬碟分區的最後面,
+留出一塊磁碟空間來存放日誌(Journal)記錄
+
+在 ext2 file system 上, 當要向硬碟中寫入數據時, 系統並不是立即將這些數據寫到硬碟上,
+而是先將這些數據寫到數據緩衝區中(內存), 當數據緩衝區寫滿時, 這些數據才會被寫到硬碟中.
+
+在 ext3 file system 上, 當要向硬碟中寫入數據時, 系統同樣先將這些數據寫到數據緩衝區.
+當緩衝區寫滿時, 在數據被寫入硬碟之前, 系統要先通知日誌,
+現在要開始向硬碟中寫入數據(即向日誌中寫入一些信息), 之後才會將數據寫入硬碟中.
+當數據寫入硬碟之後, 系統會再次通知日誌數據已經寫入硬碟.
+
+
+### Definition
+
++ sector (扇區)
+    > physical 最小單位, 一般 default 是 `512 bytes`
+
+
+### Concept
+
+FAT physical structure
+
+```
++-----------------+
+| Boot Block      |                 Block group
++-----------------+ ---------> +-------------------+
+| Block group 1   |            | Superblock        |
++-----------------+ ---+       +-------------------+
+| Block group 2   |    |       | Group Description |
++-----------------+    |       +-------------------+
+| Block group ... |    |       | Block bitmap      |
++-----------------+    |       +-------------------+
+                       |       | Inode bitmap      |
+                       |       +-------------------+
+                       |       | Inode table       |
+                       |       +-------------------+
+                       |       |   Data            |
+                       |       |   Blocks          |
+                       +-----> +-------------------+
+```
+
++ Block
+    > 邏輯塊.
+    對於 ext2 file system 來說, 硬盤分區首先被分割為一個一個的邏輯塊(Block),
+    每個 Block 就是實際用來存儲數據的單元, 大小相同並從 `0` 開始順序進行編號, 第一個 Block 的編號為 `0`.
+    ext2 file system 支持的 Block 的大小有 `1024/2048/4096 bytes`, Block 的大小在創建文件系統的時候可以通過參數指定.
+    如果不指定, 則會從 `/etc/mke2fs.conf` 文件中讀取對應的值; 原則上, Block 的大小與數量在格式化後就不能夠發生改變了.
+
+    > 每個 Block 內最多只會存放一個文件的數據(即不會出現兩個文件的數據被放入同一個 Block 的情況),
+    如果文件大小超過了一個 Block 的 size, 則會佔用多個 Block 來存放文件,
+    如果文件小於一個 Block 的 size, 則這個 Block 剩餘的空間就浪費掉了.
+
+    ```shell
+    # 可以使用 dumpe2fs 命令查看 Block 的大小
+    $ sudo dumpe2fs /dev/sda1 | grep "Block size:"
+    ```
+
++ Boot Block
+    > 每個 disk partition 的開頭 `1024-bytes` 大小都預留為分區的啟動 sector,
+    存放引導程序和數據, 所以又叫引導塊.
+    引導塊在第一個 Block, 即 `Block 0` 中存放, 但是未必佔滿這個 Block, 原因是 Block 的大小可能大於 1024 bytes.
+
+    > 這裡是存放開機管理程序的地方, 這是個非常重要的設計.
+    因為這樣使得我們能夠把不同的開機管理程序, 安裝到每個文件系統的最前端,
+    而不用覆蓋整顆磁盤唯一的 MBR, 這樣就能支持多系統啟動了.
+
++ Block Group
+    > Block 在邏輯上被劃分為多個 Block Group, 每個 Block Group 包含的 Block 數量相同,
+    具體是在 `SuperBlock` 中通過 `s_block_per_group` 屬性定義的.
+    >> 最後一個 Block Group 除外, 最後剩下的 Block 數量可能小於 `s_block_per_group`,
+    這些 Block 會被劃分到最後一個 Block Group 中.
+
+    - example
+
+        ```
+        $ sudo dumpe2fs /dev/sda1
+            ...
+            Group 0: (Blocks 1-8192) [ITABLE_ZEROED]
+              Checksum 0xa22b, unused inodes 501
+              Primary superblock at 1, Group descriptors at 2-81
+              Reserved GDT blocks at 82-337
+              Block bitmap at 338 (+337), Inode bitmap at 354 (+353)
+              Inode table at 370-497 (+369)
+              5761 free blocks, 501 free inodes, 2 directories, 501 unused inodes
+              Free blocks: 2432-8192
+              Free inodes: 12-512
+            Group 1: (Blocks 8193-16384) [INODE_UNINIT, BLOCK_UNINIT, ITABLE_ZEROED]
+              Checksum 0xea71, unused inodes 512
+              Backup superblock at 8193, Group descriptors at 8194-8273
+              Reserved GDT blocks at 8274-8529
+              Block bitmap at 339 (bg #0 + 338), Inode bitmap at 355 (bg #0 + 354)
+              Inode table at 498-625 (bg #0 + 497)
+              7855 free blocks, 512 free inodes, 0 directories, 512 unused inodes
+              Free blocks: 8530-16384
+              Free inodes: 513-1024
+            ...
+        ```
+
+        1. Group0 佔用從 `1 ~ 8192` 號的 block.
+            > + 其中的 Superblock 則在 `1` 號 block 內.
+            > + Group descriptors (文件系統描述說明) 佔用從 `2 ~ 81` 號 block.
+            > + Block bitmap 在 `338` 號 block 上.
+            > + Inode bitmap 在 `354` 號 block 上.
+            > + Inode table 佔用 `370 ~ 497` 號 block.
+
+        1. Group0 當前可用的 block 號為: `2432 ~ 8192`, 可用的 inode 號碼為: `12 ~ 512`
+
+            ```
+            Group 內 inode 數量的計算方式:
+            一個 inode 佔用 256 Bytes, 每個 block 的大小為 1024 Bytes
+
+            inodes_per_block = 1024 / 256;
+
+            Inode 佔用的 block 數: 497 - 370 + 1 = 128
+
+            total_inodes_per_group = 128 * inodes_per_block = 512
+            ```
+
++ Superblock
+    > 記錄整個 filesystem 相關信息的地方, 其實上除了第一個 block group 內會含有 superblock 之外,
+    後續的 block group 不一定都包含 superblock, 如果包含,
+    也是做為第一個 block group 內 superblock 的備份
+
+    - superblock 記錄的主要信息
+
+        1. `block` 與 `inode` 的總量
+        1. 未使用與已使用的 inode/block 數量
+        1. block 與 inode 的大小
+            > + block: `1/2/4 KB`
+            > + inode: `128/256 Bytes`
+        1. filesystem 的掛載時間
+        1. 最近一次寫入數據的時間
+        1. 最近一次檢驗磁盤(fsck)的時間等文件系統的相關信息
+        1. 一個 `valid bit` 數值, 若此文件系統已被掛載, 則 `valid bit = 0`, 若未被掛載, 則 `valid bit = 1`
+
+    - Superblock 的大小為 1024 Bytes, 它非常重要, 因為分區上重要的信息都在上面.
+    如果 Superblock 掛掉了, partition 上的數據就很難恢復了
+
+        1. Superblock 中的信息
+
+            ```
+            $ sudo dumpe2fs -h /dev/sdd1
+            ```
+
++ Group Description
+    > 用來描述每個 group 的開始與結束位置的 block 號碼,
+    以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間
+
++ Block bitmap
+    > 查看 block 是否已經被使用了.
+    >> 在創建文件時需要為文件分配 blocks, 屆時就會選擇分配空閒的 block 給文件使用.
+    通過 block bitmap 可以知道哪些 block 是空的, 因此系統就能夠很快地找到空閒空間來分配給文件.
+    同樣的, 在刪除某些文件時, 文件原本佔用的 block 號碼就要釋放出來,
+    此時在 block bitmap 當中相對應到該 block 號碼的標誌就需要修改成**空閒**
+
++ Inode bitmap
+    > 記錄的是**使用**與**未使用**的 inode 號
+
++ Inode table
+    > 存放著一個個 inode
+    >> inode 的內容, 記錄文件的屬性以及該文件實際數據是放置在哪些 block 內
+
+    - 文件屬性
+
+    - inode 特點
+        1. 數量與大小在格式化時就已經固定
+        1. 每個 inode 大小均固定為 `128 Bytes`
+            > 新的 ext4 為 `256 Bytes`
+        1. **每個文件都僅會佔用一個 inode**
+        1. file system 能夠創建的文件數量與 inode 的數量相關
+        1. 系統讀取文件時需要先找到 inode, 並分析 inode 所記錄的權限與使用者是否符合,
+        若符合才能夠開始讀取 block 的內容
+
+
++ Data block
+
+
+### reference
+
++ [Ext2文件系統簡單剖析(一)](https://www.jianshu.com/p/3355a35e7e0a)
++ [ext2檔案系統](http://shihyu.github.io/books/ch29s02.html)
++ [Linux EXT2 文件系統](https://www.cnblogs.com/sparkdev/p/11212734.html)
 
 ## environment bootargs of u-boot
 
@@ -348,43 +526,18 @@ make cscope
 ```
 $ /dev/mmcblk0boot1
 ```
-## FAT 格式文件系統相關操作命令
-
-+ `fatinfo`
-    > 用來查詢mmc設備中指定分區的文件系統信息.
-    >> 該命令的用法中, `<interface>` 表示要查看的接口, 例如 mmc,
-    `[<dev[:part]>]`中的 dev 表示要查詢的設備號, part 則表示要查詢的分區
-
-    ```
-    => fatinfo
-        fatinfo - print information about filesystem
-
-        Usage:
-        fatinfo <interface> [<dev[:part]>]
-            - print information about filesystem from 'dev' on 'interface'
-
-    => mmc list
-    FSL_SDHC: 0 (SD)
-    FSL_SDHC: 1
-    => fatinfo mmc 0:1      # 查看 sd 卡中 partition 1 的文件系統信息
-    ```
-
-
-+ reference
-    - [Uboot常用命令使用](https://www.cnblogs.com/Cqlismy/p/12214305.html)
-
 
 # simulation environment
 
 + 生成一個空的 SD卡 image
 
-```
-# bs: block size= 1024/1M
-$ dd if=/dev/zero of=uboot.disk bs=1024 count=1024
-    1024+0 records in
-    1024+0 records out
-    1073741824 bytes (1.1 GB, 1.0 GiB) copied, 1.39208 s, 771 MB/s
-```
+    ```
+    # bs: block size= 512/1024/1M
+    $ dd if=/dev/zero of=uboot.disk bs=512 count=1024
+        1024+0 records in
+        1024+0 records out
+        1073741824 bytes (1.1 GB, 1.0 GiB) copied, 1.39208 s, 771 MB/s
+    ```
 
     - 創建 GPT 分區
         > 下面創建了兩個分區, 一個用來存放 kernel 和設備樹, 另一個存放 rootfs
@@ -448,7 +601,8 @@ $ dd if=/dev/zero of=uboot.disk bs=1024 count=1024
         1. 格式化
 
             ```
-            sudo mkfs.fat /dev/loop0p1
+            $ sudo mkfs.fat /dev/loop0p1
+            $ sudo mkfs.vfat -F 32 /dev/loop0p1
             ```
 
         1. mount
