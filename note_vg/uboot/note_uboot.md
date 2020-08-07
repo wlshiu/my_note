@@ -325,191 +325,105 @@ make cscope
 
 # MISC
 
+## Commands
 
-## ext2/ext3 file system
++ 檢查及修復檔案系統指令
 
-ext2 和 ext3 格式是完全相同的, 只是 ext3 file system 會在硬碟分區的最後面,
-留出一塊磁碟空間來存放日誌(Journal)記錄
-
-在 ext2 file system 上, 當要向硬碟中寫入數據時, 系統並不是立即將這些數據寫到硬碟上,
-而是先將這些數據寫到數據緩衝區中(內存), 當數據緩衝區寫滿時, 這些數據才會被寫到硬碟中.
-
-在 ext3 file system 上, 當要向硬碟中寫入數據時, 系統同樣先將這些數據寫到數據緩衝區.
-當緩衝區寫滿時, 在數據被寫入硬碟之前, 系統要先通知日誌,
-現在要開始向硬碟中寫入數據(即向日誌中寫入一些信息), 之後才會將數據寫入硬碟中.
-當數據寫入硬碟之後, 系統會再次通知日誌數據已經寫入硬碟.
-
-
-### Definition
-
-+ sector (扇區)
-    > physical 最小單位, 一般 default 是 `512 bytes`
-
-
-### Concept
-
-FAT physical structure
-
-```
-+-----------------+
-| Boot Block      |                 Block group
-+-----------------+ ---------> +-------------------+
-| Block group 1   |            | Superblock        |
-+-----------------+ ---+       +-------------------+
-| Block group 2   |    |       | Group Description |
-+-----------------+    |       +-------------------+
-| Block group ... |    |       | Block bitmap      |
-+-----------------+    |       +-------------------+
-                       |       | Inode bitmap      |
-                       |       +-------------------+
-                       |       | Inode table       |
-                       |       +-------------------+
-                       |       |   Data            |
-                       |       |   Blocks          |
-                       +-----> +-------------------+
-```
-
-+ Block
-    > 邏輯塊.
-    對於 ext2 file system 來說, 硬盤分區首先被分割為一個一個的邏輯塊(Block),
-    每個 Block 就是實際用來存儲數據的單元, 大小相同並從 `0` 開始順序進行編號, 第一個 Block 的編號為 `0`.
-    ext2 file system 支持的 Block 的大小有 `1024/2048/4096 bytes`, Block 的大小在創建文件系統的時候可以通過參數指定.
-    如果不指定, 則會從 `/etc/mke2fs.conf` 文件中讀取對應的值; 原則上, Block 的大小與數量在格式化後就不能夠發生改變了.
-
-    > 每個 Block 內最多只會存放一個文件的數據(即不會出現兩個文件的數據被放入同一個 Block 的情況),
-    如果文件大小超過了一個 Block 的 size, 則會佔用多個 Block 來存放文件,
-    如果文件小於一個 Block 的 size, 則這個 Block 剩餘的空間就浪費掉了.
-
-    ```shell
-    # 可以使用 dumpe2fs 命令查看 Block 的大小
-    $ sudo dumpe2fs /dev/sda1 | grep "Block size:"
-    ```
-
-+ Boot Block
-    > 每個 disk partition 的開頭 `1024-bytes` 大小都預留為分區的啟動 sector,
-    存放引導程序和數據, 所以又叫引導塊.
-    引導塊在第一個 Block, 即 `Block 0` 中存放, 但是未必佔滿這個 Block, 原因是 Block 的大小可能大於 1024 bytes.
-
-    > 這裡是存放開機管理程序的地方, 這是個非常重要的設計.
-    因為這樣使得我們能夠把不同的開機管理程序, 安裝到每個文件系統的最前端,
-    而不用覆蓋整顆磁盤唯一的 MBR, 這樣就能支持多系統啟動了.
-
-+ Block Group
-    > Block 在邏輯上被劃分為多個 Block Group, 每個 Block Group 包含的 Block 數量相同,
-    具體是在 `SuperBlock` 中通過 `s_block_per_group` 屬性定義的.
-    >> 最後一個 Block Group 除外, 最後剩下的 Block 數量可能小於 `s_block_per_group`,
-    這些 Block 會被劃分到最後一個 Block Group 中.
-
-    - example
+    - `dumpe2fs`
+        > 查看這個 partition 中, superblock 和 Group Description Table 中的信息
 
         ```
-        $ sudo dumpe2fs /dev/sda1
-            ...
-            Group 0: (Blocks 1-8192) [ITABLE_ZEROED]
-              Checksum 0xa22b, unused inodes 501
-              Primary superblock at 1, Group descriptors at 2-81
-              Reserved GDT blocks at 82-337
-              Block bitmap at 338 (+337), Inode bitmap at 354 (+353)
-              Inode table at 370-497 (+369)
-              5761 free blocks, 501 free inodes, 2 directories, 501 unused inodes
-              Free blocks: 2432-8192
-              Free inodes: 12-512
-            Group 1: (Blocks 8193-16384) [INODE_UNINIT, BLOCK_UNINIT, ITABLE_ZEROED]
-              Checksum 0xea71, unused inodes 512
-              Backup superblock at 8193, Group descriptors at 8194-8273
-              Reserved GDT blocks at 8274-8529
-              Block bitmap at 339 (bg #0 + 338), Inode bitmap at 355 (bg #0 + 354)
-              Inode table at 498-625 (bg #0 + 497)
-              7855 free blocks, 512 free inodes, 0 directories, 512 unused inodes
-              Free blocks: 8530-16384
-              Free inodes: 513-1024
-            ...
+        $ dumpe2fs ./ext4.disk
+        dumpe2fs 1.44.1 (24-Mar-2018)
+        Filesystem volume name:   <none>
+        Last mounted on:          <not available>
+        Filesystem UUID:          66737b90-1d24-4f13-8589-9df4edc7b757
+        Filesystem magic number:  0xEF53
+        Filesystem revision #:    1 (dynamic)
+        Filesystem features:      has_journal ext_attr resize_inode dir_index filetype extent 64bit flex_bg sparse_super large_file huge_file dir_nlink extra_isize metadata_csum
+        Filesystem flags:         signed_directory_hash
+        Default mount options:    user_xattr acl
+        Filesystem state:         clean
+        Errors behavior:          Continue
+        Filesystem OS type:       Linux
+        Inode count:              2048
+        Block count:              2048
+        Reserved block count:     102
+        Free blocks:              950
+        Free inodes:              2037
+        First block:              0
+        Block size:               4096
+        ...
+
+        Group 0: (Blocks 0-2047) csum 0x7a19
+          Primary superblock at 0, Group descriptors at 1-1
+          Block bitmap at 2 (+2), csum 0xfbdf5b1e
+          Inode bitmap at 18 (+18), csum 0xa4024b9c
+          Inode table at 34-97 (+34)
+          950 free blocks, 2037 free inodes, 2 directories, 2037 unused inodes
+          Free blocks: 1098-2047
+          Free inodes: 12-2048
         ```
 
-        1. Group0 佔用從 `1 ~ 8192` 號的 block.
-            > + 其中的 Superblock 則在 `1` 號 block 內.
-            > + Group descriptors (文件系統描述說明) 佔用從 `2 ~ 81` 號 block.
-            > + Block bitmap 在 `338` 號 block 上.
-            > + Inode bitmap 在 `354` 號 block 上.
-            > + Inode table 佔用 `370 ~ 497` 號 block.
+    - `e2fsck`
 
-        1. Group0 當前可用的 block 號為: `2432 ~ 8192`, 可用的 inode 號碼為: `12 ~ 512`
+        ```shell
+        $ e2fsck --help
+            e2fsck: invalid option -- '-'
+            Usage: e2fsck [-panyrcdfktvDFV] [-b superblock] [-B blocksize]
+                            [-l|-L bad_blocks_file] [-C fd] [-j external_journal]
+                            [-E extended-options] [-z undo_file] device
 
-            ```
-            Group 內 inode 數量的計算方式:
-            一個 inode 佔用 256 Bytes, 每個 block 的大小為 1024 Bytes
+            Emergency help:
+             -p                   Automatic repair (no questions), 自動修復
+             -n                   Make no changes to the filesystem, 以[唯讀]方式開啟
+             -y                   Assume "yes" to all questions
+             -c                   Check for bad blocks and add them to the badblock list
+             -f                   Force checking even if filesystem is marked clean
+             -v                   Be verbose, 詳細顯示模式
+             -b superblock        Use alternative superblock
+             -B blocksize         Force blocksize when looking for superblock
+             -j external_journal  Set location of the external journal
+             -l bad_blocks_file   Add to badblocks list
+             -L bad_blocks_file   Set badblocks list
+             -z undo_file         Create an undo file
+             -V                   顯示出目前 e2fsck 的版本
+             -C file              將檢查的結果存到 file 中以便查看
 
-            inodes_per_block = 1024 / 256;
+        $ e2fsck -p -y /dev/hda5
+        ```
 
-            Inode 佔用的 block 數: 497 - 370 + 1 = 128
+        1. 大部份使用 e2fsck 來檢查硬盤 partition 的情況時, 通常都是情形特殊,
+        因此最好先將該 partition umount, 然後再執行 e2fsck 來做檢查,
+        若是要非要檢查 `/` 時, 則請進入 singal user mode 再執行.
 
-            total_inodes_per_group = 128 * inodes_per_block = 512
-            ```
+    - `od`
+        > 用來檢視儲存在二進位制檔案中的值
 
-+ Superblock
-    > 記錄整個 filesystem 相關信息的地方, 其實上除了第一個 block group 內會含有 superblock 之外,
-    後續的 block group 不一定都包含 superblock, 如果包含,
-    也是做為第一個 block group 內 superblock 的備份
+        ```shell
+        $ od -tx1 -Ax fs
+            000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            *
+            000400 80 00 00 00 00 04 00 00 33 00 00 00 da 03 00 00
+            000410 75 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+            ...
 
-    - superblock 記錄的主要信息
+        # 其中以'*'開頭的行表示這一段數據全是 0 因此省略了
+        ```
 
-        1. `block` 與 `inode` 的總量
-        1. 未使用與已使用的 inode/block 數量
-        1. block 與 inode 的大小
-            > + block: `1/2/4 KB`
-            > + inode: `128/256 Bytes`
-        1. filesystem 的掛載時間
-        1. 最近一次寫入數據的時間
-        1. 最近一次檢驗磁盤(fsck)的時間等文件系統的相關信息
-        1. 一個 `valid bit` 數值, 若此文件系統已被掛載, 則 `valid bit = 0`, 若未被掛載, 則 `valid bit = 1`
+    - `hexdump`
+        > 用來檢視儲存在二進位制檔案中的值
 
-    - Superblock 的大小為 1024 Bytes, 它非常重要, 因為分區上重要的信息都在上面.
-    如果 Superblock 掛掉了, partition 上的數據就很難恢復了
+        ```shell
+        $ hexdump -C fs
+            000000 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            *
+            000400 80 00 00 00 00 04 00 00 33 00 00 00 da 03 00 00
+            000410 75 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+            ...
 
-        1. Superblock 中的信息
-
-            ```
-            $ sudo dumpe2fs -h /dev/sdd1
-            ```
-
-+ Group Description
-    > 用來描述每個 group 的開始與結束位置的 block 號碼,
-    以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間
-
-+ Block bitmap
-    > 查看 block 是否已經被使用了.
-    >> 在創建文件時需要為文件分配 blocks, 屆時就會選擇分配空閒的 block 給文件使用.
-    通過 block bitmap 可以知道哪些 block 是空的, 因此系統就能夠很快地找到空閒空間來分配給文件.
-    同樣的, 在刪除某些文件時, 文件原本佔用的 block 號碼就要釋放出來,
-    此時在 block bitmap 當中相對應到該 block 號碼的標誌就需要修改成**空閒**
-
-+ Inode bitmap
-    > 記錄的是**使用**與**未使用**的 inode 號
-
-+ Inode table
-    > 存放著一個個 inode
-    >> inode 的內容, 記錄文件的屬性以及該文件實際數據是放置在哪些 block 內
-
-    - 文件屬性
-
-    - inode 特點
-        1. 數量與大小在格式化時就已經固定
-        1. 每個 inode 大小均固定為 `128 Bytes`
-            > 新的 ext4 為 `256 Bytes`
-        1. **每個文件都僅會佔用一個 inode**
-        1. file system 能夠創建的文件數量與 inode 的數量相關
-        1. 系統讀取文件時需要先找到 inode, 並分析 inode 所記錄的權限與使用者是否符合,
-        若符合才能夠開始讀取 block 的內容
-
-
-+ Data block
-
-
-### reference
-
-+ [Ext2文件系統簡單剖析(一)](https://www.jianshu.com/p/3355a35e7e0a)
-+ [ext2檔案系統](http://shihyu.github.io/books/ch29s02.html)
-+ [Linux EXT2 文件系統](https://www.cnblogs.com/sparkdev/p/11212734.html)
+        # 其中以'*'開頭的行表示這一段數據全是 0 因此省略了
+        ```
 
 ## environment bootargs of u-boot
 
@@ -603,6 +517,7 @@ $ /dev/mmcblk0boot1
             ```
             $ sudo mkfs.fat /dev/loop0p1
             $ sudo mkfs.vfat -F 32 /dev/loop0p1
+            $ sudo mkfs.ext4 /dev/loop0p1
             ```
 
         1. mount
@@ -729,7 +644,7 @@ $ vi ./z_qemu.sh
 + [Linux MMC原理及框架詳解](https://my.oschina.net/u/4399347/blog/3275069)
 + [eMMC分區詳解](http://blog.sina.com.cn/s/blog_5c401a150101jcos.html)
 + [emmc boot1 boot2 partition](https://www.twblogs.net/a/5d2ca04dbd9eee1e5c84c0e4)
-+ [u-boot v2018.01 啓動流程分析](file:///D:/msys64/home/wl.hsu/test/bootloader/uboot/u-boot%20v2018.01%20%E5%95%93%E5%8B%95%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90.html)
++ [u-boot v2018.01 啓動流程分析](https://www.twblogs.net/a/5b8e6a002b7177188344fddf)
 
 
 
