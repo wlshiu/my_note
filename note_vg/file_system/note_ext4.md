@@ -143,7 +143,7 @@ ext2 和 ext3 格式是完全相同的, 只是 ext3 file system 會在硬碟分�
 
 # Concept
 
-FAT physical structure
+ext fs physical structure
 
 ```
 +-----------------+
@@ -269,21 +269,26 @@ FAT physical structure
 
 + Group Description
     > 用來描述每個 group 的開始與結束位置的 block 號碼,
-    以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間
+    以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間.
 
-+ Block bitmap
+    > Superblock 和 Group Description 會被 copy 到每個 block group 中,
+    其中只有 block group 0 中包含的 Superblock 和 Group Description 才被使用,
+    這樣當 block group 0 的開頭意外損壞時就可以用其它拷貝來恢復, 從而減少損失.
+
++ Block bitmap (固定佔一個 block 大小)
     > 查看 block 是否已經被使用了.
     >> 在創建文件時需要為文件分配 blocks, 屆時就會選擇分配空閒的 block 給文件使用.
     通過 block bitmap 可以知道哪些 block 是空的, 因此系統就能夠很快地找到空閒空間來分配給文件.
     同樣的, 在刪除某些文件時, 文件原本佔用的 block 號碼就要釋放出來,
     此時在 block bitmap 當中相對應到該 block 號碼的標誌就需要修改成**空閒**
 
-+ Inode bitmap
++ Inode bitmap (固定佔一個 block 大小)
     > 記錄的是**使用**與**未使用**的 inode 號
 
 + Inode table
     > 存放著一個個 inode
-    >> inode 的內容, 記錄文件的屬性以及該文件實際數據是放置在哪些 block 內
+    >> inode 的內容, 記錄文件的屬性以及該文件實際數據是放置在哪些 block 內.
+    `mke2fs` 格式化工具的默認策略, 是一個 block group 有多少個 `8KB` 就分配多少個 inode
 
     - 文件屬性
         1. 文件的讀寫權限(rwx)
@@ -305,6 +310,8 @@ FAT physical structure
         若符合才能夠開始讀取 block 的內容
 
 
+
+
 + Data block
     > 是用來存放文件內容的地方, Ext2 file system 有 1KB/2KB/4KB 大小的 block.
     在格式化文件系統時 block 的大小就確定了, 並且每個 block 都有編號.
@@ -321,6 +328,44 @@ FAT physical structure
         > + 每個 block 內最多只能夠放置一個文件的數據
         > + 如果文件大於 block 的大小, 那麼一個文件會佔用多個 block
         > + 若文件小於 block, 則該 block 的剩餘容量也不能再被使用了(磁盤空間被浪費)
+
+
++ exampe flow
+
+    - 存一個 hello 的文件
+
+        1. 載入 block group 0 中的GDT, 並從 GDT 中找出 inode bitmap,
+        在 inode bitmap 中找出 inode table 中**空的inode**.
+
+        1. 申請一個inode.
+            > inode主要包含兩部分內容
+            > + 文件屬性(68-Bytes)
+            > + 數據塊指針(60-Bytes)
+            >> 數據塊指針指向存儲 **hello文件目錄項** 和 ***文件內容**的 Data Block index
+        1. 將文件內容和文件的目錄信息分別存在對應的Data Block中
+        1. 修改對應的 inode Bitmap 和 Block Bitmap.
+
+    - 給定文件路徑'/home/hello', 如何找到該文件的位置
+        1. 查找根目錄的目錄項.
+            > Linux 有規定, **根目錄**的目錄項必須存放在 `2-nd inode` 中.
+        1. 根目錄的目錄項中存著根目錄下的子目錄目錄項和文件的數據塊信息.
+            通過根目錄的目錄項可以找到 home 對應的 inode.
+        1. 根據 home 對應的 inode 找到 home 的目錄項.
+        1. 在 home 目錄項中找到 hello 文件的 inode
+        1. 根據 hello 文件的 inode 中的數據塊指針找到存儲有 hello 文件內容的數據塊
+
+    - 刪除 hello 文件
+        1. 找到 hello 文件位置
+        1. 將 Block Bitmap 中對應 bit 設為 0
+        1. 將 inode Bitmap 中對應 bit 設為 0
+
+    - 數據塊(Data block)尋址
+        > inode中的數據塊指針為 `60-bytes`, 每個紀錄參數為 `4-bytes`, 所以有 15 個紀錄參數,
+        其中**前 12個**參數用來直接對應 block index, **最後 3個**被用來對應 1/2/3級的間接尋址 block
+
+        ```
+        ```
+
 
 # MISC
 
@@ -451,9 +496,54 @@ FAT physical structure
         # 其中以'*'開頭的行表示這一段數據全是 0 因此省略了
         ```
 
++ simulation
+
+    ```
+    $ cd lwext4
+    $ make generic
+    $ cd build_generic
+    $ make
+
+    # simulation
+    $ cd fs_test
+    $ dd if=/dev/zero of=ext.disk bs=512 count=16384 # 8MB partition
+    $ ./lwext4-mkfs -i ./ext.disk -b 4096 -e 2 -v
+    ```
+
+    - GDB debug
+
+        ```
+        $ cd fs_test
+        $ gdb lwext4-mkfs
+            ...
+            (gdb) file lwext4-mkfs
+            (gdb) set args -i ./ext.disk -b 4096 -e 2 -v
+            (gdb) b main
+            (gdb) r
+        ```
+
+    - gdb server + gdb
+
+        1. gdbserver
+
+            ```
+            $ sudo apt install gdbserver
+            $ gdbserver :1234 ./lwext4-mkfs
+            ```
+        1. gdb
+
+            ```
+            $ gdb lwext4-mkfs
+                ...
+                (gdb) file lwext4-mkfs
+                (gdb) target remote :1234
+            ```
+
 # reference
 
 + [Ext2文件系統簡單剖析(一)](https://www.jianshu.com/p/3355a35e7e0a)
 + [ext2檔案系統](http://shihyu.github.io/books/ch29s02.html)
 + [Linux EXT2 文件系統](https://www.cnblogs.com/sparkdev/p/11212734.html)
 + [The Second Extended File System](http://www.nongnu.org/ext2-doc/ext2.html)
++ [lwext4](https://github.com/gkostka/lwext4)
+
