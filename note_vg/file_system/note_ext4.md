@@ -147,21 +147,29 @@ ext fs physical structure
 
 ```
 +-----------------+
-| Boot Block      |                 Block group
-+-----------------+ ---------> +-------------------+
-| Block group 1   |            | Superblock        |
-+-----------------+ ---+       +-------------------+
-| Block group 2   |    |       | Group Description |
-+-----------------+    |       +-------------------+
-| Block group ... |    |       | Block bitmap      |
-+-----------------+    |       +-------------------+
-                       |       | Inode bitmap      |
-                       |       +-------------------+
-                       |       | Inode table       |
-                       |       +-------------------+
-                       |       |   Data            |
-                       |       |   Blocks          |
-                       +-----> +-------------------+
+| Block group 0   |         Block group 0       Block group x {x > 0}
++-----------------+     +-------------------+   +--------------------+
+| Block group 1   |     | Boot Block (1KB)  |   | Superblock (1KB)   |
++-----------------+     |  (at Block 0)     |   |  (at Block 0)      |
+| Block group 2   |     +-------------------+   +--------------------+
++-----------------+     | Superblock (1KB)  |   | Group Description  |
+| Block group ... |     |  (at Block 0)     |   |  (at Block 1)      |
++-----------------+     +-------------------+   +--------------------+
+                        | Group Description |   | Block bitmap       |
+                        | (at Block 1)      |   | (use 1 block)      |
+                        +-------------------+   +--------------------+
+                        | Block bitmap      |   | Inode bitmap       |
+                        | (use 1 block)     |   | (use 1 block)      |
+                        +-------------------+   +--------------------+
+                        | Inode bitmap      |   | Inode table        |
+                        | (use 1 block)     |   |                    |
+                        +-------------------+   +--------------------+
+                        |   Inode table     |   |   Data             |
+                        |                   |   |   Blocks           |
+                        +-------------------+   +--------------------+
+                        |   Data            |
+                        |   Blocks          |
+                        +-------------------+
 ```
 
 + Block
@@ -275,17 +283,17 @@ ext fs physical structure
     其中只有 block group 0 中包含的 Superblock 和 Group Description 才被使用,
     這樣當 block group 0 的開頭意外損壞時就可以用其它拷貝來恢復, 從而減少損失.
 
-+ Block bitmap (固定佔一個 block 大小)
++ Block bitmap (固定佔一個 block 大小, start at block alignment)
     > 查看 block 是否已經被使用了.
     >> 在創建文件時需要為文件分配 blocks, 屆時就會選擇分配空閒的 block 給文件使用.
     通過 block bitmap 可以知道哪些 block 是空的, 因此系統就能夠很快地找到空閒空間來分配給文件.
     同樣的, 在刪除某些文件時, 文件原本佔用的 block 號碼就要釋放出來,
     此時在 block bitmap 當中相對應到該 block 號碼的標誌就需要修改成**空閒**
 
-+ Inode bitmap (固定佔一個 block 大小)
++ Inode bitmap (固定佔一個 block 大小, start at block alignment)
     > 記錄的是**使用**與**未使用**的 inode 號
 
-+ Inode table
++ Inode table (start at block alignment)
     > 存放著一個個 inode
     >> inode 的內容, 記錄文件的屬性以及該文件實際數據是放置在哪些 block 內.
     `mke2fs` 格式化工具的默認策略, 是一個 block group 有多少個 `8KB` 就分配多少個 inode
@@ -545,5 +553,6 @@ ext fs physical structure
 + [ext2檔案系統](http://shihyu.github.io/books/ch29s02.html)
 + [Linux EXT2 文件系統](https://www.cnblogs.com/sparkdev/p/11212734.html)
 + [The Second Extended File System](http://www.nongnu.org/ext2-doc/ext2.html)
++ [Ext4 Disk Layout](https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout)
 + [lwext4](https://github.com/gkostka/lwext4)
 
