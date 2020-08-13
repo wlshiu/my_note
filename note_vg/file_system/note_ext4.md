@@ -150,13 +150,13 @@ ext fs physical structure
 | Block group 0   |         Block group 0       Block group x {x > 0}
 +-----------------+     +-------------------+   +--------------------+
 | Block group 1   |     | Boot Block (1KB)  |   | Superblock (1KB)   |
-+-----------------+     |  (at Block 0)     |   |  (at Block 0)      |
++-----------------+     |  (at Block-0)     |   |  (at Block-0)      |
 | Block group 2   |     +-------------------+   +--------------------+
 +-----------------+     | Superblock (1KB)  |   | Group Description  |
-| Block group ... |     |  (at Block 0)     |   |  (at Block 1)      |
+| Block group ... |     |  (at Block-0)     |   |  (at Block-1)      |
 +-----------------+     +-------------------+   +--------------------+
                         | Group Description |   | Block bitmap       |
-                        | (at Block 1)      |   | (use 1 block)      |
+                        | (at Block-1)      |   | (use 1 block)      |
                         +-------------------+   +--------------------+
                         | Block bitmap      |   | Inode bitmap       |
                         | (use 1 block)     |   | (use 1 block)      |
@@ -249,7 +249,7 @@ ext fs physical structure
             total_inodes_per_group = 128 * inodes_per_block = 512
             ```
 
-+ Superblock
++ Superblock (固定 1KB)
     > 記錄整個 filesystem 相關信息的地方, 其實上除了第一個 block group 內會含有 superblock 之外,
     後續的 block group 不一定都包含 superblock, 如果包含,
     也是做為第一個 block group 內 superblock 的備份
@@ -275,13 +275,33 @@ ext fs physical structure
             $ sudo dumpe2fs -h /dev/sdd1
             ```
 
-+ Group Description
++ Group Description (or Block Group Description)
     > 用來描述每個 group 的開始與結束位置的 block 號碼,
     以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間.
 
     > Superblock 和 Group Description 會被 copy 到每個 block group 中,
     其中只有 block group 0 中包含的 Superblock 和 Group Description 才被使用,
     這樣當 block group 0 的開頭意外損壞時就可以用其它拷貝來恢復, 從而減少損失.
+
+    - blocks number of GDT
+
+        ```
+        # 計算總共有多少個 block group (一個 block group 需要一個 GDT item)
+        bgroup_num = partition_block_num / blk_per_group
+
+        # 計算一個 block 可以存幾個 GDT itme
+        gdt_items_per_block = blk_size / sblock->s_desc_size # 32 or 64 bytes
+
+        # 計算存所有 GDT items 需要多少個 blocks
+        blocks_of_gdt = bgroup_num / gdt_per_block;
+        ```
+
+        1. ext2/ext3
+            > + GDT 占用 1 Block, 每個 item 大小為 32
+        1. ext4
+            > + GDT 占用 n Blocks(s_reserved_gdt_blocks member of superblock),
+            每個 item 大小為 32 or 64 (s_desc_size member of superblock)
+
 
 + Block bitmap (固定佔一個 block 大小, start at block alignment)
     > 查看 block 是否已經被使用了.
@@ -383,6 +403,11 @@ ext fs physical structure
         > 查看這個 partition 中, superblock 和 Group Description Table 中的信息
 
         ```
+        # 只看 superblock 上關整個檔案系統的資訊
+        $ dumpe2fs -h ./ext4.disk
+
+            or
+
         $ dumpe2fs ./ext4.disk
         dumpe2fs 1.44.1 (24-Mar-2018)
         Filesystem volume name:   <none>
@@ -443,6 +468,182 @@ ext fs physical structure
           Free blocks: 1098-2047
           Free inodes: 12-2048
         ```
+
+        1. 檔案系統 volume 名稱 (Filesystem volume name)
+            > 即是檔案系統標籤 (Filesystem label), 用作簡述該檔案系統的用途或其儲存數據.
+            現時 GNU/Linux 都會用 USB 大拇哥/IEEE1394 硬盤等,
+            可移除儲存裝置的檔案系統標籤作為其掛載目錄的名稱, 方便使用者識別.
+            而個別 GNU/Linux distribution, 如 Fedora, RHEL 和 CentOS 等,
+            亦在 fstab 取代傳統裝置檔案名稱 (即 /dev/sda1 和 /dev/hdc5 等) 的指定開機時要掛載的檔案系統,
+            避免偶然因為 BIOS 設定或插入次序的改變而引起的混亂.
+            可以使用命令 `e2label` 或 `tune2fs -L` 改變.
+
+        1. 上一次掛載於 (Last mounted on)
+            > 上一次掛載檔案系統的掛載點路徑, 此欄一般為空, 很少使用.
+            可以使用命令 `tune2fs -M` 設定.
+
+        1. 檔案系統 UUID (Filesystem UUID)
+            > 一個一般由亂數產生的識別碼, 可以用來識別檔案系統.
+            個別 GNU/Linux distribution 如 Ubuntu] 等,
+            亦在 fstab 取代傳統裝置檔案名稱 (即 /dev/sda1 和 /dev/hdc5 等) 的指定開機時要掛載的檔案系統,
+            避免偶然因為 BIOS 設定或插入次序的改變而引起的混亂.
+            可以使用命令 `tune2fs -U` 改變.
+
+        1. Filesystem magic number
+            > 用來識別此檔案系統為 Ext2/Ext3/Ext4 的簽名,
+            位置在檔案系統的 0x0438 - 0x0439 (Superblock 的 0x38-0x39), 現時必定是 `0xEF53`.
+
+        1. 檔案系統版本編號 (Filesystem revision #)
+            > 檔案系統微版本編號, 只可以在格式化時使用 `mke2fs -r` 設定.
+            現在只支援:
+            > + `0`: 原始格式, Linux 1.2 或以前只支援此格式
+            > + `1` (dymanic): V2 格式支援動態 inode 大小 (現時一般都使用此版本)
+
+        1. 檔案系統功能 (Filesystem features)
+            > 開啟了的檔案系統功能, 可以使用 `tune2fs -O` 改變.
+            現在可以有以下功能:
+            > + has_journal
+            >> 有日誌 (journal), 亦代表此檔案系統必為 Ext3 或 Ext4
+            > + ext_attr
+            >> 支援 extended attribute
+            > + resize_inode
+            >> resize2fs 可以加大檔案系統大小
+            > + dir_index
+            >> 支援目錄索引, 可以加快在大目錄中搜索檔案.
+            > + filetype
+            >> 目錄項目為否記錄檔案類型
+            > + needs_recovery
+            >> e2fsck 檢查 Ext3/Ext4 檔案系統時用來決定是否需要完成日誌紀錄中未完成的工作, 快速自動修復檔案系統
+            > + extent
+            >> 支援 Ext4 extent 功能, 可以加快檔案系系效能和減少 external fragmentation
+            > + flex_bg
+            > + sparse_super
+            >> 只有少數 superblock 備份, 而不是每個區塊組都有 superblock 備份, 節省空間.
+            > + large_file
+            >> 支援大於 2GiB 的檔案
+            > + huge_file
+            > + uninit_bg
+            > + dir_nlink
+            > + extra_isize
+        1. 檔案系統旗號 (Filesystem flags)
+            > signed_directory_hash
+        1. 預設掛載選項 (Default mount options)
+            > 掛載此檔案系統缺省會使用的選項
+        1. 檔案系統狀態 (Filesystem state)
+            > 可以為
+            > + clean (檔案系統已成功地被卸載)
+            > + not-clean (表示檔案系統掛載成讀寫模式後, 仍未被卸載)
+            > + erroneous (檔案系統被發現有問題)
+
+        1. 錯誤處理方案 (Errors behavior)
+            > 檔案系統發生問題時的處理方案, 可以為
+            > + continue (繼續正常運作)
+            > + remount-ro (重新掛載成只讀模式)
+            > + panic (即時當掉系統)
+
+            > 可以使用 `tune2fs -e` 改變.
+
+        1. 作業系統類型 (Filesystem OS type)
+            > 建立檔案系統的作業系統, 可以為 Linux/Hurd/MASIX/FreeBSD/Lites
+        1. Inode 數目 (Inode count)
+            > 檔案系統的總 inode 數目, 亦是整個檔案系統所可能擁有檔案數目的上限
+
+        1. 區塊數目 (Block count)
+            > 檔案系統的總區塊數目
+
+        1. 保留區塊數目 (Reserved block count)
+            > 保留給系統管理員工作之用的區塊數目
+
+        1. 未使用區塊數目 (Free blocks)
+            > 未使用區塊數目
+        1. 未使用 inode 數目 (Free inodes)
+            > 未使用 inode 數目
+
+        1. 第一個區塊編數 (First block)
+            > Superblock 或第一個區塊組開始的區塊編數.
+            此值在 1 KiB 區塊大小的檔案系統為 1, 大於1 KiB 區塊大小的檔案系統為 0.
+
+            > 第一個區塊組的 Superblock, 一般都在檔案系統 0x0400 (1024) 開始
+
+        1. 區塊大小 (Block size)
+            > 區塊大小, 可以為 1024/2048/4096 bytes (Compaq Alpha 系統可以使用 8192 字節的區塊)
+
+        1. Fragment 大小 (Fragment size)
+            > 實際上 Ext2/Ext3/Ext4 未有支援 Fragment, 所以此值一般和區塊大小一樣
+
+        1. 保留 GDT 區塊數目 (Reserved GDT blocks)
+            > 保留作在線 (online) 改變檔案系統大小的區塊數目.
+            若此值為 `0`, 必須先卸載才可改變檔案系統大小
+
+        1. 區塊/組 (Blocks per group)
+            > 每個區塊組的區塊數目
+
+        1. Fragments/組 (Fragments per group)
+            > 每個區塊組的 fragment 數目, 亦用來計算每個區塊組中 block bitmap 的大小
+
+        1. Inodes/組 (Inodes per group)
+            > 每個區塊組的 inode 數目
+
+        1. Inode 區塊/組 (Inode blocks per group)
+            > 每個區塊組的 inode 區塊數目
+
+        1. Flex block group size
+            > `16`
+
+        1. 檔案系統建立時間 (Filesystem created)
+            > 格式化此檔案系統的時間
+        1. 最後掛載時間 (Last mount time)
+            > 上一次掛載此檔案系統的時間
+        1. 最後改動時間 (Last write time)
+            > 上一次改變此檔案系統內容的時間
+
+        1. 掛載次數 (Mount count)
+            > 距上一次作完整檔案系統檢查後檔案系統被掛載的次數,
+            讓 `fsck` 決定是否應進行另一次完整檔案系統檢查
+
+        1. 最大掛載次數 (Maximum mount count)
+            > 檔案系統進行另一次完整檢查可以被掛載的次數, 若掛載次數 (Mount count) 大於此值,
+            `fsck` 會進行另一次完整檔案系統檢查
+
+        1. 最後檢查時間 (Last checked)
+            > 上一次檔案系統作完整檢查的時間
+
+        1. 檢查間距 (Check interval)
+            > 檔案系統應該進行另一次完整檢查的最大時間距
+
+        1. 下次檢查時間 (Next check after)
+            > 下一次檔案系統應該進行另一次完整檢查的時間
+
+        1. 保留區塊使用者識別碼 (Reserved blocks uid)
+            > 0: user root
+
+        1. 保留區塊群組識別碼 (Reserved blocks gid)
+            > 0: group root
+
+        1. 第一個 inode (First inode)
+            > 第一個可以用作存放正常檔案屬性的 inode 編號,
+            在原格式此值一定為 `11`,  V2 格式亦可以改變此值
+
+        1. Inode 大小 (Inode size)
+            > Inode 大小, 傳統為 128 字節, 新系統會使用 256 字節的 inode 令擴充功能更方便
+
+        1. Required extra isize
+            > 28
+        1. Desired extra isize
+            > 28
+
+        1. 日誌 inode (Journal inode)
+            > 日誌檔案的 inode 編號
+
+        1. 預設目錄 hash 算法 (Default directory hash)
+            > half_md4
+        1. 目錄 hash 種子 (Directory Hash Seed)
+            > 17e9c71d-5a16-47ad-b478-7c6bc3178f1d
+        1. 日誌備份 (Journal backup)
+            > inode blocks
+        1. 日誌大小 (Journal size)
+            > 日誌檔案的大小
+
 
     - `e2fsck`
 
@@ -547,12 +748,35 @@ ext fs physical structure
                 (gdb) target remote :1234
             ```
 
+
 # reference
 
++ [Ext2文件系統初步](https://blog.csdn.net/lly/article/details/43928911)
 + [Ext2文件系統簡單剖析(一)](https://www.jianshu.com/p/3355a35e7e0a)
 + [ext2檔案系統](http://shihyu.github.io/books/ch29s02.html)
 + [Linux EXT2 文件系統](https://www.cnblogs.com/sparkdev/p/11212734.html)
 + [The Second Extended File System](http://www.nongnu.org/ext2-doc/ext2.html)
 + [Ext4 Disk Layout](https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout)
 + [lwext4](https://github.com/gkostka/lwext4)
++ [教程：12.文件存儲結構](https://blog.csdn.net/aspic214/article/details/42212981)
+
+
+## linxu directory
+
+```
+    /           根目錄, 只能包含目錄, 不能包含具體文件.
+    |- bin      存放可執行文件. 很多命令就對應/bin目錄下的某個程序, 例如 ls、cp、mkdir. /bin目錄對所有用戶有效.
+    |- dev      硬件驅動程序. 例如聲卡、磁盤驅動等, 還有如 /dev/null、/dev/console、/dev/zero、/dev/full 等文件.
+    |- etc      主要包含系統配置文件和用戶、用戶組配置文件.
+    |- lib      主要包含共享庫文件, 類似於Windows下的DLL; 有時也會包含內核相關文件.
+    |- boot     系統啟動文件, 例如Linux內核、引導程序等.
+    |- home     用戶工作目錄(主目錄), 每個用戶都會分配一個目錄.
+    |- mnt      臨時掛載文件系統. 這個目錄一般是用於存放掛載儲存設備的掛載目錄的, 例如掛載 CD-ROM 的 cdrom 目錄.
+    |- proc     操作系統運行時, 進程(正在運行中的程序)信息及內核信息(比如cpu、硬盤分區、內存信息等)存放在這裡.
+               proc目錄是偽裝的文件系統 proc 的掛載目錄, proc 並不是真正的文件系統.
+    |- tmp      臨時文件目錄, 系統重啟後不會被保存.
+    |- usr      user目錄下的文件比較混雜, 包含了管理命令、共享文件、庫文件等, 可以被很多用戶使用.
+    |- var      主要包含一些可變長度的文件, 會經常對數據進行讀寫, 例如日誌文件和打印隊列裡的文件.
+    |- sbin 和 bin 類似, 主要包含可執行文件, 不過一般是系統管理所需要的, 不是所有用戶都需要
+```
 
