@@ -137,6 +137,18 @@ ext2 和 ext3 格式是完全相同的, 只是 ext3 file system 會在硬碟分�
 
 # Definition
 
++ `MBR` (Master Boot Record)
+    > 主開機記錄, IBM 在 1983 年提出的分割表格式.
+    MBR 只支援最大 **4 個主分割區** 或是 **3 個主分割區 + 1 個擴展分區**
+
++ `GPT` (GUID Partition Table)
+    > GUID 磁碟分割表格, 即**全域唯一標識磁碟分割表格**.
+    GPT 是逐漸取代 MBR新標準, GPT使用了更加現代的技術取代了老舊的 MBR磁碟分割表格,
+    其優勢有:
+    > + 突破了 2.2T 最大容量的限制
+    > + 允許無限數量的分割區
+    > + GPT 在磁片上存儲了這些資料的多個副本, 可以在資料損壞的情況下進行恢復
+
 + sector (扇區)
     > physical 最小單位, 一般 default 是 `512 bytes`
 
@@ -179,6 +191,39 @@ ext2 和 ext3 格式是完全相同的, 只是 ext3 file system 會在硬碟分�
     linux 就會分配一個 inode 與 25 個data block 來儲存該文件.
     這種數據存取的方法我們稱為索引式文件系統(indexed allocation)
 
+
++ inode number
+    > 每個檔案對應的 inode number, 是跨 block group 並且連續標號
+    >> 從 `1` 開始, ext4 系統**不存在 0 號文件索引**
+
+    - 依文件的 inode number 查找對應的 inode item
+
+        ```
+        假設一個檔案的 inode number 為 90612, 且
+        Inodes per group = 8192,
+        Block size = 4096,
+        Inode size = 256
+
+        block_group_idx         = (90612 / 8192) = 11
+        inode_itm_idx_in_itable = 90612 - (block_group_idx * 8192) = 500
+        inode_total_itms_a_blk  = BlockSize/InodeSize = 4096 / 256 = 16
+        blk_idx_in_inode_table  = inode_itm_idx_in_itable / inode_total_itms_a_blk
+                                = 31
+        inode_itm_offset_in_blk = ((inode_itm_idx_in_itable % inode_total_itms_a_blk) - 1) * 256
+                                = 3 * 256 = 768
+
+        phy_blk_idx  = (inode table of Group 11) + blk_idx_in_inode_table = 360481
+
+        第 360481 個 block內, 且 offset 768 bytes
+
+        ```
+
+    - script of dump data
+
+        ```
+        $ dd if=/dev/sda2 bs=4096 skip=360481 count=1 2>/dev/null | \
+        awk 'BEGIN { LINE=0 } { if (LINE>=(768/16)) print; LINE=LINE+1 }' | xxd
+        ```
 
 # Concept
 
@@ -832,7 +877,9 @@ ext fs physical structure
         # 其中以'*'開頭的行表示這一段數據全是 0 因此省略了
         ```
 
-+ simulation
+## simulation
+
++ lwext4
 
     ```
     $ cd lwext4
@@ -874,6 +921,50 @@ ext fs physical structure
                 (gdb) file lwext4-mkfs
                 (gdb) target remote :1234
             ```
+
++ mkfs.ext4
+
+```
+$ dd if=/dev/zero of=ext.disk bs=512 count=65536  # 32MB partition
+$ losetup -f                            # 找一個空的 loop 設備
+$ sudo losetup /dev/loop0 ext.disk      # 映射 image 到 loop 設備上
+$ sudo partprobe /dev/loop0
+$ ls /dev/loop*
+    ...
+    /dev/loop0p1
+    /dev/loop0p2
+    ...
+$ sudo mkfs.ext4 -b 4096 -g 4096 /dev/loop0p1
+$ sudo dumpe2fs /dev/loop0p1
+$ sudo hexdump -C /dev/loop0p1
+
+$ mkdir ext_disk        # 建立連接的目錄
+$ sudo mount -t ext4 /dev/loop0p1 ext_disk/
+$ cd ext_disk
+$ sudo ls -li           # list the inode index
+    total 16
+    11 drwx------ 2 root root 16384 Aug 19 10:16 lost+found
+
+$ sudo umount ext_disk
+$ sudo losetup -d /dev/loop0            # detach loop device
+```
+
+    - `mount`
+
+        ```
+        usage: mount -t <type> <device> <dir>
+
+            <device>    就是要掛載的設備或映像檔
+            -t <type>   是指定 device 的檔案系統格式(如 ext4, fat 或 ntfs 等)
+            <dir>       則是指定掛載的路徑(也就是要把這個設備掛在目錄樹的哪裡)
+        ```
+
+    - `umount`
+
+        ```
+        usage: umount <dir>
+            <dir>       指定掛載的路徑
+        ```
 
 ## linxu directory
 
@@ -940,9 +1031,11 @@ drwxr-xr-x  20 root root   4096 Aug  3 16:06 lib
 + [lwext4](https://github.com/gkostka/lwext4)
 + [教程：12.文件存儲結構](https://blog.csdn.net/aspic214/article/details/42212981)
 + [Ext4檔案系統架構分析(一)](https://www.itread01.com/content/1542183553.html)
++ [ext2檔案系統結構分析](https://www.itread01.com/content/1541892092.html)
++ [***一口氣搞懂'文件系統',就靠這 25 張圖了](https://zhuanlan.zhihu.com/p/183238194)
++ [ext4文件系統由文件的inode號定位其inode Table](https://blog.csdn.net/yiqiaoxihui/article/details/55683328)
 
-
++ [Linux磁盤分區的詳細步驟(圖解linux分區命令使用方法)](https://blog.csdn.net/Phoenix_wang_cheng/article/details/52743821?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase)
 + [Linux 文件與目錄](https://www.cnblogs.com/sparkdev/p/11249659.html)
 + [Linux文件系統之一：inode節點和inode節點包含的block尋址信息](https://blog.csdn.net/roger_ranger/article/details/78035978)
 + [一天一點學習Linux之Inode詳解](http://www.opsers.org/base/one-day-the-little-learning-linux-inode-detailed.html)
-
