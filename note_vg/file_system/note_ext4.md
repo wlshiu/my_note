@@ -934,7 +934,13 @@ $ ls /dev/loop*
     /dev/loop0p1
     /dev/loop0p2
     ...
-$ sudo mkfs.ext4 -b 4096 -g 4096 /dev/loop0p1
+$ sudo mkfs.ext4 -b 4096 -g 4096 -I 128 -i 16384 -m 0 -J size=0 /dev/loop0p1
+
+### disable journal feature
+$ sudo tune2fs -o journal_data_writeback /dev/loop0p1
+$ sudo tune2fs -O ^has_journal /dev/loop0p1
+$ sudo e2fsck -f /dev/loop0p1
+
 $ sudo dumpe2fs /dev/loop0p1
 $ sudo hexdump -C /dev/loop0p1
 
@@ -964,6 +970,46 @@ $ sudo losetup -d /dev/loop0            # detach loop device
         ```
         usage: umount <dir>
             <dir>       指定掛載的路徑
+        ```
+
+
++ `fsck`
+    > 用於檢查並且試圖修復檔案系統中的錯誤, 把設備需 `umount` 後才能進行
+
+    ```
+    # 文件系統錯誤訊息
+    $ sudo dumpe2fs /dev/loop0p1
+        ...
+
+        First error time:         Mon Oct  5 00:52:47 2015
+        First error function:     ext4_mb_generate_buddy
+        First error line #:       742
+        First error inode #:      0
+        First error block #:      0
+        Last error time:          Mon Oct  5 00:56:32 2015
+        Last error function:      ext4_mb_generate_buddy
+        Last error line #:        742
+        Last error inode #:       0
+        Last error block #:       0
+    ```
+
+    - 手動修復
+
+        ```
+        # 檢查錯誤
+        $ fsck /dev/loop0p1
+            ps. error code '$ echo $?'
+                0   – No errors
+                1   – File system errors corrected
+                2   – System should be rebooted
+                4   – File system errors left uncorrected
+                8   – Operational error
+                16  – Usage or syntax error
+                32  – Fsck canceled by user request
+                128 – Shared library error
+
+        # 自動修復
+        $ fsck -a /dev/loop0p1
         ```
 
 ## linxu directory
@@ -1034,6 +1080,9 @@ drwxr-xr-x  20 root root   4096 Aug  3 16:06 lib
 + [ext2檔案系統結構分析](https://www.itread01.com/content/1541892092.html)
 + [***一口氣搞懂'文件系統',就靠這 25 張圖了](https://zhuanlan.zhihu.com/p/183238194)
 + [ext4文件系統由文件的inode號定位其inode Table](https://blog.csdn.net/yiqiaoxihui/article/details/55683328)
++ [**Linux FSCK自動修覆文件系統](https://blog.csdn.net/liujia2100/article/details/48900619)
++ [Linux 檔案格式 ext2 ext3 ext4 比較](https://stackoverflow.max-everyday.com/2017/08/linux-ext2-ext3-ext4/)
+
 
 + [Linux磁盤分區的詳細步驟(圖解linux分區命令使用方法)](https://blog.csdn.net/Phoenix_wang_cheng/article/details/52743821?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase)
 + [Linux 文件與目錄](https://www.cnblogs.com/sparkdev/p/11249659.html)
