@@ -359,6 +359,135 @@ ext fs physical structure
             $ sudo dumpe2fs -h /dev/sdd1
             ```
 
+    - Structure of the super block
+
+        ```c
+        struct ext4_super_block {
+        /*00*/
+            __le32  s_inodes_count;         /* Inodes count文件系統中inode的總數*/
+            __le32  s_blocks_count_lo;      /* Blocks count文件系統中塊的總數*/
+            __le32  s_r_blocks_count_lo;    /* Reserved blocks count保留塊的總數*/
+            __le32  s_free_blocks_count_lo; /*Free blocks count未使用的塊的總數(包括保留塊)*/
+        /*10*/
+            __le32  s_free_inodes_count;    /* Free inodes count未使用的inode的總數*/
+            __le32  s_first_data_block;     /* First Data Block第一塊塊ID, 在小於1KB的文件系統中為0,
+                                               大於1KB的文件系統中為1*/
+            __le32  s_log_block_size;       /* Block size用以計算塊的大小(1024算術左移該值即為塊大小)(0=1K, 1=2K, 2=4K) */
+            __le32  s_obso_log_frag_size;   /* Obsoleted fragment size用以計算段大小(為正則1024算術左移該值, 否則右移)*/
+        /*20*/
+            __le32  s_blocks_per_group;     /* # Blocks per group每個塊組中塊的總數*/
+            __le32  s_obso_frags_per_group; /*Obsoleted fragments per group每個塊組中段的總數*/
+            __le32  s_inodes_per_group;     /* # Inodes per group每個塊組中inode的總數*/
+            __le32  s_mtime;                /* Mount time POSIX中定義的文件系統裝載時間*/
+        /*30*/
+            __le32  s_wtime;                /* Write time POSIX中定義的文件系統最近被寫入的時間*/
+            __le16  s_mnt_count;            /* Mount count最近一次完整校驗後被裝載的次數*/
+            __le16  s_max_mnt_count;        /* Maximal mount count在進行完整校驗前還能被裝載的次數*/
+            __le16  s_magic;                /* Magic signature文件系統標誌*/
+            __le16  s_state;                /* File system state文件系統的狀態*/
+            __le16  s_errors;               /* Behaviour when detectingerrors文件系統發生錯誤時驅動程序應該執行的操作*/
+            __le16  s_minor_rev_level;      /* minor revision level局部修訂級別*/
+        /*40*/
+            __le32  s_lastcheck;            /* time of last check POSIX中定義的文件系統最近一次檢查的時間*/
+            __le32  s_checkinterval;        /* max. time between checks POSIX中定義的文件系統最近檢查的最大時間間隔*/
+            __le32  s_creator_os;           /* OS生成該文件系統的操作系統*/
+            __le32  s_rev_level;            /* Revision level修訂級別*/
+        /*50*/
+            __le16  s_def_resuid;           /* Default uid for reserved blocks報留塊的默認用戶ID */
+            __le16  s_def_resgid;           /* Default gid for reserved blocks保留塊的默認組ID */
+            /*
+             * These fields are for EXT4_DYNAMIC_REV superblocks only.
+             *
+             * Note: the difference between the compatible feature set and
+             * the incompatible feature set is that if there is a bit set
+             * in the incompatible feature set that the kernel doesn't
+             * know about, it should refuse to mount the filesystem.
+             *
+             * e2fsck's requirements are more strict; if it doesn't know
+             * about a feature in either the compatible or incompatible
+             * feature set, it must abort and not try to meddle with
+             * things it doesn't understand...
+             */
+            __le32  s_first_ino;            /* First non-reserved inode標準文件的第一個可用inode的索引(非動態為11)*/
+            __le16  s_inode_size;           /* size of inode structure inode結構的大小(非動態為128)*/
+            __le16  s_block_group_nr;       /* block group # of this superblock保存此超級塊的塊組號*/
+            __le32  s_feature_compat;       /* compatible feature set兼容特性掩碼*/
+        /*60*/
+            __le32  s_feature_incompat;     /* incompatible feature set不兼容特性掩碼*/
+            __le32  s_feature_ro_compat;    /* readonly-compatible feature set只讀特性掩碼*/
+        /*68*/
+            __u8    s_uuid[16];             /* 128-bit uuid for volume卷ID, 應儘可能使每個文件系統的格式唯一*/
+        /*78*/
+            char    s_volume_name[16];      /* volume name卷名(只能為ISO-Latin-1字符集, 以'\0'結束)*/
+        /*88*/
+            char    s_last_mounted[64];     /* directory where last mounted最近被安裝的目錄*/
+        /*C8*/
+            __le32  s_algorithm_usage_bitmap;/* For compression文件系統採用的壓縮算法*/
+            /*
+             * Performance hints.  Directorypreallocation should only
+             * happen if the EXT4_FEATURE_COMPAT_DIR_PREALLOC flag is on.
+             */
+            __u8    s_prealloc_blocks;      /* Nr of blocks to try to preallocate預分配的塊數*/
+            __u8    s_prealloc_dir_blocks;  /* Nr topreallocate for dirs給目錄預分配的塊數*/
+            __le16  s_reserved_gdt_blocks;  /* Pergroup desc for online growth */
+            /*
+             * Journaling support valid if EXT4_FEATURE_COMPAT_HAS_JOURNAL set.
+             */
+        /*D0*/
+            __u8    s_journal_uuid[16];     /* uuid of journal superblock日誌超級塊的卷ID */
+        /*E0*/
+            __le32  s_journal_inum;         /* inode number of journal file日誌文件的inode數目*/
+            __le32  s_journal_dev;          /* device number of journal file日誌文件的設備數*/
+            __le32  s_last_orphan;          /* start of list of inodes to delete要刪除的inode列表的起始位置*/
+            __le32  s_hash_seed[4];         /* HTREE hash seed HTREE散列種子*/
+            __u8    s_def_hash_version;     /* Default hash version to use默認使用的散列函數*/
+            __u8    s_jnl_backup_type;
+            __le16  s_desc_size;            /* size of group descriptor */
+        /*100*/
+            __le32  s_default_mount_opts;
+            __le32  s_first_meta_bg;        /* First metablock block group塊組的第一個元塊*/
+            __le32 s_mkfs_time;             /* Whenthe filesystem was created */
+            __le32  s_jnl_blocks[17];       /* Backup of the journal inode */
+            /* 64bit support valid if EXT4_FEATURE_COMPAT_64BIT */
+        /*150*/
+            __le32  s_blocks_count_hi;      /* Blocks count */
+            __le32  s_r_blocks_count_hi;    /* Reserved blocks count */
+            __le32  s_free_blocks_count_hi; /*Free blocks count */
+            __le16  s_min_extra_isize;      /* All inodes have at least # bytes */
+            __le16  s_want_extra_isize;     /* New inodes should reserve # bytes */
+            __le32  s_flags;                /* Miscellaneous flags */
+            __le16  s_raid_stride;          /* RAID stride */
+            __le16 s_mmp_update_interval;   /* #seconds to wait in MMP checking */
+            __le64 s_mmp_block;             /* Blockfor multi-mount protection */
+            __le32  s_raid_stripe_width;    /* blocks on all data disks (N*stride)*/
+            __u8   s_log_groups_per_flex;   /* FLEX_BGgroup size */
+            __u8    s_reserved_char_pad;
+            __le16  s_reserved_pad;
+            __le64  s_kbytes_written;       /* nr of lifetime kilobytes written */
+            __le32  s_snapshot_inum;        /* Inode number of active snapshot */
+            __le32  s_snapshot_id;          /* sequential ID of active snapshot*/
+            __le64  s_snapshot_r_blocks_count;/* reserved blocks for active
+                                                 snapshot's future use */
+            __le32  s_snapshot_list;        /* inode number of the head of the
+                                               on-disk snapshot list */
+        #define EXT4_S_ERR_START offsetof(structext4_super_block, s_error_count)
+            __le32  s_error_count;          /* number of fs errors */
+            __le32  s_first_error_time;     /* first time an error happened */
+            __le32  s_first_error_ino;      /* inode involved in first error */
+            __le64  s_first_error_block;    /* block involved of first error */
+            __u8    s_first_error_func[32]; /*function where the error happened */
+            __le32  s_first_error_line;     /* line number where error happened */
+            __le32  s_last_error_time;      /* most recent time of an error */
+            __le32  s_last_error_ino;       /* inode involved in last error */
+            __le32  s_last_error_line;      /* line number where error happened */
+            __le64  s_last_error_block;     /* block involved of last error */
+            __u8   s_last_error_func[32];  /*function where the error happened */
+        #define EXT4_S_ERR_END offsetof(structext4_super_block, s_mount_opts)
+            __u8    s_mount_opts[64];
+            __le32  s_reserved[112];        /* Padding to the end of the block */
+        };
+        ```
+
 + Group Description (or Block Group Description)
     > 用來描述每個 group 的開始與結束位置的 block 號碼,
     以及說明每個塊(superblock, bitmap, inodemap, datablock)分別介於哪一個 block 號碼之間.
@@ -385,6 +514,31 @@ ext fs physical structure
         1. ext4
             > + GDT 占用 n Blocks(s_reserved_gdt_blocks member of superblock),
             每個 item 大小為 32 or 64 (s_desc_size member of superblock)
+
+    - structure of a blocks group descriptor
+
+        ```c
+        struct ext4_group_desc {
+            __le32  bg_block_bitmap_lo;     /* Blocks bitmap block塊位圖所在的第一個塊的塊ID */
+            __le32  bg_inode_bitmap_lo;     /* Inodes bitmap block inode位圖所在的第一個塊的塊ID */
+            __le32  bg_inode_table_lo;      /* Inodes table block inode表所在的第一個塊的塊ID */
+            __le16  bg_free_blocks_count_lo;/*Free blocks count塊組中未使用的塊數*/
+            __le16  bg_free_inodes_count_lo;/*Free inodes count塊組中未使用的inode數*/
+            __le16 bg_used_dirs_count_lo;  /*Directories count塊組分配的目錄的inode數*/
+            __le16  bg_flags;               /* EXT4_BG_flags (INODE_UNINIT,etc) */
+            __u32   bg_reserved[2];         /* Likely block/inode bitmap checksum*/
+            __le16  bg_itable_unused_lo;    /* Unused inodes count */
+            __le16  bg_checksum;            /* crc16(sb_uuid+group+desc) */
+            __le32  bg_block_bitmap_hi;     /* Blocks bitmap block MSB */
+            __le32  bg_inode_bitmap_hi;     /* Inodes bitmap block MSB */
+            __le32  bg_inode_table_hi;      /* Inodes table block MSB */
+            __le16  bg_free_blocks_count_hi;/*Free blocks count MSB */
+            __le16  bg_free_inodes_count_hi;/*Free inodes count MSB */
+            __le16 bg_used_dirs_count_hi;  /*Directories count MSB */
+            __le16  bg_itable_unused_hi;    /* Unused inodes count MSB */
+            __u32   bg_reserved2[3];
+        };
+        ```
 
 
 + Block bitmap (固定佔一個 block 大小, start at block alignment)
@@ -435,6 +589,69 @@ ext fs physical structure
 
     - inode 本身並不記錄文件名, 只是記錄文件的相關屬性,
     file name 是記錄在目錄所屬的 block 中的
+
+    - Structure of an inode
+
+        ```c
+        struct ext4_inode {
+            __le16  i_mode;         /* File mode文件格式和訪問權限*/
+            __le16  i_uid;          /* Low 16 bits of Owner Uid文件所有者ID的低16位*/
+            __le32  i_size_lo;      /* Size in bytes文件字節數*/
+            __le32  i_atime;        /* Access time文件上次被訪問的時間*/
+            __le32  i_ctime;        /* Inode Change time文件創建時間*/
+            __le32  i_mtime;        /* Modification time文件被修改的時間*/
+            __le32  i_dtime;        /* Deletion Time文件被刪除的時間（如果存在則為0）*/
+            __le16  i_gid;          /* Low 16 bits of Group Id文件所有組ID的低16位*/
+            __le16  i_links_count;  /* Links count此inode被連接的次數*/
+            __le32  i_blocks_lo;    /* Blocks count文件已使用和保留的總塊數（以512B為單位）*/
+            __le32  i_flags;        /* File flags */
+            union {
+                struct {
+                    __le32  l_i_version;
+                } linux1;
+                struct {
+                    __u32  h_i_translator;
+                } hurd1;
+                struct {
+                    __u32  m_i_reserved1;
+                } masix1;
+            } osd1;                         /*OS dependent 1 */
+            __le32  i_block[EXT4_N_BLOCKS];/*Pointers to blocks定位存儲文件的塊的數組*/
+            __le32  i_generation;   /* File version (for NFS) 用於NFS的文件版本*/
+            __le32  i_file_acl_lo;  /* File ACL包含擴展屬性的塊號, 老版本中為0*/
+            __le32  i_size_high;
+            __le32  i_obso_faddr;   /* Obsoleted fragment address */
+            union {
+                struct {
+                    __le16  l_i_blocks_high; /* were l_i_reserved1 */
+                    __le16  l_i_file_acl_high;
+                    __le16  l_i_uid_high;   /* these 2 fields */
+                    __le16  l_i_gid_high;   /* were reserved2[0] */
+                    __u32   l_i_reserved2;
+                } linux2;
+                struct {
+                    __le16  h_i_reserved1;  /* Obsoleted fragment number/size which areremoved in ext4 */
+                    __u16   h_i_mode_high;
+                    __u16   h_i_uid_high;
+                    __u16   h_i_gid_high;
+                    __u32   h_i_author;
+                } hurd2;
+                struct {
+                    __le16  h_i_reserved1;  /* Obsoleted fragment number/size which areremoved in ext4 */
+                    __le16  m_i_file_acl_high;
+                    __u32   m_i_reserved2[2];
+                } masix2;
+            } osd2;                         /*OS dependent 2 */
+            __le16  i_extra_isize;
+            __le16  i_pad1;
+            __le32  i_ctime_extra;  /* extra Change time      (nsec << 2 | epoch) */
+            __le32  i_mtime_extra;  /* extra Modification time(nsec << 2 |epoch) */
+            __le32  i_atime_extra;  /* extra Access time      (nsec << 2 | epoch) */
+            __le32  i_crtime;       /* File Creation time */
+            __le32  i_crtime_extra; /* extraFileCreationtime (nsec << 2 | epoch) */
+            __le32  i_version_hi;   /* high 32 bits for 64-bit version */
+        };
+        ```
 
 + Data block
     > 是用來存放文件內容的地方, Ext2 file system 有 1KB/2KB/4KB 大小的 block.
@@ -567,6 +784,64 @@ ext fs physical structure
                     | root dir   |        | sub-dir    |
                     +------------+        +------------+
             ```
+
+        1. Structure of a dir entry
+
+            ```c
+            struct ext4_dir_entry {
+                __le32  inode;                  /* Inode number文件入口的inode號, 0表示該項未使用*/
+                __le16  rec_len;                /* Directory entry length目錄項長度*/
+                __le16  name_len;               /* Name length文件名包含的字符數*/
+                char    name[EXT4_NAME_LEN];    /* File name文件名*/
+            };
+            ```
+
++ Hard link (硬鏈接)
+
+```
+$ mkdir my_hard_link    # directory
+    or
+$ touch my_hard_link    # file
+
+$ ln src_file my_hard_link
+$ rm -f my_hard_link
+```
+
+    - 在 ext 文件系統中, 允許多個文件名指向同一個 Inode, 這種情況的文件就稱為硬鏈接.
+        > 允許一個文件擁有多個有效路徑名(多個入口), 這樣用戶就可以建立硬鏈接到重要的文件, 以防止**誤刪**源數據.
+        Hard link 相當於對文件的備份, 但是改變一個文件內容, 會影像其它的文件內容
+
+    - the `link conunt` member in the inode item
+        > 當建立 Hard link 時, link count 會增加, 刪除時則會減少.
+        當 link count 到 0 時, file system 才會真正回收這個 inode item, 以及其所對應 data block
+
+    - 創建目錄時, 默認會生成兩個目錄項`.`和`..`.
+    `.` 的 inode 號碼就是**當前目錄的 inode 號碼**, 等同於**當前目錄的硬鏈接**;
+    `..` 的 inode 號碼就是當前目錄的**父目錄的 inode 號碼**, 等同於**父目錄的硬鏈接**.
+    所以, 任何一個目錄的**硬鏈接總數**, 總是等於 2 加上它的子目錄總數(含隱藏目錄),
+    這裡的 2 是父目錄對其的硬鏈接和當前目錄下 `.` 的硬鏈接
+
+
++ Soft link of Symbolic link (符號鏈接)
+
+```
+$ mkdir my_soft_link    # directory
+    or
+$ touch my_soft_link    # file
+
+$ ln -s src_file my_soft_link
+
+# 看 my_soft_link 這個軟鏈接文件是指向哪個文件
+$ readlink my_soft_link
+```
+
+    > 文件A和文件B的 inode 號碼雖然不一樣, 但是文件A的內容是文件B的路徑.
+    讀取文件A時, 系統會自動將訪問者導向文件B.
+    因此, 無論打開哪一個文件, 最終讀取的都是文件B.
+    >> 由於文件A(文件類型是 l)依賴於文件B而存在, 如果刪除了文件B,
+    打開文件A就會報錯`No such file or directory`,
+    也因為兩者是不同的 inode, 文件B的 inode `鏈接數`不會發生變化
+
 
 # MISC
 
@@ -1083,8 +1358,24 @@ drwxr-xr-x  20 root root   4096 Aug  3 16:06 lib
 + [**Linux FSCK自動修覆文件系統](https://blog.csdn.net/liujia2100/article/details/48900619)
 + [Linux 檔案格式 ext2 ext3 ext4 比較](https://stackoverflow.max-everyday.com/2017/08/linux-ext2-ext3-ext4/)
 
+## extern reference
++ [磁盤調度算法](http://c.biancheng.net/cpp/html/2627.html)
++ [文件系統筆記四、磁盤調度算法](https://blog.csdn.net/XD_hebuters/article/details/79046170)
++ [一篇文章理解Ext4文件系統的目錄](https://blog.csdn.net/shuningzhang/article/details/91953377)
++ [**linux文件系統一 ext4框架結構](https://blog.csdn.net/frank_zyp/article/details/88528728)
+    - block device
 
+## tmp
 + [Linux磁盤分區的詳細步驟(圖解linux分區命令使用方法)](https://blog.csdn.net/Phoenix_wang_cheng/article/details/52743821?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-5.nonecase)
 + [Linux 文件與目錄](https://www.cnblogs.com/sparkdev/p/11249659.html)
 + [Linux文件系統之一：inode節點和inode節點包含的block尋址信息](https://blog.csdn.net/roger_ranger/article/details/78035978)
 + [一天一點學習Linux之Inode詳解](http://www.opsers.org/base/one-day-the-little-learning-linux-inode-detailed.html)
+
+
+
+# 磁盤管理
+
++ [Linux入門之磁盤管理與inode表和group表詳解(CentOS)](https://blog.csdn.net/qq_42452450/article/details/105014057)
+
+
+

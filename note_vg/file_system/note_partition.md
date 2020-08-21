@@ -136,3 +136,6 @@ Partition of file system
 + debugfs
     - [Linux下的 DebugFs(基礎)](https://cuteparrot.pixnet.net/blog/post/206885452-linux%E4%B8%8B%E7%9A%84-debugfs-%28%E5%9F%BA%E7%A4%8E%29)
 
++ 磁盤管理
+    - [Linux入門之磁盤管理與inode表和group表詳解(CentOS)](https://blog.csdn.net/qq_42452450/article/details/105014057)
+
