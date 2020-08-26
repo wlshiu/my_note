@@ -224,6 +224,28 @@ typedef struct fsinfo {
     => fatinfo mmc 0:1      # 查看 sd 卡中 partition 1 的文件系統信息
     ```
 
++ `fatwrite`
+    > save memory data to device with Fat file system
+
+    ```
+    usage: fatwrite <interface> <dev:[partition]> <mem addr> <save name> <length>
+    e.g.
+    => fatwrite mmc 0:1 0x700000 kernel.img 0x2792f4
+
+    表示從地址 0x700000 dump 0x2792f4 bytes 大小的內存保存到 mmc0 的第一分區命名為 kernel.img
+    ```
+
++ `fatload`
+    > load a file to memory with Fat file system
+
+    ```
+    usage: fatload <interface> <dev:[partition]> <mem addr> <file name>
+    e.g.
+    => fatload mmc 0:1 0x40008000 uImage
+
+    從第 0 個存儲設備的第 1 個分區的根目錄讀出 uImage 文件到內存地址 0x40008000
+    ```
+
 # reference
 
 + [FAT32文件系統格式詳解(圖文針對具體文件存儲,分析fat32 SD卡)](https://blog.csdn.net/csdn66_2016/article/details/88066637)

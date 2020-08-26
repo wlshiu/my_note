@@ -1152,6 +1152,28 @@ $ readlink my_soft_link
         # 其中以'*'開頭的行表示這一段數據全是 0 因此省略了
         ```
 
+## ext2/3/4 in uboot
+
++ `ext2load` and`ext4load`
+    > load a file to memory with ext2/3/4 file system
+
+    ```
+    usage: ext4load <interface> <dev:[partition]> <mem addr> <file name> [bytes]
+    e.g.
+    => ext4load mmc 0:2 0x40008000 uImage
+
+    從第 0 個存儲設備的第 1 個分區的根目錄讀出 uImage 文件到內存地址 0x40008000
+    ```
+
++ `ext4write`
+    > save memory data to device with ext4 file system
+
+    ```
+    usage: ext4write <interface> <dev[:part]> <addr> <absolute filename path> [sizebytes]
+    e.g.
+    => ext4write mmc 2:2 0x30007fc0 /boot/uImage 6183120
+    ```
+
 ## simulation
 
 + lwext4

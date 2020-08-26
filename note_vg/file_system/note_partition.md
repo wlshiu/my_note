@@ -275,6 +275,7 @@ Partition of file system
 # reference
 
 + uboot/doc/README.gpt
++ [GUID磁碟分割表](https://www.wikiwand.com/zh-mo/GUID%E7%A3%81%E7%A2%9F%E5%88%86%E5%89%B2%E8%A1%A8)
 + [J6 Android eMMC 分區介紹](https://blog.csdn.net/cross_cross/article/details/79382626)
 + [C language reads GPT partition information](https://www.programmersought.com/article/9275766390/#_21)
 + [GPT分區數據格式分析(圖已補上)](https://blog.csdn.net/diaoxuesong/article/details/9406015)

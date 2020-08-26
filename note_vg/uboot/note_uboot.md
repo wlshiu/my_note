@@ -5,6 +5,20 @@ u-boot
 
 the version is `201907` or `latest`
 
+
+## definitions
+
++ `IPL` (Initial Program Loader)
+    > 是專門用於作業系統啟動引導的程式, 主要功能包括載入和運行啟動時必須的檔案,
+    提供可配置的啟動引導功能表和設置, 支援多系統並存環境下的選擇和引導功能.
+    可當作 ROM code
+
+    ```
+    # bring-up flow
+    (ROM)     (SRAM)       (DDR)
+     IPL --> uboot_SPL --> uboot --> kernel
+    ```
+
 # uboot directory
 
 ```
@@ -136,6 +150,54 @@ mmc bootpart-resize
 mmc partconf <boot_ack>     # set PARTITION_CONFIG field
 mmc rst-function            # change RST_n_FUNCTION field between 0|1|2 (write-once)
 ```
+
++ `CONFIG_BOOTARGS`
+    > 是 u-boot 向 Linux kernel 傳遞的參數, 實際上這個宏值就是環境變量中的 bootargs 的值
+
+    1. 使用 nfs 文件系統
+
+        ```
+        #define CONFIG_BOOTARGS     "console=ttySAC0,115200 noinitrd" \
+                                    "root=/dev/nfs rw nfsroot=192.168.1.2:/home/yanghao/nfs/rootfs" \
+                                    "ip=192.168.1.4:192.168.1.2:192.168.1.1:255.255.255.0::eth0:off"
+
+        相當於執行
+        => setenv bootargs=...
+        ```
+
++ `CONFIG_BOOTCOMMAND`
+    > 是系統在上電自動執行時, 所執行的命令對應環境變量中 bootcmd 的值
+    >> 可從 kconfig 設定: `Enable a default value for bootcmd` -> type your commonds
+
+    - example
+
+        1. auto partition when power on
+
+            ```
+            # kconfig set
+            env set partitions \"name=aa,size=16MB,type=data;name=bb,size=32M,type=data;\"; gpt write mmc 0 $partitions
+            ```
+
+        1. 利用 NFS 傳輸 kernel image 並完成啟動
+
+            ```
+            #define CONFIG_BOOTCOMMAND  "nfs 0x30008000 192.168.1.2:/home/xxx/nfs/zImage; bootm 0x30008000"
+            /* 系統啟動時會執行這個命令, 將 host (IP=192.168.1.2) 的檔案 "/home/xxx/nfs/zImage"
+            copy 到內存 0x30008000, 然後再跳轉到該地址去執行 */
+
+            相當於
+            set bootcmd=...
+            ```
+
+        1. 如果檔案在 NAND Flash
+
+            ```
+            #define CONFIG_BOOTCOMMAND  "nand read 0x30008000 0x600000 0x210000; bootm 0x30008000"
+            /* u-boot 先從 NAND Flash 中讀取檔案到內存, 然後去執行檔案 */
+
+            相當於
+            set bootcmd=...
+            ```
 
 + switch partition of eMMC
     > 默認分區是 UDA, 而 eMMC 每個分區都是獨立編址的.
@@ -287,7 +349,95 @@ mmc rst-function            # change RST_n_FUNCTION field between 0|1|2 (write-o
         (which you can determine using the part list mmc 0 command)
         you can also use `gzwrite` to flash a compressed partition image.
 
+## tftp in uboot
 
++ host side
+
+    - TFTP Server
+
+        1. install
+
+            ```
+            $ sudo apt-get install tftpd-hpa    # tftp server
+            $ sudo apt-get install tftp-hpa     # tftp client, for test
+            ```
+
+        1. 配置TFTP Server
+
+            ```
+            $ mkdir -p /home/xxx/tftpboot       # xxx為你的用戶名
+            $ chmod 777 /home/xxx/tftpboot
+            $ sudo vim /etc/default/tftpd-hpa
+                TFTP_USERNAME="tftp"
+                TFTP_DIRECTORY="/home/xxx/tftpboot"
+                TFTP_ADDRESS="0.0.0.0:69
+                TFTP_OPTIONS="-l -c -s"
+            ```
+
+            > + 修改 `TFTP_DIRECTORY` 為 TFTP_Server 服務目錄, 該目錄最好具有可讀可寫權限
+            > + 修改 `TFTP_ADDRESS` 為 0.0.0.0:69, 表示所有 IP 源都可以訪問
+            > + 修改 `TFTP_OPTIONS` 為 `-l -c -s`. 其中
+            >> `-l`: 以 standalone/listen 模式啟動 TFTP服務, 而不是從 xinetd 啟動
+
+            >> `-c`: 可創建新文件. 默認情況下 TFTP 只允許覆蓋原有文件而不能創建新文件
+
+            >> `-s`: 改變TFTP啟動的根目錄, 加了`-s`後, 客戶端使用 TFTP 時,
+            不再需要輸入指定目錄, 填寫文件的文件路徑, 而是使用配置文件中寫好的目錄.
+
+        1. 重啟 TFTP Server
+
+            ```
+            $ mkdir /home/xxx/tftpboot
+            $ sudo service tftpd-hpd restar
+
+            # enter tftp control
+            $ tftp 127.0.0.1
+            tftp>
+            ```
+
++ target device side (uboot console)
+
+    - configure uboot
+
+        ```
+        => setenv ipaddr 192.168.1.20       # 設置開發板的本地IP
+        => setenv serverip 192.168.1.103    # 設置 tftp server 的 IP, 也就是你存放 kernel 之類的文件的 tftp 服務器地址
+        ```
+
+    - download file
+
+        ```
+        => tftp c0008000 zImage
+        => erase 0x680000 +0x120000
+        => cp.b c0008000 0x680000 0x120000
+
+        # c0008000 是下載開發板裡 memory 地址,
+        # zImage 是需要下載的文件名稱,
+        # 0x680000 是 kernel 的起始位置,
+        # 0x120000 是 kernel 的分區大小.
+        ```
+
+## ext2/3/4 in uboot
+
++ `ext2load` and`ext4load`
+    > load a file to memory with ext2/3/4 file system
+
+    ```
+    usage: ext4load <interface> <dev:[partition]> <mem addr> <file name> [bytes]
+    e.g.
+    => ext4load mmc 0:2 0x40008000 uImage
+
+    從第 0 個存儲設備的第 1 個分區的根目錄讀出 uImage 文件到內存地址 0x40008000
+    ```
+
++ `ext4write`
+    > save memory data to device with ext4 file system
+
+    ```
+    usage: ext4write <interface> <dev[:part]> <addr> <absolute filename path> [sizebytes]
+    e.g.
+    => ext4write mmc 2:2 0x30007fc0 /boot/uImage 6183120
+    ```
 
 # Build u-boot
 
@@ -308,6 +458,7 @@ make cscope
     $ sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev libc6-dev lib32ncurses5-dev gcc-multilib libx11-dev lib32z1-dev libgl1-mesa-dev
 
     $ sudo apt-get install device-tree-compiler
+    $ sudo apt-get install u-boot-tools # for mkimage tool
     ```
 
 ## target board example
@@ -634,6 +785,12 @@ $ vi ./z_qemu.sh
 + [eMMC 簡介](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/)
 + [eMMC 原理 3:分區管理](http://www.wowotech.net/basic_tech/emmc_partitions.html)
 + [***用QEMU模擬運行uboot從SD卡啟動Linux](https://www.cnblogs.com/pengdonglin137/p/12194548.html)
++ [UBOOT中利用CONFIG_EXTRA_ENV_SETTINGS宏來設置默認ENV](https://blog.csdn.net/weixin_42418557/article/details/89018965)
++ [U-boot中常用參數設定及常用宏的解釋和說明](https://blog.csdn.net/alifrank/article/details/50392431)
++ [常用 U-boot命令詳解](https://blog.csdn.net/willand1981/article/details/5822911)
++ [qemu模擬arm系統vexpress-a9—uboot+uImage](https://www.itread01.com/content/1548783372.html)
++ [ARM板移植Linux系統啟動（二）SPL](http://conanwhf.github.io/2017/06/08/bootup-2-spl/)
+
 
 + [三星公司 uboot模式下更改分區(EMMC)大小 fdisk命令](https://topic.alibabacloud.com/tc/a/samsung-company-uboot-mode-change-partition-emmc-size-fdisk-command_8_8_10262641.html)
     - [uboot_tiny4412](https://github.com/friendlyarm/uboot_tiny4412)
