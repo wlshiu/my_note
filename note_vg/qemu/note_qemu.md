@@ -67,16 +67,47 @@ Qemu
         $ qemu-system-arm -M stm32-p103 -monitor stdio -kernel main.bin -semihosting
         ```
 
+# Version
+
+
++ `qemu-arm` 是用戶模式的模擬器(更精確的表述應該是系統調用模擬器),
+    > 僅可用來運行二進制文件, 因此你可以交叉編譯完, 例如 hello world 之類的程序然後交給 qemu-arm 來運行, 簡單而高效
+
++ `qemu-system-arm` 則是系統模擬器
+    > 它可以模擬出整個機器並運行操作系統, 需要你把 hello world 程序下載到客戶機操作系統能訪問到的硬盤裡才能運行
+
+
 # Cross compile
 
 + qemu
 
     ```shell
-    $ ./configure --target-list=arm-softmmu --prefix=$HOME/qemu-3.1.1.1/out/
+    $ mkdir qemu && cd qemu
+    $ wget https://download.qemu.org/qemu-5.1.0.tar.xz
+    $ tar -xJf qemu-5.1.0.tar.xz
+
+    $ sudo apt-get install libpixman-1-dev
+    $ ./configure --target-list=arm-softmmu --static --prefix=$HOME/.local/
     $ make
     $ make install
     $ ./out/bin/arm-system-arm -M vexpress-a9 -kernel u-boot -nographic -m 128M
     ```
+
+    - `--target-list=LIST`
+        > set target list (default: build everything)
+
+        ```
+        --target-list=arm-softmmu,arm-linux-user
+        ```
+
+        1. `x86_64-softmmu`
+            > x86_64-linux-use
+
+        1. `xxx-softmmu`
+            > compile `qemu-system-xxx`
+
+        1. `xxx-linux-user`
+            > compiles `qemu-xxx` (User-mode emulation)
 
     - [qemu-system-gnuarmeclipse](https://github.com/xpack-dev-tools/qemu-arm-xpack/releases/)
         > this qemu is for Cortex-M serial
