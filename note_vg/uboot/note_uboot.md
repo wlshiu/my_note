@@ -31,6 +31,46 @@ the version is `201907` or `latest`
     以及提供硬件機制的內存訪問授權.
 
 
++ `DM` (driver model)
+    > 為驅動的定義和訪問接口提供了統一的方法. 提高了驅動之間的兼容性以及訪問的標準型.
+    uboot driver model 和 kernel device driver 類似, 但是又有所區別.
+
+    > uclass 和 udevice 都是動態生成的. 在解析 fdt 中的設備的時候, 會動態生成 udevice.
+    然後找到 device 對應的 driver, 通過 driver 中的 uclass id 得到 uclass_driver id.
+    從 uclass list 中查找對應的 uclass 是否已經生成, 沒有生成的話則動態生成 uclass.
+
+    ```
+            user
+              |
+            uclass ------- uclass_driver
+              |
+        +-----+-----+
+        |           |
+    udevice       udevice
+        |           |
+     driver       driver
+        |           |
+      H/w          H/w
+    ```
+
+    - `udevice` (uboot device)
+        > 設備對象, 可以理解為kernel中的device
+
+    - `driver`
+        > udevice 的驅動, 可以理解為 kernel 中的 device_driver.
+        和底層硬件設備通信, 並且為設備提供面向上層的接口
+
+    - `uclass` (uboot class)
+        > 使用相同 interface 的 device group.
+        e.g. GPIO uclass 提供了get/set接口.
+             一個 I2C uclass 下可能有 10 個 I2C 端口,
+             4 個使用一個 driver, 另外 6 個使用另外一個 driver.
+
+    - `uclass_driver`
+        > 對應 uclass 的驅動程序.
+        主要提供 uclass 操作時, 如綁定 udevice 時的一些操作
+
+
 # uboot directory
 
 ```
@@ -86,6 +126,109 @@ the version is `201907` or `latest`
             doc/tools/examples
 
     ```
+
+# uboot commands
+
++ `dfu`
+    > Device Firmware Upgrade
+
+    - host side
+
+        ```bash
+        $ sudo apt-get install dfu-util
+        $ dfu-util --help
+            Usage: dfu-util [options] ...
+              -h --help                     Print this help message
+              -V --version                  Print the version number
+              -v --verbose                  Print verbose debug statements
+              -l --list                     List currently attached DFU capable devices
+              -e --detach                   Detach currently attached DFU capable devices
+              -E --detach-delay seconds     Time to wait before reopening a device after detach
+              -d --device <vendor>:<product>[,<vendor_dfu>:<product_dfu>]
+                                            Specify Vendor/Product ID(s) of DFU device
+              -p --path <bus-port. ... .port>       Specify path to DFU device
+              -c --cfg <config_nr>          Specify the Configuration of DFU device
+              -i --intf <intf_nr>           Specify the DFU Interface number
+              -S --serial <serial_string>[,<serial_string_dfu>]
+                                            Specify Serial String of DFU device
+              -a --alt <alt>                Specify the Altsetting of the DFU Interface
+                                            by name or by number
+              -t --transfer-size <size>     Specify the number of bytes per USB Transfer
+              -U --upload <file>            Read firmware from device into <file>
+              -Z --upload-size <bytes>      Specify the expected upload size in bytes
+              -D --download <file>          Write firmware from <file> into device
+              -R --reset                    Issue USB Reset signalling once we're finished
+              -s --dfuse-address <address>  ST DfuSe mode, specify target address for
+                                            raw file download or upload. Not applicable for
+                                            DfuSe file (.dfu) downloads
+        ```
+
+        1. example
+
+            ```
+            $ lsusb     # check usb status
+                Bus 001 Device 013: ID 0483:df11 STMicroelectronics STM Device in DFU Mode
+            $ sudo dfu-util -d 0483:df11 -a 0 -s 0x08000000 -D stm32_demo.bin
+
+                or
+
+            $ dfu-util -D u-boot.bin
+                dfu-util 0.8
+
+                Copyright 2005-2009 Weston Schmidt, Harald Welte and OpenMoko Inc.
+                Copyright 2010-2014 Tormod Volden and Stefan Schmidt
+                This program is Free Software and has ABSOLUTELY NO WARRANTY
+                Please report bugs to dfu-util@lists.gnumonks.org
+
+                dfu-util: Invalid DFU suffix signature
+                dfu-util: A valid DFU suffix will be required in a future dfu-util release!!!
+                Opening DFU capable USB device...
+                ID 18d1:4e30
+                Run-time device DFU version 0110
+                Claiming USB DFU Interface...
+                Setting Alternate Setting #0 ...
+                Determining device status: state = dfuIDLE, status = 0
+                dfuIDLE, continuing
+                DFU mode device DFU version 0110
+                Device returned transfer size 4096
+                Copying data from PC to DFU device
+                Download        [=========================] 100%       419666 bytes
+                Download done.
+                state(7) = dfuMANIFEST, status(0) = No error condition is present
+                state(2) = dfuIDLE, status(0) = No error condition is present
+                Done!
+            ```
+
+    - target board side
+
+        1. enable option
+
+            ```
+            CONFIG_CMD_DFU=y
+            # DFU support
+            CONFIG_USB_FUNCTION_DFU=y
+            # CONFIG_DFU_TFTP is not set
+            CONFIG_DFU_MMC=y
+            # CONFIG_DFU_NAND is not set
+            CONFIG_DFU_RAM=y
+            # CONFIG_DFU_SF is not set
+            可以使用 MMC 和 RAM 存儲文件
+
+            # e.g. 輸入 setenv dfu_alt_info u-boot.bin ram 0x43E00000 0x100000
+            # 表示如果使用 ram 方式, 將接收的數據存儲在 RAM 中以 0x43E00000 開始的位置, 最大為 0x10000
+            # 表示如果使用 mmc 方式, 將接收的數據存儲在 MMC 中以 0x10000000 開始的位置, 最大為 0x10000
+            ```
+
+        1. example
+
+            ```
+            => dfu 0 ram 0
+            USB PHY0 Enable
+            crq->brequest:0x0
+
+            DOWNLOAD ... OK
+            Ctrl+C to exit ...
+            ```
 
 # Flow Chart
 
@@ -478,6 +621,498 @@ stage2
         1. [u-boot啟動流程 2017.03](https://wowothink.com/146db8db/)
         1. [U-BOOT-2016.07移植(第三篇)代碼重定位](https://blog.csdn.net/funkunho/article/details/52474373)
         1. [mcdx:u-boot2020.04移植](https://blog.csdn.net/a1598025967/category_10123105.html)
+
++ `init_sequence_f[]` at `common/board_f.c`
+
+    - `setup_mon_len()`
+        > 置 `gd->mon_len`的值, 這個值表示 u-boot executable bin 大小
+        >> `_start` ~ `__bss_end`
+
+    - `fdtdec_setup()`
+        > 設置`gd->fdt_blob`指針(即 device tree binary 所在的存儲位置)的值
+        >> `__dtb_dt_begin` at `dts/dt.dtb.S`
+
+    - `initf_malloc()`
+        > 設置`gd->malloc_limit` heap 空間限制為 `CONFIG_SYS_MALLOC_F_LEN`
+
+    - `log_init()`
+        >  Setup the log system ready for use if necessary
+
+    - `initf_bootstage()`
+        > 主要作用就是為`gd->bootstage`分配空間, 並初始化`gd->bootstage`;
+        同時增加兩個紀錄, 一條是`reset`, 一條是`board_init_f`
+        >> Record the bootstrap flow and the spent time
+
+    - `arch_cpu_init()`
+        > 針對特定 CPU 的初始化, 不同 CPU 的初始化也不盡相同,
+        因此 u-boot 提供了 `arch_cpu_init`用於CPU初始化.
+        這個函數由移植者根據自己的硬件(CPU)的情況來實作
+
+    - `mach_cpu_init()`
+        > 針對特定 `SoC`的初始化, 這個函數同樣由移植者根據自己的硬件(SoC)的情況來提供
+
+    - `initf_dm()`
+        > 進行 u-boo t的 Driver Model 的初始化,
+        在這裡會去解析 fdt 的設備, 並註冊與之匹配的驅動
+
+    - `board_early_init_f()`
+        > 由 vendor 提供, 通常定義在 board 目錄下, 用來對開發版做前期配置.
+        提供這個函數的同時還需要定義 `CONFIG_BOARD_EARLY_INIT_F`
+
+    - `env_init()`
+        > 設置`gd->env_addr`環境變量的 address.
+        可由不同 priority 的 storage device 載入.
+
+            ```c
+            // at env/env.c
+            enum env_location env_locations[] = {};
+            ```
+
+        > 使用 `U_BOOT_ENV_LOCATION` 宣告一個相應的 `struct env_driver` 類型的 entry,
+        多個 entries 用 link script 將其集中到一個 memory pool.
+        >> 利用 macro `ll_entry_start/ll_entry_end` 來定義 pool 開始及結束 address
+
+        ```
+        .u_boot_list : { KEEP(*(SORT(.u_boot_list*))); }
+
+        /*
+         *  .u_boot_list_2_env_driver_1         => ll_entry_start(struct env_driver, env_driver)
+         *  .u_boot_list_2_env_driver_2_eeprom  => U_BOOT_ENV_LOCATION(eeprom)
+         *  .u_boot_list_2_env_driver_2_ext4    => U_BOOT_ENV_LOCATION(ext4)
+         *  .u_boot_list_2_env_driver_3         => ll_entry_end(struct env_driver, env_driver)
+         */
+        ```
+
+        1. 預設值存放在 `default_environment[]` at `include/env_default.h`
+
+        1. source code
+
+            ```c
+            int env_init(void)
+            {
+                struct env_driver *drv;
+                int ret = -ENOENT;
+                int prio;
+
+                /**
+                 *  從 env_locations array 的第  1個元素開始遍歷(即從最最優先的位置開始遍歷).
+                 *  env_driver_lookup 會遍歷上述的一系列entry,
+                 *  若有 entry 的 location 與 env_locations[prio] 匹配, 則返回該 entry 的地址,
+                 *  否則返回NULL
+                 */
+                for (prio = 0; (drv = env_driver_lookup(ENVOP_INIT, prio)); prio++) {
+                    /**
+                     *  一旦找到匹配的 entry, 嘗試調用該 entry 的初始化成員函數.
+                     *  初始化函數通常會設置 gd->env_addr (環境變量地址)和 gd->env_valid
+                     */
+                    if (!drv->init || !(ret = drv->init()))
+                        /**
+                         *  如果初始化成員函數存在且調用成功.
+                         *  則將 gd->env_has_init 的相應 bit 置 1,
+                         *  標誌該位置的環境變量已初始化
+                         */
+                        env_set_inited(drv->location);
+
+                    debug("%s: Environment %s init done (ret=%d)\n", __func__,
+                          drv->name, ret);
+                }
+
+                if (!prio)
+                    return -ENODEV;
+
+                if (ret == -ENOENT) {
+                    /**
+                     *  未能匹配到 entry 或匹配到但初始化失敗的話,
+                     *  就使用默認的環境變量
+                     */
+                    gd->env_addr = (ulong)&default_environment[0];
+                    gd->env_valid = ENV_VALID;
+
+                    return 0;
+                }
+
+                return ret;
+            }
+            ```
+
+    - `init_baud_rate()`
+        > 從環境變量中獲取 baudrate 的值, 並設置`gd->baudrate`(default: CONFIG_BAUDRATE).
+
+    - `serial_init()`
+        > at `drivers/serial/serial-uclass.c`
+
+    - `console_init_f()`
+    - `display_options()`
+        > show version info
+    - `display_text_info()`
+        > show `.text` and `.bss` section addresses
+        >> text_base 由 `CONFIG_SYS_TEXT_BASE`來決定, 即 `_start` 開始的地方
+
+    - `print_cpuinfo()`
+        > 需定義 `CONFIG_DISPLAY_CPUINFO`
+
+    - `show_board_info()`
+        > 需定義 `CONFIG_DISPLAY_BOARDINFO` 及 `CONFIG_OF_CONTROL`.
+        讀取 DTB 的 `cpu-model` 資訊
+
+    - `dram_init()`
+        > 初始化系統的 DDR, `dram_init` 應該由平台相關的代碼實現.
+        如果 DDR 已經初始化過了, 則不需要重新初始化,
+        只需要設置 `gd->ram_size` 的大小
+        >> 按照 u-boot 的說明, 調用`dram_init()`之後,
+        就要去分配 DDR 的空間以及 relocate u-boot 的代碼
+
+    - reference
+        1. [u-boot v2018.01 啟動流程分析](https://www.shangmayuan.com/a/d31b5c1f20d7418186c1675e.html)
+            > relocate layout
+        1. [uboot 驅動模型- DM](https://blog.csdn.net/ooonebook/article/details/53234020)
+        1. [u-boot啟動流程](https://wowothink.com/146db8db/)
+
++ uboot relocate
+
+    在以前的板子上, u-boot 有可能是運行在 NOR FLASH 或 ROM 上, 空間小執行慢, 而且不支持 write 操作,
+    DDR 初始化完畢之後, 需要將其 relocate 到 DDR 去運行, 空間大執行的速度也比較快, 也支持 write 操作.
+
+    同時考慮到後續的 kernel 是在 DDR 的 Low memory 解壓縮並執行的,
+    為了避免麻煩,** u-boot 將使用 DRAM 的 top address**, 即 `gd->ram_top`所代表的位置.
+
+    延續 uboot initial flow `init_sequence_f[]` at `common/board_f.c`
+
+    - `setup_dest_addr()`
+        > 設置 u-boot 的 relocaddr address, 通過`gd->ram_size`和`CONFIG_SYS_SDRAM_BASE`(DDR的起始地址),
+        確定`gd->ram_top`和`gd->relocaddr`, 也就是將 u-boot 重定位到 DDR highest address,
+        執行完之後`gd->relocaddr = gd->ram_top`
+
+    - `reserve_round_4k()`
+        > 對 `gd->relocaddr` 做 4K-align
+
+    - `reserve_mmu()`
+        > 保留 mmu 所需的 memory buffer
+
+        ```c
+        __weak int reserve_mmu(void)
+        {
+        ...
+            /* reserve TLB table  */
+            gd->arch.tlb_size = PGTABLE_SIZE;   // PGTABLE_SIZE default (4096 * 4) = 16KB
+            gd->relocaddr -= gd->arch.tlb_size; // 保留 16KB 的空間
+            gd->relocaddr &= ~(0x10000 - 1);    // 64KB 對齊(向 Low address)
+
+            gd->arch.tlb_addr = gd->relocaddr;
+        ...
+            return 0;
+        }
+        ```
+
+    - `reserve_uboot()`
+        > 保留 uboot `.text` 和 `.data` section 並配置 `gd->start_addr_sp`
+
+        ```
+        High address
+        +------------------+--> gd->ram_top
+        | 4K-align padding |
+        +------------------+
+        | MMU PGTABLE_SIZE |
+        +------------------+
+        | reserve memory   |
+        | gd->mon_len      |
+        +------------------+
+        | 4K-align padding |
+        +------------------+--> gd->relocaddr = gd->start_addr_sp
+        |                  |
+
+        ```
+
+    - `reserve_malloc()`
+        > reserve memory for `malloc()` area,
+        大小為`TOTAL_MALLOC_LEN` at `include/common.h`
+
+        ```c
+        #if defined(CONFIG_ENV_IS_EMBEDDED)
+        #define TOTAL_MALLOC_LEN    CONFIG_SYS_MALLOC_LEN
+        #elif ( ((CONFIG_ENV_ADDR+CONFIG_ENV_SIZE) < CONFIG_SYS_MONITOR_BASE) || \
+            (CONFIG_ENV_ADDR >= (CONFIG_SYS_MONITOR_BASE + CONFIG_SYS_MONITOR_LEN)) ) || \
+              defined(CONFIG_ENV_IS_IN_NVRAM)
+        #define TOTAL_MALLOC_LEN    (CONFIG_SYS_MALLOC_LEN + CONFIG_ENV_SIZE)
+        #else
+        #define TOTAL_MALLOC_LEN    CONFIG_SYS_MALLOC_LEN
+        #endif
+        ```
+
+        > memory layout
+
+        ```
+        High address
+        +------------------+--> gd->ram_top
+        | 4K-align padding |
+        +------------------+
+        | MMU PGTABLE_SIZE |
+        +------------------+
+        | reserve memory   |
+        | gd->mon_len      |
+        +------------------+
+        | 4K-align padding |
+        +------------------+-->  gd->relocaddr
+        | reserve          |
+        | TOTAL_MALLOC_LEN |
+        +------------------+-->  gd->start_addr_sp
+        |                  |
+        ```
+
+    - `reserve_board()`
+        > 為`struct bd_info`分配空間, 並配置 `gd->bd`
+
+        ```
+        High address
+        +------------------------+--> gd->ram_top
+        | 4K-align padding       |
+        +------------------------+
+        | MMU PGTABLE_SIZE       |
+        +------------------------+
+        | reserve memory         |
+        | gd->mon_len            |
+        +------------------------+
+        | 4K-align padding       |
+        +------------------------+--> gd->relocaddr
+        | reserve                |
+        | TOTAL_MALLOC_LEN       |
+        +------------------------+-->
+        | sizeof(struct bd_info) |
+        +------------------------+--> gd->bd = gd->start_addr_sp
+        |                        |
+
+        ps. memory cast 往 High address 走, stack 往 Low address 走
+        ```
+
+    - `reserve_global_data()`
+        > 為`struct global_data`分配空間, 並配置 `gd->new_gd`
+
+        ```
+        High address
+        +------------------------+--> gd->ram_top
+        | 4K-align padding       |
+        +------------------------+
+        | MMU PGTABLE_SIZE       |
+        +------------------------+
+        | reserve memory         |
+        | gd->mon_len            |
+        +------------------------+
+        | 4K-align padding       |
+        +------------------------+--> gd->relocaddr
+        | reserve                |
+        | TOTAL_MALLOC_LEN       |
+        +------------------------+-->
+        | sizeof(struct bd_info) |
+        +------------------------+--> gd->bd
+        | sizeof(global_data_t)  |
+        +------------------------+--> gd->new_gd = gd->start_addr_sp
+        |                        |
+
+        ps. memory cast 往 High address 走, stack 往 Low address 走
+        ```
+
+    - `reserve_fdt()`
+        > 為 fdt 分配空間, 通過`gd->fdt_blob`計算出`gd->fdt_size`的大小, 並配置 `gd->new_fdt`
+
+        ```
+        High address
+        +------------------------+--> gd->ram_top
+        | 4K-align padding       |
+        +------------------------+
+        | MMU PGTABLE_SIZE       |
+        +------------------------+
+        | reserve memory         |
+        | gd->mon_len            |
+        +------------------------+
+        | 4K-align padding       |
+        +------------------------+--> gd->relocaddr
+        | reserve                |
+        | TOTAL_MALLOC_LEN       |
+        +------------------------+-->
+        | sizeof(struct bd_info) |
+        +------------------------+--> gd->bd
+        | sizeof(global_data_t)  |
+        +------------------------+--> gd->new_gd
+        | reserve                |
+        | gd->fdt_size           |
+        +------------------------+--> gd->new_fdt = gd->start_addr_sp
+        |                        |
+
+        ps. memory cast 往 High address 走, stack 往 Low address 走
+        ```
+
+    - `reserve_bootstage()`
+        > 為`struct bootstage_data`分配空間, 並配置 `gd->new_bootstage`
+
+        ```
+        High address
+        +------------------------+--> gd->ram_top
+        | 4K-align padding       |
+        +------------------------+
+        | MMU PGTABLE_SIZE       |
+        +------------------------+
+        | reserve memory         |
+        | gd->mon_len            |
+        +------------------------+
+        | 4K-align padding       |
+        +------------------------+--> gd->relocaddr
+        | reserve                |
+        | TOTAL_MALLOC_LEN       |
+        +------------------------+-->
+        | sizeof(struct bd_info) |
+        +------------------------+--> gd->bd
+        | sizeof(global_data_t)  |
+        +------------------------+--> gd->new_gd
+        | reserve                |
+        | gd->fdt_size           |
+        +------------------------+--> gd->new_fdt
+        |sizeof(bootstage_data_t)|
+        +------------------------+--> gd->new_bootstage = gd->start_addr_sp
+        |                        |
+
+        ps. memory cast 往 High address 走, stack 往 Low address 走
+        ```
+
+    - `reserve_stacks()`
+        > 保留 16-bytes 的 irq stack, 並配置 `gd->irq_sp`
+
+        ```
+        High address
+        +------------------------+--> gd->ram_top
+        | 4K-align padding       |
+        +------------------------+
+        | MMU PGTABLE_SIZE       |
+        +------------------------+
+        | reserve memory         |
+        | gd->mon_len            |
+        +------------------------+
+        | 4K-align padding       |
+        +------------------------+--> gd->relocaddr
+        | reserve                |
+        | TOTAL_MALLOC_LEN       |
+        +------------------------+-->
+        | sizeof(struct bd_info) |
+        +------------------------+--> gd->bd
+        | sizeof(global_data_t)  |
+        +------------------------+--> gd->new_gd
+        | reserve                |
+        | gd->fdt_size           |
+        +------------------------+--> gd->new_fdt
+        |sizeof(bootstage_data_t)|
+        +------------------------+--> gd->new_bootstage
+        | irq stack, 16-bytes    |
+        +------------------------+--> gd->irq_sp = gd->start_addr_sp
+        |                        |
+
+        ps. memory cast 往 High address 走, stack 往 Low address 走
+        ```
+
+    - `reloc_xxx()`
+        > 將 data 搬到上述保留的 memory address
+
+    - `setup_reloc()`
+        > + 計算 relocate 後, 與原本位置的 offset, 並配置給 `gd->reloc_off`
+        > + copy global_data 到新的 address (gd->new_gd)
+
+
+    - `relocate_code()` at `arch/arm/lib/relocate.S`
+
+        1. pre-setup
+
+            ```
+                ldr sp, [r9, #GD_START_ADDR_SP] /* sp = gd->start_addr_sp */
+                bic sp, sp, #7  /* 8-byte alignment for ABI compliance */
+                ldr r9, [r9, #GD_BD]        /* r9 = gd->bd */
+                sub r9, r9, #GD_SIZE        /* new GD is below bd */
+
+                /**
+                 * 上面這一段代碼是將 board_init_f 中,
+                 * 設置好的 start_addr_sp 地址值賦給棧指針,
+                 * 使其指向重定位後的棧頂 8-bytes 對齊後,
+                 * 將 r9 設為新的 GD 地址
+                 * (對照內存分配圖: gd_new_addr = bd_addr - sizeof(gd_t))
+                 */
+
+                adr lr, here                    //設置返回地址為下面的 here, 重定位到 sdram 後返回 here 運行
+                ldr r0, [r9, #GD_RELOC_OFF]     /* r0 = gd->reloc_off 取重定位地址偏移值 */
+                add lr, lr, r0                  //返回地址加偏移地址等於重定位後在 sdram 中的 here 地址
+                ldr r0, [r9, #GD_RELOCADDR]     /* r0 = gd->relocaddr 傳入參數為重定位地址 */
+                b   relocate_code               //跳到 arch/arm/lib/relocate.S 中執行
+            here:                               //返回後跳到 sdram 中運行
+            ```
+        1. source code
+
+            ```
+            ENTRY(relocate_code)
+                /* r1 <- SRC &__image_copy_start 這是 u-boot.bin 起始鏈接地址,
+                 * 定義在 u-boot.lds 中 (編譯後在頂層目錄生成)
+                 * 原文件是 arch/arm/cpu/u-boot.lds, 大家可以自行分析
+                 */
+                ldr r1, =__image_copy_start
+
+                /* r4 <- relocation offset r0 是 crt0.S 中傳入的重定位地址,
+                 * 這裡是算出偏移值
+                 */
+                subs    r4, r0, r1
+
+                beq relocate_done           /* skip relocation 如果 r4 為 0, 則認為重定位已完成 */
+                ldr r2, =__image_copy_end   /* r2 <- SRC &__image_copy_end 同第一條指令, 在 u-boot.lds 中定義 */
+
+            copy_loop:
+                /* r1 是源地址 __image_copy_start,
+                 * r0 是目的地址 relocaddr,
+                 * size = __image_copy_start - __image_copy_end
+                 */
+                ldmia   r1!, {r10-r11}  /* copy from source address [r1] */
+                stmia   r0!, {r10-r11}  /* copy to   target address [r0] */
+                cmp r1, r2              /* until source end address [r2] */
+                blo copy_loop
+
+                /*
+                 * fix .rel.dyn relocations  定義了"-PIE"選項就會執行下面這段代碼
+                 * 目的是為了讓位置相關的資源(代碼/參數/變量)的地址在重定位後仍然能被尋址到, 所以讓他們加上偏移地址,
+                 * 即等於他們重定位後的真正地址
+                 * 這些 "存放(資源的地址)的地址" 存放在 .rel.dyn 這個段中, 每個參數後面都會跟著一個起標誌作用的參數,
+                 * 如果這個標誌參數為 23, 即 0x17, 則表示這個 (資源的地址) 是位置相關的, 需要加上重定位偏移值
+                 * 這一段代碼首先讓 .rel.dyn 這個段中的存放的地址值加上偏移值, 使其在 sdram 中取出(資源的地址)
+                 * 然後再讓這些(資源的地址)加上偏移值, 存回 rel.dyn 中存放這些地址的地址中,
+                 * 比較拗口, 抽象, 大家多研究研究代碼, 或看看我下面發的圖來幫助理解
+                 */
+                ldr r2, =__rel_dyn_start  /* r2 <- SRC &__rel_dyn_start */
+                ldr r3, =__rel_dyn_end    /* r3 <- SRC &__rel_dyn_end */
+            fixloop:
+                ldmia   r2!, {r0-r1}    /* (r0,r1) <- (SRC location,fixup) r0為"存放(資源的地址)的地址",
+                                         * 這個地址裡存放的是需要用到的(資源的地址), r1為標誌值
+                                         */
+                and r1, r1, #0xff    /* r1 取低八位 */
+                cmp r1, #23          /* relative fixup? 和23比較, 如果相等則繼續往下, 否則跳到fixnext */
+                bne fixnext
+
+                /* relative fix: increase location by offset */
+                add r0, r0, r4      // r4 存放的是重定位偏移值, r0 這個地址存放的是位置相關的(資源的地址),
+                                    // r4 + r0 即為重定位後的 "存放(資源的地址)的地址",
+                ldr r1, [r0]        //在 sdram 中取出還未修改的(資源的地址)
+                add r1, r1, r4      //加上偏移值
+                str r1, [r0]        //存回去
+            fixnext:                //跳到下一個繼續檢測是否需要重定位
+                cmp r2, r3
+                blo fixloop
+
+            relocate_done:
+
+                /* ARMv4- don't know bx lr but the assembler fails to see that */
+
+            #ifdef __ARM_ARCH_4__
+                mov pc, lr                 //ARM920T 用的彙編指令集是 ARMv4, 所以使用這條返回指令,
+                                           //返回重定位後的 here 標誌
+            #else
+                bx  lr
+            #endif
+
+            ENDPROC(relocate_code)
+            ```
+
+        1. [arch/arm/lib/relocate.S](https://blog.csdn.net/funkunho/article/details/52474373)
 
 + System Control Coprocessor Registers `CP15`
 
@@ -1594,6 +2229,17 @@ $ vi ./z_qemu.sh
 
 ```
 
+# others
+
++ set bit with asm
+
+    ```nasm
+        ldr r0, =0xE010E81C     /* register address */
+        ldr r1, [r0]
+        ldr r2, =((0x1 << 0) | (0x1 << 8) | (0x1 << 9))
+        orr r1, r1, r2          /* r1 = r1 | r2; */
+        str r1, [r0]            /* write r1 date to r0 */
+    ```
 
 # reference
 
