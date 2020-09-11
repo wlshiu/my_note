@@ -623,6 +623,7 @@ stage2
         1. [mcdx:u-boot2020.04移植](https://blog.csdn.net/a1598025967/category_10123105.html)
 
 + `init_sequence_f[]` at `common/board_f.c`
+    > `board_f.c` board init first
 
     - `setup_mon_len()`
         > 置 `gd->mon_len`的值, 這個值表示 u-boot executable bin 大小
@@ -776,7 +777,12 @@ stage2
     同時考慮到後續的 kernel 是在 DDR 的 Low memory 解壓縮並執行的,
     為了避免麻煩,** u-boot 將使用 DRAM 的 top address**, 即 `gd->ram_top`所代表的位置.
 
-    延續 uboot initial flow `init_sequence_f[]` at `common/board_f.c`
+    > relocate 會造持執行 address 混亂.
+    一般執行地址都是在編譯時由 linker 指定的, 為了確保搬移後可以執行, 有兩種方法.
+    > + linker 就直接使用搬移後的 address (link script)
+    > + 開啟 PIC (Position independent code) 選項來編譯. linker 會**使用相對位址**來連結
+
+    以下延續 uboot initial flow `init_sequence_f[]` at `common/board_f.c`
 
     - `setup_dest_addr()`
         > 設置 u-boot 的 relocaddr address, 通過`gd->ram_size`和`CONFIG_SYS_SDRAM_BASE`(DDR的起始地址),
@@ -1017,85 +1023,171 @@ stage2
 
     - `relocate_code()` at `arch/arm/lib/relocate.S`
 
+        1. build `.rel.dyn` section
+            > ARM 架構, 是在編譯時使用`-mword-relocations`, 生成與位置無關代碼.
+            link 時使用`-pie`生成 `.rel.dyn` section
+            >> At `arch/arm/config.mk`
+
+            > `.rel.dyn` section 中的每個條目被稱為一個 Label, 用來存儲絕對地址的 symbol_address.
+
+
+        1. relocation memory layout
+            > `.rel.dyn` 與 `.bss` section 起始地址是相同, u-boot 運行 stage1 時, `.bss` section 是不為零的.
+            運行 stage1 時的全域變數, 會預先放到別的 memory section, 或是從 heap 使用後再做搬移
+
+            ```
+                    High address
+                    +---------------+   gd->ram_top
+                    | align padding |
+                +-- +---------------+   gd->relocaddr + gd->mon_len
+                |   | .bss (reloc)  |
+            +-> |   +---------------+
+            |   |   | .data (reloc) |
+            |   |   +---------------+
+            |   |   | .text (reloc) |
+            |   +-- +---------------+   gd->relocaddr
+            |       | ...           |
+            |       +---------------+   __image_binary_end = __rel_dyn_end
+            |       | .rel.dyn      |
+            |   +-- +---------------+   __image_copy_end = __rel_dyn_start = __bss_start
+            +---|   | .data         |
+                |   +---------------+
+                |   | .text         |
+                +-- +---------------+   __image_copy_start
+                    |               |
+            ```
+
+        1. `.rel.dyn` section
+
+            ```
+            struct rel_item {
+                unsigned long   label_pointer; /* record symbol_address*/
+                unsigned long   tag;
+            };
+
+            ...
+            80008020 <_undefined_instruction>:      /* label_pointer */
+            80008020:	80008060 	andhi	r8, r0, r0, rrx
+            ...
+
+            80008060 <undefined_instruction>:       /* symbol_address*/
+            80008060:	e51fd028 	ldr	sp, [pc, #-40]	; 80008040 <IRQ_STACK_START_IN>
+            80008064:	e58de000 	str	lr, [sp]
+            80008068:	e14fe000 	mrs	lr, SPSR
+            8000806c:	e58de004 	str	lr, [sp, #4]
+            ...
+
+            Disassembly of section .rel.dyn:
+
+            80078f04 <__efi_runtime_rel_stop>:
+            80078f04:	80008020 	andhi	r8, r0, r0, lsr #32 /* label_pointer */
+            80078f08:	00000017 	andeq	r0, r0, r7, lsl r0  /* tag */
+            80078f0c:	80008024 	andhi	r8, r0, r4, lsr #32 /* label_pointer */
+            80078f10:	00000017 	andeq	r0, r0, r7, lsl r0  /* tag */
+            80078f14:	80008028 	andhi	r8, r0, r8, lsr #32 /* label_pointer */
+            80078f18:	00000017 	andeq	r0, r0, r7, lsl r0  /* tag */
+            ...
+            ```
+
         1. pre-setup
 
             ```
                 ldr sp, [r9, #GD_START_ADDR_SP] /* sp = gd->start_addr_sp */
-                bic sp, sp, #7  /* 8-byte alignment for ABI compliance */
+                bic sp, sp, #7      /* 8-byte alignment for ABI compliance */
                 ldr r9, [r9, #GD_BD]        /* r9 = gd->bd */
                 sub r9, r9, #GD_SIZE        /* new GD is below bd */
 
                 /**
                  * 上面這一段代碼是將 board_init_f 中,
-                 * 設置好的 start_addr_sp 地址值賦給棧指針,
+                 * 設置好的 start_addr_sp 地址值賦給 stack pointer,
                  * 使其指向重定位後的棧頂 8-bytes 對齊後,
                  * 將 r9 設為新的 GD 地址
                  * (對照內存分配圖: gd_new_addr = bd_addr - sizeof(gd_t))
                  */
 
-                adr lr, here                    //設置返回地址為下面的 here, 重定位到 sdram 後返回 here 運行
+                adr lr, here                    /* 設置返回地址為下面的 here, 重定位到 sdram 後返回 here 運行
+                                                 * adr: 讀取基於 PC 相對偏移的 address 到 register
+                                                 */
                 ldr r0, [r9, #GD_RELOC_OFF]     /* r0 = gd->reloc_off 取重定位地址偏移值 */
-                add lr, lr, r0                  //返回地址加偏移地址等於重定位後在 sdram 中的 here 地址
+                add lr, lr, r0                  // lr 加偏移地址等於在 sdram 中重定位後的 here 地址
                 ldr r0, [r9, #GD_RELOCADDR]     /* r0 = gd->relocaddr 傳入參數為重定位地址 */
                 b   relocate_code               //跳到 arch/arm/lib/relocate.S 中執行
-            here:                               //返回後跳到 sdram 中運行
+            here:                               //返回後跳到 relocated 的 sdram 中運行
             ```
+
         1. source code
 
             ```
             ENTRY(relocate_code)
-                /* r1 <- SRC &__image_copy_start 這是 u-boot.bin 起始鏈接地址,
+                /* r1 = &__image_copy_start
+                 * 其中 __image_copy_start 是 u-boot.bin 起始鏈接地址,
                  * 定義在 u-boot.lds 中 (編譯後在頂層目錄生成)
                  * 原文件是 arch/arm/cpu/u-boot.lds, 大家可以自行分析
                  */
                 ldr r1, =__image_copy_start
 
-                /* r4 <- relocation offset r0 是 crt0.S 中傳入的重定位地址,
+                /* r4 = r0 - r1 = gd->relocaddr - &__image_copy_start
+                 * r0 是 crt0.S 中傳入的 gd->relocaddr,
                  * 這裡是算出偏移值
                  */
                 subs    r4, r0, r1
 
-                beq relocate_done           /* skip relocation 如果 r4 為 0, 則認為重定位已完成 */
-                ldr r2, =__image_copy_end   /* r2 <- SRC &__image_copy_end 同第一條指令, 在 u-boot.lds 中定義 */
+                beq relocate_done           /* skip relocation 如果 r4 == 0, 則認為重定位已完成 */
+                ldr r2, =__image_copy_end   /* r2 = &__image_copy_end, __image_copy_end 在 u-boot.lds 中定義 */
 
             copy_loop:
                 /* r1 是源地址 __image_copy_start,
-                 * r0 是目的地址 relocaddr,
+                 * r0 是目的地址 gd->relocaddr,
                  * size = __image_copy_start - __image_copy_end
                  */
-                ldmia   r1!, {r10-r11}  /* copy from source address [r1] */
-                stmia   r0!, {r10-r11}  /* copy to   target address [r0] */
-                cmp r1, r2              /* until source end address [r2] */
-                blo copy_loop
+                ldmia   r1!, {r10-r11}  /* copy from source address [r1]
+                                         * C pseudo code:
+                                         *  r10 = *r1, r1 += 4;
+                                         *  r11 = *r1, r1 += 4;
+                                         */
+                stmia   r0!, {r10-r11}  /* copy to   target address [r0]
+                                         * C pseudo code:
+                                         *  *r0 = r10, r0 += 4;
+                                         *  *r0 = r11, r0 += 4;
+                                         */
+                cmp r1, r2              /* until source end address [r2]
+                                         * C pseudo code:
+                                         *  (r1 - r2) and mark flags (CF, ZF, OF, SF)
+                                         */
+                blo copy_loop           /* (unsigned)小於則跳轉 */
 
                 /*
-                 * fix .rel.dyn relocations  定義了"-PIE"選項就會執行下面這段代碼
-                 * 目的是為了讓位置相關的資源(代碼/參數/變量)的地址在重定位後仍然能被尋址到, 所以讓他們加上偏移地址,
-                 * 即等於他們重定位後的真正地址
+                 * fix .rel.dyn relocations
+                 * 定義了"-PIE"選項就會執行下面這段代碼
+                 * 目的是為了讓相關資源(代碼/參數/變量)的 address 在重定位後仍然能被尋址到,
+                 * 所以讓他們加上偏移地址, 即等於他們重定位後的真正 address
                  * 這些 "存放(資源的地址)的地址" 存放在 .rel.dyn 這個段中, 每個參數後面都會跟著一個起標誌作用的參數,
-                 * 如果這個標誌參數為 23, 即 0x17, 則表示這個 (資源的地址) 是位置相關的, 需要加上重定位偏移值
+                 * 如果這個標誌參數為 23 (即 0x17), 則表示這個 (資源的地址) 是位置相關的, 需要加上重定位偏移值
                  * 這一段代碼首先讓 .rel.dyn 這個段中的存放的地址值加上偏移值, 使其在 sdram 中取出(資源的地址)
                  * 然後再讓這些(資源的地址)加上偏移值, 存回 rel.dyn 中存放這些地址的地址中,
-                 * 比較拗口, 抽象, 大家多研究研究代碼, 或看看我下面發的圖來幫助理解
                  */
-                ldr r2, =__rel_dyn_start  /* r2 <- SRC &__rel_dyn_start */
-                ldr r3, =__rel_dyn_end    /* r3 <- SRC &__rel_dyn_end */
+                ldr r2, =__rel_dyn_start  /* r2 = &__rel_dyn_start */
+                ldr r3, =__rel_dyn_end    /* r3 = &__rel_dyn_end */
             fixloop:
-                ldmia   r2!, {r0-r1}    /* (r0,r1) <- (SRC location,fixup) r0為"存放(資源的地址)的地址",
-                                         * 這個地址裡存放的是需要用到的(資源的地址), r1為標誌值
+                ldmia   r2!, {r0-r1}    /* (r0,r1) = (SRC location, fixup)
+                                         * r0 為 label_pointer,
+                                         * r1 為 tag
                                          */
-                and r1, r1, #0xff    /* r1 取低八位 */
-                cmp r1, #23          /* relative fixup? 和23比較, 如果相等則繼續往下, 否則跳到fixnext */
+                and r1, r1, #0xff       /* r1 取低八位 */
+                cmp r1, #R_ARM_RELATIVE /* relative fixup? 和 R_ARM_RELATIVE (0x17) 比較,
+                                         * 如果相等(代表找到 label)則繼續往下, 否則跳到 fixnext
+                                         */
                 bne fixnext
 
                 /* relative fix: increase location by offset */
-                add r0, r0, r4      // r4 存放的是重定位偏移值, r0 這個地址存放的是位置相關的(資源的地址),
-                                    // r4 + r0 即為重定位後的 "存放(資源的地址)的地址",
-                ldr r1, [r0]        //在 sdram 中取出還未修改的(資源的地址)
-                add r1, r1, r4      //加上偏移值
-                str r1, [r0]        //存回去
+                add r0, r0, r4      /* r4 存放的是重定位偏移值, r0 則是原本的 label_pointer,
+                                     * r4 + r0 即為重定位後的 label_pointer,
+                                     */
+                ldr r1, [r0]        // r1 = *r0, label_pointer 取值, 得到實際的 symbol_address
+                add r1, r1, r4      // r1 += r4, 將 symbol_address 加上 offset, 指向 relocate 後的 address
+                str r1, [r0]        // *r0 = r1, 寫回 memory
             fixnext:                //跳到下一個繼續檢測是否需要重定位
-                cmp r2, r3
+                cmp r2, r3          /* 確認是否到 .rel.dyn section END */
                 blo fixloop
 
             relocate_done:
@@ -1103,16 +1195,69 @@ stage2
                 /* ARMv4- don't know bx lr but the assembler fails to see that */
 
             #ifdef __ARM_ARCH_4__
-                mov pc, lr                 //ARM920T 用的彙編指令集是 ARMv4, 所以使用這條返回指令,
-                                           //返回重定位後的 here 標誌
+                mov pc, lr          /* ARM920T 用的彙編指令集是 ARMv4, 所以使用這條返回指令,
+                                     * 返回上一層的 here 標誌
+                                     */
             #else
-                bx  lr
+                bx  lr              /* 返回上一層的 here 標誌 */
             #endif
 
             ENDPROC(relocate_code)
             ```
 
         1. [arch/arm/lib/relocate.S](https://blog.csdn.net/funkunho/article/details/52474373)
+        1. [PIC(與位置無關代碼)在u-boot上的實現](http://blog.chinaunix.net/uid-20528014-id-4445271.html)
+
+    - `relocate_vectors`
+        > 用於重定位中斷向量表, 將新的中斷向量表 start address 寫到 VBAR register 中.
+
+        ```
+        ENTRY(relocate_vectors)
+
+        #ifdef CONFIG_CPU_V7M
+            /*
+             * On ARMv7-M we only have to write the new vector address
+             * to VTOR register.
+             */
+            ldr    r0, [r9, #GD_RELOCADDR]    /* r0 = gd->relocaddr */
+            ldr    r1, =V7M_SCB_BASE
+            str    r0, [r1, V7M_SCB_VTOR]     /* 設置新的 vector table 給 SCB->VTOR register */
+        #else
+        #ifdef CONFIG_HAS_VBAR
+            /*
+             * If the ARM processor has the security extensions,
+             * use VBAR to relocate the exception vectors.
+             */
+            ldr    r0, [r9, #GD_RELOCADDR]  /* r0 = gd->relocaddr */
+            mcr    p15, 0, r0, c12, c0, 0   /* 設置 vector table 到CP15的 VBAR register */
+        #else
+            /*
+             * Copy the relocated exception vectors to the
+             * correct address
+             * CP15 c1 V bit gives us the location of the vectors:
+             * 0x00000000 or 0xFFFF0000.
+             */
+            ldr    r0, [r9, #GD_RELOCADDR]    /* r0 = gd->relocaddr */
+            mrc    p15, 0, r2, c1, c0, 0    /* V bit (bit[13]) in CP15 c1 */
+            ands    r2, r2, #(1 << 13)
+            ldreq    r1, =0x00000000        /* If V=0 */
+            ldrne    r1, =0xFFFF0000        /* If V=1 */
+            ldmia    r0!, {r2-r8,r10}
+            stmia    r1!, {r2-r8,r10}
+            ldmia    r0!, {r2-r8,r10}
+            stmia    r1!, {r2-r8,r10}
+        #endif
+        #endif
+            bx    lr
+
+        ENDPROC(relocate_vectors)
+        ```
+
+        1. [Uboot啟動流程分析(五)](https://www.cnblogs.com/Cqlismy/p/12152400.html)
+
+    - `.bss` section 清零, 並準備 `new_gd` 及 `gd->relocaddr` 參數, 跳轉到 `board_init_r`
+        > `board_init_r` at `common/board_r.c`
+        >> `board_r.c` board init relocated
 
 + System Control Coprocessor Registers `CP15`
 
