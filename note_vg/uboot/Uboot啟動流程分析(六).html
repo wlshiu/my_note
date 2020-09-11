@@ -1,0 +1,1445 @@
+﻿<!DOCTYPE html><html style="" lang="zh-cn"><script async="" data-savepage-src="https://www.google-analytics.com/analytics.js"></script><script type="text/javascript" data-savepage-src="https://common.cnblogs.com/script/encoder.js"></script><script data-savepage-src="moz-extension://e8af3748-cab9-4ad3-8a37-7f418908bdae/js/inject.js"></script><head>
+<base href="https://www.cnblogs.com/Cqlismy/p/12194641.html">
+<link rel="icon" data-savepage-href="522" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAE+0lEQVRYhcWXf2hVZRjHP8/ZVeZay9mwuY1poVM2yMl0nXO3e/2RMpM0+2P7w4qQ6K8gEEwKqegPkTAqo4Lsp0UQRRQaSmYLt7Z7p5uhqxRbxrrXMce0Mda4u7v3ffrjnF33606nq75wOPd934fv8z3ned/nfK9wC6h27DxLZBNQBljAb6p6pDEUjt4oh9xM4oBtW2LJ08CLwFxVvUYoMgi8boy+9GM4HJ9xAdVlZVh35OwDdqpLcAGoBxJANVDuhX6WNPpYUzicmIovYzrJa2trGYwPbQTeBFTgBdBtDc3hw52R6NGCBQvezbCsP4EHgOWWyKWk0tbf3z8zAgrz8kga846q3iMiHw4PJ3Y2tZw0I+vRS126sKDwJywBWAcszZmb+3YkEtF0nNZ0BMSG4zlApYgYYH/o1KkJMQ0tLQAHgBhQYpnkoqk4pyUAZB6QBcRUuZiWdDjRA1wFyLCs/JUrV86QAKEfiAOzRchLF2Z8GdlANoAxGsuaPWvjjAhIJE0f8CvgA7ZPFlNbWwsidUAO0I1QDmyvrKxML+C+FSsIOPai6wkoKi42wFvecFfQ72xZv2ZNan392rVcvhS1gX3e1HvADsDO9GX4JuMUgA0bNjD098DLIuw+0RSa8tz6V63y+Wb5vgIexD37hwS+Vff3aqAO1UxEWoH9wCeAAZY2NIc6xvNlAAwODnJnbu5mYF5nJHp2KgGRri6zsKjoMCJFwHJVLUVkM/CQqi4XEQuRo6rUifAqUOQ9aFtSOTO+J1gA3d3dAGeA54N+J3MqAQANofDAsEk+Djgi8gZwHKgXkQNADcZsFuFeYHThA8XFxRO4UnVR1VYRWQxsAz64nohQ+CTASe8ag2CVbaHsZuwmr85IJCzccqSQChCj54E+4JmA3z/phrlhqGwFguNmS8Rn5Y8PTQnounIljvs0ywTdcrO5g46dB7zGxCNugdhpBXR0dAB87w13BBxnml0SVlc5PkTeByYW20WgpqZmcgEe6r27X4T0/XMSVJSXW6rsBaZ6e/bVrq70Aoyan4EuVbWAp240+doqv3Vb1pw9wM5xSx3A6Iylc27Pzk4rIPHLuThwXEQAtgb8Ttp+P4KgY2cnVQ8Cz45bOiTgAM+NmstRZVFaAWG3SRweCRZ4NF3iasch6HdsRFoYG9cDbM9QHj7RHOpF9Wvc0wWACKVpBQCgehwY9EZP3m/bY2KqqqoI+p0SSzgINEKKsA94BSi7q7Doox9CIQPQEAr3A8dcagUoGc034bzHksm+TJ+vHrfXlw5bYgPNAb+dJcg61DwBbPLER4EG4DvgSHtr29W/4pP60C+BOq+0d1dUVNDW1ja5AGMU4AtPAMDeoN/pwW2rUeA08AjQatRE9fc/Ek09PZMlTUGVY+J6iRygYCQ5pHHFAcfOE5FOXPczHglcUzKA63p6vXsP0CPQqXBekXBjc3PqdQT9zqequk1ETi+bN1Rx4JvTQBpDEu2+3Itbz17c/RDzrj6g30vY54kY8OZ6cZNfEKGDxPD4z/pBrwR550cdzLT/C+bPn0/p4sW+JOrD87Q+yzJqkqY/NmSS8bjJLyoiEomwZMkS2tvbuXgxrU0k4Pf7BD0H5EvS5J5oaUlMKeDfQNDv7AL2qGphYyjcA9N2xbcGVf0YiIlQMDL3nwpoDIW7gc9B/h8BHvbDNUt/a8bjJqBGzyLERsb/AKulzmJdLC+gAAAAAElFTkSuQmCC">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <meta property="og:description" content="1、前言 在前面的文章《Uboot启动流程分析(三)》和《Uboot启动流程分析(四)》，链接分别如下： https://www.cnblogs.com/Cqlismy/p/12006287.html">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Uboot啟動流程分析(六) - Cqlismy - 博客園</title>
+    <link id="favicon" rel="shortcut icon" data-savepage-href="//common.cnblogs.com/favicon.ico?v=20200522" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAE+0lEQVRYhcWXf2hVZRjHP8/ZVeZay9mwuY1poVM2yMl0nXO3e/2RMpM0+2P7w4qQ6K8gEEwKqegPkTAqo4Lsp0UQRRQaSmYLt7Z7p5uhqxRbxrrXMce0Mda4u7v3ffrjnF33606nq75wOPd934fv8z3ned/nfK9wC6h27DxLZBNQBljAb6p6pDEUjt4oh9xM4oBtW2LJ08CLwFxVvUYoMgi8boy+9GM4HJ9xAdVlZVh35OwDdqpLcAGoBxJANVDuhX6WNPpYUzicmIovYzrJa2trGYwPbQTeBFTgBdBtDc3hw52R6NGCBQvezbCsP4EHgOWWyKWk0tbf3z8zAgrz8kga846q3iMiHw4PJ3Y2tZw0I+vRS126sKDwJywBWAcszZmb+3YkEtF0nNZ0BMSG4zlApYgYYH/o1KkJMQ0tLQAHgBhQYpnkoqk4pyUAZB6QBcRUuZiWdDjRA1wFyLCs/JUrV86QAKEfiAOzRchLF2Z8GdlANoAxGsuaPWvjjAhIJE0f8CvgA7ZPFlNbWwsidUAO0I1QDmyvrKxML+C+FSsIOPai6wkoKi42wFvecFfQ72xZv2ZNan392rVcvhS1gX3e1HvADsDO9GX4JuMUgA0bNjD098DLIuw+0RSa8tz6V63y+Wb5vgIexD37hwS+Vff3aqAO1UxEWoH9wCeAAZY2NIc6xvNlAAwODnJnbu5mYF5nJHp2KgGRri6zsKjoMCJFwHJVLUVkM/CQqi4XEQuRo6rUifAqUOQ9aFtSOTO+J1gA3d3dAGeA54N+J3MqAQANofDAsEk+Djgi8gZwHKgXkQNADcZsFuFeYHThA8XFxRO4UnVR1VYRWQxsAz64nohQ+CTASe8ag2CVbaHsZuwmr85IJCzccqSQChCj54E+4JmA3z/phrlhqGwFguNmS8Rn5Y8PTQnounIljvs0ywTdcrO5g46dB7zGxCNugdhpBXR0dAB87w13BBxnml0SVlc5PkTeByYW20WgpqZmcgEe6r27X4T0/XMSVJSXW6rsBaZ6e/bVrq70Aoyan4EuVbWAp240+doqv3Vb1pw9wM5xSx3A6Iylc27Pzk4rIPHLuThwXEQAtgb8Ttp+P4KgY2cnVQ8Cz45bOiTgAM+NmstRZVFaAWG3SRweCRZ4NF3iasch6HdsRFoYG9cDbM9QHj7RHOpF9Wvc0wWACKVpBQCgehwY9EZP3m/bY2KqqqoI+p0SSzgINEKKsA94BSi7q7Doox9CIQPQEAr3A8dcagUoGc034bzHksm+TJ+vHrfXlw5bYgPNAb+dJcg61DwBbPLER4EG4DvgSHtr29W/4pP60C+BOq+0d1dUVNDW1ja5AGMU4AtPAMDeoN/pwW2rUeA08AjQatRE9fc/Ek09PZMlTUGVY+J6iRygYCQ5pHHFAcfOE5FOXPczHglcUzKA63p6vXsP0CPQqXBekXBjc3PqdQT9zqequk1ETi+bN1Rx4JvTQBpDEu2+3Itbz17c/RDzrj6g30vY54kY8OZ6cZNfEKGDxPD4z/pBrwR550cdzLT/C+bPn0/p4sW+JOrD87Q+yzJqkqY/NmSS8bjJLyoiEomwZMkS2tvbuXgxrU0k4Pf7BD0H5EvS5J5oaUlMKeDfQNDv7AL2qGphYyjcA9N2xbcGVf0YiIlQMDL3nwpoDIW7gc9B/h8BHvbDNUt/a8bjJqBGzyLERsb/AKulzmJdLC+gAAAAAElFTkSuQmCC" type="image/x-icon">
+    
+    <style data-savepage-href="/css/blog-common.min.css?v=7Pwqzj5EBy4dBv4DJNI181rFKP8_OF0hT7jO3o8jAa0">.syntaxhighlighter a,.syntaxhighlighter div,.syntaxhighlighter code,.syntaxhighlighter table,.syntaxhighlighter table td,.syntaxhighlighter table tr,.syntaxhighlighter table tbody,.syntaxhighlighter table thead,.syntaxhighlighter table caption,.syntaxhighlighter textarea{-moz-border-radius:0 0 0 0 !important;-webkit-border-radius:0 0 0 0 !important;background:none !important;border:0 !important;bottom:auto !important;float:none !important;height:auto !important;left:auto !important;line-height:1.1em !important;margin:0 !important;outline:0 !important;overflow:visible !important;padding:0 !important;position:static !important;right:auto !important;text-align:left !important;top:auto !important;vertical-align:baseline !important;width:auto !important;box-sizing:content-box !important;font-family:"Consolas","Bitstream Vera Sans Mono","Courier New",Courier,monospace !important;font-weight:normal !important;font-style:normal !important;font-size:1em !important;min-height:inherit !important;min-height:auto !important}.syntaxhighlighter{width:100% !important;margin:1em 0 1em 0 !important;position:relative !important;overflow:auto !important;font-size:1em !important}.syntaxhighlighter.source{overflow:hidden !important}.syntaxhighlighter .bold{font-weight:bold !important}.syntaxhighlighter .italic{font-style:italic !important}.syntaxhighlighter .line{white-space:pre !important}.syntaxhighlighter table{width:100% !important}.syntaxhighlighter table caption{text-align:left !important;padding:.5em 0 .5em 1em !important}.syntaxhighlighter table td.code{width:100% !important}.syntaxhighlighter table td.code .container{position:relative !important}.syntaxhighlighter table td.code .container textarea{box-sizing:border-box !important;position:absolute !important;left:0 !important;top:0 !important;width:100% !important;height:100% !important;border:none !important;background:#fff !important;padding-left:1em !important;overflow:hidden !important;white-space:pre !important}.syntaxhighlighter table td.gutter .line{text-align:right !important;padding:0 .5em 0 1em !important}.syntaxhighlighter table td.code .line{padding:0 1em !important}.syntaxhighlighter.nogutter td.code .container textarea,.syntaxhighlighter.nogutter td.code .line{padding-left:0 !important}.syntaxhighlighter.show{display:block !important}.syntaxhighlighter.collapsed table{display:none !important}.syntaxhighlighter.collapsed .toolbar{padding:.1em .8em 0 .8em !important;font-size:1em !important;position:static !important;width:auto !important;height:auto !important}.syntaxhighlighter.collapsed .toolbar span{display:inline !important;margin-right:1em !important}.syntaxhighlighter.collapsed .toolbar span a{padding:0 !important;display:none !important}.syntaxhighlighter.collapsed .toolbar span a.expandSource{display:inline !important}.syntaxhighlighter .toolbar{position:absolute !important;right:1px !important;top:1px !important;width:11px !important;height:11px !important;font-size:10px !important;z-index:10 !important}.syntaxhighlighter .toolbar span.title{display:inline !important}.syntaxhighlighter .toolbar a{display:block !important;text-align:center !important;text-decoration:none !important;padding-top:1px !important}.syntaxhighlighter .toolbar a.expandSource{display:none !important}.syntaxhighlighter.ie{font-size:.9em !important;padding:1px 0 1px 0 !important}.syntaxhighlighter.ie .toolbar{line-height:8px !important}.syntaxhighlighter.ie .toolbar a{padding-top:0 !important}.syntaxhighlighter.printing .line.alt1 .content,.syntaxhighlighter.printing .line.alt2 .content,.syntaxhighlighter.printing .line.highlighted .number,.syntaxhighlighter.printing .line.highlighted.alt1 .content,.syntaxhighlighter.printing .line.highlighted.alt2 .content{background:none !important}.syntaxhighlighter.printing .line .number{color:#bbb !important}.syntaxhighlighter.printing .line .content{color:#000 !important}.syntaxhighlighter.printing .toolbar{display:none !important}.syntaxhighlighter.printing a{text-decoration:none !important}.syntaxhighlighter.printing .plain,.syntaxhighlighter.printing .plain a{color:#000 !important}.syntaxhighlighter.printing .comments,.syntaxhighlighter.printing .comments a{color:#008200 !important}.syntaxhighlighter.printing .string,.syntaxhighlighter.printing .string a{color:#00f !important}.syntaxhighlighter.printing .keyword{color:#069 !important;font-weight:bold !important}.syntaxhighlighter.printing .preprocessor{color:#808080 !important}.syntaxhighlighter.printing .variable{color:#a70 !important}.syntaxhighlighter.printing .value{color:#090 !important}.syntaxhighlighter.printing .functions{color:#ff1493 !important}.syntaxhighlighter.printing .constants{color:#06c !important}.syntaxhighlighter.printing .script{font-weight:bold !important}.syntaxhighlighter.printing .color1,.syntaxhighlighter.printing .color1 a{color:#808080 !important}.syntaxhighlighter.printing .color2,.syntaxhighlighter.printing .color2 a{color:#ff1493 !important}.syntaxhighlighter.printing .color3,.syntaxhighlighter.printing .color3 a{color:#f00 !important}.syntaxhighlighter.printing .break,.syntaxhighlighter.printing .break a{color:#000 !important}.syntaxhighlighter{background-color:#fff !important}.syntaxhighlighter .line.alt1{background-color:#fff !important}.syntaxhighlighter .line.highlighted.alt1,.syntaxhighlighter .line.highlighted.alt2{background-color:#e0e0e0 !important}.syntaxhighlighter .line.highlighted.number{color:#000 !important}.syntaxhighlighter table caption{color:#000 !important}.syntaxhighlighter .gutter{color:#afafaf !important}.syntaxhighlighter .gutter .line{border-right:3px solid #6ce26c !important}.syntaxhighlighter .gutter .line.highlighted{background-color:#6ce26c !important;color:#fff !important}.syntaxhighlighter.printing .line .content{border:none !important}.syntaxhighlighter.collapsed{overflow:visible !important}.syntaxhighlighter.collapsed .toolbar{color:#00f !important;background:#fff !important;border:1px solid #6ce26c !important}.syntaxhighlighter.collapsed .toolbar a{color:#00f !important}.syntaxhighlighter.collapsed .toolbar a:hover{color:#f00 !important}.syntaxhighlighter .toolbar{color:#fff !important;background:#6ce26c !important;border:none !important}.syntaxhighlighter .toolbar a{color:#fff !important}.syntaxhighlighter .toolbar a:hover{color:#000 !important}.syntaxhighlighter .plain,.syntaxhighlighter .plain a{color:#000 !important}.syntaxhighlighter .comments,.syntaxhighlighter .comments a{color:#008200 !important}.syntaxhighlighter .string,.syntaxhighlighter .string a{color:#00f !important}.syntaxhighlighter .keyword{color:#069 !important}.syntaxhighlighter .preprocessor{color:#808080 !important}.syntaxhighlighter .variable{color:#a70 !important}.syntaxhighlighter .value{color:#090 !important}.syntaxhighlighter .functions{color:#ff1493 !important}.syntaxhighlighter .constants{color:#06c !important}.syntaxhighlighter .script{font-weight:bold !important;color:#069 !important;background-color:none !important}.syntaxhighlighter .color1,.syntaxhighlighter .color1 a{color:#808080 !important}.syntaxhighlighter .color2,.syntaxhighlighter .color2 a{color:#ff1493 !important}.syntaxhighlighter .color3,.syntaxhighlighter .color3 a{color:#f00 !important}.syntaxhighlighter .keyword{font-weight:bold !important}.syntaxhighlighter code{white-space:pre-wrap;white-space:-moz-pre-wrap !important;white-space:-pre-wrap;white-space:-o-pre-wrap}.syntaxhighlighter .line{white-space:normal !important;line-height:1.8em !important}.syntaxhighlighter code{line-height:1.8em !important}.syntaxhighlighter .toolbar{display:none}.syntaxhighlighter.collapsed .toolbar{display:block;background:#f5f5f5 !important;border:1px solid #ccc !important;padding:.5em .8em .5em .8em !important}.syntaxhighlighter table td.code{width:auto !important}.syntaxhighlighter .line.alt2{background-color:#f4f4f4 !important}.syntaxhighlighter .gutter{width:35px !important}.syntaxhighlighter .gutter .line{border-right:2px solid #6ce26c !important}.syntaxhighlighter table td.gutter .line{padding:0 .5em 0 .5em !important;text-align:right !important}.syntaxhighlighter .keyword{font-weight:normal !important;color:#00f !important}.syntaxhighlighter a,.syntaxhighlighter div,.syntaxhighlighter code,.syntaxhighlighter table,.syntaxhighlighter table td,.syntaxhighlighter table tr,.syntaxhighlighter table tbody,.syntaxhighlighter table thead,.syntaxhighlighter table caption,.syntaxhighlighter textarea{font-size:12px !important}.sh-gutter .line,.sh-gutter code{white-space:nowrap !important}body{font-family:Helvetica,Verdana,Arial,sans-serif}input[type=button]{-webkit-appearance:button}img{border:0}.ThumbNail img{width:100%}.blog_topic{margin-top:10px;margin-left:2em}#blog_post_info_block{margin-top:20px}#BlogPostCategory{margin-bottom:10px}#EntryTag{margin-top:0 !important}.topicListFooter{text-align:right;margin-right:10px;margin-top:10px}#divRefreshComments{text-align:right;margin-right:10px;margin-bottom:5px;font-size:12px}.commentTextBox{Width:480px;height:220px}.commenttb{width:320px}.tb_comment_name{width:200px}#MyIng{margin-top:5px}.ing_title{font-weight:bold;text-align:center}.ing_body{margin-top:5px;margin-bottom:5px;word-break:break-all}.ing_date{text-align:center;color:#808080;font-size:11px}.ing_footer{text-align:right;margin-right:5px}#divNewMsg{margin-top:2px;text-align:center}.commentform table td input{margin:2px auto}.sendMsg2This:link,.sendMsg2This:visited,.sendMsg2This:active{font-size:12px;text-decoration:none;background:/*savepage-url=/images/icoMsg.gif*/url() no-repeat top left;padding-left:20px}.sendMsg2This:hover{background:/*savepage-url=/images/icoMsg.gif*/url() no-repeat bottom left}.RecentComment{overflow:hidden}.cnblogs_code{background-color:#f5f5f5;font-family:Courier New !important;font-size:12px !important;border:1px solid #ccc;padding:5px;overflow:auto;margin:5px 0;color:#000}span.cnblogs_code{padding:3px}.cnblogs_code div{background-color:#f5f5f5}.cnblogs_code pre{font-family:Courier New !important;font-size:12px !important;word-wrap:break-word}.cnblogs_code span{font-family:Courier New !important;font-size:12px !important;line-height:1.5 !important}.cnblogs_code_Collapse{border-right:#808080 1px solid;border-top:#808080 1px solid;border-left:#808080 1px solid;border-bottom:#808080 1px solid;background-color:#fff;padding:2px}.cnblogs_code_collapse{border-right:#808080 1px solid;border-top:#808080 1px solid;border-left:#808080 1px solid;border-bottom:#808080 1px solid;background-color:#fff;padding:2px}.cnblogs_code_hide{display:none}.code_img_closed{vertical-align:middle;padding-right:5px}.code_img_opened{vertical-align:middle;padding-right:5px}.cnblogs_code_open{margin-top:5px}.codeLineNumber{-moz-user-select:none;color:#008080;padding-right:10px}.cnblogs_code ol{margin-left:0;color:#008080}.cnblogs_code ol li{list-style-image:none}.cnblogs_code ol li span{color:#000}.cnblogs_code_toolbar a:hover,.cnblogs_code_toolbar a:link,.cnblogs_code_toolbar a:visited,.cnblogs_code_toolbar a:active,.cnblogs_code_toolbar a:link img,.cnblogs_code_toolbar a:visited img{background-color:#f5f5f5 !important;border:none !important}.desc_img{float:right;max-height:200px}.MsoNormal{font-size:13px;line-height:150%}.div_my_zzk{margin-top:5px;margin-bottom:5px}.input_my_zzk{width:100px;vertical-align:middle;height:20px}input.btn_my_zzk{vertical-align:middle;height:22px;font-size:12px;padding-left:5px;padding-right:5px}pre{margin-top:0;margin-bottom:0}.divPostCommentBox{float:left;width:500px}.CommentBoxNav{width:100px;float:right;margin-top:20px;line-height:120%;font-size:12px}.comment_pager{text-align:left;padding-bottom:5px}.comment_pager_current{color:#f00}.dp-highlighter{font-family:"Consolas","Courier New",Courier,mono,serif;font-size:12px;overflow:auto;margin:18px 0 18px 0 !important;word-break:break-word}.dp-highlighter ol,.dp-highlighter ol li,.dp-highlighter ol li span{margin:0;padding:0;border:none}.dp-highlighter a,.dp-highlighter a:hover{background:none;border:none;padding:0;margin:0}.dp-highlighter ol{list-style:decimal;background-color:#fff;margin:0 0 1px 45px !important;padding:0 !important;color:#5c5c5c}.dp-highlighter.nogutter ol,.dp-highlighter.nogutter ol li{list-style:none !important;margin-left:0 !important}.dp-highlighter ol li,.dp-highlighter .columns div{list-style:decimal-leading-zero;list-style-position:outside !important;border-left:3px solid #6ce26c;background-color:#f8f8f8;color:#5c5c5c;padding:0 3px 0 10px !important;margin:0 !important;line-height:1.6}.dp-highlighter.nogutter ol li,.dp-highlighter.nogutter .columns div{border:0}.dp-highlighter .columns{background-color:#f8f8f8;color:#808080;overflow:hidden;width:100%}.dp-highlighter .columns div{padding-bottom:5px}.dp-highlighter ol li.alt{background-color:#fff;color:inherit}.dp-highlighter ol li span{color:#000;background-color:inherit}.dp-highlighter.collapsed ol{margin:0}.dp-highlighter.collapsed ol li{display:none}.dp-highlighter.printing{border:none}.dp-highlighter.printing .tools{display:none !important}.dp-highlighter.printing li{display:list-item !important}.dp-highlighter .tools{padding:3px 8px 3px 10px;font:9px Verdana,Geneva,Arial,Helvetica,sans-serif;color:#c0c0c0;background-color:#f8f8f8;padding-bottom:10px;border-left:3px solid #6ce26c}.dp-highlighter.nogutter .tools{border-left:0}.dp-highlighter.collapsed .tools{border-bottom:0}.dp-highlighter .tools a{font-size:9px;color:#a0a0a0;background-color:inherit;text-decoration:none;margin-right:10px}.dp-highlighter .tools a:hover{color:#f00;background-color:inherit;text-decoration:underline}.dp-about{background-color:#fff;color:#333;margin:0;padding:0}.dp-about table{width:100%;height:100%;font-size:11px;font-family:Tahoma,Verdana,Arial,sans-serif !important}.dp-about td{padding:10px;vertical-align:top}.dp-about .copy{border-bottom:1px solid #aca899;height:95%}.dp-about .title{color:#f00;background-color:inherit;font-weight:bold}.dp-about .para{margin:0 0 4px 0}.dp-about .footer{background-color:#eceadb;color:#333;border-top:1px solid #fff;text-align:right}.dp-about .close{font-size:11px;font-family:Tahoma,Verdana,Arial,sans-serif !important;background-color:#eceadb;color:#333;width:60px;height:22px}.dp-highlighter .comment,.dp-highlighter .comments{color:#008200;background-color:inherit}.dp-highlighter .string{color:#00f;background-color:inherit}.dp-highlighter .keyword{color:#069;font-weight:bold;background-color:inherit}.dp-highlighter .preprocessor{color:#808080;background-color:inherit}#digg_block{margin-top:10px}#author_profile{float:left;width:280px;margin-top:0;margin-bottom:10px;color:#000;margin-left:0;font-size:12px}#author_profile a:link,#author_profile a:visited,#author_profile a:acitve{text-decoration:none}#author_profile a:hover{text-decoration:underline}.author_avatar{vertical-align:top;float:left;margin-right:5px;padding-top:5px;padding-left:2px;border:0}.author_profile_title{font-weight:bold;color:#666}.author_profile_info{float:left;line-height:18px}#div_digg{float:right;margin-bottom:10px;margin-right:30px;font-size:12px;width:125px;text-align:center;margin-top:10px}.diggit{float:left;width:46px;height:52px;background:/*savepage-url=//static.cnblogs.com/images/upup.gif*/var(--savepage-url-9) no-repeat;text-align:center;cursor:pointer;margin-top:2px;padding-top:5px}.diggnum{font-size:14px;color:#075db3;font-family:Verdana}.buryit{float:right;margin-left:20px;width:46px;height:52px;background:/*savepage-url=//static.cnblogs.com/images/downdown.gif*/var(--savepage-url-10) no-repeat;text-align:center;cursor:pointer;margin-top:2px;padding-top:5px}.burynum{font-size:14px;color:#075db3;font-family:Verdana}.diggword{margin-top:5px;margin-left:0;font-size:12px;color:#808080}a.digg_gray:link{color:#808080;text-decoration:underline}a.digg_gray:visited{color:#808080;text-decoration:underline}a.digg_gray:hover{color:#f00;text-decoration:underline}a.digg_gray:active{color:#808080;text-decoration:underline}a.site_hot:visited,a.site_hot:active,a.site_hot:link{color:#f00;text-decoration:none}a.site_hot:hover{color:#f00;text-decoration:underline}.ad_bottom_text{line-height:150%}#profile_block{margin-top:5px;line-height:1.5;text-align:left}.ing_date{color:#808080}.bq_post_comment{margin:0 0 5px 0;font-style:normal;line-height:180%;border:1px solid #ddd;padding:10px}.bq_post_comment img{max-width:400px;max-height:300px}.blog_comment_body{word-wrap:break-word;overflow-wrap:break-word}.blog_comment_body li{margin-left:28px}.blog_comment_body ul>li,.blog_comment_body ol>li{list-style:inherit}.blog_comment_body img{max-width:400px;max-height:300px}#post_next_prev{line-height:1.8;font-size:12px}.post_next_prev_date{color:#808080}#post_next_prev a.p_n_p_prefix:link{text-decoration:none}#post_next_prev a.p_n_p_prefix:hover{text-decoration:underline}#side_ing_block{line-height:1.5;overflow:hidden}#side_ing_block ul li{background-image:/*savepage-url=//static.cnblogs.com/images/icon_voice.gif*/url();background-repeat:no-repeat;padding:0 0 0 20px}a.ing_lnk:link,a.ing_lnk:active,a.ing_lnk:visited{color:#808080;text-decoration:none;border:0}.itnews{line-height:150%}.job_offer_list{line-height:150%}blockquote{background:none;border:2px solid #efefef;padding-left:10px;padding-right:10px;padding-top:5px;padding-bottom:5px;margin-top:10px;margin-bottom:10px}#cnblogs_post_body blockquote ul{margin-left:25px}.c_ad_block{margin-top:10px;line-height:1.5}#grade_flag{font-size:12px}.c_b_p_desc{word-wrap:break-word;word-break:break-all;overflow:hidden;line-height:1.5}.c_b_p_desc_readmore{padding-left:5px}.c_b_p_link_desc{margin-top:2px;word-break:break-word}#green_channel{padding:10px 0;margin-bottom:10px;margin-top:10px;border:#c0c0c0 1px dashed;font-size:12px;width:350px;text-align:center}#green_channel a{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAkCAYAAABIdFAMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHhJREFUeNo8zjsOxCAMBFB/KEAUFFR0Cbng3nQPw68ArZdAlOZppPFIBhH5EAB8b+Tlt9MYQ6i1BuqFaq1CKSVcxZ2Acs6406KUgpt5/LCKuVgz5BDCSb13ZO99ZOdcZGvt4mJjzMVKqcha68iIePB86GAiOv8CDADlIUQBs7MD3wAAAABJRU5ErkJggg%3D%3D) repeat-x;display:inline-block;padding:3px 8px;color:#fff;text-decoration:none;font-weight:bold;cursor:pointer;margin-right:10px;-moz-border-radius:5px;-webkit-border-radius:10px;-moz-box-shadow:0 1px 3px rgba(0,0,0,.5);-webkit-box-shadow:0 1px 3px rgba(0,0,0,.5);text-shadow:0 -1px 1px rgba(0,0,0,.25);vertical-align:middle}#green_channel a:hover{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAyCAYAAACd+7GKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAClJREFUeNpi/v//vwMTAwPDfzjBgMpFI/7hFSOT9Y8qRuF3JLoHAQIMAHYtMmRA+CugAAAAAElFTkSuQmCC)}#green_channel #green_channel_digg{background-color:#2daebf}#green_channel #green_channel_follow{background-color:#e33100}#green_channel #green_channel_favorite{background-color:#ffb515}#green_channel #green_channel_contact{background-color:#eee;color:#555;display:none}#green_channel #green_channel_weibo img{vertical-align:middle;border:none;margin-left:5px;box-shadow:none}#green_channel #green_channel_weibo,#green_channel #green_channel_wechat{background:none;padding:3px 2px;-moz-border-radius:none;-webkit-border-radius:none;-moz-box-shadow:none;-webkit-box-shadow:none;text-shadow:none}#green_channel #green_channel_wechat img{width:24px;height:24px;border:medium none;box-shadow:none;margin-left:5px;vertical-align:middle}#cnblogs_post_body{margin-bottom:20px}#cnblogs_post_body ul{margin-left:30px;padding-left:0}#cnblogs_post_body ol{padding-left:40px}#cnblogs_post_body ol li{list-style-type:decimal}#cnblogs_post_body ul li{list-style-type:disc}#cnblogs_post_body ul ul li{list-style-type:circle}#cnblogs_post_body table,.cnblogs-post-body table{border:1px solid #dfdfdf;border-collapse:collapse;word-break:break-word}#cnblogs_post_body th,.cnblogs-post-body th{background-color:#fafafa}#cnblogs_post_body th,#cnblogs_post_body td,.cnblogs-post-body th,.cnblogs-post-body td{border:1px solid #c0c0c0;border-collapse:collapse;padding:8px 14px;min-width:50px}#cnblogs_post_body img{max-width:100% !important;height:auto}.ad_text_commentbox{margin-top:5px;margin-bottom:5px}a.comment_uploadimg_a{font-size:12px}#ad_t2{margin-top:5px;line-height:1.8}#ad_t2 a{margin-right:10px}#opt_under_post{line-height:1.8}#opt_under_post a{margin-right:10px}#ad_under_comment2{margin-bottom:5px}#ad_under_comment2 img{margin-bottom:5px}.recent_comment_author{text-align:right;margin-right:4px}#HistoryToday,.recomm-block{max-width:600px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}.recomm-block{margin-top:10px}#cnblogs_t5{margin-top:5px}.cnblogs_code_toolbar{margin-top:5px}.cnblogs_code_toolbar span{padding-right:5px}input::-moz-focus-inner{border:0;padding:0}.comment_btn{height:26px;width:68px;margin:0;padding:0;line-height:22px}#commentbox_opt a{padding-left:10px}#taglist_title{margin-bottom:10px}#taglist td{padding:5px 20px 5px 10px}.Cal{width:100%}.CalTitle{width:100%}.new-comment-block{line-height:1.5}.new-comment-block img{max-width:400px;max-height:300px}.new-comment-title span{margin-left:5px}.new-comment-title a{margin-left:5px}.pager{font-size:12px;margin:10px 0;text-align:center;color:#2e6ab1;line-height:200%}.pager a{border:1px solid #9aafe5;color:#2e6ab1;margin:0 2px;padding:2px 5px;text-decoration:none}.pager span.current{background-color:#2e6ab1;border:1px solid #000080;color:#fff;font-weight:bold;margin:0 2px;padding:2px 5px}.comment_vote{text-align:right}.comment_vote a{text-decoration:none !important;padding-left:10px}.comment_actions a{padding-right:10px}.comment_actions a:last-child{padding-right:0}.recent_comment_body{white-space:pre-wrap;word-wrap:break-word}#taglist_main{margin-top:20px}#taglist_main #taglist .small{font-size:12px}#taglist_title_wrap{margin-left:auto;margin-right:auto;text-align:center}#cnblogs_post_body{word-break:break-word}#cnblogs_post_body p{margin:10px auto;text-indent:0}#cnblogs_post_body h1,.blog_comment_body h1{font-size:28px;font-weight:bold;line-height:1.5;margin:10px 0}#cnblogs_post_body h2,.blog_comment_body h2{font-size:21px;font-weight:bold;line-height:1.5;margin:10px 0}#cnblogs_post_body h3,.blog_comment_body h4{font-size:16px;font-weight:bold;line-height:1.5;margin:10px 0}#cnblogs_post_body h4,.blog_comment_body h4{font-size:14px;font-weight:bold;margin:10px 0}#cnblogs_post_body h5,.blog_comment_body h5{font-size:12px;font-weight:bold;margin:10px 0}#cnblogs_post_body h6,.blog_comment_body h6{font-size:11px;font-weight:bold;margin:10px 0}#div_digg .diggnum{line-height:1.5em !important}#div_digg .burynum{line-height:1.5em !important}#green_channel a:link,#green_channel a:visited,#green_channel a:active{color:#fff !important;border:none !important}#myposts .myposts_title{font-size:15px}#myposts{margin-left:20px}#myposts .pager{text-align:right;margin-right:10px}#myposts .PostList{margin-right:20px;margin-top:10px;font-size:13px}.vertical-middle>*{vertical-align:middle}.text-tail-icon{width:1em;height:1em}#myposts .postTitle2{font-size:13px}#myposts .postDesc2{font-size:12px}#myposts .postText2{font-size:13px;margin-bottom:5px}#blog-news{overflow:hidden}#MySignature{display:none}pre.prettyprint code{font-family:"Courier New",sans-serif !important;font-size:12px !important;line-height:20px;background-color:#f5f5f5 !important;border:1px solid #ccc !important;padding:0 5px !important;border-radius:3px !important;line-height:1.8;margin:1px 5px;vertical-align:middle;display:block;overflow-x:auto}.mermaid{white-space:pre-wrap}#cnblogs_post_body img[id^=uploading_image_]{display:none}#bigbanner_close{position:absolute;margin-left:10px;cursor:pointer}#sidebar_ad{display:none;overflow:hidden}#comment_form_container{visibility:hidden}#commentform_title{background-image:/*savepage-url=//static.cnblogs.com/images/icon_addcomment.gif*/var(--savepage-url-11);background-repeat:no-repeat;padding:0 0 0 25px;margin-bottom:10px}div.commentform input.author,div.commentform input.email,div.commentform input.url{background-image:/*savepage-url=//static.cnblogs.com/images/icon_form.gif*/url();background-repeat:no-repeat;border:1px solid #ccc;padding:4px 4px 4px 30px;width:300px;font-size:13px}div.commentform input.author{background-position:3px -3px}div.commentform input.email{background-position:3px -33px}div.commentform input.url{background-position:3px -63px}.comment_textarea{padding:8px 14px;background-color:#fff;-webkit-box-sizing:border-box;box-sizing:border-box;border:1px solid #ddd;width:600px;border-radius:3px;-webkit-transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;margin-bottom:10px}div.commentform textarea{line-height:1.6;width:100%;height:250px;resize:vertical;-webkit-box-sizing:border-box;box-sizing:border-box;outline:none;font-size:13px;border:none;font-family:"PingFang SC","Helvetica Neue","Helvetica","Arial",sans-serif;padding:8px 0}#tbCommentBodyPreview{margin-left:5px}.comment_preview{width:100%;min-height:150px;-webkit-box-sizing:border-box;box-sizing:border-box;border:none;padding:0}.comment_preview p,div.commentform p{margin:10px 0}.commentbox_footer,.commentbox_title{width:100%;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center}.commentbox_title{border-bottom:1px solid #ddd}.commentbox_footer{border-top:1px solid #d2d2d2;padding-top:10px;display:none}.commentbox_tab{margin:0 1rem 0 0;list-style:none;line-height:28px;cursor:pointer;padding:0 5px 0 5px;letter-spacing:.1rem;text-align:center;color:#707070}.commentbox_tab:hover,.commentbox_tab.active{border-bottom:2px solid #367cc2;color:#000}.commentbox_title_left{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex}.commentbox_title_right{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;margin-bottom:5px}textarea#tbCommentBody::-webkit-input-placeholder{color:#a9a9a9}textarea#tbCommentBody::-moz-placeholder{color:#a9a9a9}textarea#tbCommentBody:-ms-input-placeholder{color:#a9a9a9}textarea#tbCommentBody::-ms-input-placeholder{color:#a9a9a9}textarea#tbCommentBody::placeholder{color:#a9a9a9}.login_tips{background-image:/*savepage-url=//static.cnblogs.com/images/icon_addcomment.gif*/var(--savepage-url-11);background-repeat:no-repeat;margin-top:10px;padding:0 0 10px 25px;font-weight:bold}.login_tips a{text-decoration:underline !important}.clear{clear:both}.comment_quote{padding:5px 5px 5px 5px;border:1px solid #ccc}.comment_quote legend+br{display:none}.comment_icon{cursor:pointer;padding:0 0 0 20px}.comment_option{margin-bottom:4px;background:none;border:none;outline:none;color:#808080;fill:gray}.comment_option:hover{fill:#000;color:#000}.inline_middle{display:inline-block;vertical-align:middle}.comment_svg{display:inline-block;vertical-align:middle;width:18px;height:18px;fill:gray}.comment_svg_stroke{stroke:gray}.comment_svg_stroke:hover{stroke:#000}.comment_svg:hover{fill:#000}#comment_nav{text-align:right}#comment_nav a{padding-left:10px}.ad_commentbox_up{margin-left:5px}.ad_commentbox_up a{padding-left:10px}.cnblogs-markdown .hljs,.cnblogs-post-body .hljs{display:block;overflow-x:auto;padding:.5em;background:#fff;color:#000}.hljs-comment,.hljs-quote,.hljs-variable{color:#008000}.hljs-keyword,.hljs-selector-tag,.hljs-built_in,.hljs-name,.hljs-tag{color:#00f}.hljs-string,.hljs-title,.hljs-section,.hljs-attribute,.hljs-literal,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-addition{color:#a31515}.hljs-deletion,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-meta{color:#2b91af}.hljs-doctag{color:#808080}.hljs-attr{color:#f00}.hljs-symbol,.hljs-bullet,.hljs-link{color:#00b0e8}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:bold}.cnblogs-markdown code,.cnblogs-post-body code{font-family:"Courier New",sans-serif !important;font-size:12px !important;line-height:20px;background-color:#f5f5f5 !important;border:1px solid #ccc !important;padding:0 5px !important;border-radius:3px !important;line-height:1.8;margin:1px 5px;vertical-align:middle;display:inline-block;overflow-x:auto}.cnblogs-markdown pre code,.cnblogs-post-body pre code{display:block;margin:auto;vertical-align:auto;height:auto;line-height:1.5;padding:5px !important}.cnblogs-markdown .hljs,.cnblogs-post-body .hljs{font-family:"Courier New",sans-serif !important;font-size:12px !important;line-height:1.5 !important;padding:5px !important}.cnblogs-markdown pre{margin-top:10px;margin-bottom:10px}.dropdown-menu a{color:#08c;text-decoration:none}.typeahead{z-index:1051;margin-top:2px}.dropdown-menu{position:absolute;top:100%;left:0;z-index:1000;display:none;padding:0;float:left;margin:2px 0 0;list-style:none;background-color:#fff;text-shadow:none}.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus{color:#fff;text-decoration:none;outline:0;background-color:#4078c0;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc',endColorstr='#ff0077b3',GradientType=0)}.dropdown-menu>li>a{display:block;padding:3px 10px;clear:both;font-weight:normal;line-height:20px;color:#333;white-space:nowrap}.mention_name{font-size:12px}.mention_username{font-size:12px;color:#999}.mention_image{float:left;margin-right:5px;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;width:20px;height:20px}.active .mention_username{color:#fff}.dropdown-menu>.tips{color:#fff;text-decoration:none;outline:0;background-color:#4078c0;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc',endColorstr='#ff0077b3',GradientType=0);font-size:12px;padding:3px 5px;clear:both;line-height:20px}
+/*!
+ * ui-dialog.css
+ * Date: 2014-07-03
+ * https://github.com/aui/artDialog
+ * (c) 2009-2014 TangBin, http://www.planeArt.cn
+ *
+ * This is licensed under the GNU LGPL, version 2.1 or later.
+ * For details, see: http://www.gnu.org/licenses/lgpl-2.1.html
+ */
+.ui-dialog{*zoom:1;_float:left;position:relative;background-color:#fff;border:1px solid #999;border-radius:6px;outline:0;background-clip:padding-box;font-family:Helvetica,arial,sans-serif;font-size:14px;line-height:1.428571429;color:#333;opacity:0;-webkit-transform:scale(0);transform:scale(0);-webkit-transition:-webkit-transform .15s ease-in-out,opacity .15s ease-in-out;transition:transform .15s ease-in-out,opacity .15s ease-in-out}.ui-popup-show .ui-dialog{opacity:1;-webkit-transform:scale(1);transform:scale(1)}.ui-popup-focus .ui-dialog{box-shadow:0 0 8px rgba(0,0,0,.1)}.ui-popup-modal .ui-dialog{box-shadow:0 0 8px rgba(0,0,0,.1),0 0 256px rgba(255,255,255,.3)}.ui-dialog-grid{width:auto;margin:0;border:0 none;border-collapse:collapse;border-spacing:0;background:transparent}.ui-dialog-header,.ui-dialog-body,.ui-dialog-footer{padding:0;border:0 none;text-align:left;background:transparent}.ui-dialog-header{white-space:nowrap;border-bottom:1px solid #e5e5e5}.ui-dialog-close{position:relative;_position:absolute;float:right;top:13px;right:13px;_height:26px;padding:0 4px;font-size:21px;font-weight:bold;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2;filter:alpha(opacity=20);cursor:pointer;background:transparent;_background:#fff;border:0;-webkit-appearance:none}.ui-dialog-close:hover,.ui-dialog-close:focus{color:#000;text-decoration:none;cursor:pointer;outline:0;opacity:.5;filter:alpha(opacity=50)}.ui-dialog-title{margin:0;line-height:1.428571429;min-height:16.428571429px;padding:15px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:bold;cursor:default}.ui-dialog-body{padding:20px;text-align:center}.ui-dialog-content{display:inline-block;position:relative;vertical-align:middle;*zoom:1;*display:inline;text-align:left}.ui-dialog-footer{padding:0 20px 20px 20px}.ui-dialog-statusbar{float:left;margin-right:20px;padding:6px 0;line-height:1.428571429;font-size:14px;color:#888;white-space:nowrap}.ui-dialog-statusbar label:hover{color:#333}.ui-dialog-statusbar input,.ui-dialog-statusbar .label{vertical-align:middle}.ui-dialog-button{float:right;white-space:nowrap}.ui-dialog-footer button+button{margin-bottom:0;margin-left:5px}.ui-dialog-footer button{width:auto;overflow:visible;display:inline-block;padding:6px 12px;_margin-left:5px;margin-bottom:0;font-size:14px;font-weight:normal;line-height:1.428571429;text-align:center;white-space:nowrap;vertical-align:middle;cursor:pointer;background-image:none;border:1px solid transparent;border-radius:4px;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}.ui-dialog-footer button:focus{outline:thin dotted #333;outline:5px auto -webkit-focus-ring-color;outline-offset:-2px}.ui-dialog-footer button:hover,.ui-dialog-footer button:focus{color:#333;text-decoration:none}.ui-dialog-footer button:active{background-image:none;outline:0;-webkit-box-shadow:inset 0 3px 5px rgba(0,0,0,.125);box-shadow:inset 0 3px 5px rgba(0,0,0,.125)}.ui-dialog-footer button[disabled]{pointer-events:none;cursor:not-allowed;opacity:.65;filter:alpha(opacity=65);-webkit-box-shadow:none;box-shadow:none}.ui-dialog-footer button{color:#333;background-color:#fff;border-color:#ccc}.ui-dialog-footer button:hover,.ui-dialog-footer button:focus,.ui-dialog-footer button:active{color:#333;background-color:#ebebeb;border-color:#adadad}.ui-dialog-footer button:active{background-image:none}.ui-dialog-footer button[disabled],.ui-dialog-footer button[disabled]:hover,.ui-dialog-footer button[disabled]:focus,.ui-dialog-footer button[disabled]:active{background-color:#fff;border-color:#ccc}.ui-dialog-footer button.ui-dialog-autofocus{color:#fff;background-color:#428bca;border-color:#357ebd}.ui-dialog-footer button.ui-dialog-autofocus:hover,.ui-dialog-footer button.ui-dialog-autofocus:focus,.ui-dialog-footer button.ui-dialog-autofocus:active{color:#fff;background-color:#3276b1;border-color:#285e8e}.ui-dialog-footer button.ui-dialog-autofocus:active{background-image:none}.ui-popup-top-left .ui-dialog,.ui-popup-top .ui-dialog,.ui-popup-top-right .ui-dialog{top:-8px}.ui-popup-bottom-left .ui-dialog,.ui-popup-bottom .ui-dialog,.ui-popup-bottom-right .ui-dialog{top:8px}.ui-popup-left-top .ui-dialog,.ui-popup-left .ui-dialog,.ui-popup-left-bottom .ui-dialog{left:-8px}.ui-popup-right-top .ui-dialog,.ui-popup-right .ui-dialog,.ui-popup-right-bottom .ui-dialog{left:8px}.ui-dialog-arrow-a,.ui-dialog-arrow-b{position:absolute;display:none;width:0;height:0;overflow:hidden;_color:#ff3fff;_filter:chroma(color=#ff3fff);border:8px dashed transparent}.ui-popup-follow .ui-dialog-arrow-a,.ui-popup-follow .ui-dialog-arrow-b{display:block}.ui-popup-top-left .ui-dialog-arrow-a,.ui-popup-top .ui-dialog-arrow-a,.ui-popup-top-right .ui-dialog-arrow-a{bottom:-16px;border-top:8px solid #7c7c7c}.ui-popup-top-left .ui-dialog-arrow-b,.ui-popup-top .ui-dialog-arrow-b,.ui-popup-top-right .ui-dialog-arrow-b{bottom:-15px;border-top:8px solid #fff}.ui-popup-top-left .ui-dialog-arrow-a,.ui-popup-top-left .ui-dialog-arrow-b{left:15px}.ui-popup-top .ui-dialog-arrow-a,.ui-popup-top .ui-dialog-arrow-b{left:50%;margin-left:-8px}.ui-popup-top-right .ui-dialog-arrow-a,.ui-popup-top-right .ui-dialog-arrow-b{right:15px}.ui-popup-bottom-left .ui-dialog-arrow-a,.ui-popup-bottom .ui-dialog-arrow-a,.ui-popup-bottom-right .ui-dialog-arrow-a{top:-16px;border-bottom:8px solid #7c7c7c}.ui-popup-bottom-left .ui-dialog-arrow-b,.ui-popup-bottom .ui-dialog-arrow-b,.ui-popup-bottom-right .ui-dialog-arrow-b{top:-15px;border-bottom:8px solid #fff}.ui-popup-bottom-left .ui-dialog-arrow-a,.ui-popup-bottom-left .ui-dialog-arrow-b{left:15px}.ui-popup-bottom .ui-dialog-arrow-a,.ui-popup-bottom .ui-dialog-arrow-b{margin-left:-8px;left:50%}.ui-popup-bottom-right .ui-dialog-arrow-a,.ui-popup-bottom-right .ui-dialog-arrow-b{right:15px}.ui-popup-left-top .ui-dialog-arrow-a,.ui-popup-left .ui-dialog-arrow-a,.ui-popup-left-bottom .ui-dialog-arrow-a{right:-16px;border-left:8px solid #7c7c7c}.ui-popup-left-top .ui-dialog-arrow-b,.ui-popup-left .ui-dialog-arrow-b,.ui-popup-left-bottom .ui-dialog-arrow-b{right:-15px;border-left:8px solid #fff}.ui-popup-left-top .ui-dialog-arrow-a,.ui-popup-left-top .ui-dialog-arrow-b{top:15px}.ui-popup-left .ui-dialog-arrow-a,.ui-popup-left .ui-dialog-arrow-b{margin-top:-8px;top:50%}.ui-popup-left-bottom .ui-dialog-arrow-a,.ui-popup-left-bottom .ui-dialog-arrow-b{bottom:15px}.ui-popup-right-top .ui-dialog-arrow-a,.ui-popup-right .ui-dialog-arrow-a,.ui-popup-right-bottom .ui-dialog-arrow-a{left:-16px;border-right:8px solid #7c7c7c}.ui-popup-right-top .ui-dialog-arrow-b,.ui-popup-right .ui-dialog-arrow-b,.ui-popup-right-bottom .ui-dialog-arrow-b{left:-15px;border-right:8px solid #fff}.ui-popup-right-top .ui-dialog-arrow-a,.ui-popup-right-top .ui-dialog-arrow-b{top:15px}.ui-popup-right .ui-dialog-arrow-a,.ui-popup-right .ui-dialog-arrow-b{margin-top:-8px;top:50%}.ui-popup-right-bottom .ui-dialog-arrow-a,.ui-popup-right-bottom .ui-dialog-arrow-b{bottom:15px}@-webkit-keyframes ui-dialog-loading{0%{-webkit-transform:rotate(0deg)}100%{-webkit-transform:rotate(360deg)}}@keyframes ui-dialog-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.ui-dialog-loading{vertical-align:middle;position:relative;display:block;*zoom:1;*display:inline;overflow:hidden;width:32px;height:32px;top:50%;margin:-16px auto 0 auto;font-size:0;text-indent:-999em;color:#666}.ui-dialog-loading{width:100%\9;text-indent:0\9;line-height:32px\9;text-align:center\9;font-size:12px\9}.ui-dialog-loading::after{position:absolute;content:'';width:3px;height:3px;margin:14.5px 0 0 14.5px;border-radius:100%;box-shadow:0 -10px 0 1px #ccc,10px 0 #ccc,0 10px #ccc,-10px 0 #ccc,-7px -7px 0 .5px #ccc,7px -7px 0 1.5px #ccc,7px 7px #ccc,-7px 7px #ccc;-webkit-transform:rotate(360deg);-webkit-animation:ui-dialog-loading 1.5s infinite linear;transform:rotate(360deg);animation:ui-dialog-loading 1.5s infinite linear;display:none\9}</style>
+    <style data-savepage-href="/skins/simplememory/bundle-simplememory.min.css?v=OL4qeo1LNGlN1rKIhv5UctANvt0M6Nx6kLzr_ffx3Xk">#EntryTag{margin-top:20px;font-size:9pt;color:#808080}.topicListFooter{text-align:right;margin-right:10px;margin-top:10px}#divRefreshComments{text-align:right;margin-right:10px;margin-bottom:5px;font-size:9pt}*{margin:0;padding:0}html{height:100%}body{color:#000;background-color:#e6e6e6;font-family:"Helvetica Neue",Helvetica,Verdana,Arial,sans-serif;font-size:12px;min-height:101%}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}li{list-style:none}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}a{outline:none;color:#21759b}a:link{color:#000;text-decoration:none}a:visited{color:#000;text-decoration:none}a:hover{color:#21759b}a:active{color:#000;text-decoration:none}.clear{clear:both}#home{margin:0 auto;width:65%;min-width:950px;background-color:#fff;padding:30px;margin-top:50px;margin-bottom:50px;box-shadow:0 2px 6px rgba(100,100,100,.3)}#header{padding-bottom:5px;margin-top:10px}#blogTitle{height:60px;clear:both}#blogTitle h1{font-size:26px;font-weight:bold;line-height:1.5em;margin-top:20px}#blogTitle h1 a{color:#515151}#blogTitle h1 a:hover{color:#21759b}#blogTitle h2{font-weight:normal;font-size:13px;font-size:.928571429rem;line-height:1.846153846;color:#757575;float:left}#blogLogo{float:right}#navigator{font-size:13px;border-bottom:1px solid #ededed;border-top:1px solid #ededed;height:50px;clear:both;margin-top:25px}#navList{min-height:30px;float:left}#navList li{float:left;margin:0 40px 0 0}#navList a{display:block;width:5em;height:22px;float:left;text-align:center;padding-top:19px}#navList a:link,#navList a:visited,#navList a:active{color:#6a6a6a;font-weight:bold}#navList a:hover{color:#000;text-decoration:none}.blogStats{float:right;color:#757575;margin-top:19px;margin-right:2px;text-align:right}#main{width:100%;text-align:left;margin-top:30px}#mainContent .forFlow{margin-left:22em;float:none;width:auto}#mainContent{min-height:200px;padding:0 0 10px 0;*padding-top:10px;-o-text-overflow:ellipsis;text-overflow:ellipsis;overflow:hidden;float:left;margin-left:-22em;width:100%}.day{min-height:10px;_height:10px;margin-bottom:20px;padding-bottom:5px;position:relative}.dayTitle{display:none;border:1px solid #21759b;background:#f0ffff;border-radius:50%;font-size:12px;height:65px;line-height:1.5;margin:15px;text-align:center;width:63px;margin-left:-100px;clear:both;position:absolute;top:-15px}.dayTitle a{display:inline-block;color:#21759b;margin-top:15px;width:60px}.postTitle{border-left:3px solid #21759b;margin-bottom:10px;font-size:20px;float:right;width:100%;clear:both}.postTitle a:link,.postTitle a:visited,.postTitle a:active{color:#21759b;transition:all .4s linear 0s}.postTitle a:hover{margin-left:30px;color:#0f3647;text-decoration:none}.postCon{float:right;line-height:1.5em;width:100%;clear:both;padding:10px 0}.day .postTitle a{padding-left:10px}.postDesc{font-size:13px;background:/*savepage-url=images/posted_time.png*/url() no-repeat 0 1px;color:#757575;float:left;width:100%;clear:both;text-align:left;padding-left:20px;padding-right:5px;margin-top:20px;line-height:1.5}.postDesc a:link,.postDesc a:visited,.postDesc a:active{color:#666}.postDesc a:hover{color:#21759b;text-decoration:none}.postSeparator{clear:both;height:1px;width:100%;clear:both;float:right;margin:0 auto 15px auto}#sideBar{margin-top:-15px;width:230px;min-height:200px;padding:0 0 0 5px;float:right;-o-text-overflow:ellipsis;text-overflow:ellipsis;overflow:hidden}#sideBar a{color:#757575}#sideBar a:hover{color:#21759b;text-decoration:underline}.div_my_zzk{width:175px;position:relative;margin-top:10px}#btnZzk{background:/*savepage-url=images/blog_search.png*/var(--savepage-url-12) no-repeat 5px 5px}#widget_my_google input[type=button]{background:/*savepage-url=images/google_search.png*/var(--savepage-url-13) no-repeat 5px 5px}.input_my_zzk{border:1px solid #ccc;width:100%;height:25px;padding-right:30px;padding-left:5px;outline:0}.btn_my_zzk{font-size:12px;width:25px;height:25px;color:transparent;border:0;border-style:none;cursor:pointer;top:1px;position:absolute;right:-35px}.input_my_zzk:hover{border:1px solid #21759b;transition:all .4s linear 0s}.input_my_zzk:focus{border:1px solid #21759b}.newsItem,.catListEssay,.catListLink,.catListNoteBook,.catListTag,.catListPostCategory,.catListPostArchive,.catListImageCategory,.catListArticleArchive,.catListView,.catListFeedback,.mySearch,.catListComment,.catListBlogRank,.catList,.catListArticleCategory{background:#fff;margin-bottom:35px;word-wrap:break-word}#blog-calendar{width:228px;padding-bottom:5px;margin-bottom:35px;box-shadow:0 1px 3px #ccc;border:1px solid #ededed}#blog-calendar td{font-size:12px;font-family:"Comic Sans MS"}#blog-calendar th{font-size:12px}#calendar{width:228px;padding-bottom:5px;margin-bottom:35px;border:1px solid #ededed;box-shadow:0 1px 3px #ccc}#calendar .Cal{width:100%;line-height:1.5em}#calendar td{font-family:"Comic Sans MS";background:#fff;padding-top:2px}.Cal{border:none;color:#666}#calendar table a:link,#calendar table a:visited,#calendar table a:active{font-weight:bold}#calendar table a:hover{color:#fff;text-decoration:none}.CalTodayDay{background:#3671a5 !important;color:#fff;font-weight:bold}.CalWeekendDay{padding-top:4px;padding-bottom:4px}.CalOtherMonthDay{color:#ccc;padding-top:4px;padding-bottom:4px}#calendar .CalNextPrev a:link,#calendar .CalNextPrev a:visited,#calendar .CalNextPrev a:active{font-weight:bold;padding-left:10px;padding-right:15px}.CalDayHeader{background:#f8f8f8;font-weight:100;color:#5e5f63}.CalTitle{background:#6293bb;width:100%;height:25px;text-align:center;font-size:14px;font-weight:bold;padding:5px 0;color:#fff}.CalTitle td{background:#f8f8f8 !important;border:0 !important;color:#5e5f63;font-family:"Comic Sans MS"}.catListTitle{font-weight:bold;line-height:1.2;font-size:110%;margin-top:15px;margin-bottom:10px;text-align:left}.catListComment{line-height:1.5em}.divRecentComment{text-indent:2em;color:#494949;margin-bottom:20px}#sideBarMain ul{line-height:1.5em}#sideBarMain li{line-height:1.8}#topics{width:100%;min-height:200px;padding:0 0 10px 0;float:left;-o-text-overflow:ellipsis;text-overflow:ellipsis;overflow:hidden}#topics .postTitle{border:0;font-size:130%;font-weight:bold;float:left;line-height:1.5;width:100%;padding-left:5px}#EntryTag{color:#666}#EntryTag a{margin-left:5px;height:20px;line-height:20px;color:#333;padding:3px 14px;border-radius:10px;margin:2px 5px 0;background:#e7e7e7;text-decoration:none}#EntryTag a:link,#EntryTag a:visited,#EntryTag a:active{color:#666}#EntryTag a:hover{color:#f5f5f5;background:#21759b;transition:all .4s linear 0s}#BlogPostCategory{color:#666}#BlogPostCategory a{margin-left:5px;height:20px;line-height:20px;color:#333;padding:3px 14px;border-radius:10px;margin:2px 5px 0;background:#e7e7e7;text-decoration:none}#BlogPostCategory a:link,#BlogPostCategory a:visited,#BlogPostCategory a:active{color:#666}#BlogPostCategory a:hover{color:#f5f5f5;background:#21759b}#topics .postDesc{padding-left:0;width:100%;text-align:left;color:#666;margin-top:5px;background:none}.feedback_area_title{font:normal normal 16px/35px "Microsoft YaHei";margin:10px 0 30px;border-bottom:2px solid #ccc}.louzhu{background:transparent /*savepage-url=/images/icoLouZhu.gif*/ url() no-repeat scroll right top;padding-right:16px}.feedbackListSubtitle{color:#a8a8a8}.feedbackListSubtitle a:link,.feedbackListSubtitle a:visited,.feedbackListSubtitle a:active{color:#21759b;font-weight:bold}.feedbackListSubtitle a:hover{color:#21759b;text-decoration:underline}.feedbackListSubtitle b{color:#21759b}.feedbackManage{width:200px;text-align:right;float:right}.feedbackCon{border-bottom:1px solid #eee;padding:10px 20px 10px 5px;min-height:35px;_height:35px;margin-bottom:1em;line-height:1.5}#divRefreshComments{text-align:right;margin-bottom:10px}.commenttb{padding:8px;margin-bottom:10px;width:50%;color:#555;border:1px solid #ddd;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;width:320px}.commenttb:hover{color:#333;border-color:rgba(82,168,236,.8);outline:0;-webkit-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);-moz-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);transition:all .4s linear 0s}.commentTextBox{width:410px !important;margin-top:10px;margin-bottom:10px}.commentTextBox:hover{color:#333;border-color:rgba(82,168,236,.8);outline:0;-webkit-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);-moz-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);transition:all .4s linear 0s}#AjaxHolder_PostComment_btnSubmit{padding:8px 20px;text-align:center;font-size:14px;color:#fff;border:none;background:#21759b;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;-webkit-transition:all .4s ease;-moz-transition:all .4s ease;-o-transition:all .4s ease;-ms-transition:all .4s ease;transition:all .4s ease;cursor:pointer;display:inline-block;vertical-align:middle;outline:none;text-decoration:none}#AjaxHolder_PostComment_btnSubmit:hover{background:#333}#AjaxHolder_PostComment_divCommnentArea tr{margin-top:10px;margin-bottom:10px}.comment_vote{padding-right:10px}.comment_vote a{color:#999}.comment_vote a:hover{color:#21759b}#commentform_title{font:normal normal 16px/35px "Microsoft YaHei";margin:10px 0 30px;border-bottom:2px solid #ccc;background-image:none;padding:0}#comment_form_container .author{padding-left:10px;color:#555;border:1px solid #ddd;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;width:320px;height:20px;background-image:none}#comment_form_container p{font-size:14px;margin-bottom:20px}.commentbox_title_left{font-size:14px}.commentbox_title_right{float:left}#comment_form_container .comment_textarea{min-height:200px;font-size:13px;margin-bottom:10px;color:#555;border:1px solid #ddd;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px}#comment_form_container .comment_textarea:hover{border-color:rgba(82,168,236,.8);outline:0;transition:all .4s linear 0s}#comment_form_container .comment_textarea:focus{outline:0}.comment_btn{width:100px;height:38px;padding:8px 20px;text-align:center;font-size:14px;color:#fff;border:none;background:#21759b;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;-webkit-transition:all .4s ease;-moz-transition:all .4s ease;-o-transition:all .4s ease;-ms-transition:all .4s ease;transition:all .4s ease;cursor:pointer;display:inline-block;vertical-align:middle;outline:none;text-decoration:none}.comment_btn:hover{background:#333}.entrylistTitle,.PostListTitle,.thumbTitle{margin-bottom:25px;height:38px;line-height:38px;font-size:16px;border-bottom:2px solid #e6e6e6;color:#21759b}.entrylistDescription{color:#666;text-align:right;padding-top:5px;padding-bottom:5px;padding-right:10px;margin-bottom:10px}.entrylistItem{min-height:20px;_height:20px;margin-bottom:30px;padding-bottom:50px;padding-top:10px;width:100%}.entrylistPosttitle{padding-left:15px;margin-bottom:10px;border-left:3px solid #21759b;font-size:20px;width:100%}.entrylistPosttitle a:link,.entrylistPosttitle a:visited,.entrylistPosttitle a:active{color:#21759b;transition:all .4s linear 0s}.entrylistPosttitle a:hover{margin-left:30px;color:#0f3647;text-decoration:none}.entrylistPostSummary{margin-top:5px;margin-bottom:5px}.entrylistItemPostDesc{margin-top:20px;text-align:left;color:#757575;padding-left:5px}.entrylistItemPostDesc a:link,.entrylistItemPostDesc a:visited,.entrylistItemPostDesc a:active{color:#666}.entrylistItemPostDesc a:hover{color:#21759b}.entrylist .postSeparator{clear:both;width:100%;font-size:0;line-height:0;margin:0;padding:0;height:0;border:none}.divRecentCommentAticle a{color:#000}.pager{text-align:right;margin-right:10px}.pager a{box-shadow:0 1px 3px #3671a5;border:1px solid #3671a5;background:#3671a5;color:#fff;transition:all .4s linear 0s}.pager a:hover{background:#000}.PostList{border-bottom:1px solid #ccc;clear:both;min-height:1.5em;_height:1.5em;padding-top:20px;margin-bottom:20px;padding-bottom:20px}.postTitl2{float:left;padding-top:10px;padding-bottom:10px;font-size:14px}.postDesc2{color:#666;float:right}.postText2{clear:both;color:#757575}.pfl_feedback_area_title{text-align:right;line-height:1.5em;font-weight:bold;margin-bottom:10px}.pfl_feedbackItem{border:1px dashed #ccc;padding:10px;border-radius:3px;margin-bottom:20px}.pfl_feedbacksubtitle{width:100%;height:1.5em}.pfl_feedbackname{float:left}.pfl_feedbackname a{color:#21759b;font-weight:bold}.pfl_feedbackManage{float:right}.pfl_feedbackCon{color:#000;padding-top:5px;padding-bottom:5px}.pfl_feedbackAnswer{color:#f40;text-indent:2em}.tdSentMessage{text-align:right}.errorMessage{width:300px;float:left}#Profile1_panelAdd input[type=text],#Profile1_txtContent{padding:8px;margin-bottom:10px;color:#555;border:1px solid #ddd;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px}#Profile1_panelAdd input[type=text]:hover,#Profile1_txtContent:hover{color:#333;border-color:rgba(82,168,236,.8);outline:0;-webkit-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);-moz-box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);box-shadow:inset 1px 1px 1px rgba(0,0,0,.075),0 0 4px rgba(82,168,236,.6);transition:all .4s linear 0s}#Profile1_panelAdd input[type=text]:focus,#Profile1_txtContent:focus{outline:0;border-color:rgba(82,168,236,.8)}#Profile1_panelAdd input[type=submit]{padding:8px 20px;text-align:center;font-size:14px;color:#fff;border:none;background:#21759b;border-radius:3px;-moz-border-radius:3px;-webkit-border-radius:3px;-webkit-transition:all .4s ease;-moz-transition:all .4s ease;-o-transition:all .4s ease;-ms-transition:all .4s ease;transition:all .4s ease;cursor:pointer;display:inline-block;vertical-align:middle;outline:none;text-decoration:none}#Profile1_panelAdd input[type=submit]:hover{background:#333}.feedbackListSubtitle{clear:both;color:#a8a8a8;padding:8px 5px}.feedbackItem{margin-top:30px}.divPhoto{border:1px solid #ccc;padding:2px;margin-right:10px}.thumbDescription{color:#757575;text-align:right;padding-top:5px;padding-bottom:5px;padding-right:10px;margin-bottom:30px}#footer{color:#686868;text-align:center;min-height:15px;_height:15px;border-top:1px solid #ededed;margin-top:50px;padding-top:10px;margin-bottom:10px}.personInfo{margin-bottom:20px}.pages{text-align:right}.postBody{color:#000;line-height:1.7;font-size:14px}.postBody p,.postCon p{text-indent:2em;margin:0 auto 1em auto}.postBody h2{font-size:150%;margin:15px auto 2px auto;font-weight:bold}.postBody h3{font-size:120%;margin:15px auto 2px auto;font-weight:bold}.postBody h4{font-size:110%;margin:15px auto 2px auto;font-weight:bold;color:#333}.postBody h5{font-size:100%;margin:15px auto 2px auto;font-weight:bold;color:#333}.postBody a:link,.postBody a:visited,.postBody a:active{text-decoration:underline}.postCon a:link,.postCon a:visited,.postCon a:active{text-decoration:underline}.postBody ul,.postCon ul{margin-left:2em}.postBody li,.postCon li{list-style-type:disc;margin-bottom:1em}.postBody blockquote{background:/*savepage-url=images/comment.gif*/url() no-repeat 25px 0;min-height:35px;_height:35px;line-height:1.6em;color:#333}.myposts_title{font-weight:bold;text-align:center}#sideBar{font-size:12px}#sideBar h3{font-size:14px}.c_b_p_desc{font-size:14px;line-height:1.7}#cnblogs_post_body img{max-width:700px}</style>
+    
+    <style data-savepage-href="/skins/SimpleMemory/bundle-SimpleMemory-mobile.min.css" type="text/css" media="only screen and (max-width: 767px)">body{font-size:14px !important;font-family:'PingFang SC','Helvetica Neue','Helvetica','Arial',sans-serif;-webkit-text-size-adjust:none}#blog_nav_rss{display:none !important}#blog_nav_rss_image{display:none !important}#blog_nav_newpost{display:none !important}img{max-width:300px !important;height:auto}div.commentform textarea{min-height:200px}.commentbox_title{width:auto}#green_channel{width:320px}#cnblogs_post_body table[style]{width:auto !important;height:auto !important}#sidebar_search_box input[type=text]{width:260px}#cnblogs_post_body table{display:block;overflow-x:scroll;-webkit-overflow-scrolling:regular}#cnblogs_post_body table::-webkit-scrollbar:horizontal{height:12px}#cnblogs_post_body table::-webkit-scrollbar-track{-webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);border-radius:10px;background-color:#f5f5f5}#cnblogs_post_body table::-webkit-scrollbar{width:12px;background-color:#f5f5f5}#cnblogs_post_body table::-webkit-scrollbar-thumb{border-radius:10px;-webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);background-color:#555}#cnblogs_c1,#cnblogs_c2{text-align:center}#cnblogs_c2{overflow:hidden}.commentform{margin-left:10px}.commentbox_tab{width:100%}.comment_textarea{width:100%}div.commentform textarea{font-size:16px}.commentbox_title_right,.commentbox_title_left{width:100%;max-width:100%;justify-content:space-between}.commentbox_title_right{padding:8px 5px}#mainContent{margin-left:0;float:none;width:100% !important;padding-right:0 !important}#mainContent .forFlow{margin-left:0 !important}#sideBar{float:none;width:auto;margin-top:10px}#home{width:auto;min-width:0;margin-left:0 !important;margin-right:0 !important}#blog_stats{margin-bottom:20px}.postTitle{float:none}#navList a{width:auto}#topics .postTitle{width:auto}</style>
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/Cqlismy/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/Cqlismy/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/Cqlismy/wlwmanifest.xml">
+    <script></script>
+        <script></script>
+    <script data-savepage-src="https://common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+    <script data-savepage-src="/js/blog-common.min.js?v=ZMP-E7oivIbnbdC4Ap-FXPEUrs-k9WrJgvJkU43qwDI"></script>
+    
+    
+    
+
+<style id="savepage-cssvariables">
+  :root {
+    --savepage-url-9: url(data:image/gif;base64,R0lGODlhLgA0AMQAAP/00P/22vfqt/b29v/11f/45P/56P/34PjtwfXlqf/55v/11//00v/44vnwyfn5+f/22Pbnrf/21vny0Pn00//33vDw8P/12KioqP/10ufm61B1uv/33f/33P////H4+iH5BAAAAAAALAAAAAAuADQAAAX/oJeMZGmeaJqKQOu+cCzPcxLJmZvlcM4DPlosE4kwMsfdLrlEIo8MZvRJjTKbxaZyy+16v94iYUwum8/odDlDjgjU8Lh8LBAs7mQ8YTHmS/aAfHyBeHeCg3l1dxAQFwsXkBeMjJILEJaNko2bk4+Pl4x3knUBpaanqKmqq6sCCAEdsR2ws6mytbSwprGns766HQgIHByxxR3FxMi3y8nIycTO0MqywtTH0Mu30s/PytLRt9bYxt3Hstzf4eDUsePlzc7bzebr8e3Bw+Tx2uj06t/unct3rVzAeeC8pQtXTR+8bAP/1Qs4beA7bRCZLVT4j6E7hxjNaezIkZ1FkOQO//pLGG0hvosp5a3k17LjSwQVcurcybOnz58/ETg4QLSo0aNIkypV6sBBg6dPC0CdWkBqg6pTs1q1qpWrgwlVw4odS7as2bMTJihYy7at27dw48adQMGA3bt48+rdy5cv3b6AAwu2S8EDhcOIEytezLhxYw+QI0ueTLmy5cuYM2veDPmD58+gQ4seTbq0htIPBqguzbq159OjH2jQgEHDANe4RcMWPUCDBwsYHuQe/pr0bA8PMNwmnnt36N6/lYve8Jk69enVdYdO3ds38OWgr4sPv6G8+fOfndPGwB5DdPAf0J8vjz2+ds8eMFigPEB/aOvjVTfffOl91t96+0X2HYB58REYHmu7JWfZgp7RZ9+FDw4I2m79teebgrVVeGGAD5ZYoGcSVjbBBvCJ52CDDb4Y4Xq1SQYcBSWSaN91Ioa222+0WSDkkBiwmGOPJmJ4ooHsbVDkkw4I6CJ62cV4H2gPFHDABVsWAB9zEIIppnFjlrnhbGimqeaabLbp5mwhAAA7);
+    --savepage-url-10: url(data:image/gif;base64,R0lGODlhLgA0AMQAAP////39/fn5+fj4+Pb29vX19fPz8/Ly8vHx8fDw8O/v7+7u7u3t7ezs7Ovr6+rq6ujo6Ofn5+bm5uXl5ePj4+Li4uHh4dzc3NfX19HR0c/Pz6qqqqioqKenp4WFhYODgyH5BAQUAP8ALAAAAAAuADQAAAX/IKCNZGmeaJqKUeu+cCzP80jfeN5mGeT/wKBwSCTyisik0sd7OJ/QqHRKpWYw1ax268RgHGDuFkwuO6Res3rNbre9jbh8Tq/b73fMpcHo+xl2f3iDdRcXC4iJiol/jY2LkIh/hpGQjpcMlYuTh5qMmI+ekn6UogugoaKcpqeofqyrpq6vsqSdqrOZtX2luLOwtsC/uwy9nrm6vsW3x7nCy6zR0ogXFgrX2Nna29zd3RYWCeLj5OXm5+jo4Ajs7e7v8PHy8hQUB/f4+fr7/P399QYCChxIsKDBgwcBIlzIsKGBCQAmSJxIsaLFixgxAtjIsaPHjyBDihxJsqTJjQVS8KpcybKly5cwIcCcSbOmSpk2c+pMiZOlAHYOFDhAQGBnzp4rN2z4wIEp0wpGayIFkOABB3MdPBh4+aHrB5pfb64UYJUDBwgdFXCYsNJr2LZu265EKoBDSAoftqp8O5MvX6QFzJpFyzHBWbhuu+5NmVgxz7EcAoA0XHQxS78FMItdedZsgo4HOFRmnNmy3NKoH6sEwAHBxwEcFlxOzZc06b8sIwg2S5WD3tNfa5cOG3xuSwEECPjoPdq2c8uaVb9ES3l25uKmoxcAPBdt3ebB/Tpu6dV4TAChBUSVClOADw4Smq93yX1scvnzWy7Zzz9ICAA7);
+    --savepage-url-11: url(data:image/gif;base64,R0lGODlhEAAQAOZbAOny/v3+/lqIuT1wIOLu/lOMKKnB2omqzbTJ34+8Z9vq/c7c6tfo/ZSwhJOx0WyVwJGugWCJSbLSlff5/Pv8/efu9Y26ZDdrGUFzJXCYwuDt/vP3+uvx94usztrk793s/m6XwYe5YN/s/qO92Iu6YnCWXpeyiOnv9tXm/bHTkKa9mZ241dDj/dzm8Ex7Mejx/lePLd3r/vn7/NHk/eXw/tDk/dPm/dTm/dzq/d7s/tbn/WaOT3ugx2+XwuTv/o+7arbUnNnp/dDmurHFq9zr/X2iyF+Mu+bw/pm21Obx/oe6YFyKuvD2/oWny7HWktrp/Yy8ZYKjk+Pv/uHu/r7Q4z9xItHk/LTUlYGrYViHuP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAFsALAAAAAAQABAAAAemgFuCg4SFhoeGGw5LWY2OWU0VhB0GFFqXmFoIGRSCEwIBTABJPlM5CjhaPC2CHA9aL0dSGh8KDChaBwutrzQEGjFPDDczubtbnwEAIkRBOjY1VlpFHoOUAZgELACaGTKDigKNK5dDJTsRKog9FVFYV0I/MBCGI0hGESlOWlAJA4UnQFDZ4gIIJgkXEG2pQkKJlhD+FJooYEGChQL0FDbAcAFDgy2BAAA7);
+    --savepage-url-12: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAE6SURBVCjPbc6xS5RxAIfxz+99r8OhCL1zOdyi0R+IWBHoe4j+A9n4IiJ6f0QJgUNTEdKYbqc1RKDoEEFTW5tGDWdiDi1hQiUd6XUNZ6HhM33hOzxPICcxpGZMxW87Vi3apg7SnKJZj2W6HDhSMaxqTyPaRIIZD5StuCVTNem1fk+MkyONNyy45J67Ptj3xTsbSjJXrDvcFPIl05bNaHac5FSsGjSpTmLML081neazF4IRSFQc+Pi3mZP1Hn2KJFpSBf9zAS1tEjt6xE7xvwauoeGIxJrEtPKZO7rtp1eQxk+G3VTyNv6IYudeMKDhoW91afxqT1WmqqSs35R5A+hx0ZvYDDnBqHnXpdoCDu26qqhl0Z1wYu01LtOnZdtLW+bUpI49C6figoK2Y3DZfTUF34Nzyen2yITnfwBNsVap/Q+VNAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNS0wMS0wNlQyMjoyNDoyOCswODowMNFISBsAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTUtMDEtMDZUMjI6MjQ6MjgrMDg6MDCgFfCnAAAATXRFWHRzb2Z0d2FyZQBJbWFnZU1hZ2ljayA2LjguOC03IFExNiB4ODZfNjQgMjAxNC0wMi0yOCBodHRwOi8vd3d3LmltYWdlbWFnaWNrLm9yZ1mkX38AAAAYdEVYdFRodW1iOjpEb2N1bWVudDo6UGFnZXMAMaf/uy8AAAAYdEVYdFRodW1iOjpJbWFnZTo6SGVpZ2h0ADM5NkS0YSIAAAAXdEVYdFRodW1iOjpJbWFnZTo6V2lkdGgAMzk210UxfwAAABl0RVh0VGh1bWI6Ok1pbWV0eXBlAGltYWdlL3BuZz+yVk4AAAAXdEVYdFRodW1iOjpNVGltZQAxNDIwNTU0MjY4IpYi1gAAABN0RVh0VGh1bWI6OlNpemUAMTEuMktCQvM40ZcAAABidEVYdFRodW1iOjpVUkkAZmlsZTovLy9ob21lL2Z0cC8xNTIwL2Vhc3lpY29uLmNuL2Vhc3lpY29uLmNuL2Nkbi1pbWcuZWFzeWljb24uY24vcG5nLzExODM0LzExODM0OTYucG5nH1E5GQAAAABJRU5ErkJggg==);
+    --savepage-url-13: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAFaSURBVCjPbdFPSJMBAMbhZ9++tFFbHqSOCxYS/QHrUmh1yDBH0EbdDL1FdRl06NyxoIt8pwgE0YsIUdDBolLI2iEISgoNWjaTkUYsHGLlrA5bt+7v7/I+MSJIOq1LoIak34oeqVEQi2CPASue+OQntkrrscuoEvEsGZdNuuu7FqEtWPZaXb+PqqHtBj0wY69eScdUDXsqZ849g24F+qx4pt0Nnw1545BlKR3S3vqmL9TlDnY7YMGaMXlZbY7Yr9NzuVBcGRWr8mallExYctUrM1qcC61aR8U1/W5qd10Z71TU1dUCKMCUgm2OWgeT3gOBHRIRCedd9EHViE4KjSghFahL44q8+yJ58y403yVtM1B0UqszFpRt+mpaQHPSoxjPLur1S03OhlaHHTduCZxw0GgsIuOSh9bsww8vlRDodtZtpQZWxoAvHlu00cQ6ZWcDK/Zf7j9e/OP+C1bycGSt9JfBAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE0LTA1LTI3VDA5OjQwOjMyKzA4OjAw2n9uiAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNC0wNS0yN1QwOTo0MDozMiswODowMKsi1jQAAABNdEVYdHNvZnR3YXJlAEltYWdlTWFnaWNrIDYuOC44LTcgUTE2IHg4Nl82NCAyMDE0LTAyLTI4IGh0dHA6Ly93d3cuaW1hZ2VtYWdpY2sub3JnWaRffwAAABh0RVh0VGh1bWI6OkRvY3VtZW50OjpQYWdlcwAxp/+7LwAAABd0RVh0VGh1bWI6OkltYWdlOjpIZWlnaHQANTCQoD5eAAAAFnRFWHRUaHVtYjo6SW1hZ2U6OldpZHRoADUwaA/+0wAAABl0RVh0VGh1bWI6Ok1pbWV0eXBlAGltYWdlL3BuZz+yVk4AAAAXdEVYdFRodW1iOjpNVGltZQAxNDAxMTU0ODMyzWD0hAAAABN0RVh0VGh1bWI6OlNpemUAMi4yOEtCQvr94aMAAABidEVYdFRodW1iOjpVUkkAZmlsZTovLy9ob21lL2Z0cC8xNTIwL2Vhc3lpY29uLmNuL2Vhc3lpY29uLmNuL2Nkbi1pbWcuZWFzeWljb24uY24vcG5nLzExNjY0LzExNjY0MzcucG5naliQIQAAAABJRU5ErkJggg==);
+  }
+</style>
+<script id="savepage-shadowloader" type="application/javascript">
+  "use strict"
+  window.addEventListener("DOMContentLoaded",
+  function(event)
+  {
+    savepage_ShadowLoader(5);
+  },false);
+  function savepage_ShadowLoader(c){createShadowDOMs(0,document.documentElement);function createShadowDOMs(a,b){var i;if(b.localName=="iframe"||b.localName=="frame"){if(a<c){try{if(b.contentDocument.documentElement!=null){createShadowDOMs(a+1,b.contentDocument.documentElement)}}catch(e){}}}else{if(b.children.length>=1&&b.children[0].localName=="template"&&b.children[0].hasAttribute("data-savepage-shadowroot")){b.attachShadow({mode:"open"}).appendChild(b.children[0].content);b.removeChild(b.children[0]);for(i=0;i<b.shadowRoot.children.length;i++)if(b.shadowRoot.children[i]!=null)createShadowDOMs(a,b.shadowRoot.children[i])}for(i=0;i<b.children.length;i++)if(b.children[i]!=null)createShadowDOMs(a,b.children[i])}}}
+</script>
+<meta name="savepage-url" content="https://www.cnblogs.com/Cqlismy/p/12194641.html">
+<meta name="savepage-title" content="Uboot啟動流程分析(六) - Cqlismy - 博客園">
+<meta name="savepage-from" content="https://www.cnblogs.com/Cqlismy/p/12194641.html">
+<meta name="savepage-date" content="Sat Sep 12 2020 00:13:01 GMT+0800 (台北標準時間)">
+<meta name="savepage-state" content="Custom Items; Retain cross-origin frames; Merge CSS images; Remove unsaved URLs; Max frame depth = 5; Max resource size = 50MB; Max resource time = 10s;">
+<meta name="savepage-version" content="22.2">
+<meta name="savepage-comments" content="">
+  </head>
+<body style="margin-bottom: 28px !important;">
+    <a name="top"></a>
+    
+    
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/Cqlismy/"><img id="blogLogo" data-savepage-src="/skins/custom/images/logo.gif" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="返回主頁"></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/Cqlismy/">務實求知</a>
+</h1>
+<h2>
+路漫漫其修遠兮，吾將上下而求索。
+</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客園</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/Cqlismy/">
+首頁</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新隨筆</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/Cqlismy">
+聯繫</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/Cqlismy/rss/">
+訂閱</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			
+			<span id="stats_post_count">隨筆 - 
+133  </span>
+<span id="stats_article_count">文章 - 
+0  </span>
+<span id="stats-comment_count">評論 - 
+6</span>
+
+			
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/Cqlismy/p/12194641.html">
+    <span>Uboot啟動流程分析(六)</span>
+    
+
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div id="cnblogs_post_body" class="blogpost-body">
+    <p>1、前言</p>
+<p>在前面的文章《Uboot啟動流程分析(三)》和《Uboot啟動流程分析(四)》，鏈接分別如下：</p>
+<p><a href="https://www.cnblogs.com/Cqlismy/p/12006287.html">https://www.cnblogs.com/Cqlismy/p/12006287.html</a></p>
+<p><a href="https://www.cnblogs.com/Cqlismy/p/12147411.html">https://www.cnblogs.com/Cqlismy/p/12147411.html</a></p>
+<p>已經對board_init_f函數進行了簡單介紹，在這個函數當中，會調用一系列的函數去初始化一些早期的板子外設和gd結構體的成員變量，但是board_init_f函數並沒有將所有的外設進行初始化，還有一些後續的工作需要完成，這些工作就是由board_init_r函數去完成。</p>
+<p>在介紹board_init_r函數之前，先來回憶一下_main函數的簡單調用流程，如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #000000;">_main
+    </span>|<span style="color: #000000;">
+    board_init_f_alloc_reserve</span>--&gt;<span style="color: #000000;">reserve gd and early malloc area
+    </span>|<span style="color: #000000;">
+    board_init_f_init_reserve</span>--&gt;<span style="color: #000000;">initialize global data
+    </span>|<span style="color: #000000;">
+    board_init_f</span>--&gt;<span style="color: #000000;">initialize ddr,timer...,and fill gd_t
+    </span>|<span style="color: #000000;">
+    relocate_code</span>--&gt;<span style="color: #000000;">relocate uboot code
+    </span>|<span style="color: #000000;">
+    relocate_vectors</span>--&gt;<span style="color: #000000;">relocate vectors
+    </span>|<span style="color: #000000;">
+    board_init_r</span>--&gt;calling board_init_r</pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>可以看到board_init_r函數處於_main函數的最後階段了，board_init_r函數的執行過程和board_init_f函數非常類似，因此，將會使用相同的方法對該函數過程進行分析。</p>
+<p> </p>
+<p>2、board_init_r函數</p>
+<p>在uboot源碼中，board_init_r函數的定義在下面的文件中：</p>
+<div class="cnblogs_code">
+<pre>uboot/common/board_r.c</pre>
+</div>
+<p>函數的定義如下所示：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #0000ff;">void</span> board_init_r(gd_t *new_gd, <span style="color: #0000ff;">ulong</span><span style="color: #000000;"> dest_addr)
+{
+#ifdef CONFIG_NEEDS_MANUAL_RELOC
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> i;
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_AVR32
+    mmu_init_r(dest_addr);
+</span><span style="color: #0000ff;">#endif</span>
+
+<span style="color: #0000ff;">#if</span> !defined(CONFIG_X86) &amp;&amp; !defined(CONFIG_ARM) &amp;&amp; !defined(CONFIG_ARM64)<span style="color: #000000;">
+    gd </span>=<span style="color: #000000;"> new_gd;
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_NEEDS_MANUAL_RELOC
+    </span><span style="color: #0000ff;">for</span> (i = <span style="color: #800080;">0</span>; i &lt; ARRAY_SIZE(init_sequence_r); i++<span style="color: #000000;">)
+        init_sequence_r[i] </span>+= gd-&gt;<span style="color: #000000;">reloc_off;
+</span><span style="color: #0000ff;">#endif</span>
+
+    <span style="color: #0000ff;">if</span> (initcall_run_list(init_sequence_r)) <span style="color: #008000;">/*</span><span style="color: #008000;"> 調用一系列初始化函數 </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+        hang();
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> NOTREACHED - run_main_loop() does not return </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    hang();
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>和board_init_f函數類似，調用initcall_run_list()函數來進行初始化，init_sequence_r是一個數組，也就是函數初始化序列，為了兼容多款板子，裡面包含了大量的條件編譯函數，將一些無關條件編譯代碼去掉後，其定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre>init_fnc_t init_sequence_r[] =<span style="color: #000000;"> {
+    initr_trace, /* 初始化buffer跟蹤相關 */
+    initr_reloc, /* 標記重定位完成 */
+    
+#ifdef CONFIG_ARM
+    initr_caches, /* 使能caches */
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+    initr_reloc_global_data, /* 初始化gd的一些成員變量 */
+    initr_barrier,
+    initr_malloc,　　/* 初始化malloc區域 */
+    initr_console_record, /* 初始化控制台相關內容 */
+    bootstage_relocate, /* 啟動狀態重定位 */
+    initr_bootstage, /* 初始化bootstage */
+    
+</span><span style="color: #0000ff;">#if</span> defined(CONFIG_ARM) || defined(CONFIG_NDS32)<span style="color: #000000;">
+    board_init,    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> Setup chipselects </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+    stdio_init_tables, /* stdio相關初始化 */
+    initr_serial,　　/* serial接口初始化 */
+    initr_announce,
+    INIT_FUNC_WATCHDOG_RESET
+    power_init_board,
+    
+#ifndef CONFIG_SYS_NO_FLASH
+    initr_flash,
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+    INIT_FUNC_WATCHDOG_RESET
+
+#ifdef CONFIG_CMD_NAND
+    initr_nand,　　/* 初始化nand flash */
+</span><span style="color: #0000ff;">#endif<br></span></pre>
+<p>　#ifdef CONFIG_GENERIC_MMC<br>	　　　initr_mmc,<br>　#endif</p>
+<pre><span style="color: #000000;">    initr_env,　　/* 環境變量初始化 */
+    INIT_FUNC_WATCHDOG_RESET
+    initr_secondary_cpu,
+    stdio_add_devices,
+    initr_jumptable,
+
+    console_init_r,        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> fully init console as a device </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    interrupt_init,
+    
+</span><span style="color: #0000ff;">#if</span> defined(CONFIG_ARM) || defined(CONFIG_AVR32)<span style="color: #000000;">
+    initr_enable_interrupts,
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_CMD_NET
+    initr_ethaddr,　　/* 獲取mac地址 */
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_BOARD_LATE_INIT
+    board_late_init,　　/* 板子後期外設初始化 */
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_CMD_NET
+    INIT_FUNC_WATCHDOG_RESET
+    initr_net,　　/* 初始化板子的網絡設備 */
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+    run_main_loop,
+};</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>接下來，對init_sequence_r內定義的函數進行簡要分析：</p>
+<p>首先是initr_trace()函數，該函數的定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> initr_trace(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+#ifdef CONFIG_TRACE
+    trace_init(gd</span>-&gt;<span style="color: #000000;">trace_buff, CONFIG_TRACE_BUFFER_SIZE);
+</span><span style="color: #0000ff;">#endif</span>
+
+    <span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>該函數中，如果定義了CONFIG_TRACE宏的話，將調用trace_init()函數，是與初始化和調試跟蹤相關的內容。</p>
+<p>接下來，調用initr_reloc()函數，該函數定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> initr_reloc(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> tell others: relocation done </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    gd</span>-&gt;flags |= GD_FLG_RELOC |<span style="color: #000000;"> GD_FLG_FULL_MALLOC_INIT;
+
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>initr_reloc函數設置了gd-&gt;flags成員，標記uboot重定位完成。</p>
+<p>接下來，判斷是否定義了宏CONFIG_ARM，對於imx6ul定義了該宏，將調用initr_caches()函數，該函數定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> initr_caches(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> Enable caches </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    enable_caches();
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>從代碼可以知道，該函數用於使能芯片的caches。</p>
+<p>接下來調用initr_reloc_global_data()函數用於初始化重定為後gd的一些成員變量。</p>
+<p>對於imx6ul，initr_barrier()為空函數，直接返回。</p>
+<p>繼續調用initr_console_record()函數，用於初始化控制台相關內容，對於imx6ul為空函數。</p>
+<p>bootstage_relocate()函數用於重定位bootstage相關的東西。</p>
+<p>接下來，繼續調用initr_bootstage()函數，用於初始化bootstage相關的內容。</p>
+<p>函數繼續執行，接下來判斷是否定義宏CONFIG_ARM，對於imx6ul，定義了該宏，所以會調用board_init()函數，該函數與板級相關，定義在下面文件：</p>
+<div class="cnblogs_code">
+<pre>uboot/board/freescale/mx6ul_comp6ul_nand/mx6ul_comp6ul_nand.c</pre>
+</div>
+<p>該函數的定義如下所示：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #0000ff;">int</span> board_init(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> Address of boot parameters </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    gd</span>-&gt;bd-&gt;bi_boot_params = PHYS_SDRAM + <span style="color: #800080;">0x100</span><span style="color: #000000;">;
+
+    imx_iomux_v3_setup_multiple_pads(iox_pads, ARRAY_SIZE(iox_pads));
+
+    iox74lv_init();    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> 初始化74hc595芯片(串行輸入、並行輸出) </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+
+#ifdef CONFIG_SYS_I2C_MXC
+    setup_i2c(</span><span style="color: #800080;">0</span>, CONFIG_SYS_I2C_SPEED, <span style="color: #800080;">0x7f</span>, &amp;i2c_pad_info1); <span style="color: #008000;">/*</span><span style="color: #008000;"> 初始化I2C </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef    CONFIG_FEC_MXC
+    setup_fec(CONFIG_FEC_ENET_DEV); </span><span style="color: #008000;">/*</span><span style="color: #008000;"> 網絡相關初始化 </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_USB_EHCI_MX6
+    setup_usb(); </span><span style="color: #008000;">/*</span><span style="color: #008000;"> USB接口初始化 </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_FSL_QSPI
+    board_qspi_init();
+</span><span style="color: #0000ff;">#endif</span><span style="color: #000000;">
+
+#ifdef CONFIG_NAND_MXS
+    setup_gpmi_nand();
+</span><span style="color: #0000ff;">#endif</span>
+
+    <span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>從函數中可以看到，這是個板級初始化函數，主要是用來初始化了板子上的一些外設，例如GPIO、I2C接口和網絡相關接口等。</p>
+<p>接下來，繼續調用stdio_init_tables()函數用於初始化stdio相關東西。</p>
+<p>調用initr_serial()函數初始化串口相關東西。</p>
+<p>調用initr_announce()函數，調試相關的內容，用於通知已經在DRAM中運行。</p>
+<p>繼續調用power_init_board()函數，用於初始化電源相關的芯片。</p>
+<p>接下來，判斷有沒有定義宏CONFIG_SYS_NO_FLASH，如果沒有定義該宏的話，調用函數initr_flash()，但是對於imx6ul中，定義了該宏，因此，該函數無效。</p>
+<p>函數繼續執行，接下來，判斷是否定義了宏CONFIG_CMD_NAND，對於使用Nand Flash啟動的，將會定義該宏，因此會調用initr_nand()函數初始化nand，該函數定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #000000;">#ifdef CONFIG_CMD_NAND
+</span><span style="color: #008000;">/*</span><span style="color: #008000;"> go init the NAND </span><span style="color: #008000;">*/</span>
+<span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> initr_nand(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    puts(</span><span style="color: #800000;">"</span><span style="color: #800000;">NAND:  </span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    nand_init();
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}
+</span><span style="color: #0000ff;">#endif</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>函數執行後，會將nand flash進行初始化，並在串口以字符串的形式輸出nand flash的大小。</p>
+<p>接下來，判斷是否定義了CONFIG_GENERIC_MMC宏，對於imx6ul，該宏定義在文件：</p>
+<div class="cnblogs_code">
+<pre>uboot/include/imx6_common.h</pre>
+</div>
+<p>因此，函數initr_mmc()會執行，用來初始化和sd/mmc相關的接口。</p>
+<p>initr_env()函數用來初始化環境變量。</p>
+<p>initr_secondary_cpu()用來初始化其它的CPU核，但是對於imx6ul只有一個CPU核，因此此函數無效。</p>
+<p>stdio_add_devices()函數用於初始化各種輸入輸出設備，例如LCD相關的設備。</p>
+<p>initr_jumptable()函數用來初始化跳轉表相關的內容。</p>
+<p>console_init_r()函數用於完成控制器台的初始化，該函數調用後，uboot將輸出如下：</p>
+<div class="cnblogs_code">
+<pre><span style="color: #000000;">In:    serial
+Out:   serial
+Err:   serial</span></pre>
+</div>
+<p>interrupt_init()函數用來初始化中斷相關內容，initr_enable_interrupts()函數用來使能中斷。</p>
+<p>接下來，判斷是否定義CONFIG_CMD_NET宏，對於imx6ul相關的板級配置文件，定義了該宏，因此會調用initr_ethaddr()函數初始化網絡地址，用於獲取網卡的MAC地址。</p>
+<p>board_late_init()函數用於板級後續的一些外設初始化。</p>
+<p>接下來，調用函數initr_net()初始化板子上的網絡設備，該函數的定義如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div>
+<pre><span style="color: #000000;">#ifdef CONFIG_CMD_NET
+</span><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> initr_net(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    puts(</span><span style="color: #800000;">"</span><span style="color: #800000;">Net:   </span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    eth_initialize();
+</span><span style="color: #0000ff;">#if</span> defined(CONFIG_RESET_PHY_R)<span style="color: #000000;">
+    debug(</span><span style="color: #800000;">"</span><span style="color: #800000;">Reset Ethernet PHY\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    reset_phy();
+</span><span style="color: #0000ff;">#endif</span>
+    <span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}
+</span><span style="color: #0000ff;">#endif</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="複製代碼"><img data-savepage-src="//common.cnblogs.com/images/copycode.gif" src="data:image/gif;base64,R0lGODlhFAAUANQHADJKYpKluc3P05qy4jJdta/M92KQ3vv8/nKi4rK/0rLC6mJ6mtHe7sHN4ZW19iJLmUp2wqKy0nKa8iJCgsLV9uLq8qKywnKa2oKy4lKC0qLC8qKqwnKS0oKn7cDI1AAAACH5BAEAAB8ALAAAAAAUABQAAAWE4CeOZGmeaKquLKkoSRwJrXLch7XQa4IfAc+ud6AUGIHCS+NwME6WX6Xw6xAaps2BiUFofpICwVMK3CoVxuDQZBgIhEf50EVc1rgKJSInmRkMDQ0dBx0IBhkZfGUAjY0cOAwUChZ9KQYHiIkZG5YoEAcRohYbAZ4nEHAPq6sTLa+wsSUhADs=" alt="複製代碼"></a></span></div></div>
+<p>需要定義相關宏CONFIG_CMD_NET才會調用該函數，如果初始化成功的話，串口會輸出對應的信息。</p>
+<p>最後，運行run_main_loop()函數，主循環函數，用於處理輸入的命令，該函數的實現過程分析另起文章分析。</p>
+<p> </p>
+<p>3、小結</p>
+<p>本篇文章主要是對board_init_r()函數進行簡單分析，該函數用於板級後期的一些外設初始化和設置gd結構體的成員變量，函數的調用過程和board_init_f()函數類似。</p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block"><div id="BlogPostCategory">
+    分類: 
+            <a href="https://www.cnblogs.com/Cqlismy/category/1603479.html" target="_blank">Uboot移植適配</a>,             <a href="https://www.cnblogs.com/Cqlismy/category/1603457.html" target="_blank">NXP I.MX</a>,             <a href="https://www.cnblogs.com/Cqlismy/category/1654918.html" target="_blank">ARM裸機</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(12194641,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要頂</a>
+        <a id="green_channel_follow" onclick="follow('bc1cf55d-a2cd-4bda-a110-08d6a2d445dd');" href="javascript:void(0);">關注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏該文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img data-savepage-src="https://common.cnblogs.com/images/icon_weibo_24.png" src="data:image/png;base64,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" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img data-savepage-src="https://common.cnblogs.com/images/wechat.png" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABA9pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iCiAgICAgICAgICAgIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIgogICAgICAgICAgICB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIj4KICAgICAgICAgPHhtcE1NOkRlcml2ZWRGcm9tIHJkZjpwYXJzZVR5cGU9IlJlc291cmNlIj4KICAgICAgICAgICAgPHN0UmVmOmluc3RhbmNlSUQ+eG1wLmlpZDo0RUREMkQ4M0Q4REUxMUUzQkU2QUFFRDI0NThBOTQxQTwvc3RSZWY6aW5zdGFuY2VJRD4KICAgICAgICAgICAgPHN0UmVmOmRvY3VtZW50SUQ+eG1wLmRpZDo0RUREMkQ4NEQ4REUxMUUzQkU2QUFFRDI0NThBOTQxQTwvc3RSZWY6ZG9jdW1lbnRJRD4KICAgICAgICAgPC94bXBNTTpEZXJpdmVkRnJvbT4KICAgICAgICAgPHhtcE1NOkRvY3VtZW50SUQ+eG1wLmRpZDo0RUREMkQ4NkQ4REUxMUUzQkU2QUFFRDI0NThBOTQxQTwveG1wTU06RG9jdW1lbnRJRD4KICAgICAgICAgPHhtcE1NOkluc3RhbmNlSUQ+eG1wLmlpZDo0RUREMkQ4NUQ4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" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/Cqlismy/" target="_blank"><img data-savepage-src="https://pic.cnblogs.com/face/1625033/20200511222655.png" src="data:image/png;base64,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" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/Cqlismy/">Cqlismy</a><br>
+            <a href="https://home.cnblogs.com/u/Cqlismy/followees/">關注 - 3</a><br>
+            <a href="https://home.cnblogs.com/u/Cqlismy/followers/">粉絲 - 13</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow('bc1cf55d-a2cd-4bda-a110-08d6a2d445dd');return false;">+加關注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(12194641,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(12194641,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript"></script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/Cqlismy/p/12193209.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/Cqlismy/p/12193209.html" title="發佈於 2020-01-14 17:29">git更新提交到倉庫</a>
+    <br>
+    <a href="https://www.cnblogs.com/Cqlismy/p/12198478.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/Cqlismy/p/12198478.html" title="發佈於 2020-01-15 19:50">MSM8953中Android內核添加AX88772C以太網驅動</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2020-01-14 23:42</span> 
+<a href="https://www.cnblogs.com/Cqlismy/">Cqlismy</a> 
+閱讀(<span id="post_view_count">209</span>) 
+評論(<span id="post_comment_count">0</span>) 
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=12194641" rel="nofollow">編輯</a> 
+<a href="javascript:void(0)" onclick="AddToWz(12194641);return false;">收藏</a></div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script data-savepage-src="https://common.cnblogs.com/highlight/9.12.0/highlight.min.js"></script>
+<script></script>
+<script></script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script></script>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新評論</a><a href="#" onclick="return RefreshPage();">刷新頁面</a><a href="#top">返回頂部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    註冊用戶登錄後才能發表評論，請 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login('commentform');">登錄</a>
+     或 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">註冊</a>，
+    <a href="https://www.cnblogs.com/">訪問</a> 網站首頁。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="c_ad_block">
+        <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;"></div>
+    </div>
+    <div id="under_post_news"></div>
+    <div id="cnblogs_c2" class="c_ad_block">
+        <div id="div-gpt-ad-1592366332455-0" style="width: 468px; height: 60px;"></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新聞</b>:
+    <br>
+ ‧          <a href="//news.cnblogs.com/n/672702/" target="_blank">總收入腰斬、市值暴跌、轉型無路，趣店退無可退？</a>
+        <br>
+ ‧          <a href="//news.cnblogs.com/n/672701/" target="_blank">鴻蒙「備胎扶正」，華為背水一戰</a>
+        <br>
+ ‧          <a href="//news.cnblogs.com/n/672700/" target="_blank">京東數科招股書披露：擬發行5.3億股 劉強東持股過半</a>
+        <br>
+ ‧          <a href="//news.cnblogs.com/n/672699/" target="_blank">張朝陽：搜狐還年輕 處在二次爆發狀態 要堅持做社交</a>
+        <br>
+ ‧          <a href="//news.cnblogs.com/n/672698/" target="_blank">庫克2021年功成身退 COO傑夫‧威廉姆斯或接任蘋果CEO</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新聞" target="_blank">更多新聞...</a>
+</div></div>
+    <div id="HistoryToday" class="c_ad_block"></div>
+    <script type="text/javascript"></script>
+</div>
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<div id="sidebar_news" class="newsItem"><!--done-->
+<h3 class="catListTitle">公告</h3>
+
+<div id="blog-news">
+    
+    <div id="profile_block">
+        暱稱：
+        <a href="https://home.cnblogs.com/u/Cqlismy/">
+            Cqlismy
+        </a>
+        <br>
+        園齡：
+        <a href="https://home.cnblogs.com/u/Cqlismy/" title="入園時間：2019-03-09">
+            1年6個月
+        </a>
+        <br>
+        粉絲：
+        <a href="https://home.cnblogs.com/u/Cqlismy/followers/">
+            13
+        </a>
+        <br>
+        關注：
+        <a href="https://home.cnblogs.com/u/Cqlismy/followees/">
+            3
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow('bc1cf55d-a2cd-4bda-a110-08d6a2d445dd')">+加關注</a></div>
+        <script></script>
+    </div>
+</div>
+
+</div>
+
+<div id="sidebar_ad"></div>
+			<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" title="Calendar" cellspacing="0" cellpadding="0" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/08/12'); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2020年9月</td>
+                            <td class="CalNextPrev" align="right">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/10/12'); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" abbr="日" scope="col" align="center">日</th>
+        <th class="CalDayHeader" abbr="一" scope="col" align="center">一</th>
+        <th class="CalDayHeader" abbr="二" scope="col" align="center">二</th>
+        <th class="CalDayHeader" abbr="三" scope="col" align="center">三</th>
+        <th class="CalDayHeader" abbr="四" scope="col" align="center">四</th>
+        <th class="CalDayHeader" abbr="五" scope="col" align="center">五</th>
+        <th class="CalDayHeader" abbr="六" scope="col" align="center">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                        <td class="" align="center">
+                            3
+                        </td>
+                        <td class="" align="center">
+                            4
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        5
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            6
+                        </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                            <td class="" align="center">
+                                10
+                            </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                        <td class="CalTodayDay" align="center">
+                            12
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            13
+                        </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                15
+                            </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            19
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            20
+                        </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            26
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            27
+                        </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                            <td class="" align="center">
+                                29
+                            </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            3
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            4
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                8
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                9
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            10
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script></script>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn">
+<!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk" value=""> <input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk" value=""> <input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+    <div class="catListLink">
+<h3 class="catListTitle">
+常用鏈接
+</h3>
+<ul>
+    
+<li><a href="https://www.cnblogs.com/Cqlismy/p/" title="我的博客的隨筆列表">我的隨筆</a></li>
+<li><a href="https://www.cnblogs.com/Cqlismy/MyComments.html" title="我的發表過的評論列表">我的評論</a></li>
+<li><a href="https://www.cnblogs.com/Cqlismy/OtherPosts.html" title="我評論過的隨筆列表">我的參與</a></li>
+<li><a href="https://www.cnblogs.com/Cqlismy/RecentComments.html" title="我的博客的評論列表">最新評論</a></li>
+<li><a href="https://www.cnblogs.com/Cqlismy/tag/" title="我的博客的標籤列表">我的標籤</a></li>
+
+</ul>
+</div>
+
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+    
+</div>
+
+<!-- 积分与排名 -->
+<div id="sidebar_scorerank" class="sidebar-block">
+    <div class="catListBlogRank">
+<h3 class="catListTitle">積分與排名</h3>
+<ul>
+	<li class="liScore">
+		積分 -	
+66946
+	</li>
+	<li class="liRank">
+		排名 -	
+12973
+	</li>
+</ul>
+</div>
+
+
+
+
+</div>
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+    
+        <div id="sidebar_postcategory" class="catListPostCategory sidebar-block">
+            <h3 class="catListTitle">
+                
+隨筆分類
+<span style="font-size:11px;font-weight:normal">(275)</span>
+
+
+            </h3>
+
+
+            <ul>
+
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1610909.html" rel="" target="">
+    Allwinner SoC(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1527551.html" rel="" target="">
+    Android(24)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1588719.html" rel="" target="">
+    Android Framework(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1588714.html" rel="" target="">
+    Android HAL(3)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1636154.html" rel="" target="">
+    Android Init Language(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1610907.html" rel="" target="">
+    Android LK(4)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1588726.html" rel="" target="">
+    Android編譯調試(10)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1588721.html" rel="" target="">
+    Android應用(3)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1654918.html" rel="" target="">
+    ARM裸機(22)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1415046.html" rel="" target="">
+    C/C++(12)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1537047.html" rel="" target="">
+    Git(3)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1603966.html" rel="" target="">
+    Hardware基礎(4)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1759960.html" rel="" target="">
+    Hisilicon SoC(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1746671.html" rel="" target="">
+    Java(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1603480.html" rel="" target="">
+    Kernel移植適配(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1416912.html" rel="" target="">
+    Linux(60)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1688674.html" rel="" target="">
+    Linux編譯調試(11)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1528157.html" rel="" target="">
+    Linux常用命令(20)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1499341.html" rel="" target="">
+    Linux內核架構(14)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1595369.html" rel="" target="">
+    Linux內核同步機制(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1499367.html" rel="" target="">
+    Linux驅動(23)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1582147.html" rel="" target="">
+    Linux驅動子系統(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1603457.html" rel="" target="">
+    NXP I.MX(23)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1603460.html" rel="" target="">
+    Qualcomm MSM(9)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1628768.html" rel="" target="">
+    Shell程序設計(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1603479.html" rel="" target="">
+    Uboot移植適配(10)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1767003.html" rel="" target="">
+    計算機基礎(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1543713.html" rel="" target="">
+    旅遊(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1485102.html" rel="" target="">
+    面試(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1415047.html" rel="" target="">
+    算法與數據結構(2)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/category/1557579.html" rel="" target="">
+    雜項(3)
+</a>
+ 
+
+                        </li>
+
+            </ul>
+
+
+        </div>
+        <div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+            <h3 class="catListTitle">
+                
+隨筆檔案
+<span style="font-size:11px;font-weight:normal">(133)</span>
+
+
+            </h3>
+
+
+            <ul>
+
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/08.html" rel="" target="">
+    2020年8月(4)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/07.html" rel="" target="">
+    2020年7月(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/06.html" rel="" target="">
+    2020年6月(5)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/05.html" rel="" target="">
+    2020年5月(11)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/04.html" rel="" target="">
+    2020年4月(6)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/03.html" rel="" target="">
+    2020年3月(8)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/02.html" rel="" target="">
+    2020年2月(5)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2020/01.html" rel="" target="">
+    2020年1月(11)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/12.html" rel="" target="">
+    2019年12月(12)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/11.html" rel="" target="">
+    2019年11月(17)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/10.html" rel="" target="">
+    2019年10月(3)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/09.html" rel="" target="">
+    2019年9月(18)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/08.html" rel="" target="">
+    2019年8月(23)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/07.html" rel="" target="">
+    2019年7月(1)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/06.html" rel="" target="">
+    2019年6月(7)
+</a>
+ 
+
+                        </li>
+                        <li>
+                            
+<a href="https://www.cnblogs.com/Cqlismy/archive/2019/03.html" rel="" target="">
+    2019年3月(1)
+</a>
+ 
+
+                        </li>
+
+            </ul>
+
+
+        </div>
+
+</div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block">
+    <div class="catListComment">
+<h3 class="catListTitle">最新評論</h3>
+
+	<div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/Cqlismy/p/12152400.html">1. Re:Uboot啟動流程分析(五)</a></li>
+                    <li class="recent_comment_body"><p>厲害，膜拜大神。沒有你這幾個文章，我怕我都要放棄看uboot了、</p>
+</li>
+                    <li class="recent_comment_author">--眼花手抖敲代碼</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/Cqlismy/p/11968276.html">2. Re:NXP官方ddr_stress_tester工具使用</a></li>
+                    <li class="recent_comment_body">@明明1109 你好，校準後得到的值就是DDR控制器寄存器能填入的較好值，壓力測試需要使用的是校準後的配置參數，另外，這些校準後的DDR控制器配置參數，同樣需要更新到bootloader源碼裡面，用來...</li>
+                    <li class="recent_comment_author">--Cqlismy</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/Cqlismy/p/11968276.html">3. Re:NXP官方ddr_stress_tester工具使用</a></li>
+                    <li class="recent_comment_body">嗨，博主，請教一個問題，進行壓力測試，是直接用校準後的inc文件 download之後進行， 還是講inc配置參數回填到soc uboot之後，更新soc uboot完，再進行壓力測試？...</li>
+                    <li class="recent_comment_author">--明明1109</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/Cqlismy/p/12549087.html">4. Re:ARM Cortex-A7中斷系統基礎知識</a></li>
+                    <li class="recent_comment_body"><p>寫的很好！學習了！</p>
+</li>
+                    <li class="recent_comment_author">--fendoulan</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/Cqlismy/p/11965334.html">5. Re:DDR基礎知識</a></li>
+                    <li class="recent_comment_body"><p>精彩簡潔</p>
+</li>
+                    <li class="recent_comment_author">--叻亞</li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+    <div class="catListView">
+<h3 class="catListTitle">閱讀排行榜</h3>
+	<div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11539702.html">
+                            1. 修改ssh服務器默認端口號(6968)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11358657.html">
+                            2. Ubuntu下載源碼並編譯(3312)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11471028.html">
+                            3. adb和fastboot的使用(2773)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/12942471.html">
+                            4. VSCode代碼對齊和縮進快捷鍵(2772)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11568363.html">
+                            5. 修改Ubuntu系統的用戶名和主機名(2365)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11358361.html">
+                            6. find和grep的使用(2109)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11153449.html">
+                            7. C中關鍵字inline用法(2037)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11358259.html">
+                            8. vim設定Tab縮進長度(2004)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11530512.html">
+                            9. putty常用配置修改(1734)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11779295.html">
+                            10. Android中getprop命令的使用(1713)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block">
+    <div class="catListFeedback">
+<h3 class="catListTitle">評論排行榜</h3>
+	<div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11968276.html">
+                            1. NXP官方ddr_stress_tester工具使用(2)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11965334.html">
+                            2. DDR基礎知識(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/11471028.html">
+                            3. adb和fastboot的使用(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/12549087.html">
+                            4. ARM Cortex-A7中斷系統基礎知識(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/Cqlismy/p/12152400.html">
+                            5. Uboot啟動流程分析(五)(1)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+
+</div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+    
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推薦排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/Cqlismy/p/11358259.html">
+                                1. vim設定Tab縮進長度(2)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/Cqlismy/p/12549087.html">
+                                2. ARM Cortex-A7中斷系統基礎知識(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/Cqlismy/p/11758391.html">
+                                3. Android實時打印內核log(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div></div>
+                    <script></script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright © 2020 Cqlismy
+<br><span id="poweredby">Powered by .NET Core on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+    
+
+
+<link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3downbar.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/contextmenu.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/tooltip.css?googleapis"><div id="s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha" style="box-sizing: initial !important; position: fixed; white-space: nowrap; width: 100% !important; left: 0px; bottom: 0px; border-top: 1px solid rgb(153, 153, 153); transform-origin: left bottom 0px; z-index: 2147483647; margin: 0px; padding: 2px 0px; background-color: rgb(238, 238, 238); color: rgb(34, 34, 34); display: flex !important; transform: scale(1) !important;"><style type="text/css" media="print">#s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha { display: none !important; }</style><div style="box-sizing: initial !important; position: absolute !important;" id="s3downbar_resize_pane" is_top="false"><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 4 !important;" class="s3dmBox" id="s3downbar_hide_button" is_hidden="false"><div id="s3downbar_hide_button_img" style="box-sizing: initial !important; background-image: url(&quot;moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3dm_icons.png&quot;) !important; display: inline-block !important;"></div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Hide Download Bar</div><div style="box-sizing: initial !important;" class="tooltipText">Ctrl + Shift + Z = Show/Hide Download Bar</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important;" class="s3dmBox" id="s3downbar_main_menu_button" is_hidden="false"><img style="box-sizing: initial !important;" src="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/logo16.png"><span style="box-sizing: initial !important;">下載</span><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Download Manager (S3)</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 2 !important;" class="s3dmBox" id="s3downbar_clear_button" is_hidden="false">清除<div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">按左鍵: 移除全部已完成檔案</div><div style="box-sizing: initial !important;" class="tooltipText">按右鍵: 復原上次清除項目</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 1 !important;" class="s3dmBox" id="s3downbar_holder_summary_progress" is_hidden="false"><div style="box-sizing: initial !important;">100%</div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">下載歷史記錄</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important;" id="s3downbar_download_data_listbox"><div style="box-sizing: initial !important; max-height: 25px !important;" id="s3downbar_download_data_listbox_scroll" list_count="1"><div style="box-sizing: initial !important;" id="s3downbar_download_data_list_empty">Download list is empty</div><div id="s3db_1679091C5A880FAF6FB5E6087EB1B2DC" class="download_data_box db_finishedHbox" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important;" click_handle="finished_click_handle">
+		<div class="download_data_box_iframe_box"><div id="s3downbar_download_box_iframe" is_hidden="true" class="download_data_box_iframe"></div></div>
+		<div id="s3downbar_download_box_progressremainder" class="download_data_box_progressremainder" is_hidden="true"></div>
+		<div id="s3downbar_download_box_progress" class="download_data_box_progress" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important; width: 100% !important;" is_hidden="true"></div>
+		<div id="s3downbar_download_box_data" class="download_data_box_data">
+			<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" id="s3downbar_download_box_img" class="download_data_box_img" style="background: rgba(0, 0, 0, 0) url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACBklEQVQ4jY3RQUiTcRjH8T/4+ILQIUnJRu98HUM301y+Orbc+75zyzXUZGzY0iYMJA9akgchCiOhCBIMPBYkXSroWniLDh6KTgVieTCKECzIDtlJ/XaKiL2THvgen8/lp9TfO3rwgN8pl1KVJ5RSVWqfM7tDN4i3zZQUDowz4jxdVarSLI+IRJ3QDM1GriSjzmE2u8F558l7pSo73BGRmN12jWB9tiSjzuHO2W1msxsMW48+KKXq3YHWKwS9mZKMwxZ6bQS9NkKLkUeJ9LgBVqxlmoA+8E+vn6dZf5fG70nh96QIB8YRkW5XoCs4he1L87jYznS/QzSQZu9TArb6WVlKEGvroys4hRKx3AA72jTJWqYLbnn4uRBkqf8hbyYfsLOagM9Jvi33Em2aRInYboATaZxgd7iD3ZuN7N0/xo/FAZ6lNtlezsBbi721FJHGCZSI4/Iv8bB/jN2eBBSP87IwxfXcJvPndli7ewlehNl55RD2jyEicVegs2GUL74inLbYyp9ibnCee6ML/JprhcVWtubidDaMlgW6TaPI5eohvvsLYCehNwa5MAyZfB2McvtkHNMouq8gIgnTO4KvxuZidZ7Vmgt81AdZ955hxZPl6pE+fDU2pncEEUm4Au16gYZD1r6164WyQDKkD/E/iUiydEZNa67QtEyFVpXfPy2jNK35z9tv0X8pp1I7DfMAAAAASUVORK5CYII=&quot;) no-repeat scroll 50% 50% / contain !important;" no_image="false" is_hidden="false">
+			<img src="" id="s3downbar_download_box_img_queue" class="download_data_box_img" is_hidden="true">
+			<img src="" id="s3downbar_download_box_picToShrink" pictoshrink="true" is_hidden="true" class="download_data_box_img">
+			<div id="s3downbar_download_box_filename" class="download_data_box_filename">Uboot啟動流程分析(四).html</div>
+			<div id="s3downbar_download_box_progress_data" class="download_data_box_progress_data" is_hidden="true">
+				<div id="s3downbar_download_box_progress_percent" class="download_data_box_progress_percent" is_hidden="true">100%</div>
+				<div id="s3downbar_download_box_progress_remaintime" class="download_data_box_progress_remaintime" is_hidden="false">--:--</div>
+				<div id="s3downbar_download_box_progress_bytesReceived" class="download_data_box_progress_bytesReceived" is_hidden="true">874 KB</div>
+				<div id="s3downbar_download_box_progress_speed" class="download_data_box_progress_speed" is_hidden="false">-.--</div>
+			</div>
+		</div>
+	<div style="box-sizing: initial !important; position: fixed !important; z-index: 50 !important;"><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div id="download_data_tooltip" class="download_data_tooltip">
+		<div class="download_data_tooltip_head">
+			<img src="data:image/png;base64,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" id="s3downbar_download_tooltip_img" class="download_data_tooltip_img" no_image="false">
+			<div id="s3downbar_download_tooltip_filename" class="download_data_tooltip_filename">Uboot啟動流程分析(四).html </div>
+		</div>
+		<div class="download_data_tooltip_data_box" id="s3downbar_download_tooltip_data_box" is_hidden_progress="true" is_hidden_finish="false">
+			<table class="download_data_tooltip_data">
+				<tbody><tr id="s3downbar_download_tooltip_source_box" is_hidden="true"><td><div>Source:</div></td><td><input type="text" id="s3downbar_download_tooltip_source" class="download_data_tooltip_url" readonly="true" value=""></td></tr>
+				<tr><td><div>從:</div></td><td><input type="text" id="s3downbar_download_tooltip_from" class="download_data_tooltip_url" readonly="true" title="blob:https://www.cnblogs.com/3f5437c3-1469-4cfe-9c54-37f0b63ec1e5" value="blob:https://www.cnblogs.com/3f5437c3-1469-4cfe-9c54-37f0b63ec1e5"></td></tr>
+				<tr><td><div>儲存至:</div></td><td><div id="s3downbar_download_tooltip_to">C:\Users\redegg\Desktop\my_note\note_vg\uboot\Uboot啟動流程分析(四).html</div></td></tr>
+				<tr class="download_progress"><td><div>狀態:</div></td><td><div id="s3downbar_download_tooltip_status">874 KB / 874 KB ( -.-- )</div></td></tr>
+				<tr class="download_finish"><td><div>檔案大小:</div></td><td><div id="s3downbar_download_tooltip_size" filenotfound="false">874 KB</div></td></tr>
+				<tr class="download_finish" id="s3downbar_download_virus_scan_box" is_hidden="true"><td><div id="s3downbar_download_virus_scan_label">Virus scan:</div></td><td><a id="s3downbar_download_virus_scan" target="_blank"></a></td></tr>
+				<tr><td><div>開始時間:</div></td><td><div id="s3downbar_download_tooltip_timeStart">2020.09.12 - 00:12:46</div></td></tr>
+				<tr class="download_finish"><td><div>完成時間:</div></td><td><div id="s3downbar_download_tooltip_timeEnd">&lt;00:01</div></td></tr>
+				<tr class="download_progress"><td><div>剩餘時間:</div></td><td><div id="s3downbar_download_tooltip_timeLeft">--:--</div></td></tr>
+				<tr class="download_progress"><td><div>完成百分比:</div></td><td><div id="s3downbar_download_tooltip_percent">100%</div></td></tr>
+				<tr class="download_finish"><td><div>平均速度:</div></td><td><div id="s3downbar_download_tooltip_speed">9.59 MB/秒</div></td></tr>
+			</tbody></table>
+			<div class="download_data_tooltip_img_preview_box download_finish"><div class="download_data_tooltip_img_box">
+				<img src="" id="s3downbar_download_tooltip_img_preview" is_hidden="true" class="download_data_tooltip_img_preview download_finish" width="120" height="120">
+				<div id="s3downbar_download_tooltip_img_size" class="download_data_tooltip_img_size"></div>
+			</div></div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_progress" is_hidden="true">
+			<div>mouse double click: download pause/resume</div>
+			<div>mouse middle click: download cancel</div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_finish" is_hidden="false">
+			<div>mouse double click: open file</div>
+			<div>mouse double click + Ctrl: open dir</div>
+			<div style="padding-top: 4px !important;">mouse middle click: delete from list</div>
+			<div>mouse middle click + Ctrl: delete from system</div>
+			<div style="padding-top: 4px !important;">press mouse button + Ctrl: drag &amp; drop</div>
+		</div>
+	</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div></div></div></div></div></body></html>

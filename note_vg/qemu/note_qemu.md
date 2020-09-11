@@ -166,6 +166,15 @@ qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7)
 Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 ```
 
+```
+$ sudo apt install qemubuilder  # some remote library servers are no exist
+$ sudo wget https://download.qemu.org/qemu-5.0.0.tar.xz
+$ tar -xJf ./qemu-5.0.0.tar.xz
+$ cd qemu-5.0.0
+$ mkdir build && mkdir out &&　cd build
+$ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm-softmmu --audio-drv-list=sdl --disable-werror
+```
+
 + uboot
 
     - download
@@ -567,6 +576,20 @@ Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
     ```
     $ killall qemu-system-arm
     ```
+
+## 32-bits uboot
+
+```
+# toolchai: gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi
+$ vi setting.env
+    export PATH=$HOME/.local/bin:$HOME/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+    export ARCH=arm
+    export CROSS_COMPILE=arm-linux-gnueabi-
+
+$ sudo apt install libpython2.7-dev:i386, liblzma-dev:i386
+$ source setting.env
+```
 
 ## kernel image
 
