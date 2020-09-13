@@ -740,6 +740,31 @@ mcr p15, 0, r0, c1, c0{, 0}     @// 將 r0 的值寫到 CP15 的寄存器 C1 中
 | bit[31:16]      | 這些位保留將來使用, 應為 UNP/SBZP
 
 
+# MISC
+
+## Set bit with asm
+
+    ```nasm
+        ldr r0, =0xE010E81C     /* r0 = 0xE010E81C; register address */
+        ldr r1, [r0]            /* r1 = (*r0); */
+        ldr r2, =((0x1 << 0) | (0x1 << 8) | (0x1 << 9))
+        orr r1, r1, r2          /* r1 = r1 | r2; */
+        str r1, [r0]            /* (*r0) = r1; write r1 data to r0 */
+    ```
+
+## 循環右移
+
+先將數值拓展成 word 大小, 往右移時, LSB 則被循環到 MSB, 如此類推
+
+```
+循環右移 0x53
+
+先拓展成 32-bits
+0x0000_0053
+
+右移 1 位 (LSB 循環跑到 MSB)
+0x8000_0029
+```
 
 # reference
 

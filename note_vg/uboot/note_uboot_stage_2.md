@@ -13,7 +13,7 @@ board initialize relocated
 
 # reference
 
-
++ [Uboot啟動流程分析(六)](https://www.cnblogs.com/Cqlismy/p/12194641.html)
 
 
 

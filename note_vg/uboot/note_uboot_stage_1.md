@@ -452,6 +452,27 @@ ENDPROC(cpu_init_crit)
     ENDPROC(_main)
     ```
 
+    - `adr` vs. `mov`
+        > `adr` 是一個**偽指令**, 會再轉譯
+
+        ```nasm
+        adr lr, here
+
+        /* 轉譯 */
+        sub	lr, pc, #172    /* 處理的值, 都是相對於 PC 的 offset */
+        ```
+
+        > `mov` 直接搬移
+
+        ```nasm
+        mov lr, here
+
+        /* linker 處理完 */
+        mov lr, 0x33d00000  /* 直接使用絕對位置 */
+        ```
+
+        1. 如果執行 address 會 relocated, 就需要使用**相對位址**, `mov` 就不適合使用
+
     - `board_init_f_alloc_reserve()`
         > 分配 global_data 的空間
         >> At `common/init/board_init.c`
@@ -571,14 +592,14 @@ board initialize first
 
     ```c
     static const init_fnc_t init_sequence_f[] = {
-        setup_mon_len,
+        setup_mon_len,          /* 設置 gd>mon_len 成員，表示 uboot 代碼的長度 */
     #ifdef CONFIG_OF_CONTROL
         fdtdec_setup,
     #endif
     #ifdef CONFIG_TRACE_EARLY
         trace_early_init,
     #endif
-        initf_malloc,
+        initf_malloc,           /* 初始化 gd 中與 malloc 相關的成員 */
         log_init,
         initf_bootstage,	/* uses its own timer, so does not need DM */
     #ifdef CONFIG_BLOBLIST
@@ -589,27 +610,27 @@ board initialize first
     #if defined(CONFIG_HAVE_FSP)
         arch_fsp_init,
     #endif
-        arch_cpu_init,		/* basic arch cpu dependent setup */
+        arch_cpu_init,		/* basic arch cpu dependent setup, 初始化 arm 架構相關的東西 */
         mach_cpu_init,		/* SoC/machine dependent CPU setup */
-        initf_dm,
+        initf_dm,           /* 初始化驅動模型相關 */
         arch_cpu_init_dm,
     #if defined(CONFIG_BOARD_EARLY_INIT_F)
-        board_early_init_f,
+        board_early_init_f, /* 與板子的早期外設初始化, imx6ul 用來初始化串口 */
     #endif
     #if defined(CONFIG_PPC) || defined(CONFIG_SYS_FSL_CLK) || defined(CONFIG_M68K)
         ...
     #endif
     #if !defined(CONFIG_M68K)
-        timer_init,		/* initialize timer */
+        timer_init,		/* initialize timer, 初始化 Cortex-A7 中的定時器 */
     #endif
     #if defined(CONFIG_BOARD_POSTCLK_INIT)
         board_postclk_init,
     #endif
-        env_init,		/* initialize environment */
-        init_baud_rate,		/* initialze baudrate settings */
-        serial_init,		/* serial communications setup */
-        console_init_f,		/* stage 1 init of console */
-        display_options,	/* say that we are here */
+        env_init,		    /* initialize environment; 和環境變量有關, 設置 gd->env_addr */
+        init_baud_rate,		/* initialze baudrate settings; 初始化串口波特率 */
+        serial_init,		/* serial communications setup; 初始化串口 */
+        console_init_f,		/* stage 1 init of console; 設置 console 標誌位 */
+        display_options,	/* say that we are here; 顯示 uboot 版本和編譯時間字符串 */
         display_text_info,	/* show debugging info if required */
     #if defined(CONFIG_PPC) || defined(CONFIG_SH) || defined(CONFIG_X86)
         ...
@@ -618,13 +639,13 @@ board initialize first
         print_resetinfo,
     #endif
     #if defined(CONFIG_DISPLAY_CPUINFO)
-        print_cpuinfo,		/* display cpu info (and speed) */
+        print_cpuinfo,		/* display cpu info (and speed); 顯示 cpu 的相關信息 */
     #endif
     #if defined(CONFIG_DTB_RESELECT)
         embedded_dtb_select,
     #endif
     #if defined(CONFIG_DISPLAY_BOARDINFO)
-        show_board_info,
+        show_board_info,    /* 顯示 board 的相關信息 */
     #endif
         INIT_FUNC_WATCHDOG_INIT
     #if defined(CONFIG_MISC_INIT_F)
@@ -632,13 +653,13 @@ board initialize first
     #endif
         INIT_FUNC_WATCHDOG_RESET
     #if defined(CONFIG_SYS_I2C)
-        init_func_i2c,
+        init_func_i2c,      /* 初始化 i2c 接口 (實際初始化的是 SPD_BUS) */
     #endif
     #if defined(CONFIG_VID) && !defined(CONFIG_SPL)
         init_func_vid,
     #endif
-        announce_dram_init,
-        dram_init,		/* configure available RAM banks */
+        announce_dram_init, /* 輸出 "DRAM:" 字符串 */
+        dram_init,		    /* configure available RAM banks; 獲取 DDR 的大小 */
     #ifdef CONFIG_POST
         post_init_f,
     #endif
@@ -664,28 +685,28 @@ board initialize first
          *  - monitor code
          *  - board info struct
          */
-        setup_dest_addr,
+        setup_dest_addr,    /* 設置目的地址 (gd->ram_size, gd->ram_top, gd->relocaddr) */
     #ifdef CONFIG_PRAM
         reserve_pram,
     #endif
-        reserve_round_4k,
+        reserve_round_4k,   /* 對 gd->relocaddr 做 4K 對齊 */
     #ifdef CONFIG_ARM
-        reserve_mmu,
+        reserve_mmu,        /* 留出 mmu 的 TLB 表位置 */
     #endif
         reserve_video,
-        reserve_trace,
-        reserve_uboot,
-        reserve_malloc,
-        reserve_board,
+        reserve_trace,      /* 留出 ddr 調試追蹤的內存 */
+        reserve_uboot,      /* 留出重定位 uboot 佔用的位置 */
+        reserve_malloc,     /* 留出 malloc 的內存位置和 ENV 的內存大小 */
+        reserve_board,      /* 留出 bd 所佔用的內存大小(80-bytes) */
         setup_machine,
-        reserve_global_data,
-        reserve_fdt,
+        reserve_global_data,    /* 留出 gd_t 結構的內存大小(248-bytes) */
+        reserve_fdt,        /* 留出設備樹的內存大小 */
         reserve_bootstage,
         reserve_bloblist,
         reserve_arch,
-        reserve_stacks,
+        reserve_stacks,     /* 留出棧空間(16-bytes)並做16-bytes 對齊 */
         dram_init_banksize,
-        show_dram_config,
+        show_dram_config,   /* 顯示 DRAM 的位置 */
     #if defined(CONFIG_M68K) || defined(CONFIG_MIPS) || defined(CONFIG_PPC) || \
         defined(CONFIG_SH)
         ...
@@ -693,15 +714,15 @@ board initialize first
     #if defined(CONFIG_PPC) || defined(CONFIG_M68K)
         ...
     #endif
-        display_new_sp,
+        display_new_sp,     /* 顯示新的 sp 位置 */
     #ifdef CONFIG_OF_BOARD_FIXUP
         fix_fdt,
     #endif
         INIT_FUNC_WATCHDOG_RESET
-        reloc_fdt,
+        reloc_fdt,          /* 重定位 fdt */
         reloc_bootstage,
         reloc_bloblist,
-        setup_reloc,
+        setup_reloc,        /* 設置 gd 結構體的一些其他成員 */
     #if defined(CONFIG_X86) || defined(CONFIG_ARC)
         ...
     #endif
@@ -1301,6 +1322,26 @@ board initialize first
     ENDPROC(relocate_vectors)
     ```
 
+## `c_runtime_cpu_setup`
+
++ sourece code
+    > 用於完成與 ARM 處理器相關的配置.
+
+    ```nasm
+    ENTRY(c_runtime_cpu_setup)
+    /*
+     * If I-cache is enabled invalidate it
+     */
+    #ifndef CONFIG_SYS_ICACHE_OFF
+        mcr     p15, 0, r0, c7, c5, 0   @ invalidate icache
+        mcr     p15, 0, r0, c7, c10, 4  @ DSB
+        mcr     p15, 0, r0, c7, c5, 4   @ ISB
+    #endif
+
+        bx    lr
+
+    ENDPROC(c_runtime_cpu_setup)
+    ```
 
 # Relocated memory layout
 
@@ -1308,6 +1349,9 @@ board initialize first
 
 # reference
 
++ [Uboot啟動流程分析(三)](https://www.cnblogs.com/Cqlismy/p/12006287.html)
++ [Uboot啟動流程分析(四)](https://www.cnblogs.com/Cqlismy/p/12147411.html)
++ [Uboot啟動流程分析(五)](https://www.cnblogs.com/Cqlismy/p/12152400.html)
 + [u-boot啟動流程](https://wowothink.com/146db8db/)
 + [u-boot2020.04移植](https://blog.csdn.net/a1598025967/category_10123105.html)
 + [u-boot v2018.01 啓動流程分析](https://www.twblogs.net/a/5b8e6a002b7177188344fddf)
