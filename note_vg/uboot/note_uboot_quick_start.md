@@ -30,7 +30,7 @@ the version is `201907` or `latest`
     以及提供硬件機制的內存訪問授權.
 
 
-+ `DM` (driver model)
++ `DM` ([U-boot Driver Model](note_uboot_dm.md))
     > 為驅動的定義和訪問接口提供了統一的方法. 提高了驅動之間的兼容性以及訪問的標準型.
     uboot driver model 和 kernel device driver 類似, 但是又有所區別.
 
@@ -307,7 +307,6 @@ DDR 初始化完畢之後, 需要將其 relocate 到 DDR 去運行, 空間大執
 ## [stage2](note_uboot_stage_2.md)
 
 通常用 C 來實現, 這樣可以實現複雜的功能, 而且有更好的可讀性和移植性
-
 
 # Source code
 
