@@ -53,8 +53,7 @@ udevice       udevice
     - App layer 直接使用 uclass 的 interface
 
 
-
-# Analyze code
+# Components of DM
 
 ## uclass id
 
@@ -126,14 +125,13 @@ enum uclass_id {
 + 如何宣告 uclass_driver
 
     ```c
+    #define UCLASS_DRIVER(__name)                       \
+        ll_entry_declare(struct uclass_driver, __name, uclass)
+
     #define ll_entry_declare(_type, _name, _list)               \
         _type _u_boot_list_2_##_list##_2_##_name __aligned(4)   \
                 __attribute__((unused,                          \
                 section(".u_boot_list_2_"#_list"_2_"#_name)))
-
-    #define UCLASS_DRIVER(__name)                       \
-        ll_entry_declare(struct uclass_driver, __name, uclass)
-
 
     UCLASS_DRIVER(serial) = {
         .id             = UCLASS_SERIAL,
@@ -238,6 +236,35 @@ enum uclass_id {
 + Get the udevice
     > 從 uclass 中取得 udevice, 遍歷 `uclass->dev_head`, 獲取對應的 udevice
 
++ udevice API
+
+    - `device_bind()`
+        > At `drivers/core/device.c`
+
+        ```c
+        /* 初始化一個 udevice, 並將其與其 uclass and driver 綁定. */
+        int device_bind(struct udevice *parent, const struct driver *drv,
+                const char *name, void *platdata, int of_offset,
+                struct udevice **devp)
+        ```
+
+    - `device_bind_by_name()`
+        > At `drivers/core/device.c`
+
+        ```c
+        /* 通過 name 獲取 driver 並且調用 device_bind 對 udevice 初始化,
+         * 並將其與其 uclass and driver 綁定
+         */
+        int device_bind_by_name(struct udevice *parent, bool pre_reloc_only,
+                    const struct driver_info *info, struct udevice **devp)
+        ```
+    - `int uclass_bind_device()`
+        > At `drivers/core/uclass.c`
+
+        ```c
+        /* Connect the device into uclass's list of devices. */
+        int uclass_bind_device(struct udevice *dev)
+        ```
 
 ## driver
 
@@ -274,14 +301,13 @@ enum uclass_id {
 + 如何宣告 driver
 
     ```c
+    #define U_BOOT_DRIVER(__name)                        \
+        ll_entry_declare(struct driver, __name, driver)
+
     #define ll_entry_declare(_type, _name, _list)               \
         _type _u_boot_list_2_##_list##_2_##_name __aligned(4)   \
                 __attribute__((unused,                          \
                 section(".u_boot_list_2_"#_list"_2_"#_name)))
-
-    #define U_BOOT_DRIVER(__name)                        \
-        ll_entry_declare(struct driver, __name, driver)
-
 
     U_BOOT_DRIVER(serial_s5p) = {
         .name     = "serial_s5p",
@@ -348,7 +374,759 @@ enum uclass_id {
         struct driver *lists_driver_lookup_name(const char *name);
         ```
 
+## root device
+
+根設備其實是一個虛擬設備, 主要是為 uboot 的其他 devices 提供一個掛載點
+
+相關的定義如下:
+
+```c
+// At drivers/core/root.c
+
+static const struct driver_info root_info = {
+    .name       = "root_driver",
+};
+
+/* This is the root driver - all drivers are children of this */
+U_BOOT_DRIVER(root_driver) = {
+    .name   = "root_driver",
+    .id = UCLASS_ROOT,
+};
+
+/* This is the root uclass */
+UCLASS_DRIVER(root) = {
+    .name   = "root",
+    .id = UCLASS_ROOT,
+};
+```
+
+# DM initial flow
+
++ DM initialize
+    > 創建 root device 的 udevice, 存放在`gd->dm_root`中
+
++ 解析並產生 udevice 和 uclass
+
+    - 創建 udevice 和 uclass
+    - 綁定 udevice 和 uclass
+    - 綁定 uclass_driver 和 uclass
+    - 綁定 driver 和 udevice
+    - 部分 driver 函數的調用
+
++ `initf_dm()` before relocation
+
+    ```c
+    static int initf_dm(void)
+    {
+    #if defined(CONFIG_DM) && CONFIG_VAL(SYS_MALLOC_F_LEN)
+        int ret;
+
+        bootstage_start(BOOTSTATE_ID_ACCUM_DM_F, "dm_f");
+        /*
+         * 對 DM 進行初始化和設備的解析.
+         * 當 dm_init_and_scan 的參數為 true 時,
+         * 只會對帶有 "u-boot,dm-pre-reloc" 屬性的節點進行解析
+         */
+        ret = dm_init_and_scan(true);
+        bootstage_accum(BOOTSTATE_ID_ACCUM_DM_F);
+        if (ret)
+            return ret;
+    #endif
+    #ifdef CONFIG_TIMER_EARLY
+        ret = dm_timer_init();
+        if (ret)
+            return ret;
+    #endif
+
+        return 0;
+    }
+    ```
+
++ `initr_dm()` after relocation
+
+    ```c
+    static int initr_dm(void)
+    {
+        int ret;
+
+        /* Save the pre-reloc driver model and start a new one */
+        gd->dm_root_f = gd->dm_root;    /* 存儲 relocate 之前的根設備 */
+        gd->dm_root = NULL;
+    #ifdef CONFIG_TIMER
+        gd->timer = NULL;
+    #endif
+        bootstage_start(BOOTSTATE_ID_ACCUM_DM_R, "dm_r");
+        /*
+         * 對 DM 進行初始化和設備的解析.
+         * 當 dm_init_and_scan 的參數為 false 時,
+         * 會對所有節點都進行解析
+         */
+        ret = dm_init_and_scan(false);
+        bootstage_accum(BOOTSTATE_ID_ACCUM_DM_R);
+        if (ret)
+            return ret;
+    #ifdef CONFIG_TIMER_EARLY
+        ret = dm_timer_init();
+        if (ret)
+            return ret;
+    #endif
+
+        return 0;
+    }
+    ```
+
+## `dm_init_and_scan()`
+
++ source code
+    > At `driver/core/root.c`
+
+    ```c
+    int dm_init_and_scan(bool pre_reloc_only)
+    {
+        int ret;
+
+        ret = dm_init(IS_ENABLED(CONFIG_OF_LIVE));  /* DM 的初始化 */
+        if (ret) {
+            debug("dm_init() failed: %d\n", ret);
+            return ret;
+        }
+        ret = dm_scan_platdata(pre_reloc_only);     /* 從平台設備中解析 udevice 和 uclass */
+        if (ret) {
+            debug("dm_scan_platdata() failed: %d\n", ret);
+            return ret;
+        }
+
+        if (CONFIG_IS_ENABLED(OF_CONTROL) && !CONFIG_IS_ENABLED(OF_PLATDATA)) {
+            /* 從 dtb 中解析 udevice 和 uclass */
+            ret = dm_extended_scan_fdt(gd->fdt_blob, pre_reloc_only);
+            if (ret) {
+                debug("dm_extended_scan_dt() failed: %d\n", ret);
+                return ret;
+            }
+        }
+
+        ret = dm_scan_other(pre_reloc_only);
+        if (ret)
+            return ret;
+
+        return 0;
+    }
+    ```
+
+## `dm_init()`
+
++ source code
+    > At `drivers/core/root.c`
+    >> + root device 的 udevice, 存放在`gd->dm_root`中
+    >> + root uclass list 則存放在 `gd->uclass_root`
+
+    ```
+    /* 宏定義 root device 指標 gd->dm_root */
+    #define DM_ROOT_NON_CONST           (((gd_t *)gd)->dm_root)
+
+    /* 宏定義 gd->uclass_root (uclass 的 list) */
+    #define DM_UCLASS_ROOT_NON_CONST    (((gd_t *)gd)->uclass_root)
+
+    int dm_init(bool of_live)
+    {
+        int ret;
+
+        if (gd->dm_root) {
+            /* 根設備已經存在, 說明 DM 已經初始化過了 */
+            dm_warn("Virtual root driver already exists!\n");
+            return -EINVAL;
+        }
+
+        /* 初始化 uclass 鏈表 */
+        INIT_LIST_HEAD(&DM_UCLASS_ROOT_NON_CONST);
+
+    #if defined(CONFIG_NEEDS_MANUAL_RELOC)
+        /* 手動重設  method pointers 到 relocation 後的 address */
+        fix_drivers();
+        fix_uclass();
+        fix_devices();
+    #endif
+
+        /**
+         *  DM_ROOT_NON_CONST 是指根設備 udevice, root_info 是表示根設備的設備信息.
+         *  device_bind_by_name 會查找和設備信息匹配的 driver,
+         *  然後創建對應的 udevice 和 uclass 並進行綁定,
+         *  最後放在 DM_ROOT_NON_CONST 中.
+         *  此時 root device 的 udevice 以及對應的 uclass 都已經創建完成
+         */
+        ret = device_bind_by_name(NULL, false, &root_info, &DM_ROOT_NON_CONST);
+        if (ret)
+            return ret;
+    #if CONFIG_IS_ENABLED(OF_CONTROL)
+    # if CONFIG_IS_ENABLED(OF_LIVE)
+        if (of_live)
+            DM_ROOT_NON_CONST->node = np_to_ofnode(gd->of_root);
+        else
+    #endif
+            DM_ROOT_NON_CONST->node = offset_to_ofnode(0);
+    #endif
+        /**
+         *  對 root device 執行 probe 操作
+         */
+        ret = device_probe(DM_ROOT_NON_CONST);
+        if (ret)
+            return ret;
+
+        return 0;
+    }
+    ```
+
+## `dm_extended_scan_fdt()`
+
++ source code
+    > At `drivers/core/root.c`
+
+    ```c
+    static int dm_scan_fdt_node(struct udevice *parent, const void *blob,
+                    int offset, bool pre_reloc_only)
+    {
+        int ret = 0, err;
+
+        /*
+         *  以下是遍歷每一個 dts 節點並且調用 lists_bind_fdt 對其進行解析並綁定
+         *  fdt_first_subnode 獲得 blob 設備樹, 從偏移 offset 處開始
+         */
+        for (offset = fdt_first_subnode(blob, offset);
+             offset > 0;
+             offset = fdt_next_subnode(blob, offset)) {
+            const char *node_name = fdt_get_name(blob, offset, NULL);
+
+            /*
+             * The "chosen" and "firmware" nodes aren't devices
+             * themselves but may contain some:
+             */
+            if (!strcmp(node_name, "chosen") ||
+                !strcmp(node_name, "firmware")) {
+                pr_debug("parsing subnodes of \"%s\"\n", node_name);
+
+                err = dm_scan_fdt_node(parent, blob, offset,
+                               pre_reloc_only);
+                if (err && !ret)
+                    ret = err;
+                continue;   /* 沒有子節點的話則繼續掃瞄下一個節點 */
+            }
+
+            /*
+             *  判斷節點狀態是否是 disable, 如果是的話直接忽略
+             */
+            if (!fdtdec_get_is_enabled(blob, offset)) {
+                pr_debug("   - ignoring disabled device\n");
+                continue;
+            }
+
+            /*
+             *  解析並綁定這個節點
+             */
+            err = lists_bind_fdt(parent, offset_to_ofnode(offset), NULL,
+                         pre_reloc_only);
+            if (err && !ret) {
+                ret = err;
+                debug("%s: ret=%d\n", node_name, ret);
+            }
+        }
+
+        if (ret)
+            dm_warn("Some drivers failed to bind\n");
+
+        return ret;
+    }
+
+    int dm_scan_fdt(const void *blob, bool pre_reloc_only)
+    {
+    #if CONFIG_IS_ENABLED(OF_LIVE)
+        if (of_live_active())
+            return dm_scan_fdt_live(gd->dm_root, gd->of_root,
+                        pre_reloc_only);
+        else
+    #endif
+        /**
+         *  parent         = gd->dm_root, 表示以 root device 作為父設備開始解析
+         *  blob           = gd->fdt_blob, 指定了對應的 dtb data
+         *  offset         = 0, 從偏移 0 的節點開始掃瞄
+         *  pre_reloc_only = 0, 解析 relotion 前或是 relotion 後的設備
+         */
+        return dm_scan_fdt_node(gd->dm_root, blob, 0, pre_reloc_only);
+    }
+
+    int dm_extended_scan_fdt(const void *blob, bool pre_reloc_only)
+    {
+        int ret;
+
+        ret = dm_scan_fdt(blob, pre_reloc_only);
+        if (ret) {
+            debug("dm_scan_fdt() failed: %d\n", ret);
+            return ret;
+        }
+
+        ret = dm_scan_fdt_ofnode_path("/clocks", pre_reloc_only);
+        if (ret) {
+            debug("scan for /clocks failed: %d\n", ret);
+            return ret;
+        }
+
+        ret = dm_scan_fdt_ofnode_path("/firmware", pre_reloc_only);
+        if (ret)
+            debug("scan for /firmware failed: %d\n", ret);
+
+        return ret;
+    }
+    ```
+
++ `lists_bind_fdt()`
+    > At `drivers/core/lists.c`
+
+    ```c
+    int lists_bind_fdt(struct udevice *parent, ofnode node, struct udevice **devp,
+               bool pre_reloc_only)
+    {
+        struct driver *driver = ll_entry_start(struct driver, driver); /* 獲得 driver table start pointer */
+        const int n_ents = ll_entry_count(struct driver, driver);      /* 計算 driver item 的數量 */
+        const struct udevice_id *id;
+        struct driver *entry;
+        struct udevice *dev;
+        bool found = false;
+        const char *name, *compat_list, *compat;
+        int compat_length, i;
+        int result = 0;
+        int ret = 0;
+
+        if (devp)
+            *devp = NULL;
+        name = ofnode_get_name(node);
+        log_debug("bind node %s\n", name);
+
+        /*
+         *  compatible 用來匹配的關鍵詞
+         */
+        compat_list = ofnode_get_property(node, "compatible", &compat_length);
+        if (!compat_list) {
+            if (compat_length == -FDT_ERR_NOTFOUND) {
+                log_debug("Device '%s' has no compatible string\n",
+                      name);
+                return 0;
+            }
+
+            dm_warn("Device tree error at node '%s'\n", name);
+            return compat_length;
+        }
+
+        /*
+         * Walk through the compatible string list, attempting to match each
+         * compatible string in order such that we match in order of priority
+         * from the first string to the last.
+         */
+        for (i = 0; i < compat_length; i += strlen(compat) + 1) {
+            compat = compat_list + i;
+            log_debug("   - attempt to match compatible string '%s'\n",
+                  compat);
+
+            for (entry = driver; entry != driver + n_ents; entry++) {
+                /**
+                 *  搜尋 driver table 裡是否有對應的 compatible string
+                 *  Check if a driver matches a compatible string
+                 */
+                ret = driver_check_compatible(entry->of_match, &id,
+                                  compat);
+                if (!ret)
+                    break;
+            }
+            if (entry == driver + n_ents)
+                continue;   /* 沒有對應的 compatible string */
+
+            if (pre_reloc_only) {
+                /**
+                 *  check 是否有 'u-boot,dm-pre-reloc'
+                 *  或是 'u-boot,dm-pre-proper' 屬性
+                 */
+                if (!dm_ofnode_pre_reloc(node) &&
+                    !(entry->flags & DM_FLAG_PRE_RELOC))
+                    return 0;
+            }
+
+            log_debug("   - found match at '%s': '%s' matches '%s'\n",
+                  entry->name, entry->of_match->compatible,
+                  id->compatible);
+
+            /**
+             *  進行 binding, 將設備節點和 parent 節點建立聯繫, 也就是建立樹形結構.
+             *  device_bind_with_driver_data() -> device_bind_common()
+             */
+            ret = device_bind_with_driver_data(parent, entry, name,
+                               id->data, node, &dev);
+            if (ret == -ENODEV) {
+                log_debug("Driver '%s' refuses to bind\n", entry->name);
+                continue;
+            }
+            if (ret) {
+                dm_warn("Error binding driver '%s': %d\n", entry->name,
+                    ret);
+                return ret;
+            } else {
+                found = true;
+                if (devp)
+                    *devp = dev;
+            }
+            break;
+        }
+
+        if (!found && !result && ret != -ENODEV)
+            log_debug("No match for node '%s'\n", name);
+
+        return result;
+    }
+    ```
+
++ `device_bind_common()`
+    > At `drivers/core/device.c`
+
+    ```c
+    static int device_bind_common(struct udevice *parent, const struct driver *drv,
+                      const char *name, void *platdata,
+                      ulong driver_data, ofnode node,
+                      uint of_platdata_size, struct udevice **devp)
+    {
+        struct udevice *dev;
+        struct uclass *uc;
+        int size, ret = 0;
+
+        if (devp)
+            *devp = NULL;
+        if (!name)
+            return -EINVAL;
+
+        /**
+         *  根據 id 查找同類 uclass, 如果沒有, 就新建一個 uclass
+         */
+        ret = uclass_get(drv->id, &uc);
+        if (ret) {
+            debug("Missing uclass for driver %s\n", drv->name);
+            return ret;
+        }
+
+        /**
+         *  生成一個 udevice
+         */
+        dev = calloc(1, sizeof(struct udevice));
+        if (!dev)
+            return -ENOMEM;
+
+        INIT_LIST_HEAD(&dev->sibling_node);
+        INIT_LIST_HEAD(&dev->child_head);
+        INIT_LIST_HEAD(&dev->uclass_node);
+    #ifdef CONFIG_DEVRES
+        INIT_LIST_HEAD(&dev->devres_head);
+    #endif
+        dev->platdata = platdata;   // 指向設備 platdata
+        dev->driver_data = driver_data;
+        dev->name = name;           // 驅動名字
+        dev->node = node;
+        dev->parent = parent;       // 設置 udevice 的父設備
+        dev->driver = drv;          // 绑定 udevice 和 driver
+        dev->uclass = uc;           // 設置 udevice 的所屬 uclass
+
+        dev->seq = -1;
+        dev->req_seq = -1;
+        if (CONFIG_IS_ENABLED(DM_SEQ_ALIAS) &&
+            (uc->uc_drv->flags & DM_UC_FLAG_SEQ_ALIAS)) {
+            /*
+             * Some devices, such as a SPI bus, I2C bus and serial ports
+             * are numbered using aliases.
+             *
+             * This is just a 'requested' sequence, and will be
+             * resolved (and ->seq updated) when the device is probed.
+             */
+            if (CONFIG_IS_ENABLED(OF_CONTROL) && !CONFIG_IS_ENABLED(OF_PLATDATA)) {
+                if (uc->uc_drv->name && ofnode_valid(node))
+                    dev_read_alias_seq(dev, &dev->req_seq);
+    #if CONFIG_IS_ENABLED(OF_PRIOR_STAGE)
+                if (dev->req_seq == -1)
+                    dev->req_seq =
+                        uclass_find_next_free_req_seq(drv->id);
+    #endif
+            } else {
+                dev->req_seq = uclass_find_next_free_req_seq(drv->id);
+            }
+        }
+
+        if (drv->platdata_auto_alloc_size) {
+            bool alloc = !platdata;
+
+            if (CONFIG_IS_ENABLED(OF_PLATDATA)) {
+                if (of_platdata_size) {
+                    dev->flags |= DM_FLAG_OF_PLATDATA;
+                    if (of_platdata_size <
+                            drv->platdata_auto_alloc_size)
+                        alloc = true;
+                }
+            }
+            if (alloc) {
+                dev->flags |= DM_FLAG_ALLOC_PDATA;
+                /**
+                 *  為 udevice 分配平台數據的空間,
+                 *  由 driver 中的 platdata_auto_alloc_size 決定
+                 */
+                dev->platdata = calloc(1,
+                               drv->platdata_auto_alloc_size);
+                if (!dev->platdata) {
+                    ret = -ENOMEM;
+                    goto fail_alloc1;
+                }
+                if (CONFIG_IS_ENABLED(OF_PLATDATA) && platdata) {
+                    memcpy(dev->platdata, platdata,
+                           of_platdata_size);
+                }
+            }
+        }
+
+        size = uc->uc_drv->per_device_platdata_auto_alloc_size;
+        if (size) {
+            dev->flags |= DM_FLAG_ALLOC_UCLASS_PDATA;
+            dev->uclass_platdata = calloc(1, size);
+            if (!dev->uclass_platdata) {
+                ret = -ENOMEM;
+                goto fail_alloc2;
+            }
+        }
+
+        if (parent) {
+            size = parent->driver->per_child_platdata_auto_alloc_size;
+            if (!size) {
+                size = parent->uclass->uc_drv->
+                        per_child_platdata_auto_alloc_size;
+            }
+            if (size) {
+                dev->flags |= DM_FLAG_ALLOC_PARENT_PDATA;
+                dev->parent_platdata = calloc(1, size);
+                if (!dev->parent_platdata) {
+                    ret = -ENOMEM;
+                    goto fail_alloc3;
+                }
+            }
+        }
+
+        /* put dev into parent's successor list */
+        if (parent)
+            list_add_tail(&dev->sibling_node, &parent->child_head); /* 添加到父設備的子設備 list 中 */
+
+        /**
+         * 綁定 uclass 和 udevice,
+         * 將 udevice 連接到對應的 uclass list (udev->uclass->dev_head) 上
+         */
+        ret = uclass_bind_device(dev);
+        if (ret)
+            goto fail_uclass_bind;
+
+        /* if we fail to bind we remove device from successors and free it */
+        if (drv->bind) {
+            ret = drv->bind(dev);   /* 執行 udevice 對應 driver 的 bind method */
+            if (ret)
+                goto fail_bind;
+        }
+        if (parent && parent->driver->child_post_bind) {
+            ret = parent->driver->child_post_bind(dev); /* 父節點 driver 的 child_post_bind method */
+            if (ret)
+                goto fail_child_post_bind;
+        }
+        if (uc->uc_drv->post_bind) {
+            /* 設備所屬的 uclass_driver 的 post_bind method.
+             * (具體的設備節點就是在這個接口下, 在 soc 下進行展開的)
+             */
+            ret = uc->uc_drv->post_bind(dev);
+            if (ret)
+                goto fail_uclass_post_bind;
+        }
+
+        if (parent)
+            pr_debug("Bound device %s to %s\n", dev->name, parent->name);
+        if (devp)
+            *devp = dev;  /* 將 udevice 進行返回 */
+
+        /**
+         *  設置已經綁定的標誌.
+         *  後續可以通過 'dev->flags & DM_FLAG_ACTIVATED'
+         *  或者 device_active 宏來判斷設備是否已經被激活
+         */
+        dev->flags |= DM_FLAG_BOUND;
+
+        return 0;
+
+     ...
+        return ret;
+    }
+    ```
+
+## `device_probe()`
+
+激活一個設備主要是通過 device_probe(), 主要的流程:
+> + 分配設備的私有數據
+> + 對父設備進行 probe
+> + 執行 probe device 之前 uclass 需要調用的一些函數
+> + 調用 driver 的 ofdata_to_platdata, 將 dts 信息轉化為設備的平台數據
+> + 調用 driver 的 probe()
+> + 執行 probe device 之後 uclass 需要調用的一些函數
+
++ source code
+    > At `drivers/core/device.c`
+
+    ```c
+    int device_probe(struct udevice *dev)
+    {
+        const struct driver *drv;
+        int size = 0;
+        int ret;
+        int seq;
+
+        if (!dev)
+            return -EINVAL;
+
+        /* 表示這個設備已經被激活了 */
+        if (dev->flags & DM_FLAG_ACTIVATED)
+            return 0;
+
+        drv = dev->driver;
+        assert(drv);
+
+        /* Allocate private data if requested and not reentered */
+        if (drv->priv_auto_alloc_size && !dev->priv) {
+            /* 分配私有數據 */
+            dev->priv = alloc_priv(drv->priv_auto_alloc_size, drv->flags);
+            if (!dev->priv) {
+                ret = -ENOMEM;
+                goto fail;
+            }
+        }
+        /* Allocate private data if requested and not reentered */
+        size = dev->uclass->uc_drv->per_device_auto_alloc_size;
+        if (size && !dev->uclass_priv) {
+            /* 為設備所屬 uclass 分配私有數據 */
+            dev->uclass_priv = alloc_priv(size,
+                              dev->uclass->uc_drv->flags);
+            if (!dev->uclass_priv) {
+                ret = -ENOMEM;
+                goto fail;
+            }
+        }
+
+        /* Ensure all parents are probed */
+        if (dev->parent) {
+            size = dev->parent->driver->per_child_auto_alloc_size;
+            if (!size) {
+                size = dev->parent->uclass->uc_drv->
+                        per_child_auto_alloc_size;
+            }
+            if (size && !dev->parent_priv) {
+                dev->parent_priv = alloc_priv(size, drv->flags);
+                if (!dev->parent_priv) {
+                    ret = -ENOMEM;
+                    goto fail;
+                }
+            }
+
+            /* recursive 到最上層 parent */
+            ret = device_probe(dev->parent);
+            if (ret)
+                goto fail;
+
+            /*
+             * The device might have already been probed during
+             * the call to device_probe() on its parent device
+             * (e.g. PCI bridge devices). Test the flags again
+             * so that we don't mess up the device.
+             */
+            if (dev->flags & DM_FLAG_ACTIVATED)
+                return 0;
+        }
+
+        seq = uclass_resolve_seq(dev);
+        if (seq < 0) {
+            ret = seq;
+            goto fail;
+        }
+        dev->seq = seq;
+
+        /* 設置 udevice 的激活標誌 */
+        dev->flags |= DM_FLAG_ACTIVATED;
+
+        /*
+         * Process pinctrl for everything except the root device, and
+         * continue regardless of the result of pinctrl. Don't process pinctrl
+         * settings for pinctrl devices since the device may not yet be
+         * probed.
+         */
+        if (dev->parent && device_get_uclass_id(dev) != UCLASS_PINCTRL)
+            pinctrl_select_state(dev, "default");
+
+        if (CONFIG_IS_ENABLED(POWER_DOMAIN) && dev->parent &&
+            (device_get_uclass_id(dev) != UCLASS_POWER_DOMAIN) &&
+            !(drv->flags & DM_FLAG_DEFAULT_PD_CTRL_OFF)) {
+            ret = dev_power_domain_on(dev);
+            if (ret)
+                goto fail;
+        }
+
+        /* uclass 在 probe device 之前的一些函數的調用 */
+        ret = uclass_pre_probe_device(dev);
+        if (ret)
+            goto fail;
+
+        if (dev->parent && dev->parent->driver->child_pre_probe) {
+            ret = dev->parent->driver->child_pre_probe(dev);
+            if (ret)
+                goto fail;
+        }
+
+        if (drv->ofdata_to_platdata &&
+            (CONFIG_IS_ENABLED(OF_PLATDATA) || dev_has_of_node(dev))) {
+            /* 調用 driver 中的 ofdata_to_platdata,
+             * 將 dts 信息轉化為設備的平台數據
+             */
+            ret = drv->ofdata_to_platdata(dev);
+            if (ret)
+                goto fail;
+        }
+
+        /* Only handle devices that have a valid ofnode */
+        if (dev_of_valid(dev)) {
+            /*
+             * Process 'assigned-{clocks/clock-parents/clock-rates}'
+             * properties
+             */
+            ret = clk_set_defaults(dev, 0);
+            if (ret)
+                goto fail;
+        }
+
+        if (drv->probe) {
+            /* 調用 driver 的 probe method, 到這裡設備才真正激活了 */
+            ret = drv->probe(dev);
+            if (ret) {
+                dev->flags &= ~DM_FLAG_ACTIVATED;
+                goto fail;
+            }
+        }
+
+        ret = uclass_post_probe_device(dev);
+        if (ret)
+            goto fail_uclass;
+
+        if (dev->parent && device_get_uclass_id(dev) == UCLASS_PINCTRL)
+            pinctrl_select_state(dev, "default");
+
+        return 0;
+    ...
+        return ret;
+    }
+    ```
+
 # reference
 
 + [uboot 驅動模型](https://blog.csdn.net/ooonebook/article/details/53234020)
 + [uboot dm-gpio使用方法以及工作](https://blog.csdn.net/ooonebook/article/details/53340441)
+
++ [uboot驱动模型(DM)分析(二)](https://www.cnblogs.com/gs1008612/p/8253213.html)
+    - ![uclass,uclass_driver,udevice,driver之間的關係](https://images2017.cnblogs.com/blog/1288891/201801/1288891-20180109195640754-1116532786.png)
