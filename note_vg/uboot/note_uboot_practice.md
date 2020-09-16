@@ -26,6 +26,328 @@ uboot 實務 [Back](note_uboot_quick_start.md)
     make cscope
     ```
 
+## rootfs
+
++ busybox
+
+    - environment setup
+
+        ```
+        $ vi ./setting.env
+            export ARCH=arm
+            export PATH=$HOME/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            export CROSS_COMPILE=arm-linux-gnueabi-
+        $ source setting.env
+        ```
+
+    - build
+
+        ```bash
+        $ wget https://busybox.net/downloads/busybox-1.31.1.tar.bz2
+        $ tar -xjf busybox-1.31.1.tar.bz2
+        $ cd busybox-1.31.1
+        $ make menuconfig
+            # 勾選 Busybox Setting
+                -> Build Options
+                    -> [*] Build static binary (no shared libs) 或 搜索 CONFIG_STATIC
+        $ make
+        $ make install
+        $ ll
+            ...
+            _install/
+        ```
+
++ `make_rootfs.sh`
+
+    ```bash
+    $ vi ./make_rootfs.sh
+        #!/bin/bash -
+
+        set -e
+
+        base=`pwd`
+        tmpfs=$base/_tmpfs
+        cross_compiler=$HOME/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi
+
+        sudo rm -rf rootfs
+        sudo rm -rf ${tmpfs}
+        sudo rm -f a9rootfs.ext3
+        sudo mkdir rootfs
+        sudo cp _install/*  rootfs/ -raf
+
+        #sudo mkdir -p rootfs/{lib,proc,sys,tmp,root,var,mnt}
+        cd rootfs && sudo mkdir -p lib proc sys tmp root var mnt && cd ${base}
+
+        # copy libc/*.so of arm-gcc
+        sudo cp -arf ${cross_compiler}/arm-linux-gnueabi/libc/lib/*so*  rootfs/lib
+
+        # sudo cp app rootfs
+        sudo cp examples/bootfloppy/etc rootfs/ -arf
+        sudo sed -r  "/askfirst/ s/.*/::respawn:-\/bin\/sh/" rootfs/etc/inittab -i
+        sudo mkdir -p rootfs/dev/
+        sudo mknod rootfs/dev/tty1 c 4 1
+        sudo mknod rootfs/dev/tty2 c 4 2pro
+        sudo mknod rootfs/dev/tty3 c 4 3
+        sudo mknod rootfs/dev/tty4 c 4 4
+        sudo mknod rootfs/dev/console c 5 1
+        sudo mknod rootfs/dev/null c 1 3
+        sudo dd if=/dev/zero of=a9rootfs.ext3 bs=1M count=128
+        # message "No space left on device": you should extend size
+
+        sudo mkfs.ext3 a9rootfs.ext3
+        sudo mkdir -p ${tmpfs}
+        sudo chmod 777 ${tmpfs}
+        sudo mount -t ext3 a9rootfs.ext3 ${tmpfs}/ -o loop
+        sudo cp -r rootfs/*  ${tmpfs}/
+        sudo umount ${tmpfs}
+    $ chmod +x ./make_rootfs.sh
+    ```
+
++ sd image
+
+    ```
+    $ dd if=/dev/zero of=uboot.disk bs=1M count=256
+    $ sgdisk -n 0:0:+10M -c 0:kernel uboot.disk
+    $ sgdisk -n 0:0:0 -c 0:rootfs uboot.disk
+    $ sgdisk -p uboot.disk
+    ...
+        Number  Start (sector)    End (sector)  Size       Code  Name
+           1            2048           22527   10.0 MiB    8300  kernel
+           2           22528          524254   245.0 MiB   8300  rootfs
+    ```
+
+    - map to loop device
+
+        ```
+        $ LOOPDEV=`losetup -f`
+        $ sudo losetup $LOOPDEV  uboot.disk
+        $ sudo partprobe $LOOPDEV
+        $ ls /dev/loop*
+            /dev/loop0    /dev/loop1  /dev/loop4  /dev/loop7
+            /dev/loop0p1  /dev/loop2  /dev/loop5  /dev/loop-control
+            /dev/loop0p2  /dev/loop3  /dev/loop6
+        ```
+
+    - format
+
+        ```
+        $ sudo mkfs.ext4 /dev/loop0p1
+        $ sudo mkfs.ext4 /dev/loop0p2
+        ```
+    - mount
+
+        ```
+        $ mkdir p1 p2
+        $ sudo mount -t ext4 /dev/loop0p1 p1
+        $ sudo mount -t ext4 /dev/loop0p2 p2
+        ```
+
+    - copy data
+
+        ```
+        # 將 zImage 和 dtb 拷貝到 p1
+        # schips @ ubuntu in ~/arm/sc/linux-4.14.14 [17:55:39]
+        $ sudo cp arch/arm/boot/zImage p1
+        $ sudo cp arch/arm/boot/dts/vexpress-v2p-ca9.dtb p1
+
+        # 將 文件系統中的文件拷貝到 p2
+        ## 因為在上一講我已經做好了一個 ext3的鏡像, 所以我直接使用了
+
+        # schips @ ubuntu in ~/arm/sc/linux-4.14.14 [17:59:24] C:1
+        $ sudo mount -t ext3 ../busybox-1.27.0/a9rootfs.ext3 _tmp -o loop
+        $ sudo cp _tmp/* p2 -arf
+        ```
+
+    - unmount
+
+        ```
+        $ sudo umount p1 p2
+        $ sudo losetup -d /dev/loop0
+        ```
+
+    - `z_gen_sd_img.sh`
+
+        ```bash
+        $ vi ./z_gen_sd_img.sh
+            #!/bin/bash
+
+            set -e
+
+            OUT_DISK=uboot.disk
+            PATH_ZIMAGE=
+            PATH_DTB=
+            PATH_ROOTFS=
+
+            PARTITION_NUM=2
+            i=0
+            LOOP_DEV=$(losetup -f)
+
+            dd if=/dev/zero of=${OUT_DISK} bs=1M count=256
+
+            sgdisk -n 0:0:+10M -c 0:kernel ${OUT_DISK}
+            i=$((i+1))
+
+            sgdisk -n 0:0:0 -c 0:rootfs ${OUT_DISK}
+            i=$((i+1))
+
+            if [ $i != $PARTITION_NUM ]; then
+                echo -e "\n!!!! partiotn number is not match !!!!!!"
+                exit -1;
+            fi
+
+            sgdisk -p ${OUT_DISK}
+
+            sudo losetup ${LOOP_DEV}  ${OUT_DISK}
+            sudo partprobe ${LOOP_DEV}
+            ls ${LOOP_DEV}*
+
+            i=1
+            while [ $i -le $PARTITION_NUM ]
+            do
+                mkdir p$i
+                echo -e "\n------ partition format --------"
+                sudo mkfs.ext4 ${LOOP_DEV}p$i
+                echo -e "\n------ mount p$i --------"
+                sudo mount -t ext4 ${LOOP_DEV}p$i p$i
+
+                case $i in
+                    "1")
+                        # ToDo: copy ${PATH_ZIMAGE} and ${PATH_DTB} to partiotn
+                        ;;
+                    "2")
+                        # ToDo: copy ${PATH_ROOTFS} to partiotn
+                        ;;
+                    *)
+                        break;
+                        ;;
+                esac
+
+                (( i++ ))
+            done
+
+            i=1
+            while [ $i -le $PARTITION_NUM ]
+            do
+                echo -e "\n------ umount p$i --------"
+                sudo umount p$i
+                rm -fr p$i
+
+                (( i++ ))
+            done
+
+            sudo losetup -d ${LOOP_DEV}
+
+            echo -e "\n----------- done ---------"
+        ```
+
+## u-boot
+
++ environment setup
+
+    ```
+    $ vi ./setting.env
+        export ARCH=arm
+        export PATH=$HOME/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        export CROSS_COMPILE=arm-linux-gnueabi-
+    $ source setting.env
+    ```
+
++ build
+
+    ```
+    $ wget https://mirror.cyberbits.eu/u-boot/u-boot-2020.07.tar.bz2
+    $ tar -xjf u-boot-2020.07.tar.bz2
+    $ cd u-boot-2020.07
+    $ make vexpress_ca9x4_defconfig
+    $ make
+    ```
+
++ run
+
+    ```bash
+    $ vi ./z_qemu_uboot.sh
+        set -e
+
+        help()
+        {
+            echo -e "usage: $0 <disk_img>"
+            echo -e "    e.g. $0 uboot.disk"
+            exit -1
+        }
+
+        if [ $# != 1 ]; then
+            help
+        fi
+
+        # '-M vexpress-a9'                  模擬vexpress-a9單板, 你能夠使用'-M ?'參數來獲取該 qemu 版本號支持的全部單板
+        # '-m 512M'                         單板執行物理內存 512M
+        # '-kernel arch/arm/boot/zImage'    告訴 qemu 單板執行內核鏡像路徑
+        # '-dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb'     告訴 qemu單板的設備樹(必須加入)
+        # '-nographic'                      不使用圖形化界面, 僅僅使用串口
+        # '-append "console=ttyAMA0" '      內核啟動參數. 這裡告訴內核 vexpress 單板執行. 串口設備是哪個 tty.
+
+        sudo qemu-system-arm -M vexpress-a9 -m 128M -smp 1 -nographic -kernel u-boot -sd $1
+    $ chmod +x ./z_qemu_uboot.sh
+    $ ./z_qemu_uboot.sh uboot.disk
+    ```
+
+## linux 4.14.136
+
++ environment setup
+
+    ```
+    $ vi ./setting.env
+        export ARCH=arm
+        export PATH=$HOME/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        export CROSS_COMPILE=arm-linux-gnueabi-
+    $ source setting.env
+    ```
+
++ build
+
+    ```
+    $ wget http://ftp.ntu.edu.tw/linux/kernel/v4.x/linux-4.14.136.tar.xz
+    $ tar -xZf linux-4.14.136.tar.xz
+    $ cd linux-4.14.136
+    $ make vexpress_defconfig
+    $ make
+    ```
+
++ run
+
+    ```
+    $ vi ./z_qemu_linux.sh
+        set -e
+
+        help()
+        {
+            echo -e "usage: $0 <disk_img>"
+            echo -e "    e.g. $0 linux.disk"
+            exit -1;
+        }
+
+        if [ $# != 1 ]; then
+            help
+        fi
+
+        # '-M vexpress-a9'                  模擬vexpress-a9單板, 你能夠使用'-M ?'參數來獲取該 qemu 版本號支持的全部單板
+        # '-m 512M'                         單板執行物理內存 512M
+        # '-kernel arch/arm/boot/zImage'    告訴 qemu 單板執行內核鏡像路徑
+        # '-dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb'     告訴 qemu單板的設備樹(必須加入)
+        # '-nographic'                      不使用圖形化界面, 僅僅使用串口
+        # '-append "console=ttyAMA0" '      內核啟動參數. 這裡告訴內核 vexpress 單板執行. 串口設備是哪個 tty.
+
+        sudo qemu-system-arm -M vexpress-a9 -m 256M -smp 4 \
+            -kernel arch/arm/boot/zImage \
+            -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
+            -nographic \
+            -append "root=/dev/mmcblk0 rw console=ttyAMA0" \
+            -sd $1
+    $ chmod +x ./z_qemu_linux.sh
+    $ ./z_qemu_linux.sh linux.disk
+    ```
+
+
 ## Host commonds
 
 + 檢查及修復檔案系統指令
