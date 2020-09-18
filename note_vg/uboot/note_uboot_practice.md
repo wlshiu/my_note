@@ -347,6 +347,67 @@ uboot 實務 [Back](note_uboot_quick_start.md)
     $ ./z_qemu_linux.sh linux.disk
     ```
 
+## 64-bits
+
++ `qemu_arm64_defconfig` of uboot
+    > enable DM
+
+    ```bash
+    $ wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+    $ tar -xJf ./gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+
+    $ vi setting.env
+        export ARCH=arm64
+        export PATH=$HOME/toolchain/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        export CROSS_COMPILE=aarch64-linux-gnu-
+
+    $ source ./setting.env
+    $ cd uboot
+    $ make qemu_arm64_defconfig && make
+
+    # gdb server
+    $ qemu-system-aarch64 -machine virt -cpu cortex-a57 -bios u-boot.bin -nographic -s -S
+
+    # gdb client
+    $ aarch64-linux-gnu-gdb u-boot
+        GNU gdb (Linaro_GDB-2019.12) 8.3.1.20191204-git
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+        Type "show copying" and "show warranty" for details.
+        This GDB was configured as "--host=x86_64-unknown-linux-gnu --target=aarch64-linux-gnu".
+        Type "show configuration" for configuration details.
+        For bug reporting instructions, please see:
+        <http://www.gnu.org/software/gdb/bugs/>.
+        Find the GDB manual and other documentation resources online at:
+            <http://www.gnu.org/software/gdb/documentation/>.
+
+        For help, type "help".
+        Type "apropos word" to search for commands related to "word"...
+
+        warning: ~/.gdbinit.local: No such file or directory
+        /home/vng/.gdbinit:97: Error in sourced command file:
+        Invalid type combination in equality test.
+        Reading symbols from u-boot...
+        (gdb) target remote :1234
+        Remote debugging using :1234
+        _start () at arch/arm/cpu/armv8/start.S:31
+        31              b       reset
+        (gdb) b initf_dm
+        Breakpoint 1 at 0x1196c: file common/board_f.c, line 806.
+        (gdb) c
+        Continuing.
+
+        Breakpoint 1, initf_dm () at common/board_f.c:806
+        (gdb)
+    ```
+
++ reference
+
+    - [README.qemu-arm](doc/README.qemu-arm)
+    - [qemu: usb存儲設備仿真](https://www.twblogs.net/a/5bbcfcdb2b71776bd30bc2d2)
+
 
 ## Host commonds
 
@@ -982,8 +1043,9 @@ but adds an additional argument to the mmc interface to describe the hardware pa
     (which you can determine using the part list mmc 0 command)
     you can also use `gzwrite` to flash a compressed partition image.
 
++ reference
 
-
+    - [eMMC之分區管理、總線協議和工作模式](https://blog.csdn.net/u013686019/article/details/66472291)
 
 # reference
 

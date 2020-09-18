@@ -1123,8 +1123,243 @@ UCLASS_DRIVER(root) = {
     }
     ```
 
-# examples
++ 透過 uclass 來取得 udevice 並 probe
+    > At `drivers/core/uclass.c`
 
+    ```c
+    /*
+     * 通過索引從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+     */
+    int uclass_get_device(enum uclass_id id, int index, struct udevice **devp)
+
+    /**
+     *  通過設備名從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+     */
+    int uclass_get_device_by_name(enum uclass_id id, const char *name,
+                      struct udevice **devp)
+
+    /**
+     *  通過序號從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+     */
+    int uclass_get_device_by_seq(enum uclass_id id, int seq, struct udevice **devp)
+
+    /**
+     *  通過 dts 節點的偏移從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+     */
+    int uclass_get_device_by_of_offset(enum uclass_id id, int node,
+                       struct udevice **devp)
+
+    /**
+     *  通過設備的 "phandle" 屬性從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+     */
+    int uclass_get_device_by_phandle(enum uclass_id id, struct udevice *parent,
+                     const char *name, struct udevice **devp)
+
+    /**
+     *  從 uclass 的設備鏈表中獲取第一個 udevice, 並且進行 probe
+     */
+    int uclass_first_device(enum uclass_id id, struct udevice **devp)
+
+    /**
+     *  從 uclass 的設備鏈表中獲取下一個 udevice, 並且進行 probe
+     */
+    int uclass_next_device(struct udevice **devp)
+    ```
+
+# examples of serial
+
+serial-uclass 只操作作為 console 的 serial
+
++ serial uclass driver
+    > At `drivers/serial/serial-uclass.c`
+
+    ```
+    UCLASS_DRIVER(serial) = {
+        .id            = UCLASS_SERIAL,     // 注意這裡的 uclass id
+        .name          = "serial",
+        .flags         = DM_UC_FLAG_SEQ_ALIAS,
+        .post_probe    = serial_post_probe,
+        .pre_remove    = serial_pre_remove,
+        .per_device_auto_alloc_size = sizeof(struct serial_dev_priv),
+    };
+    ```
+
++ serial driver
+
+    - dts (ex. s5pv210 serial)
+
+        ```
+        ...
+        serial@e2900000 {
+            compatible = "samsung,exynos4210-uart"; // 注意這裡的 compatible
+            reg = <0xe2900000 0x100>;
+            interrupts = <0 51 0>;
+            id = <0>;
+        };
+        ```
+
+    - driver source
+
+        ```
+        static const struct udevice_id s5p_serial_ids[] = {
+            { .compatible = "samsung,exynos4210-uart" }, // 注意這裡的 compatible
+            { }
+        };
+
+        U_BOOT_DRIVER(serial_s5p) = {
+            .name       = "serial_s5p",
+            .id         = UCLASS_SERIAL,    // 注意這裡的 uclass id
+            .of_match   = s5p_serial_ids,
+            .ofdata_to_platdata = s5p_serial_ofdata_to_platdata,
+            .platdata_auto_alloc_size = sizeof(struct s5p_serial_platdata),
+            .probe      = s5p_serial_probe,
+            .ops        = &s5p_serial_ops,
+            .flags      = DM_FLAG_PRE_RELOC,
+        };
+        ```
+
++ flow
+
+    - 在 uboot 初始化 DM 時, 創建 udevice 和 uclass 的對應
+    - 在 uboot 初始化 DM 時, 綁定 udevice 和 uclass
+    - udevice 的 probe method
+    - uclass interface
+
+        1. 原則上先從 root_uclass list 中提取對應的 uclass,
+        然後通過 uclass->uclass_driver->ops 來進行 method 調用
+
+        1. 調用 uclass 直接呼叫 API(不推薦, 有些是為了與舊版相容), 像 serial-uclass 使用的是這種方式
+            > 這部分應該屬於 serial core, 但是也放在了 serial-uclass.c 中實現.
+            其他 uclass 也有類似的情況
+
+            ```
+            static void serial_find_console_or_panic(void)
+            {
+                const void *blob = gd->fdt_blob;
+                struct udevice *dev;
+            ...
+                /* skip 部分 code */
+                if (CONFIG_IS_ENABLED(OF_PLATDATA)) {
+                    uclass_first_device(UCLASS_SERIAL, &dev);
+                    if (dev) {
+                        gd->cur_serial_dev = dev;
+                        return;
+                    }
+                } else if (CONFIG_IS_ENABLED(OF_CONTROL) && blob) {
+                    /* Live tree has support for stdout */
+                    if (of_live_active()) {
+                        struct device_node *np = of_get_stdout();
+
+                        /**
+                         *  透過 uclass_get_device_xxx(),
+                         *  從 uclass 的設備鏈表中獲取 udevice, 並且進行 probe
+                         */
+                        if (np && !uclass_get_device_by_ofnode(UCLASS_SERIAL,
+                                np_to_ofnode(np), &dev)) {
+
+                            /**
+                             *  將 udevice 存儲在 gd->cur_serial_dev,
+                             *  後續 uclass 可以直接通過 gd->cur_serial_dev 獲取到對應的設備並且進行操作
+                             *  但是注意, 這種並不是通用做法
+                             */
+                            gd->cur_serial_dev = dev;
+                            return;
+                        }
+                    } else {
+                        if (!serial_check_stdout(blob, &dev)) {
+                            gd->cur_serial_dev = dev;
+                            return;
+                        }
+                    }
+                }
+            ...
+            }
+
+            int serial_init(void)
+            {
+                // 調用 serial_find_console_or_panic 進行作為 console serial的初始化
+                serial_find_console_or_panic();
+                gd->flags |= GD_FLG_SERIAL_READY;
+
+                return 0;
+            }
+            ...
+
+            static void _serial_putc(struct udevice *dev, char ch)
+            {
+                /* 獲取設備對應的 driver 的 ops 操作集 */
+                struct dm_serial_ops *ops = serial_get_ops(dev);
+                int err;
+
+                do {
+                    /* 以udevice為參數, 調用ops中對應的操作函數 */
+                    err = ops->putc(dev, ch);
+                } while (err == -EAGAIN);
+            }
+
+            /* 直接開放 API */
+            void serial_putc(char ch)
+            {
+                if (gd->cur_serial_dev)
+                    /* 將 console 對應的 serial 的 udevice 作為參數傳入 */
+                    _serial_putc(gd->cur_serial_dev, ch);
+            }
+            ```
+
+# examples of dm_gpio
+
+```
+                 app
+                  |
+    --------------------------------
+                  | API
+                  |
+    dts <----> gpio core (instance in gpio uclass)
+                  |
+                gpio uclass ------- gpio uclass_driver
+                  |
+            +-----+-----+
+            |           |
+       gpio udevice  gpio udevice
+          (bank 1)    (bank 2)
+            |           |
+        gpio driver  gpio driver
+            |           |
+           H/w 1       H/w 2
+```
+
++ gpio core
+    > 也在 gpio uclass 中實現
+
+    - 主要是為上層提供接口
+    - 從 dts 中獲取 GPIO 屬性
+    - 從 gpio uclass 的設備鏈表中獲取到相應的 udevice 設備, 並使用其操作集
+
++ gpio uclass
+
+    - 鏈接屬於該 uclass 的所有 gpio udevice 設備
+    - 為 gpio udevice 的 driver 提供統一的操作集接口
+
++ bank 和 gpio
+
+    - 有些平台上, 將某些使用同一組寄存器的 gpio 構成一個 bank, 例如三星的 s5pv210
+    - 並不是所有平台都有 bank 的概念, 例如高通的 GPIO 都有自己獨立的寄存器, 因此可以將高通當成只有一個bank
+
++ gpio udevice
+
+    - 一個 bank 對應一個 gpio udevice, 用 bank 中的偏移來表示具體的 GPIO 號
+    - gpio udevice 的 driver 就會根據 bank 以及 offset 對相應的寄存器上的相應的 bit 進行操作.
+
++ flow
+    - 一個 bank 對應一個 udevice, udevice 中私有數據中存放著該 bank 的信息, 比如相應 register bass 等
+    - APP 層用 gpio_desc 來描述一個 GPIO, 其中包括該 GPIO 所屬的 udevice, 在 bank 內的偏移, 以及標誌位.
+    - APP 層通過調用 gpio core 的接口從 dtsi 獲取到 GPIO 屬性對應的 gpio_desc
+    - APP 層使用 gpio_desc 來作為調用 gpio core 的操作接口的參數
+    - gpio core 從 gpio_desc 提取 udevice, 並調用其 driver 中對應的 methods,
+        以 bank 內的偏移作為其參數(這樣 driver 就能判斷出是哪個 GPIO 了)
+    - driver 中提取 udevice 的私有數據中的 bank 信息, 並進行相應的操作
+
+##
 
 # reference
 
