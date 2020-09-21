@@ -1,4 +1,4 @@
-uboot Device Module [Back](note_uboot_quick_start.md)
+uboot Device Module [[Back](note_uboot_quick_start.md)]
 ---
 
 uboot Device Module (DM) 為 driver 的定義和 interface 提供了統一的方法.

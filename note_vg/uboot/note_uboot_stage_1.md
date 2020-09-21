@@ -1,4 +1,4 @@
-uboot boot Stage 1 [Back](note_uboot_quick_start.md)
+uboot boot Stage 1 [[Back](note_uboot_quick_start.md)]
 ---
 
 # source code

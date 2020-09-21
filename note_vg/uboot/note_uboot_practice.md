@@ -1,4 +1,4 @@
-uboot 實務 [Back](note_uboot_quick_start.md)
+uboot 實務 [[Back](note_uboot_quick_start.md)]
 ---
 
 # simulation
@@ -1046,6 +1046,64 @@ but adds an additional argument to the mmc interface to describe the hardware pa
 + reference
 
     - [eMMC之分區管理、總線協議和工作模式](https://blog.csdn.net/u013686019/article/details/66472291)
+
+
+## `booti`/`bootm`/`bootz`
+
+用於啟動一個 kernel image
+
+```
+=> boot[i/m/z] <Image/zImage> [ramdisk] <dtb>
+```
+
++ `bootm`
+    > Use to boot an application image that is stored in memory (RAM or Flash).
+    >> you should use `setenv` to pass `bootargs` to kernel
+
+    ```
+    假設 Image   的加載地址是 0x20008000,
+         ramdisk 的加載地址是 0x21000000,
+         dtb     的加載地址是 0x22000000
+
+    (1) 只加載 kernel 的情況下
+    bootm 0x20008000
+
+    (2) 加載 kernel 和 ramdisk
+    bootm 0x20008000 0x21000000
+
+    (3) 加載 kernel 和 dtb
+    bootm 0x20008000 - 0x22000000
+
+    (4) 加載 kernel, ramdisk, fdt
+    bootm 0x20008000 0x21000000 0x22000000
+    ```
+
+    - `booti`
+        > booti 是 bootm 命令的一個子集,
+
+        ```
+        # kconfig
+        Command line interface  --->
+            Boot commands  --->
+                [*] bootm
+        ```
+
+        > 要使用 booti 需要 `CONFIG_CMD_BOOTI` 配置項
+        >> `config.h` of board
+
+        ```
+        --- a/include/configs/bubblegum.h
+        +++ b/include/configs/bubblegum.h
+        @@ -71,4 +71,6 @@
+        #define CONFIG_BOARD_EARLY_INIT_F
+        +#define CONFIG_CMD_BOOTI
+        +
+        #endif
+        ```
+
++ `bootz`
+    > boot Linux `zImage` image from memory
+
 
 # reference
 

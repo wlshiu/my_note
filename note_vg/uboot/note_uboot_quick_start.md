@@ -368,6 +368,7 @@ DDR 初始化完畢之後, 需要將其 relocate 到 DDR 去運行, 空間大執
 
 ## [實務範例操作](note_uboot_practice.md)
 
+## [Legacy uImage vs. FIT uImage](note_uboot_img_type.md)
 
 # eMMC
 
