@@ -28,10 +28,23 @@ udevice       udevice
         > 為那些使用相同接口的設備提供了統一的接口.
         e.g. I2C uclass 下可能有 10 個 I2C ports, 4個使用 A chip, 另外 6 個使用 B chip
 
+        > 動態產生 uclass
+
     - uclass_driver
         > 對應 uclass 的驅動程序.
         主要提供 uclass 操作時, 如綁定 udevice 時的一些操作
         >> uclass_driver 會和 uclass 綁定
+
+        > 藉由 link-scrip 靜態產生 uclass_driver table
+
+        ```
+        /* 雖然命名為 uclass, 但實際上是 struct uclass_driver */
+        u_boot_list_2_uclass_1
+        _u_boot_list_2_uclass_2_serial
+        _u_boot_list_2_uclass_2_gpio
+        ...
+        u_boot_list_2_uclass_3
+        ```
 
     - udevice (u-boot device)
         > 簡單說就是抽象具體的設備, 可以理解為 kernel 中的 device.
@@ -39,16 +52,47 @@ udevice       udevice
         udevice 找到對應的 uclass 的方式, 主要是通過 udevice 對應 driver 的 id,
         和 uclass 對應的 uclass_driver 的 id 是否匹配
 
+        > 動態產生 udevice
+
     - driver
         > udevice 的驅動, 可以理解為 kernel 中的 device_driver.
         和底層 H/w 設備通信, 並且為設備提供相對應的 method instances
         >> driver 會和 udevice 綁定
+
+        > 藉由 link-script 靜態產生 driver table
 
 + flow
     > 在 `initf_dm()` 解析 fdt 中的設備的時候, 會動態生成 `udevice`.
     然後找到 udevice 對應的driver, 通過 driver 中的 uclass id 得到 uclass_driver id.
     從 uclass list 中查找對應的 uclass 是否已經生成, 沒有生成的話則動態生成 uclass
 
+    - 先從 driver table 中尋找 `root driver`,
+    再用 `uclass id` 去 uclass_driver table 中尋找 `root uclase_driver`.
+        > `device_bind_by_name()`
+
+    - 動態生成 uclass 並綁定對應的 uclase_driver
+        > `uclass_get()`
+
+    - 動態生成 udevice 並對 `udevice` 綁定對應的 uclass, uclase_driver, 及 driver
+        > `device_bind_common()`
+
+    - 將 uclass 綁定 udevice (雙向 uclass 和 udevice)
+        > `uclass_bind_device()`
+
+    - trigger udevice
+        > `device_probe()`
+
+    - parsing `dtb` data, 試著找 driver 並綁定 uclass
+        > 綁定的動作與 `root uclass` 相同
+
+        ```
+        dm_extended_scan_fdt()
+            -> dm_scan_fdt()
+                > dm_scan_fdt_node()
+                    -> lists_bind_fdt()
+                        -> device_bind_with_driver_data()
+                            -> device_bind_common()
+        ```
 
     - App layer 直接使用 uclass 的 interface
 
@@ -75,6 +119,8 @@ enum uclass_id {
 ```
 
 ## uclass
+
+uclass 只是抽象的概念, 並提供這一類 uclass 的進入點, 實際上是接到各自的 uclass_driver
 
 + structure
     > At `include/dm/uclass.h`

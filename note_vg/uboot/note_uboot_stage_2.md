@@ -335,6 +335,61 @@ board initialize relocated
 + `bootdelay_process()`
 + `autoboot_command()`
 
+## `bootm`
+
++ source code
+    > At `cmd/bootm.c`
+
+    ```c
+    int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+    {
+        /* determine if we have a sub command */
+        argc--; argv++;
+        if (argc > 0) {
+            char *endp;
+
+            simple_strtoul(argv[0], &endp, 16);
+            /* endp pointing to NULL means that argv[0] was just a
+             * valid number, pass it along to the normal bootm processing
+             *
+             * If endp is ':' or '#' assume a FIT identifier so pass
+             * along for normal processing.
+             *
+             * Right now we assume the first arg should never be '-'
+             * 判斷是否有子命令
+             */
+            if ((*endp != 0) && (*endp != ':') && (*endp != '#'))
+                return do_bootm_subcommand(cmdtp, flag, argc, argv);
+        }
+
+        /* 最終調用到 do_bootm_states,
+         * 在 do_bootm_states 中執行的操作如 states 標識所示:
+         * BOOTM_STATE_START
+         * BOOTM_STATE_FINDOS
+         * BOOTM_STATE_FINDOTHER
+         * BOOTM_STATE_LOADOS
+         * BOOTM_STATE_OS_PREP
+         * BOOTM_STATE_OS_FAKE_GO
+         * BOOTM_STATE_OS_GO
+         */
+        return do_bootm_states(cmdtp, flag, argc, argv, BOOTM_STATE_START |
+            BOOTM_STATE_FINDOS | BOOTM_STATE_FINDOTHER |
+            BOOTM_STATE_LOADOS |
+    #ifdef CONFIG_SYS_BOOT_RAMDISK_HIGH
+            BOOTM_STATE_RAMDISK |
+    #endif
+    #if defined(CONFIG_PPC) || defined(CONFIG_MIPS)
+            BOOTM_STATE_OS_CMDLINE |
+    #endif
+            BOOTM_STATE_OS_PREP | BOOTM_STATE_OS_FAKE_GO |
+            BOOTM_STATE_OS_GO, &images, 1);
+    }
+    ```
+
++ reference
+    - [第01節_傳遞dtb給內核](https://blog.51cto.com/11134889/2326410)
+    - [uboot啟動kernel篇(二)——bootm跳轉到kernel的流程](https://blog.csdn.net/ooonebook/article/details/53495021)
+
 # reference
 
 + [Uboot啟動流程分析(六)](https://www.cnblogs.com/Cqlismy/p/12194641.html)
