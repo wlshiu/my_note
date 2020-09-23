@@ -53,6 +53,8 @@ Bootloader 會將這棵樹傳遞給 kernel, 然後 kernel 可以識別這棵樹,
     >> interrupt nexus 需要在不同的 interrupt domains 之間進行轉譯,
     需要定義 `interrupt-map` 的屬性
 
++ offset (偏移量)
+    > 第幾級的 node
 
 + block device
     > 以 block為單位來操作, e.g. flash
@@ -467,24 +469,41 @@ device-tree/
 |  DTB header                  |
 | (struct boot_param_header)   |
 +------------------------------+
-|           alignment padding  |
+|  64-bytes alignment padding  |
 +------------------------------+
 |  memory reserve              |
 |       map                    |
 +------------------------------+
-|           alignment padding  |
+|  64-bytes alignment padding  |
 +------------------------------+
 |   device-tree                |
 |   structure block            |
 +------------------------------+
-|           alignment padding  |
+|  64-bytes alignment padding  |
 +------------------------------+
 |   device-tree                |
 |   strings block              |
 +------------------------------+
+
+* 64-bytes alignment padding: 相容 64-bits platform
 ```
 
 + DTB header
+
+```c
+struct boot_param_header {
+    __be32 magic;           //設備樹魔數, 固定為 0xd00dfeed
+    __be32 totalsize;       //整個設備樹的大小
+    __be32 off_dt_struct;   //保存結構塊在整個設備樹中的偏移
+    __be32 off_dt_strings;  //保存的字符串塊在設備樹中的偏移
+    __be32 off_mem_rsvmap;  //保留內存區,該區保留了不能被內核動態分配的內存空間
+    __be32 version;         //設備樹版本
+    __be32 last_comp_version; //向下兼容版本號
+    __be32 boot_cpuid_phys; //為在多核處理器中用於啟動的主 cpu 的物理 id
+    __be32 dt_strings_size; //字符串塊大小
+    __be32 dt_struct_size;  //結構塊大小
+};
+```
 
     - `magic`
         > 用來識別 DTB 的.
@@ -528,7 +547,14 @@ device-tree/
     每個 reserve memory 描述符是由 `address` 和 `size`組成.
     其中 address 和 size 都是用 `U64` 來描述
 
-+ device tree structure
+    ```c
+    struct fdt_reserve_entry {
+        fdt64_t address;
+        fdt64_t size;
+    };
+    ```
+
++ device tree structure block
     > device tree structure block 區域是由若干的 slices 組成,
     每個 slices 開始位置都是保存了 token, 以此來描述該分片的屬性和內容.
     共計有5種token：
@@ -543,7 +569,15 @@ device-tree/
     >> 該 token 描述了一個 property 的開始位置, 該 token 之後是兩個u32的數據, 分別是 `length` 和 `name offset`.
     `length` 表示該 property value data 的 size.
     `name offset` 表示該屬性字符串在 device tree strings block 的偏移值.
-    length 和 name offset 之後就是長度為 length 具體的屬性值數據。
+    length 和 name offset 之後就是長度為 length 具體的屬性值數據.
+
+    ```c
+    struct fdt_prop {
+        uint32_t    length;
+        uint32_t    offset;     // base address is string block address
+        uint8_t     value[];    // the value data
+    };
+    ```
 
     > - `FDT_NOP` (0x00000004)
 
@@ -586,11 +620,19 @@ device-tree/
         FDT_END
         ```
 
-+ device tree strings
++ device tree strings block
     > 定義了各個 node 中使用的屬性的字符串表.
     由於很多屬性會出現在多個 node 中,
     因此所有的屬性字符串組成了一個 string block (這樣可以壓縮 DTB 的 size).
 
+    - DTS use `key-value` format.
+        > `string block` records `key` and `structure block` records `value`
+
+        ```
+        compatible     = "test_tree1"
+            key             value
+        (string block)    (structure block)
+        ```
 
 # kernel flow with DTB
 
