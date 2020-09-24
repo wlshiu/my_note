@@ -409,6 +409,12 @@ uboot 實務 [[Back](note_uboot_quick_start.md)]
     - [qemu: usb存儲設備仿真](https://www.twblogs.net/a/5bbcfcdb2b71776bd30bc2d2)
 
 
+## ramdisk booting
+
++ reference
+
+    - [BeagleBone ramdisk booting](http://karlkwchen.blogspot.com/2017/11/beaglebone-ramdisk-booting.html)
+
 ## Host commonds
 
 + 檢查及修復檔案系統指令

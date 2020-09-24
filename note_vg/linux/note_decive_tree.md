@@ -54,7 +54,7 @@ Bootloader 會將這棵樹傳遞給 kernel, 然後 kernel 可以識別這棵樹,
     需要定義 `interrupt-map` 的屬性
 
 + offset (偏移量)
-    > 第幾級的 node
+    > 以 `structure block` 為 base 的 offset
 
 + block device
     > 以 block為單位來操作, e.g. flash
@@ -463,6 +463,8 @@ device-tree/
 
 ## binary architecture
 
+參數以 `big-endian` 儲存
+
 ```
 # DTB
 +------------------------------+
@@ -572,10 +574,11 @@ struct boot_param_header {
     length 和 name offset 之後就是長度為 length 具體的屬性值數據.
 
     ```c
-    struct fdt_prop {
-        uint32_t    length;
-        uint32_t    offset;     // base address is string block address
-        uint8_t     value[];    // the value data
+    struct fdt_property {
+        fdt32_t tag;        // FDT_PROP == 0x00000003
+        fdt32_t len;        // data length. if string type, length = strlen(xxx).
+        fdt32_t nameoff;    // base address is string block address
+        char data[0];       // the value data
     };
     ```
 
@@ -1252,3 +1255,5 @@ base kernel v3.14
     - DTB加載及解析過程 (uboot)
 
 + [Booting ARM Linux](http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html)
++ [設備樹(device tree)學習筆記](https://www.cnblogs.com/pengdonglin137/p/4495056.html)
++ [linux設備樹筆記--dts基本概念及語法](https://e-mailky.github.io/2016-12-06-dts-introduce)
