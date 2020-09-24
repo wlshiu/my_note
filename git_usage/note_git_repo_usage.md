@@ -336,6 +336,28 @@
             $ git checkout origin/master <conflict files>
             ```
 
+- Git mergetool with p4merge (GUI)
+
+    + difftool
+
+        ```
+        $ git config --global diff.tool p4merge
+        $ git config --global difftool.p4merge.path "$PROGRAMFILES\Perforce\p4merge.exe"
+        $ git config --global difftool.prompt false  # disable comfirm window
+
+        $ git difftool
+        ```
+
+    + mergetool
+
+        ```
+        $ git config --global mergetool.keepBackup false    # disable backup
+        $ git config --global merge.tool p4merge
+        $ git config --global mergetool.p4merge.cmd  "$PROGRAMFILES\Perforce\p4merge.exe $LOCAL $REMOTE $BASE $MERGED"
+        $ git config --global mergetool.p4merge.trustExitCode true
+
+        $ git mergetool
+        ```
 
 - Git apply / Git am  (加入patch)
     + patch 由 git diff 產生
@@ -525,7 +547,7 @@
         ```
 
     - download tag projects
-    
+
         ```
         repo init -u git@url_manifest.git -b refs/tags/tag_v1.3
         ```
@@ -640,7 +662,7 @@
 
         ```
         repo forall -p -c git tag tag_v1.3
-        repo forall -p -c git push origin --tags        
+        repo forall -p -c git push origin --tags
         ```
 + create manifest
 
@@ -654,7 +676,7 @@
         # you also can add to default attribute of xml
         <default revision="refs/tags/tag_v1.3"
                 remote="aosp"
-                sync-j="4" />        
+                sync-j="4" />
 
     $ git add target_manifest.xml
     $ git commit -m "release v1.3"
