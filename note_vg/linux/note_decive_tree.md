@@ -395,10 +395,30 @@ device-tree/
 + `interrupts`
     > 一個能產生中斷的設備, 必須要定義`interrups`這屬性.
 
+    - format
+        > 默認 element 順序
+
+        ```
+        <IRQ index> <IRQ trigger type> <IRQ priority>
+        ```
+
+        - IRQ index
+            > interrupt index number
+
+        - IRQ trigger type
+            > + rising edge triggered  = 1
+            > + falling edge triggered = 2
+            > + high level-sensitive   = 4
+            > + low level-sensitive    = 8
+
+        - IRQ priority
+            > 0 是最高的, 7 是最低的
+            >> 其中 0 級的中斷, 系統當做 FIQ 處理
+
 + `interrupt-controller`
     > 用來表示該 node 是一個 H/w interrupt-controller 而不是interrupt nexus
 
-+ `interrupt-cells`
++ `#interrupt-cells`
     > 用來表示 interrupt-controller 需要幾個 cells,
     來描述 interrupt specifier (interrupt source)
 
@@ -458,6 +478,105 @@ device-tree/
         phandle = <0x1>;
     };
     ```
+
+## exampe 4
+
+```
+/ {
+    compatible = "acme,coyotes-revenge";
+    #address-cells = <1>;
+    #size-cells = <1>;
+    ...
+    external-bus {
+        #address-cells = <2>;
+        #size-cells = <1>;
+        ranges = <0 0 0x10100000 0x10000     // Chipselect 1, Ethernet
+                  1 0 0x10160000 0x10000     // Chipselect 2, i2c controller
+                  2 0 0x30000000 0x1000000>; // Chipselect 3, NOR Flash
+
+        ethernet@0,0 {
+            compatible = "smc,smc91c111";
+            reg = <0 0 0x1000>;
+        };
+
+        i2c@1,0 {
+            compatible = "acme,a1234-i2c-bus";
+            #address-cells = <1>;
+            #size-cells = <0>;
+            reg = <1 0 0x1000>;
+            rtc@58 {
+                compatible = "maxim,ds1338";
+                reg = <58>;
+            };
+        };
+
+        flash@2,0 {
+            compatible = "samsung,k8f1315ebm", "cfi-flash";
+            reg = <2 0 0x4000000>;
+        };
+    };
+
+    soc {
+        compatible = "simple-bus";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges = <0x0 0xe0000000 0x00100000>;
+        serial {
+            device_type = "serial";
+            compatible = "ns16550";
+            reg = <0x4600 0x100>;
+            clock-frequency = <0>;
+            interrupts = <0xA 0x8>;
+            interrupt-parent = < &ipic >;
+        }
+    }
+};
+```
+
++ `ranges`
+    > a list of address translations
+
+    - format
+        > 主要由 3 個部分組成, 子地址, 父地址, 區域大小
+
+        ```
+        <child address>, <parent address>, <the size of the region>
+        ```
+
+        1. child address
+            > 長度對應到 `#address-cells` of child node
+        1. parent address
+            > 長度對應到 `#address-cells` of parent node
+        1. the size of the region
+            > 長度對應到 `#size-cells` of child node
+
+    - 分析
+
+        ```
+        child's #address-cells is 2
+        parent's #address-cells is 1
+        child's #size-cells is 1
+
+        child's #address | parent's #address  | child's #size
+                         |                    |
+        ranges = <0 0    | 0x10100000         | 0x10000
+                  1 0    | 0x10160000         | 0x10000
+                  2 0    | 0x30000000         | 0x1000000>;
+        ```
+
+        1. Offset 0 from chip select 0 is mapped to address range 0x10100000 ~ (0x10100000 + 0x10000 - 1)
+        1. Offset 0 from chip select 1 is mapped to address range 0x10160000 ~ (0x10160000 + 0x10000 - 1)
+        1. Offset 0 from chip select 2 is mapped to address range 0x30000000 ~ (0x30000000 + 0x1000000 - 1)
+
+        1. `soc node`
+            > ranges 屬性指定了, 從 physical address 為 0x0 大小為 0x00100000 的子節點,
+            映射到了 physical address 為 0xe0000000 的父地址空間.
+            有個這層映射關係, `serial node` 就可以通過 load/store 地址 0xe0004600 來訪問,
+            (即 0x4600 + 0xe0000000)
+
+    - 如果 parent node 和 child node 的地址空間是相同的, 可以添加一個空的ranges屬性.
+    一個空的 ranges 屬性, 意味著 child node 的 address, 是 1:1 對應到 parent node address
+
 
 # DTB
 
@@ -1257,3 +1376,5 @@ base kernel v3.14
 + [Booting ARM Linux](http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html)
 + [設備樹(device tree)學習筆記](https://www.cnblogs.com/pengdonglin137/p/4495056.html)
 + [linux設備樹筆記--dts基本概念及語法](https://e-mailky.github.io/2016-12-06-dts-introduce)
+
++ [(DT系列三)系統啟動時, dts 是怎麼被加載的](https://www.cnblogs.com/biglucky/p/4057481.html)

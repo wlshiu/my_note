@@ -893,6 +893,80 @@ Device Firmware Upgrade
         Ctrl+C to exit ...
         ```
 
+### the `dfu` command uses 3 environments variables
+
++ `dfu_alt_info`
+    > the DFU setting for the USB download gadget with a semicolon
+    separated string of information on each alternate:
+    dfu_alt_info="<alt1>;<alt2>;....;<altN>"
+
+    - `ram`
+        > 當 uboot 端使用 `=> dfu 0 ram <dev>` (<dev> is not used for RAM target)
+
+        ```
+        dfu_alt_info = <filename> ram <offset> <size>  # raw access to ram
+
+        e.g.
+        dfu_alt_info = u-boot.bin ram 0x43E00000 0x100000;rootfs ram 0x40000000 0x100000;
+        ```
+
+    - `mmc`
+        > 當 uboot 端使用 `=> dfu 0 mmc <dev>`
+
+        ```
+        each element in "dfu_alt_info" =
+            <filename> raw <offset> <size> [mmcpart <num>]   # raw access to mmc device
+            <filename> part <dev> <part_id> [mmcpart <num>]  # raw access to partition
+            <filename> fat <dev> <part_id> [mmcpart <num>]   # file in FAT partition
+            <filename> ext4 <dev> <part_id> [mmcpart <num>]  # file in EXT4 partition
+
+            with <part_id> being the GPT or DOS partition index,
+            with <num> being the eMMC 'hardware partition number'.
+        ```
+
+        1. example
+
+            ```
+            # u-boot 以 raw data 寫到 eMMC H/w partition 1 中, offset 0x3e 的位置, 長度為 0x800
+            dfu_alt_info = u-boot raw 0x3e 0x800 mmcpart 1;bl2 raw 0x1e 0x1d mmcpart 1;
+
+            # 將檔案 u-boot 以 fat 格式寫到 device 0 的 partition 1
+            # 將檔案 bl2 以 ext4 格式寫到 device 0 的 partition 2
+            dfu_alt_info = u-boot fat 0 1;bl2 ext4 0 2;
+            ```
+
+    - `nand`
+        > 當 uboot 端使用 `=> dfu 0 nand <dev>`
+
+        ```
+        each element in "dfu_alt_info" =
+            <filename> raw <offset> <size>      # raw access to nand device
+            <filename> part <dev> <part_id>     # raw acces to partition
+            <filename> partubi <dev> <part_id>  # raw acces to ubi partition
+
+            with <part_id> is the MTD partition index
+        ```
+
+    - `sf` (serial flash: NOR)
+        > 當 uboot 端使用 `=> dfu 0 sf <dev>`
+
+        ```
+        each element in "dfu_alt_info" =
+            <filename> ram <offset> <size>      # raw access to sf device
+            <filename> part <dev> <part_id>     # raw acces to partition
+            <filename> partubi <dev> <part_id>  # raw acces to ubi partition
+
+            with <part_id> is the MTD partition index
+        ```
+
++ `dfu_bufsiz`
+    > size of the DFU buffer, when absent, use
+    `CONFIG_SYS_DFU_DATA_BUF_SIZE` (8 MiB by default)
+
++ `dfu_hash_algo`
+    > name of the hash algorithm to use
+
+
 ## `mmc`
 
 U-Boot provides access to eMMC devices through the `mmc` command and interface
