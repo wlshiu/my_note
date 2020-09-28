@@ -1361,6 +1361,179 @@ base kernel v3.14
         }
         ```
 
+##  OF API in linux
+
+設備樹 API 通常以 `of_` 開頭, source code 位於`drivers/of` 及 `include/linux/of_*.h`
+
+```
+$ ls drivers/of
+    address.c  fdt.c      of_mtd.c  of_pci_irq.c       pdt.c
+    base.c     irq.c      of_net.c  of_private.h       platform.c
+    device.c   of_mdio.c  of_pci.c  of_reserved_mem.c  selftest.c
+$ ls include/linux/of_*
+    of_address.h       of_gpio.h          of_mdio.h          of_pdt.h
+    of_device.h        of.h               of_mtd.h           of_platform.h
+    of_dma.h           of_iommu.h         of_net.h           of_reserved_mem.h
+    of_fdt.h           of_irq.h           of_pci.h
+```
+
++ header
+
+    ```
+    /* At of.h */
+
+    typedef u32 phandle;
+    typedef u32 ihandle;
+
+    struct property {
+        char    *name;
+        int length;
+        void    *value;
+        struct property *next;
+        unsigned long _flags;
+        unsigned int unique_id;
+    };
+    struct device_node {
+        const char *name;
+        const char *type;
+        phandle phandle;
+        const char *full_name;
+
+        struct  property *properties;
+        struct  property *deadprops;    /* removed properties */
+        struct  device_node *parent;
+        struct  device_node *child;
+        struct  device_node *sibling;
+        struct  device_node *next;  /* next device of same type */
+        struct  device_node *allnext;   /* next in list of all nodes */
+        struct  proc_dir_entry *pde;    /* this node's proc directory */
+        struct  kref kref;
+        unsigned long _flags;
+        void    *data;
+    #if defined(CONFIG_SPARC)
+        const char *path_component_name;
+        unsigned int unique_id;
+        struct of_irq_controller *irq_trans;
+    #endif
+    };
+
+    #define MAX_PHANDLE_ARGS 8
+    struct of_phandle_args {
+        struct device_node *np;
+        int args_count;
+        uint32_t args[MAX_PHANDLE_ARGS];
+    };
+    #define of_match_ptr(_ptr)  (_ptr)
+    ```
+
++ search node
+
+    - `of_device_is_compatible`
+        > 判斷設備結點的 compatible 屬性是否包含 compat 指定的字符串.
+        當一個驅動支持 2 個或多個設備的時候, 這些不同`.dts`文件中設備的 compatible 屬性都會進入驅動 OF 匹配表.
+        因此驅動可以透過 Bootloader 傳遞給內核的 Device Tree 中, 真正 node 的 compatible 屬性,
+        以確定究竟是哪一種設備, 從而根據不同的設備類型進行不同的處理.
+
+        ```c
+        int of_device_is_compatible(const struct device_node *device, const char *compat);
+        ```
+
+    - `of_find_compatible_node`
+        > 根據 compatible 屬性, 獲得設備結點.
+        遍歷 Device Tree 中所有的設備結點, 看看哪個 ndoe 的類型, compatible 屬性與本函數的輸入參數匹配,
+        大多數情況下, `from` 和 `type` 為 NULL, 則表示遍歷所有節點.
+
+        ```c
+        struct device_node *of_find_compatible_node(struct device_node *from, const char *type, const char *compatible);
+        ```
+
++ get property
+
+    - `of_property_read_uXX_array`
+        > 讀取設備結點 np 的屬性名為 propname, 類型為8、16、32、64位整型數組的屬性.
+        對於32位處理器來講, 最常用的是of_property_read_u32_array()。
+
+        ```
+        int of_property_read_u8_array(const struct device_node *np,
+                             const char *propname, u8 *out_values, size_t sz);
+
+        int of_property_read_u16_array(const struct device_node *np,
+                              const char *propname, u16 *out_values, size_t sz);
+
+        int of_property_read_u32_array(const struct device_node *np,
+                              const char *propname, u32 *out_values, size_t sz);
+
+        int of_property_read_u64(const struct device_node *np,
+                              const char *propname, u64 *out_value);
+        ```
+
+        1. example
+
+            ```
+            of_property_read_u32_array(np, "arm,data-latency", data, ARRAY_SIZE(data));
+            of_property_read_u32_array(np, propname, out_value, 1);
+            ```
+
+    - `of_property_read_string`
+        > 前者讀取字符串屬性, 後者讀取字符串數組屬性中的第index個字符串.
+
+        ```
+        int of_property_read_string(struct device_node *np,
+                        const char *propname, const char **out_string);
+
+        int of_property_read_string_index(struct device_node *np,
+                        const char *propname, int index, const char **output);
+        ```
+
+    - `of_property_read_bool`
+        > 如果設備結點 np 含有 propname 屬性, 則返回true, 否則返回false.
+        一般用於檢查空屬性是否存在.
+
+        ```
+        static inline bool of_property_read_bool(const struct device_node *np,
+                                                 const char *propname);
+        ```
+
++ memory mapping
+
+    - `of_iomap`
+        > 通過設備結點直接進行設備內存區間的 ioremap(), index 是內存段的索引.
+        若設備結點的 reg 屬性有多段, 可通過 index 標示要 ioremap 的是哪一段, 只有 1 段的情況, index 為 0.
+        採用 Device Tree 後, 大量的設備驅動通過 `of_iomap()` 進行映射, 而不再通過傳統的 ioremap
+
+        ```
+        void __iomem *of_iomap(struct device_node *node, int index);
+        ```
+
++ interrupt
+
+    - `irq_of_parse_and_map`
+        > 透過 Device Tree 或者設備的中斷號, 實際上是從`.dts`中的`interrupts`屬性解析出中斷號.
+        若設備使用了多個中斷, index 指定中斷的索引號.
+
+        ```
+        unsigned int irq_of_parse_and_map(struct device_node *dev, int index);
+        ```
+
++ platform device
+
+    - `of_find_device_by_node`
+        > 在拿到 device_node 的情況下, 反向獲取對應的 platform_device.
+
+        ```
+        struct platform_device *of_find_device_by_node(struct device_node *np);
+        ```
+    - 有 platform_device 的情況下, 獲得 device_node
+        > 記錄在 member `of_node`
+
+        ```
+        static int imx_gpio_probe (struct platform_device *op)
+        {
+             struct device_node *dn = op->dev.of_node;
+             ...
+        }
+        ```
+
 # reference
 
 + [Device Tree(一):背景介紹](http://www.wowotech.net/linux_kenrel/why-dt.html)

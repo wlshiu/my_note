@@ -1191,3 +1191,88 @@ but adds an additional argument to the mmc interface to describe the hardware pa
 + [UBOOT 中利用 CONFIG_EXTRA_ENV_SETTINGS 宏來設置默認ENV](https://blog.csdn.net/weixin_42418557/article/details/89018965)
 + [Zero u-boot編譯和使用指南](https://licheezero.readthedocs.io/zh/latest/%E8%B4%A1%E7%8C%AE/article%204.html)
 
+
+# risc-v
+
++ uboot
+
+    - toolchain
+
+        ```
+        $ sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev git libexpat1-dev
+
+        # 一次連 submodule 都下載
+        $ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+
+        # 分段下載
+        $ git clone https://github.com/riscv/riscv-gnu-toolchain
+        $ git rm qemu       # 移除 qemu submodule, 降低資料量
+        $ git submodule update --init --recursiv
+        ```
+
+        1. architectures
+            > Supported architectures are `rv32i` or `rv64i` plus standard extensions
+            > + `(a)tomics`
+            > + `(m)ultiplication and division`
+            > + `(f)loat`
+            > + `(d)ouble`
+            > + `(g)eneral for MAFD`
+
+            ```
+            #
+            $ cd riscv-gnu-toolchain && mkdir build && cd build
+            $ ../configure --with-arch=rv32ima --prefix=${HOME}/toolchain/riscv32_toolchain
+            ## '--with-arch' default rv64imafdc
+            ```
+
+        1. Supported ABIs
+            > + `ilp32 (32-bit soft-float)`
+            > + `ilp32d (32-bit hard-float)`
+            > + `ilp32f (32-bit with single-precision in registers and double in memory, niche use only)`
+            > + `lp64`
+            > + `lp64f`
+            > + `lp64d (same but with 64-bit long and pointers)`
+
+
+        1. ubuntu pre-build
+
+            ```
+            $ sudo apt install gcc-riscv64-linux-gnu
+            $ vi ./setting_riscv.env
+                export ARCH=riscv
+                export PATH=${HOME}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+                export CROSS_COMPILE=riscv64-linux-gnu-
+            $ source ./setting_riscv.env
+            ```
+
+    - env
+
+        ```
+        $ vi ./setting_riscv.env
+            export ARCH=riscv
+            export PATH=${HOME}/toolchain/riscv32_toolchain/bin:${HOME}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            export CROSS_COMPILE=riscv32-unknown-elf-
+        $ source ./setting_riscv.env
+        ```
+
+    - build
+
+        ```
+        $ make qemu-riscv32_defconfig
+            or
+        $ make qemu-riscv64_defconfig
+
+        $ make
+        ```
+
+    - run qemu
+        > qemu 5.1 的 risc-v 有問題, 請使用 qemu 4
+
+        ```
+        $ qemu-system-riscv32 -nographic -machine virt -bios u-boot
+            or
+        $ qemu-system-riscv64 -nographic -machine virt -bios u-boot
+        ```
++ reference
+    - u-boot/doc/board/emulation/qemu-riscv.rst
+
