@@ -333,7 +333,13 @@ board initialize relocated
     ```
 
 + `bootdelay_process()`
+    > 為了設置啟動延時使用, 可以通過`CONFIG_BOOTDELAY`設置啟動延時多少秒
+
++ `cli_process_fdt()`
+    > 判斷是否有 secure boot 相關的
+
 + `autoboot_command()`
+    > 執行環境變量 `bootcmd`的內容, 也就是執行相關的命令
 
 ## `bootm`
 
@@ -386,6 +392,563 @@ board initialize relocated
     }
     ```
 
+    - state type
+
+        1. `BOOTM_STATE_START`
+            > 開始執行 bootm 的一些準備動作.
+
+            ```
+            #define BOOTM_STATE_START (0x00000001)
+            ```
+
+        1. BOOTM_STATE_FINDOS
+            > 查找 OS image
+
+            ```
+            #define BOOTM_STATE_FINDOS (0x00000002)
+            ```
+
+        1. BOOTM_STATE_FINDOTHER
+            > 查找 OS image 以外的其他鏡像, 比如 FDT\ramdisk 等等
+
+            ```
+            #define BOOTM_STATE_FINDOTHER (0x00000004)
+            ```
+
+        1. BOOTM_STATE_LOADOS
+            > 加載 OS
+
+            ```
+            #define BOOTM_STATE_LOADOS (0x00000008)
+            ```
+
+        1. BOOTM_STATE_RAMDISK
+            > 操作 ramdisk
+
+            ```
+            #define BOOTM_STATE_RAMDISK (0x00000010)
+            ```
+
+        1. BOOTM_STATE_FDT
+            > 操作 FDT
+
+            ```
+            #define BOOTM_STATE_FDT (0x00000020)
+            ```
+
+        1. BOOTM_STATE_OS_CMDLINE
+            > 操作 commandline
+
+            ```
+            #define BOOTM_STATE_OS_CMDLINE (0x00000040)
+            ```
+
+        1. BOOTM_STATE_OS_BD_T
+
+            ```
+            #define BOOTM_STATE_OS_BD_T (0x00000080)
+            ```
+
+        1. BOOTM_STATE_OS_PREP
+            > 跳轉到 OS 前的準備動作
+
+            ```
+            #define BOOTM_STATE_OS_PREP (0x00000100)
+            ```
+
+        1. BOOTM_STATE_OS_FAKE_GO
+            > 偽跳轉, 一般都能直接跳轉到 kernel 中去
+
+            ```
+            #define BOOTM_STATE_OS_FAKE_GO (0x00000200) /* 'Almost' run the OS */
+            ```
+
+        1. BOOTM_STATE_OS_GO
+            > 跳轉到 kernel 中去
+
+            ```
+            #define BOOTM_STATE_OS_GO (0x00000400)
+            ```
+
++ `do_bootm_states`
+    > 主要流程簡單說明如下:
+    > + BOOTM_STATE_START
+    >> bootm 的準備動作
+    > + BOOTM_STATE_FINDOS
+    >> 獲取 kernel 信息
+    > + BOOTM_STATE_FINDOTHER
+    >> 獲取 ramdisk 和 fdt 的信息
+    > + BOOTM_STATE_LOADOS
+    >> 加載 kernel 到對應的位置上(有可能已經就在這個位置上了)
+    > + BOOTM_STATE_RAMDISK and BOOTM_STATE_FDT
+    >> 重定向 ramdisk 和 fdt(不一定需要)
+    > + BOOTM_STATE_OS_PREP
+    >> 執行跳轉前的準備動作
+    > + BOOTM_STATE_OS_GO
+    >> 設置啟動參數, 跳轉到 kernel 所在的地址上
+
+    > 在這些流程中, 起傳遞作用的是`bootm_headers_t images`這個數據結構,
+    有些流程是解析鏡像, 往這個結構體裡寫數據.
+    而跳轉的時候, 則需要使用到這個結構體裡面的數據。
+
+    - `struct bootm_headers`
+        > At `include/image.h`
+
+        ```c
+        typedef struct bootm_headers {
+            /*
+             * Legacy os image header, if it is a multi component image
+             * then boot_get_ramdisk() and get_fdt() will attempt to get
+             * data from second and third component accordingly.
+             */
+            image_header_t  *legacy_hdr_os;     /* image header pointer; Legacy-uImage 的 iamge header */
+            image_header_t  legacy_hdr_os_copy; /* header copy; Legacy-uImage的 iamge header 備份 */
+            ulong           legacy_hdr_valid;   /* Legacy-uImage 的鏡像頭是否存在的標記 */
+
+        #if IMAGE_ENABLE_FIT
+            const char  *fit_uname_cfg; /* configuration node unit name; 配置節點名 */
+
+            void        *fit_hdr_os;    /* os FIT image header; FIT-uImage 中 kernel 鏡像頭 */
+            const char  *fit_uname_os;  /* os subimage node unit name; FIT-uImage 中 kernel 的節點名 */
+            int         fit_noffset_os; /* os subimage node offset; FIT-uImage 中 kernel 的節點偏移 */
+
+            void        *fit_hdr_rd;    /* init ramdisk FIT image header; FIT-uImage 中 ramdisk 的鏡像頭 */
+            const char  *fit_uname_rd;  /* init ramdisk subimage node unit name; FIT-uImage 中 ramdisk 的節點名 */
+            int         fit_noffset_rd; /* init ramdisk subimage node offset; FIT-uImage 中 ramdisk 的節點偏移 */
+
+            void        *fit_hdr_fdt;   /* FDT blob FIT image header; FIT-uImage 中 FDT 的鏡像頭 */
+            const char  *fit_uname_fdt; /* FDT blob subimage node unit name; FIT-uImage 中 FDT 的節點名 */
+            int         fit_noffset_fdt;/* FDT blob subimage node offset; FIT-uImage 中 FDT 的節點偏移 */
+        #endif
+
+            image_info_t    os;     /* os image info; 操作系統信息的結構體 */
+            ulong           ep;     /* entry point of OS; 操作系統的入口地址 */
+
+            ulong       rd_start, rd_end;/* ramdisk start/end; ramdisk 在內存上的起始地址和結束地址 */
+
+            char        *ft_addr;   /* flat dev tree address;  fdt 在內存上的地址 */
+            ulong       ft_len;     /* length of flat device tree; fdt 在內存上的長度 */
+
+            ulong       initrd_start;   //
+            ulong       initrd_end;     //
+            ulong       cmdline_start;  //
+            ulong       cmdline_end;    //
+            bd_t        *kbd;           //
+
+            int         verify;     /* getenv("verify")[0] != 'n' */ // 是否需要驗證
+            int         state;      /* 狀態標識, 用於標識對應的 bootm 需要做什麼操作 */
+
+        #ifdef CONFIG_LMB
+            struct lmb  lmb;        /* for memory mgmt */
+        #endif
+
+        } bootm_headers_t;
+        ```
+
+    - source code
+        > At `common/bootm.c`
+
+        ```c
+        int do_bootm_states(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[],
+                    int states, bootm_headers_t *images, int boot_progress)
+        {
+            boot_os_fn *boot_fn;
+            ulong iflag = 0;
+            int ret = 0, need_boot_fn;
+
+            images->state |= states;
+
+            /*
+             * Work through the states and see how far we get. We stop on
+             * any error.
+             */
+            /**
+             *  判斷 states 是否需要 BOOTM_STATE_START 動作,
+             *  也就是 bootm 的準備動作,
+             *  需要的話則調用 bootm_start()
+             */
+            if (states & BOOTM_STATE_START)
+                ret = bootm_start(cmdtp, flag, argc, argv);
+
+            /**
+             *  判斷 states 是否需要 BOOTM_STATE_FINDOS 動作,
+             *  也就是獲取 kernel 信息,
+             *  需要的話在調用 bootm_find_os()
+             */
+            if (!ret && (states & BOOTM_STATE_FINDOS))
+                ret = bootm_find_os(cmdtp, flag, argc, argv);
+
+            /**
+             *  判斷 states 是否需要 BOOTM_STATE_FINDOTHER 動作,
+             *  也就是獲取 ramdisk 和 fdt 等其他鏡像的信息,
+             *  需要的話則調用 bootm_find_other()
+             */
+            if (!ret && (states & BOOTM_STATE_FINDOTHER))
+                ret = bootm_find_other(cmdtp, flag, argc, argv);
+
+            /**
+             *  這裡要重點注意, 前面的步驟都是在解析 uImage 鏡像並填充 bootm_headers_t images.
+             *  也就是說解析 uImage 的部分在此之前,
+             *  而後續則是使用 bootm_headers_t images 裡面的內容來進行後續動作
+             */
+
+            /* Load the OS */
+            /**
+             *  判斷 states 是否需要 BOOTM_STATE_LOADOS 動作,
+             *  也就是加載操作系統的動作,
+             *  需要的話則調用 bootm_load_os
+             */
+            if (!ret && (states & BOOTM_STATE_LOADOS)) {
+                iflag = bootm_disable_interrupts();
+                ret = bootm_load_os(images, 0);
+                if (ret && ret != BOOTM_ERR_OVERLAP)
+                    goto err;
+                else if (ret == BOOTM_ERR_OVERLAP)
+                    ret = 0;
+            }
+
+            /* Relocate the ramdisk */
+            /**
+             * 是否需要重定向 ramdinsk, do_bootm 流程的話是不需要的
+             */
+        #ifdef CONFIG_SYS_BOOT_RAMDISK_HIGH
+            if (!ret && (states & BOOTM_STATE_RAMDISK)) {
+                ulong rd_len = images->rd_end - images->rd_start;
+
+                ret = boot_ramdisk_high(&images->lmb, images->rd_start,
+                    rd_len, &images->initrd_start, &images->initrd_end);
+                if (!ret) {
+                    env_set_hex("initrd_start", images->initrd_start);
+                    env_set_hex("initrd_end", images->initrd_end);
+                }
+            }
+        #endif
+
+            /**
+             *  是否需要重定向 fdt, do_bootm 流程的話是不需要的
+             */
+        #if IMAGE_ENABLE_OF_LIBFDT && defined(CONFIG_LMB)
+            if (!ret && (states & BOOTM_STATE_FDT)) {
+                boot_fdt_add_mem_rsv_regions(&images->lmb, images->ft_addr);
+                ret = boot_relocate_fdt(&images->lmb, &images->ft_addr,
+                            &images->ft_len);
+            }
+        #endif
+
+            /* From now on, we need the OS boot function */
+            if (ret)
+                return ret;
+
+            /**
+             *  獲取對應操作系統的啟動函數, 存放到 boot_fn 中
+             */
+            boot_fn = bootm_os_get_boot_func(images->os.os);
+            need_boot_fn = states & (BOOTM_STATE_OS_CMDLINE |
+                    BOOTM_STATE_OS_BD_T | BOOTM_STATE_OS_PREP |
+                    BOOTM_STATE_OS_FAKE_GO | BOOTM_STATE_OS_GO);
+            if (boot_fn == NULL && need_boot_fn) {
+                if (iflag)
+                    enable_interrupts();
+                printf("ERROR: booting os '%s' (%d) is not supported\n",
+                       genimg_get_os_name(images->os.os), images->os.os);
+                bootstage_error(BOOTSTAGE_ID_CHECK_BOOT_OS);
+                return 1;
+            }
+
+
+            /* Call various other states that are not generally used */
+            if (!ret && (states & BOOTM_STATE_OS_CMDLINE))
+                ret = boot_fn(BOOTM_STATE_OS_CMDLINE, argc, argv, images);
+            if (!ret && (states & BOOTM_STATE_OS_BD_T))
+                ret = boot_fn(BOOTM_STATE_OS_BD_T, argc, argv, images);
+
+            /**
+             *  跳轉到 OS 前的準備動作,
+             *  會直接調用啟動函數,
+             *  但是標識是 BOOTM_STATE_OS_PREP
+             */
+            if (!ret && (states & BOOTM_STATE_OS_PREP)) {
+        #if defined(CONFIG_SILENT_CONSOLE) && !defined(CONFIG_SILENT_U_BOOT_ONLY)
+                if (images->os.os == IH_OS_LINUX)
+                    fixup_silent_linux();
+        #endif
+                ret = boot_fn(BOOTM_STATE_OS_PREP, argc, argv, images);
+            }
+
+        #ifdef CONFIG_TRACE
+            /* Pretend to run the OS, then run a user command */
+            if (!ret && (states & BOOTM_STATE_OS_FAKE_GO)) {
+                char *cmd_list = env_get("fakegocmd");
+
+                ret = boot_selected_os(argc, argv, BOOTM_STATE_OS_FAKE_GO,
+                        images, boot_fn);
+                if (!ret && cmd_list)
+                    ret = run_command_list(cmd_list, -1, flag);
+            }
+        #endif
+
+            /* Check for unsupported subcommand. */
+            if (ret) {
+                puts("subcommand not supported\n");
+                return ret;
+            }
+
+            /* Now run the OS! We hope this doesn't return */
+            /**
+             *  BOOTM_STATE_OS_GO 標識,
+             *  跳轉到操作系統中, 並且不應該再返回了
+             */
+            if (!ret && (states & BOOTM_STATE_OS_GO))
+                ret = boot_selected_os(argc, argv, BOOTM_STATE_OS_GO,
+                        images, boot_fn);
+
+            /* Deal with any fallout */
+        err:
+            if (iflag)
+                enable_interrupts();
+
+            if (ret == BOOTM_ERR_UNIMPLEMENTED)
+                bootstage_error(BOOTSTAGE_ID_DECOMP_UNIMPL);
+            else if (ret == BOOTM_ERR_RESET)
+                do_reset(cmdtp, flag, argc, argv);
+
+            return ret;
+        }
+        ```
+
++ `bootm_start`
+    > 填入 `struct bootm_headers.verify` and `struct bootm_headers.lmb`
+
++ `bootm_find_os`
+    > 填入 `struct bootm_headers.os` and `struct bootm_headers.ep`
+
++ `bootm_find_other`
+    > 填入 `struct bootm_headers.rd_start`, `struct bootm_headers.rd_end`,
+    `struct bootm_headers.ft_addr` and `struct bootm_headers.initrd_end`
+
++ `bootm_load_os`
+    > 在 bootm_load_os() 中, 會對 kernel image 進行 load 到對應的位置上,
+    並且如果 kernel image 是被 mkimage 壓縮過的, 那麼會先經過解壓之後再進行 load.
+    >> 這裡要注意, 這裡的壓縮和 Image 壓縮成 zImage 並不是同一個,
+    而是 uboot 在 Image 或者 zImage 的基礎上進行的壓縮.
+
+    - source code
+
+        ```c
+        static int bootm_load_os(bootm_headers_t *images, int boot_progress)
+        {
+            image_info_t os = images->os;
+            ulong load = os.load;
+            ulong load_end;
+            ulong blob_start = os.start;
+            ulong blob_end = os.end;
+            ulong image_start = os.image_start;
+            ulong image_len = os.image_len;
+            ulong flush_start = ALIGN_DOWN(load, ARCH_DMA_MINALIGN);
+            bool no_overlap;
+            void *load_buf, *image_buf;
+            int err;
+
+            load_buf = map_sysmem(load, 0);
+            image_buf = map_sysmem(os.image_start, image_len);
+
+            /**
+             *  調用 bootm_decomp_image,
+             *  對 image_buf 的 image 進行解壓縮,
+             *  並 load 到 load_buf 上
+             */
+            err = image_decomp(os.comp, load, os.image_start, os.type,
+                       load_buf, image_buf, image_len,
+                       CONFIG_SYS_BOOTM_LEN, &load_end);
+            if (err) {
+                err = handle_decomp_error(os.comp, load_end - load, err);
+                bootstage_error(BOOTSTAGE_ID_DECOMP_IMAGE);
+                return err;
+            }
+
+            flush_cache(flush_start, ALIGN(load_end, ARCH_DMA_MINALIGN) - flush_start);
+
+            debug("   kernel loaded at 0x%08lx, end = 0x%08lx\n", load, load_end);
+            bootstage_mark(BOOTSTAGE_ID_KERNEL_LOADED);
+
+            no_overlap = (os.comp == IH_COMP_NONE && load == image_start);
+
+            if (!no_overlap && load < blob_end && load_end > blob_start) {
+                debug("images.os.start = 0x%lX, images.os.end = 0x%lx\n",
+                      blob_start, blob_end);
+                debug("images.os.load = 0x%lx, load_end = 0x%lx\n", load,
+                      load_end);
+
+                /* Check what type of image this is. */
+                if (images->legacy_hdr_valid) {
+                    if (image_get_type(&images->legacy_hdr_os_copy)
+                            == IH_TYPE_MULTI)
+                        puts("WARNING: legacy format multi component image overwritten\n");
+                    return BOOTM_ERR_OVERLAP;
+                } else {
+                    puts("ERROR: new format image overwritten - must RESET the board to recover\n");
+                    bootstage_error(BOOTSTAGE_ID_OVERWRITTEN);
+                    return BOOTM_ERR_RESET;
+                }
+            }
+
+            lmb_reserve(&images->lmb, images->os.load, (load_end -
+                                    images->os.load));
+            return 0;
+        }
+        ```
+
++ `bootm_os_get_boot_func`
+    > 根據 OS 類型獲得到對應的操作函數
+
+    ```c
+    /* At 'common/bootm_os.c' */
+
+    static boot_os_fn *boot_os[] = {
+    ...
+    #ifdef CONFIG_BOOTM_LINUX
+        [IH_OS_LINUX] = do_bootm_linux,
+    #endif
+    };
+    ```
+
++ `do_bootm_linux`
+    > `boot_fn(BOOTM_STATE_OS_PREP, argc, argv, images)`
+
+    - source code
+        > At `arch/arm/lib/bootm.c`
+
+        ```c
+        int do_bootm_linux(int flag, int argc, char * const argv[],
+                   bootm_headers_t *images)
+        {
+            /* No need for those on ARM */
+            if (flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE)
+                return -1;
+
+            /**
+             *  當 flag 為 BOOTM_STATE_OS_PREP,
+             *  則說明只需要做準備動作 boot_prep_linux()
+             */
+            if (flag & BOOTM_STATE_OS_PREP) {
+                boot_prep_linux(images);
+                return 0;
+            }
+
+            /**
+             *  當 flag 為 BOOTM_STATE_OS_GO,
+             *  則說明只需要做跳轉動作
+             */
+            if (flag & (BOOTM_STATE_OS_GO | BOOTM_STATE_OS_FAKE_GO)) {
+                boot_jump_linux(images, flag);
+                return 0;
+            }
+
+            /**
+             *  以全局變量 'bootm_headers_t images' 為參數傳遞給 boot_prep_linux()
+             */
+            boot_prep_linux(images);
+
+            /**
+             *  以全局變量 'bootm_headers_t images' 為參數傳遞給 boot_jump_linux()
+             */
+            boot_jump_linux(images, flag);
+            return 0;
+        }
+        ```
+
++ `boot_prep_linux`
+    > 主要的目的是修正 LMB, 並把 LMB 填入到 fdt 中
+    >> LMB (logical memory blocks), 主要是用於表示內存的保留區域,
+    主要有 fdt 的區域, ramdisk 的區域等等
+
+    - source code
+        >  AT `arch/arm/lib/bootm.c`
+
+        ```c
+        static void boot_prep_linux(bootm_headers_t *images)
+        {
+            char *commandline = env_get("bootargs");
+
+            if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len) {
+        #ifdef CONFIG_OF_LIBFDT
+                debug("using: FDT\n");
+                /**
+                 *  修正 LMB, 並把 LMB 填入到 fdt 中
+                 */
+                if (image_setup_linux(images)) {
+                    printf("FDT creation failed! hanging...");
+                    hang();
+                }
+        #endif
+            } else if (BOOTM_ENABLE_TAGS) {
+                ...
+            } else {
+                printf("FDT and ATAGS support not compiled in - hanging\n");
+                hang();
+            }
+        }
+        ```
+
++ `boot_jump_linux`
+    > 經過 `kernel_entry` 之後就跳轉到 kernel 環境中了
+
+    - source code
+        > At `arch/arm/lib/bootm.c`
+
+        ```c
+        static void boot_jump_linux(bootm_headers_t *images, int flag)
+        {
+            ...
+
+            /**
+             *  從 bd 中獲取 machine-id
+             */
+            unsigned long machid = gd->bd->bi_arch_number;
+            char *s;
+
+            /**
+             * kernel 入口函數, 也就是 kernel 的入口地址, 對應 kernel 的 _start 地址.
+             */
+            void (*kernel_entry)(int zero, int arch, uint params);
+            unsigned long r2;
+            int fake = (flag & BOOTM_STATE_OS_FAKE_GO); // 偽跳轉, 並不真正地跳轉到 kernel 中
+
+            /**
+             *  將 kernel_entry 設置為 images 中的 ep (kernel的入口地址),
+             *  後面直接執行 kernel_entry 也就跳轉到了 kernel 中了
+             */
+            kernel_entry = (void (*)(int, int, uint))images->ep;
+
+            debug("## Transferring control to Linux (at address %08lx)" \
+                "...\n", (ulong) kernel_entry);
+            bootstage_mark(BOOTSTAGE_ID_RUN_OS);
+            announce_and_cleanup(fake);
+
+            /**
+             *  把 images->ft_addr(fdt 的地址)放在 'r2' 中
+             */
+            if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len)
+                r2 = (unsigned long)images->ft_addr;
+            else
+                r2 = gd->bd->bi_boot_params;
+
+            if (!fake) {
+                ...
+
+                    /**
+                     *  這裡通過調用 kernel_entry, 就跳轉到了 images->ep 中了,
+                     *  也就是跳轉到 kernel 中了, 具體則是 kernel 的 _start 地址.
+                     *
+                     *  參數 0 則傳入到 'register r0'中, 參數 machid 傳入到 'register r1' 中,
+                     *  把 images->ft_addr(fdt 的地址)放在'register r2'中.
+                     *  滿足了kernel啟動的硬件要求.
+                     */
+                    kernel_entry(0, machid, r2);
+            }
+        }
+        ```
+
 + reference
     - [第01節_傳遞dtb給內核](https://blog.51cto.com/11134889/2326410)
     - [uboot啟動kernel篇(二)——bootm跳轉到kernel的流程](https://blog.csdn.net/ooonebook/article/details/53495021)
@@ -393,3 +956,4 @@ board initialize relocated
 # reference
 
 + [Uboot啟動流程分析(六)](https://www.cnblogs.com/Cqlismy/p/12194641.html)
++ [Schulz-how-to-support-new-board-u-boot-linux.pdf](https://elinux.org/images/2/2a/Schulz-how-to-support-new-board-u-boot-linux.pdf)
