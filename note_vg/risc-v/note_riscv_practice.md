@@ -279,19 +279,20 @@ $ git submodule update --init --recursive
                 "arm")
                     echo -e "export ARCH=${arch_type}" >> ${env_file}
                     echo -e "export PATH=${HOME}/toolchain/gcc-linaro-6.5.0-2018.12-i686_arm-linux-gnueabi/bin:${path_base}" >> ${env_file}
-                    echo -e "CROSS_COMPILE=arm-linux-gnueabi-" >> ${env_file}
+                    echo -e "export CROSS_COMPILE=arm-linux-gnueabi-" >> ${env_file}
                     ;;
 
                 "arm64")
                     echo -e "export ARCH=${arch_type}" >> ${env_file}
                     echo -e "export PATH=${HOME}/toolchain/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:${path_base}" >> ${env_file}
-                    echo -e "CROSS_COMPILE=aarch64-linux-gnu-" >> ${env_file}
+                    echo -e "export CROSS_COMPILE=aarch64-linux-gnu-" >> ${env_file}
                     ;;
 
                 "riscv32")
+                    toolchain_version=xpack-riscv-none-embed-gcc-8.3.0-1.2
                     echo -e "export ARCH=riscv" >> ${env_file}
-                    echo -e "export PATH=${HOME}/toolchain/riscv32_toolchain/bin:${path_base}" >> ${env_file}
-                    echo -e "CROSS_COMPILE=riscv32-unknown-elf-" >> ${env_file}
+                    echo -e "export PATH=${HOME}/toolchain/${toolchain_version}/bin:${path_base}" >> ${env_file}
+                    echo -e "export CROSS_COMPILE=riscv-none-embed-" >> ${env_file}
                     ;;
 
                 "riscv64")
@@ -301,8 +302,8 @@ $ git submodule update --init --recursive
                     echo -e "export ARCH=riscv" >> ${env_file}
                     echo -e "export PATH=${HOME}/toolchain/${toolchain_version}/bin:${path_base}" >> ${env_file}
 
-                    # echo -e "CROSS_COMPILE=riscv-none-embed--" >> ${env_file}
-                    echo -e "CROSS_COMPILE=riscv64-unknown-linux-gnu-" >> ${env_file}
+                    # echo -e "export CROSS_COMPILE=riscv-none-embed-" >> ${env_file}
+                    echo -e "export CROSS_COMPILE=riscv64-unknown-linux-gnu-" >> ${env_file}
                     ;;
                 *)
                     help
