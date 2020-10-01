@@ -86,8 +86,11 @@ Qemu
     $ wget https://download.qemu.org/qemu-5.1.0.tar.xz
     $ tar -xJf qemu-5.1.0.tar.xz
 
-    $ sudo apt-get install libpixman-1-dev
+    $ sudo apt-get install qemubuilder libpixman-1-dev libpulse-dev libsdl2-dev
     $ ./configure --target-list=arm-softmmu --static --prefix=$HOME/.local/
+        or
+    $ ./configure --target-list=riscv64-softmmu --prefix=$HOME/.local/
+
     $ make
     $ make install
     $ ./out/bin/arm-system-arm -M vexpress-a9 -kernel u-boot -nographic -m 128M
