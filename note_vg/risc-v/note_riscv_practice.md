@@ -3,6 +3,27 @@ RISC-V Practice
 
 # risc-v
 
+## freedom-e-sdk
+
+[freedom-e-sdk source](https://github.com/sifive/freedom-e-sdk)
+
++ toolcahin
+    > [sifive-software](https://www.sifive.com/software) -> `GNU Embedded Toolchain — v2020.04.1`
+
++ Qemu
+    > [sifive-software](https://www.sifive.com/software) -> `QEMU — v2020.04.0`
+
++ setup environment
+
+    ```
+    $ mkdir -p $HOME/sifive/ && cd $HOME/sifive/
+    $ git clone --recursive https://github.com/sifive/freedom-e-sdk.git
+    $ cd freedom-e-sdk
+    $ make pip-cache
+    $ export FREEDOM_E_SDK_VENV_PATH=$HOME/sifive/freedom-e-sdk/venv
+    $ make PROGRAM=example-freertos-minimal TARGET=qemu-sifive-e31 LINK_TARGET=freertos software
+    ```
+
 ## toolchain
 
 ```bash
@@ -16,6 +37,7 @@ $ git clone https://github.com/riscv/riscv-gnu-toolchain
 $ git rm qemu       # 移除 qemu submodule, 降低資料量
 $ git submodule update --init --recursive
 ```
+
 + `riscv-gnu-toolchain`
     > 包含多個 submodules
     > + [riscv-gcc](https://github.com/riscv/riscv-gcc)
