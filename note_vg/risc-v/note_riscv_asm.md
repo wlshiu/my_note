@@ -1,4 +1,4 @@
-RISC-V ASM [[Back](note_uboot_quick_start.md)]
+RISC-V ASM [[Back](note_riscv_quick_start.md)]
 ---
 
 `RV32I` 為 32-bits 基本整數指令集, 有 `32` 個 32-bits 暫存器 (x0-x31), 總共有 47 道指令
