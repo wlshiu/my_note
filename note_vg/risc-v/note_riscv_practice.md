@@ -1,4 +1,4 @@
-RISC-V Practice
+RISC-V Practice [[Back](note_riscv_quick_start.md)]
 ---
 
 # risc-v
