@@ -21,7 +21,9 @@ RISC-V Practice
     $ cd freedom-e-sdk
     $ make pip-cache
     $ export FREEDOM_E_SDK_VENV_PATH=$HOME/sifive/freedom-e-sdk/venv
+    $ make PROGRAM=example-freertos-minimal TARGET=qemu-sifive-e31 LINK_TARGET=freertos clean
     $ make PROGRAM=example-freertos-minimal TARGET=qemu-sifive-e31 LINK_TARGET=freertos software
+    $ make PROGRAM=example-freertos-minimal TARGET=qemu-sifive-e31 LINK_TARGET=freertos simulate
     ```
 
 ## toolchain
@@ -345,6 +347,9 @@ $ git submodule update --init --recursive
 
 + run qemu
     > qemu 5.1 的 risc-v 有問題, 請使用 qemu 4
+    > + `virt` machine (32-bit and 64-bit)
+    > + `sifive_u` Machine (HiFive Unleashed)
+    > + `sifive_e` Machine (HiFive 1)
 
     ```
     $ qemu-system-riscv32 -nographic -M virt -m 128M -bios u-boot
