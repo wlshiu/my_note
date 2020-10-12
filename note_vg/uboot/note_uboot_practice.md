@@ -291,6 +291,37 @@ uboot 實務 [[Back](note_uboot_quick_start.md)]
     $ ./z_qemu_uboot.sh uboot.disk
     ```
 
++ `mkimage`
+    > in tool folder of u-boot
+
+    ```
+    -A ==> set architecture to 'arch'           用於指定CPU類型,
+                                                alpha/arm/x86/ia64/mips/mips64/ppc/s390/sh/sparc/sparc64/m68k
+
+    -O ==> set operating system to 'os'         用於指定操作系統,
+                                                openbsd/netbsd/freebsd/4_4bsd/linux/svr4/esix/
+                                                solaris/irix/sco/dell/ncr/lynxos/vxworks/
+                                                psos/qnx/u-boot/rtems/artos
+
+    -T ==> set image type to 'type'             用於指定 image 類型,
+                                                standalone/kernel/ramdisk/multi/firmware/script/filesystem
+
+    -C ==> set compression type 'comp'          指定壓縮類型
+                                                none:不壓縮, gzip: 用 gzip 壓縮, bzip2 用 bzip2 壓縮
+
+    -a ==> set load address to 'addr' (hex)     指定 image 的加載地址
+    -e ==> set entry point to 'ep' (hex)        指定內核的入口地址, 一般是image的載入地址 +0x40(信息頭的大小)
+    -n ==> set image name to 'name'             image 在頭結構中的命名
+    -d ==> use image data from 'datafile'       指定製作鏡像的源文件
+    ```
+
+    - example
+
+        ```
+        $ mkimage -n 'tekkaman' -A arm -O linux -T kernel -C none -a 0x30008000 -e 0x30008040 -d zImage zImage.img
+        $ mkimage -A arm -O linux -T script -C none -a 0x0 -e 0 -d uboot_command.txt uboot_sh.img
+        ```
+
 ## linux 4.14.136
 
 + environment setup
