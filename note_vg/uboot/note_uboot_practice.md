@@ -732,6 +732,79 @@ uboot 實務 [[Back](note_uboot_quick_start.md)]
 
 # Commands in U-boot
 
+```
+=> help
+askenv  - get environment variables from stdin
+base    - print or set address offset
+bdinfo  - print Board Info structure
+bmp     - manipulate BMP image data
+boot    - boot default, i.e., run 'bootcmd'
+bootd   - boot default, i.e., run 'bootcmd'
+bootelf - Boot from an ELF image in memory
+bootm   - boot application image from memory
+bootp   - boot image via network using BOOTP/TFTP protocol
+bootvx  - Boot vxWorks from an ELF image
+cmp     - memory compare
+coninfo - print console devices and information
+cp      - memory copy
+crc32   - checksum calculation
+date    - get/set/reset date & time
+dcache  - enable or disable data cache
+dhcp    - boot image via network using DHCP/TFTP protocol
+echo    - echo args to console
+editenv - edit environment variable
+eeprom  - EEPROM sub-system
+erase   - erase FLASH memory
+exit    - exit script
+fatinfo - print information about filesystem
+fatload - load binary file from a dos filesystem
+fatls   - list files in a directory (default /)
+flinfo  - print FLASH memory information
+fsinfo  - print information about filesystems
+fsload  - load binary file from a filesystem image
+go      - start application at address 'addr'
+help    - print online help
+i2c     - I2C sub-system
+icache  - enable or disable instruction cache
+iminfo  - print header information for application image
+imls    - list all images found in flash
+imxtract- extract a part of a multi-image
+itest   - return true/false on integer compare
+loadb   - load binary file over serial line (kermit mode)
+loads   - load S-Record file over serial line
+loadx   - load binary file over serial line (xmodem mode)
+loady   - load binary file over serial line (ymodem mode)
+loop    - infinite loop on address range
+ls      - list files in a directory (default /)
+md      - memory display
+mm      - memory modify (auto-incrementing address)
+mmc     - MMC sub-system
+mtest   - simple RAM read/write test
+mw      - memory write (fill)
+nand    - NAND sub-system
+nboot   - boot from NAND device
+nfs     - boot image via network using NFS protocol
+nm      - memory modify (constant address)
+ping    - send ICMP ECHO_REQUEST to network host
+printenv- print environment variables
+protect - enable or disable FLASH write protection
+rarpboot- boot image via network using RARP/TFTP protocol
+reginfo - print register information
+reset   - Perform RESET of the CPU
+run     - run commands in an environment variable
+saveenv - save environment variables to persistent storage
+setenv  - set environment variables
+showvar - print local hushshell variables
+sleep   - delay execution for some time
+source  - run script from memory
+test    - minimal test like /bin/sh
+tftpboot- boot image via network using TFTP protocol
+unzip   - unzip a memory region
+usb     - USB sub-system
+usbboot - boot from USB device
+version - print monitor version
+```
+
 ## ext2/3/4 in uboot
 
 + `ext2load` and`ext4load`
@@ -1123,6 +1196,72 @@ but adds an additional argument to the mmc interface to describe the hardware pa
     => mmc dev 0 2     # select boot1 hw partition
     ```
 
++ `mmc hwpartition`
+    > 設定 H/w partition, OTP (One Time Program) 性質
+
+    ```
+    => mmc info
+        Device: FSL_SDHC
+        Manufacturer ID: 13
+        OEM: 14e
+        Name: Q1J54
+        Tran Speed: 52000000
+        Rd Block Len: 512
+        MMC version 5.0
+        High Capacity: Yes
+        Capacity: 3.6 GiB
+        Bus Width: 8-bit
+        Erase Group Size: 512 KiB
+        HC WP Group Size: 8 MiB
+        User Capacity: 3.6 GiB WRREL *
+        Boot Capacity: 2 MiB ENH
+        RPMB Capacity: 512 KiB ENH
+    => mmc hwpartition user enh 0 3817472 complete  # 3817472 KiB
+        Partition configuration:
+        User Enhanced Start: 0 Bytes
+        User Enhanced Size: 1.8GiB
+        No GP1 partition
+        No GP2 partition
+        No GP3 partition
+        No GP4 partition
+    ```
+
+    - option `check`
+        > 先做試算, 並未真正寫入 eMMC
+
+        ```
+        => mmc hwpartition check
+        Partition configuration:
+                No enhanced user data area
+                No GP1 partition
+                No GP2 partition
+                No GP3 partition
+                No GP4 partition
+
+        => mmc hwpartition user enh 0 3735552 check
+        ```
+
+    - option `complete`
+        > 真正寫入 eMMC, 而且無法再修改 (OTP)
+
+        ```
+        => mmc hwpartition <user/gp1/gp2> enh <start> <size> wrrel on complete
+
+        e.g.
+        # Enhanced User Area
+        => mmc hwpartition user enh 0 3735552 wrrel on complete
+        ```
+
+        1. `wrrel on`
+            > Turn on write-reliability
+
+        1. `enh`
+            > Enhanced partition (configure the partition as SLC).
+
+    - reference
+
+        1. [Enhanced User Area and Pseudo SLC](https://developer.toradex.com/knowledge-base/emmc-linux#Enhanced_User_Area_and_Pseudo_SLC)
+
 + `mmc partconf`
     > The `mmc partconf` command can be used to configure the `PARTITION_CONFIG` specifying
     what hardware partition to boot from:
@@ -1158,6 +1297,28 @@ but adds an additional argument to the mmc interface to describe the hardware pa
 
     - [eMMC之分區管理、總線協議和工作模式](https://blog.csdn.net/u013686019/article/details/66472291)
 
+## `md.b`
+
+顯示 <address(hex)> memroy 資料
+
+```
+=> md.b <DDR address(hex)> <length(hex)>
+
+e.g.
+=> md 02000000 a
+```
+
+## `mw`
+
+修改 <address(hex)> 到 <address(hex)> + <length(hex)> 的資料為 <value(hex)>
+
+```
+# 相當於 memset(<DDR address(hex)>, <value(hex)>, <length(hex)>);
+=> mw <DDR address(hex)> <value(hex)> <length(hex)>
+
+e.g.
+=> mw 0x02000000 0 128
+```
 
 ## `booti`/`bootm`/`bootz`
 
