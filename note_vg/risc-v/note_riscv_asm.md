@@ -516,9 +516,9 @@ call offset                  | auipc x6, offset[31:12]; jalr x1, x6, offset[11:0
 tail offset                  | auipc x6, offset[31:12]; jalr x0, x6, offset[11:0]            | Tail call far-away subroutine
 fence                        | fence iorw, iorw                                              | Fence on all memory and I/O
 
-# Pseudoinstructions for accessing control and status registers
+# Pseudo-instructions for accessing control and status registers
 
-Pseudoinstruction | Base Instruction(s)        | Meaning
+Pseudo-instruction | Base Instruction(s)        | Meaning
 :---------------- |:---------------------------|:-------
 rdinstret[h] rd   | csrrs rd, instret[h], x0   | Read instructions-retired counter
 rdcycle[h] rd     | csrrs rd, cycle[h], x0     | Read cycle counter

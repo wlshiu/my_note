@@ -400,3 +400,4 @@ $ git submodule update --init --recursive
 + u-boot/doc/board/emulation/qemu-riscv.rst
 + [riscv各種版本gcc工具鏈編譯與安裝](https://www.twblogs.net/a/5c77fb01bd9eee3399184b73)
 + [Spike RISC-V ISA Simulator](https://github.com/riscv/riscv-isa-sim)
++ [SiFive Interrupt Cookbook](https://sifive.cdn.prismic.io/sifive/d1984d2b-c9b9-4c91-8de0-d68a5e64fa0f_sifive-interrupt-cookbook-v1p2.pdf)

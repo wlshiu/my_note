@@ -82,6 +82,40 @@ e.g. RV32GC.
 + PMP (Physical Memory Protection)
     > 根據不同的 physical address 區間和不同的 Privilege Mode, 進行權限隔離和保護
 
++ HART (Hardware Threads)
+
+    - Simplified
+        > The physical core.
+        So, 4 cores can genuinely support 4 hardware threads at once.
+
+    - Advanced
+        > + Hardware controls threads
+        > + Allows single core to interleave memory references and operations
+
++ CLINT (Core Local Interrupter)
+    > a fixed priority scheme (like Cortex-M)
+
+    ```
+
+    Interrupt   +-----------+
+    ------------>   HART    |
+    ------------>           |
+                +-----------+
+                     |
+        CLINT <------+
+
+    ```
+
++ CLIC (Core Local Interrupt Controller)
+    > a more flexible scheme (like GIC of kernel)
+
+    ```
+    Interrupt   +-------+   +------+
+    ------------>  CLIC |-->| HART |
+    ------------>       |   |      |
+                +-------+   +------+
+    ```
+
 # Concepts
 
 ## Registers
@@ -319,7 +353,7 @@ RISC-V 架構則放棄使用 `Load Multiple` 和 `Store Multiple` 指令.
 因此軟件程序無法通過讀取任何寄存器, 而查看當前自己所處的 Machine Mode 或者 User Mode
 
 + `Machine Mode` (M Mode, 0x3)
-    > 機器模式, 能夠訪問所有的 CSR (Control and Status Register) 暫存器,
+    > 機器模式(root 權限), 能夠訪問所有的 CSR (Control and Status Register) 暫存器,
     以及所有的 physical address 區域 (除了 PMP 禁止訪問的區域)
 
     - Machine Sub-Mode
@@ -339,13 +373,153 @@ RISC-V 架構則放棄使用 `Load Multiple` 和 `Store Multiple` 指令.
         1. Interrupt 處理模式 (Machine Sub-Mode = x1)
             > 響應 Interrupt 後 CPU 處於此狀態
 
-
 + `Supervisor Mode` (S Mode, 0x1) or `Hypervisor mode` (HS mode, 0x1)
-    > 監督模式
+    > 監督模式 (通常 kernel space 使用)
 
 + `User Mode` (U Mode, 0x0)
     > 用戶模式, 只能夠訪問 User Mode 限定的 CSR 寄存器,
     以及 PMP 設定權限的 physical address 區域.
+
++ `MRET/SRET/URET` instruction
+    > 用於從 M mode, S mode 以及 U mode 下的異常返回
+    >> 當執行 xRET 指令時, 假設 xPP 為 Y.
+    此時 `xIE = xPIE`, 特權模式設置為 Y, `xPIE = 1`, xPP 設置為 U-mode
+
+
+# Exception and Interrupt
+
+Exception 與 Interrupt 實際上是很容易混用的詞彙,
+一般來說, 中斷也是一種異常(廣義上的), 中斷可以看作是來源於外部的異常.
+
+因此在此所說的 Exception 指的是狹義上的異常,
+即來源於 CPU 內部發生的異常(e.g. 指令錯誤, ALU執行異常, 寫回存儲器異常, 長指令寫回異常等).
+
+而 Interrupt 則是指 `Exceptions(廣義) - Exceptions(CPU 內部)`
+
+在 RISC-V 架構中, 進入 exception, NMI 或者 interrupt 都可以被統稱為 `Trap`, 而且默認進入 `M-mode`
+
++ Interrupt type
+
+    - External
+        1. Peripheral devices
+        1. Global Interrupt Controller
+
+    - Internal
+        1. Timer IRQ
+        1. S/w IRQ
+
+## Interrupt flow
+
+```
+Privileged Mode Y
+
+               Trigger IRQ
+                    |
+                    v
+      +-----------------------------+
+      |   CPU update CSRs           |
+      | (mepc/mcause/mtval/mstatus) |
+      |  xepc = PC                  |
+      |  xPIE = xIE                 |
+      |  xPP  = Privileged Mode Y   |
+      +-----------------------------+
+                    |
+                    v
+               Disable xIE
+H/w                 |
+____________________|_________________________
+Privileged Mode X   |
+ISR (S/w)           |
+                    v
+          Store General Registers
+                    |
+                    v
+                Enable xIE (for Nested Interrupt)
+                    |
+                    v
+            Primary IRQ handler
+                    |
+                    v
+        +---------------------------+
+        | Handle other padding IRQs |
+        |    check mip register     |
+        |       (optional)          |
+        +---------------------------+
+                    |
+                    v
+               Disable xIE
+                    |
+                    v
+           Load General Registers
+                    |
+                    v
+                  Reset
+            (mret/sret/uret)
+____________________|_________________________
+H/w                 |
+Privileged Mode Y   |
+                    v
+                Enable xIE
+                    |
+                    v
+                Jump back
+              (mepc/sepc/uepc)
+```
+
++ Enter
+
+    - CPU update `mepc`.
+        1. Interrupt trigger, 則 `mepc` 寫入 `PC + 4`
+        1. Exception trigger, 則 `mepc` 寫入 `PC`
+
+    - CPU update `mcause`.
+        > 根據產生 Exception 的類型更新`mcause`.
+
+    - CPU update `mtval`.
+        > 某些 Exception 需要將異常相關的信息寫入到 `mtval` 當中
+
+    - CPU update `mstatus`.
+        1. 紀錄 Interrupt 發生前的 xIE 及 Privileged Mode
+
+            ```
+            xPIE = xIE
+            xPP  = Current Privileged Mode
+            ```
+
+        1. disable Interrupt
+            > 這意味著 RISC-V H/w 預設是不支持嵌套中斷的.
+            若要實現嵌套中斷, 則只能通過 S/w 的方式.
+
+            ```
+            xIE = 0
+            ```
+
+            >> S/w 實現嵌套中斷: 當一個 Interrupt 發生後,
+            則 `MPIE = MIE`, MIE = 1, 同時 MPP 設置為 M-mode
+
+    - CPU 跳轉到 `mtvec` 中所定義的異常入口地址執行.
+        1. Direct mode, 直接跳轉到 `mtvec` 中的 address 執行
+        1. Vectored mode, 根據 `mcause` 中的異常類型,
+        跳轉到對應的 Interrupt handler address 執行
+
++ Leave
+    > after xRET
+
+    - CPU 跳轉到 `mepc` 的 address 執行.
+        > 回到異常發生前的程序執行
+
+    - CPU update `mstatus`.
+        > 將 Interrupt 發生前的 `mstatus` 的狀態恢復.
+        具體動作: 此時 `MIE = MPIE`, Privileged Mode 設置為 M-mode,
+        `MPIE = 1`, MPP 設置為 M-mode.
+
+## Nested Interrupt
+
+原則上在 RISC-V 架構中, 不支援同 Privilege mode 的 Nested Interrupt
+> CPU 在 interrupt 發生時, H/w 會自動 disable IRQ (xstatus.MIE = 0)
+
+不同 Privilege mode, 可依 priority 嵌套中斷
+> mstatus.MIE, mstatus.SIE, mstatus.UIE
 
 ## Machine Mode To User Mode
 
@@ -365,7 +539,7 @@ RISC-V 架構則放棄使用 `Load Multiple` 和 `Store Multiple` 指令.
 
 ## User Mode To Machine Mode
 
-從 User Mode 切換到 Machine Mode 只能通過 exception, 響應 interrupt 或者 NMI 的方式發生
+從 User Mode 切換到 Machine Mode 只能通過 exception, interrupt 或者 NMI 的方式發生
 
 + exception 處理模式
 + interrupt 處理模式
@@ -377,18 +551,10 @@ RISC-V 架構則放棄使用 `Load Multiple` 和 `Store Multiple` 指令.
 因此在切換到 User Mode 之前, 需要配置 PMP 相關寄存器,
 設定 User Mode 可以訪問的物理地址區域.
 
-
-# Interrupt
-
-在 RISC-V 架構中, 進入 exception, NMI 或者 interrupt 都被統稱為 `Trap`
-
-
-## Nested Interrupt
-
 ## reference
 
 + [xv6 risc-v trap 筆記](https://blog.csdn.net/RedemptionC/article/details/108718347)
-
++ [RISC-V異常與中斷機制概述](http://www.sunnychen.top/2019/07/06/RISC-V%E5%BC%82%E5%B8%B8%E4%B8%8E%E4%B8%AD%E6%96%AD%E6%9C%BA%E5%88%B6%E6%A6%82%E8%BF%B0/)
 # [CSR (Control and Status Register) of RISC-V](note_riscv_csr.md)
 
 

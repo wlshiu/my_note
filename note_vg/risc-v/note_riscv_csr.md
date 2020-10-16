@@ -1,6 +1,12 @@
 RISCV CSR (Control and Status Register) [[Back](note_riscv_quick_start.md)]
 ---
 
+第一個字母代表 mode (M/S/U modes), 其行為都是一樣, 只差在執行的 Privileged Mode
+
+> + `mepc` (Machine Exception Program Counter)
+> + `sepc` (Supervisor Exception Program Counter)
+> + `uepc` (User Exception Program Counter)
+
 # `mtvec` (Machine Trap-Vector Base-Address Register)
 
 用於設定 interrupt/exception handler address
@@ -16,7 +22,7 @@ RISCV CSR (Control and Status Register) [[Back](note_riscv_quick_start.md)]
 | MODE | Name     |  Description
 | :-   | :-       |  :-
 | 0    | Direct   |  All exceptions set pc to BASE.
-| 1    | Vectored |  Asynchronous interrupts set pc to BASE+4×cause.
+| 1    | Vectored |  Asynchronous interrupts set pc to BASE + 4 * IRQ_index.
 | ≥2   | —        |  Reserved
 
 
@@ -109,17 +115,17 @@ RISCV CSR (Control and Status Register) [[Back](note_riscv_quick_start.md)]
 | field   |  bits    | default   | description
 | :-      |  :-      | :-        | :-
 | Reserved|   0      |  N/A      | 未使用的域為常數 0
-| SIE     |   1      |  0        |
+| SIE     |   1      |  0        | Supervisor Enable Interrupt (global).
 | Reserved|   2      |  N/A      | 未使用的域為常數 0
-| MIE     |   3      |  0        | Enable Interrupt (global) in Machine mode.
+| MIE     |   3      |  0        | Machine Enable Interrupt (global).
 |         |          |           | 0= disable, 1= enable
 | Reserved|   4      |  N/A      | 未使用的域為常數 0
-| SPIE    |   5      |  0        |
-| Reserved|   6      |  N/A      | 未使用的域為常數 0
-| MPIE    |   7      |  0        | 用於紀錄進入異常之前的 MIE 值
-| SPP     |   8      |           |
+| SPIE    |   5      |  0        | 用於紀錄進入異常之前的 SIE 值 (Supervisor Previous Interrupt Enable)
+| UBE     |   6      |           |
+| MPIE    |   7      |  0        | 用於紀錄進入異常之前的 MIE 值 (Machine Previous Interrupt Enable)
+| SPP     |   8      |           | 用於紀錄進入異常之前的 Privileged Mode (Supervisor Previous Privilege)
 | Reserved|   10:9   |  N/A      | 未使用的域為常數 0
-| MPP     |   12:11  |  0        | 用於紀錄進入異常之前的 Privileged Mode
+| MPP     |   12:11  |  0        | 用於紀錄進入異常之前的 Privileged Mode (Machine Previous Privilege)
 | FS      |   14:13  |  0        | 維護或反映浮點單元的狀態
 | XS      |   16:15  |  0        | 用於維護或反映用戶自定義的擴展指令單元狀態
 | MPRV    |   17     |  0        | 用於控制在 Machine Mode 下存儲器的數據讀寫(Load/Store)操作,
@@ -132,6 +138,15 @@ RISCV CSR (Control and Status Register) [[Back](note_riscv_quick_start.md)]
 | Reserved|   30:23  |  N/A      | 未使用的域為常數 0
 | SD      |   31     |  0        | Read-only.
 |         |          |           | 方便 S/w 快速的查詢 XS 或 FS 是否 Dirty 狀態
+
++ MPP 有 2-bits
+    > Exception 進入 M mode 則可以是所有的模式
+
++ SPP 有 1-bit
+    > Exception 進入 S mode 可以是 User mode 也可以是 Supervisor mode
+
++ UPP 是隱式為 0-bits
+    > Exception 進入 U mode 只能是 User mode
 
 # `mip` and `mie` (Machine Interrupt Registers)
 
@@ -205,6 +220,11 @@ e.g. 在進入機器模式的異常處理程序後, 將 APP 的某個通用寄�
 # `mtval` (Machine Trap Value Register)
 
 用於紀錄進入異常之前, **出錯的指令碼(OpCode)**或者**存儲器訪問的地址值**, 以便於對異常原因進行診斷和調試.
+
+依照 `mcause.ExceptionCode` 來判定 `mtrval` 的意義.
+
++ 指令的獲取, 存儲地址未對齊, 或者頁故障異常發生時, `mtval` 會寫入受異常影響的地址
++ 在非法指令的異常中, `mtval` 會寫入故障指令
 
 # `msubm` (Machine Sub-Mode, extension)
 
