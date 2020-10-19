@@ -228,8 +228,10 @@ RV32I 必須使用載入(load)與儲存(store)指令去存取記憶體, 前面�
 
     - syntax
 
-        ```
-        lw/lh/lhu/lb/lbu <rd>, <rs1>, simm12
+        ```nasm
+        lw/lh/lhu/lb/lbu <rd>, <rs1>, simm12    @ <rd> = *(rs1 + simm12)
+            or
+        lw/lh/lhu/lb/lbu <rd>, offset(rs1)      @ <rd> = *(rs1 + sign(offset))
         ```
 
     - 常數部分(simm12)為 `sign-extended 12-bit`, 載入位址則為 `<rs1> + simm12`
@@ -262,8 +264,10 @@ RV32I 必須使用載入(load)與儲存(store)指令去存取記憶體, 前面�
 
     - syntax
 
-        ```
-        sw/sh/sb <rs2>, <rs1>, simm12
+        ```nasm
+        sw/sh/sb <rs2>, <rs1>, simm12       @  *(rs1 + simm12)= <rs2>
+            or
+        sw/sh/sb <rs2>, offset(rs1)         @ *(rs1 + sign(offset)) = <rs2>
         ```
 
     - 常數部分(simm12)為 `sign-extended 12-bit`, 儲存位址則為 `<rs1> + simm12`
@@ -516,6 +520,7 @@ call offset                  | auipc x6, offset[31:12]; jalr x1, x6, offset[11:0
 tail offset                  | auipc x6, offset[31:12]; jalr x0, x6, offset[11:0]            | Tail call far-away subroutine
 fence                        | fence iorw, iorw                                              | Fence on all memory and I/O
 
+
 # Pseudo-instructions for accessing control and status registers
 
 Pseudo-instruction | Base Instruction(s)        | Meaning
@@ -549,3 +554,5 @@ fsflagsi imm      | csrrwi x0, fflags, imm     | Write FP exception flags, immed
 + [RISC-V 指令集架構介紹 - RV32I](https://tclin914.github.io/16df19b4/)
 + [RISC-V基本指令集概述](http://www.sunnychen.top/2019/07/06/RISC-V%E5%9F%BA%E6%9C%AC%E6%8C%87%E4%BB%A4%E9%9B%86%E6%A6%82%E8%BF%B0/)
 + [riscv instruction](https://www.francisz.cn/2020/06/23/riscv-instruction/)
++ [RV32I基礎整數指令集](https://www.cnblogs.com/mikewolf2002/p/11196680.html)
+
