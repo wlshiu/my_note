@@ -40,6 +40,15 @@ NDS32 ASM
 + EDM
     > Embedded Debug Module (connect with AICE, Andes ICE)
 
++ ZOL (Zero Overhead Loop)
+    >  ZOL is a set of mechanism in Andes DSP ISA extension to speed up performance of loops.
+
+    - referenc Programming Guide
+
++ IFC (Inline Function Call)
+    > `IFC_LP` records the PC of the instructions after IFCall9/IFCall instructions
+
+    - referenc Programming Guide
 
 #　Instruction set (32-bits)
 
