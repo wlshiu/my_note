@@ -34,6 +34,13 @@ NDS32 ASM
     > + YY = Halfword
     > + YY = Byte
 
++ IPC
+    > Interruption Program Counter
+
++ EDM
+    > Embedded Debug Module (connect with AICE, Andes ICE)
+
+
 #　Instruction set (32-bits)
 
 ##　Read/Write System Registers
@@ -322,16 +329,40 @@ standby  | Wait for External Event       | Enter standby state and wait for exte
 + `pushm  ra5, rb5`
     > Pushes the contents of registers from `ra5` to `rb5` into stack.
 
+    ```
+    for(int i = reg_idx(ra5); i < reg_idx(rb5); i++)
+    {
+        sp -= 4;
+        *sp = get_reg_value(i);
+    }
+    ```
+
 + `push  ra5`
     > Pushes the content of register `ra5` into stack
+
+    ```
+    sp -= 4;
+    *sp = get_reg_value(ra5)
+    ```
 
 + `popm  ra5, rb5`
     > Poppes top of stack values into registers `ra5` to `rb5`
 
+    ```
+    for(int i = reg_idx(ra5); i < reg_idx(rb5); i++)
+    {
+        set_reg_value(i) = *sp;
+        sp += 4;
+    }
+    ```
+
 + `pop  rt5`
     > Poppes top of stack value into register `rt5`
 
-
+    ```
+    set_reg_value(rt5) = *sp;
+    sp += 4;
+    ```
 
 
 
