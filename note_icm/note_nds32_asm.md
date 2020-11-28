@@ -1,9 +1,9 @@
 NDS32 ASM
 ---
 
+NDS32 有 `32` 個 32-bits 通用暫存器, 也可以使用精簡暫存器 (15 個 32-bits 通用暫存器)以節省成本
 
 # Definitions
-
 + xx
     > number of bits
 
@@ -50,9 +50,10 @@ NDS32 ASM
 
     - referenc Programming Guide
 
-#　Instruction set (32-bits)
 
-##　Read/Write System Registers
+# Instruction Set (32-bits)
+
+## Read/Write System Registers
 
 Mnemonic         | Instruction              | Operation
 :-               | :-                       | :-
