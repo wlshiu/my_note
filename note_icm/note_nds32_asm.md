@@ -278,4 +278,60 @@ setgie.d | Atomic disable of PSW.GIE bit | PSW.GIE = 0;
 standby  | Wait for External Event       | Enter standby state and wait for external
 
 
+# Pseudo-instructions
+
+## load 32-bit value/address
+
++ `li`
+    > Loads Immediate
+
+    ```
+    li  rt5,imm_32  /* loads 32-bit integer into register rt5. */
+    ```
+
++ `la`
+    > Load Address
+
+    ```
+    la  rt5,var  /* loads 32-bit address of var into register rt5. */
+    ```
+
+## load/store variables
+
++ `l.{bhw}  rt5, var`
+    > loads immediate (byte/half-word/word) of `var` into register rt5.
+
++ `l.{bh}s  rt5, var`
+    > loads signed immediate (byte/half-word) of `var` into register rt5.
+
++ `s.{bhw}  rt5, var`
+    > stores register rt5 to var (address, type is byte/half-word/word).
+    >> `*(u8*, u16*, u32*)var = rt5`
+
++ `br  rb5`
+    > alias of `jr rb5`
+
++ `b  label`
+    > branch to label.
+    >> the same `j  label`
+
++ `move  rt5, ra5` (16-bits instruction)
+    > Move contents between general-purpose registers
+    >> `Rt5 = Ra5`
+
++ `pushm  ra5, rb5`
+    > Pushes the contents of registers from `ra5` to `rb5` into stack.
+
++ `push  ra5`
+    > Pushes the content of register `ra5` into stack
+
++ `popm  ra5, rb5`
+    > Poppes top of stack values into registers `ra5` to `rb5`
+
++ `pop  rt5`
+    > Poppes top of stack value into register `rt5`
+
+
+
+
 
