@@ -24,6 +24,33 @@ GDB_CMD
 + list (l)
     > 印出程式碼.若在編譯時沒有加上 -g 參數，list 指令將無作用.
 
++ disassemble (disas)
+    > 看 assembly code
+
+    - `disassemble <Function> [,+<Length>]`
+        > 從 function 秀 Length bytes 的 assembly code
+
+        ```
+        (gdb) disassemble main,+30
+        ```
+
+    - `disassemble <Address> [,+<Length>]`
+        > 從 address 秀  Length bytes 的 assembly code
+
+        ```
+        (gdb) disassemble $pc,+50
+        ```
+
+    - `disassemble <Start>,<End>`
+        > 秀出在 start address 到 end addresse 間的 assembly code
+
+    - disassemble /m [...]
+        > 混合秀 source code 和 disassembled instructions.
+
+    - disassemble /r [...]
+        > 秀 raw byte values of all disassembled instructions.
+
+
 + whatis
     > 印出變數的型態.例: whatis i，印出變數 i 的型態.
 
@@ -174,7 +201,7 @@ GDB_CMD
     - 設定 input arguments of a program
 
     ```
-    gdb) set args -type f
+    (gdb) set args -type f
     ```
 
 + unset
@@ -307,7 +334,7 @@ GDB_CMD
 
     ```
 
-+ modify source path
++ 修改 source path
     > `directory` [dir]
 
     ```shell
@@ -317,7 +344,7 @@ GDB_CMD
     Source directories searched: /usr/src/python:$cdir:$cwd
     ```
 
-+ change source path prefix
++ 改變部分 source path prefix
     > set `substitute-path` [old_path] [new_path]
 
     ```shell
@@ -357,6 +384,26 @@ GDB_CMD
     (gdb) set logging off
     Done logging to backtrace.log.
     ```
+
++ 重跑 progtam
+
+    - `jump`
+
+        ```
+        (gdb) jump _start
+        ```
+
+    - `set remote exec-file`
+        > 使用 `target extended-remote` 取代 `target remote`
+
+        ```bash
+        $　gdb -ex "target extended-remote 192.168.0.1:1234" \
+            -ex "set remote exec-file ./myexec" \
+            --args ./myexec arg1 arg2
+        (gdb) r
+        [Inferior 1 (process 1234) exited normally]
+        ```
+
 
 # gdb tui
 
