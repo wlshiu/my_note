@@ -1,6 +1,8 @@
 GDB_CMD
 ---
 
+[GDB Command Reference](https://visualgdb.com/gdbreference/commands/)
+
 + help (h)
     > 顯示指令簡短說明.例:help breakpoint
 
@@ -128,7 +130,7 @@ GDB_CMD
 + commands
     > 在遇到中斷點時要自動執行的指令.
 
-+ info
++ info (i)
     > 顯示一些特定的資訊.如: info break，顯示中斷點，
     > - `info share`
     >> 顯示共享函式庫資訊.
@@ -153,7 +155,7 @@ GDB_CMD
     (gdb) enable 2
     ```
 
-+ delete
++ delete (d)
     > 刪除某個 breakpoint.
 
     ```shell
@@ -272,6 +274,27 @@ GDB_CMD
     document save-bt
     Usage: save-bt ~/bt.rec
     end
+    ```
+
++ show 目前執行的 assembly code
+
+    ```
+    set disassemble-next-line on
+    show disassemble-next-line
+    ```
+
+    ```
+    (gdb) stepi
+    0x000002ce in ResetISR () at startup_gcc.c:245
+    245 {
+       0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
+    => 0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
+       0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
+    (gdb) stepi
+    0x000002d0  245 {
+       0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
+       0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
+    => 0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
     ```
 
 + disassembly code maps to source code
