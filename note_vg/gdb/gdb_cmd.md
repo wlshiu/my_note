@@ -108,6 +108,12 @@ GDB_CMD
         (gdb) condition 2 (var > 3) # 設置中斷條件, 條件成立時 2 號中斷
         (gdb) condition 2           #　取消 2 號中斷條件
         ```
++ H/w break pointer
+    > 如果遇到`b start_kernel`停不下來, 可以使用硬體斷點
+
+    ```
+    (gdb) hb start_kernel  // 設定硬體斷點
+    ```
 
 + continue (c, cont)
     > 繼續執行.和 breakpoint 搭配使用.
