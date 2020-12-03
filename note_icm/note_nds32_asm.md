@@ -50,6 +50,15 @@ NDS32 有 `32` 個 32-bits 通用暫存器, 也可以使用精簡暫存器 (15 �
 
     - referenc Programming Guide
 
++ `SE()` is a function to `Sign-Extend` an expression.
++ `ZE()` is a function to `Zero-Extend` an expression.
+
++ EX9IT
+    > It is an extension for code size reduction.
+    Compiler can put a frequently used 32-bit instruction in the instruction table
+    and replace the 32-bit instruction with the 16-bit `ex9.it` instruction in the code
+    for the code size reduction purpose.
+    >> code size 減少, 可能會加長執行時間, 進而影響效能.
 
 # Instruction Set (32-bits)
 
