@@ -5,41 +5,41 @@ NDS32
 
 ```
 Stack Layout:
-                   V8                                                  V10
-    Low |-----------------------|                           |----------------------|
-        |          $FPU         | ( configSUPPORT_FPU )     |          $FPU        | ( configSUPPORT_FPU )
-        |-----------------------|                           |----------------------|
-        |          $SP          | (8-byte alignment)        |         Dummy word   | ( Dummy word for 8-byte stack pointer alignment )
-        |-----------------------|                           |----------------------|
-        |          $SP          |                           |          $IPC        |
-        |-----------------------|                           |----------------------|
-        |          $PSW         |                           |          $IPSW       | ( configSUPPORT_ZOL )
-        |-----------------------|                           |----------------------|
-        |          $IPC         |                           |          $LB         | (ZOL)
-        |-----------------------|                           |----------------------|
-        |          $IPSW        |                           |          $LE         | (ZOL)
-        |-----------------------|                           |----------------------|
-        |          $LB          | (ZOL)                     |          $LC         | (ZOL)
-        |-----------------------|                           |----------------------|
-        |          $LE          | (ZOL)                     |         $IFC_LP      | ( configSUPPORT_IFC )
-        |-----------------------|                           |----------------------|
-        |          $LC          | (ZOL)                     |          $R0         |
-        |-----------------------|                           |----------------------|
-        |          $IFC_LP      |                           |    .      |    .     |
-        |-----------------------|                           |    .      |    .     |
-        |             .lo       |                           | $R(10-n)  | $R(24-n) |
-        |          $d1.hi       |                           |-----------|----------|
-        |-----------------------|                           |    $R10   | $R24     |
-        |             .lo       |                           |-----------|----------|
-        |          $d0.hi       |                           |    $R15   | $R25     |
-        |-----------------------|                           | (Reduced) | (full)   |
-        |          $R2          |                           |----------------------|
-        |-----------------------|                           |          $R28 (FP)   |
-        |    .      |   .       |                           |----------------------|        ^
-        |    .      |   .       |                           |          $R29 (GP)   |        |
-        | $R(10-n)  | $R(26-n)  |                           |----------------------|        |
-        |-----------|-----------|                           |          $R30 (LP)   |
-        |    $R10   |  $R26     |                           |----------------------| ( Stack Pointer )
+                   V8                                              V10
+    Low |-----------------------|                       |----------------------|
+        |          $FPU         | configSUPPORT_FPU     |          $FPU        | configSUPPORT_FPU
+        |-----------------------|                       |----------------------|
+        |          $SP          |  8-byte alignment     |         Dummy word   | Dummy word for 8-byte stack pointer alignment
+        |-----------------------|                       |----------------------|
+        |          $SP          |                       |          $IPC        |
+        |-----------------------|                       |----------------------|
+        |          $PSW         |                       |          $IPSW       | configSUPPORT_ZOL
+        |-----------------------|                       |----------------------|
+        |          $IPC         |                       |          $LB         | (ZOL)
+        |-----------------------|                       |----------------------|
+        |          $IPSW        |                       |          $LE         | (ZOL)
+        |-----------------------|                       |----------------------|
+        |          $LB          | (ZOL)                 |          $LC         | (ZOL)
+        |-----------------------|                       |----------------------|
+        |          $LE          | (ZOL)                 |         $IFC_LP      | configSUPPORT_IFC
+        |-----------------------|                       |----------------------|
+        |          $LC          | (ZOL)                 |          $R0         |
+        |-----------------------|                       |----------------------|
+        |          $IFC_LP      |                       |    .      |    .     |
+        |-----------------------|                       |    .      |    .     |
+        |             .lo       |                       | $R(10-n)  | $R(24-n) |
+        |          $d1.hi       |                       |-----------|----------|
+        |-----------------------|                       |    $R10   | $R24     |
+        |             .lo       |                       |-----------|----------|
+        |          $d0.hi       |                       |    $R15   | $R25     |
+        |-----------------------|                       | (Reduced) | (full)   |
+        |          $R2          |                       |----------------------|
+        |-----------------------|                       |          $R28 (FP)   |
+        |    .      |   .       |                       |----------------------|        ^
+        |    .      |   .       |                       |          $R29 (GP)   |        |
+        | $R(10-n)  | $R(26-n)  |                       |----------------------|        |
+        |-----------|-----------|                       |          $R30 (LP)   |
+        |    $R10   |  $R26     |                       |----------------------| ( Stack Pointer )
         |-----------|-----------|
         |    $R15   |  $R27     |
         | (Reduced) |  (full)   |
@@ -83,8 +83,8 @@ r11      | s5            | h11        |            | Saved by callee
 r12      | s6            |            |            | Saved by callee
 r13      | s7            |            |            | Saved by callee
 r14      | s8            |            |            | Saved by callee
-r15      | ta            |            |            | Temporary register for assembler
-<space>  |               |            |            | mplied register for slt(s\|i)45, b[eq\|ne]zs8
+r15      | ta            |            |            | Temporary register for assembler \
+<space>  |               |            |            | Implied register for slt(s\|i)45, b[eq\|ne]zs8
 r16      | t0            | h12        |            |　Saved by caller
 r17      | t1            | h13        |            |　Saved by caller
 r18      | t2            | h14        |            |　Saved by caller
@@ -103,7 +103,7 @@ r30      | lp            |            |            |　Link pointer
 r31      | sp            |            |            |　Stack pointer
 
 + Reduced Register (for save cost)
-    > In this `Reduced Register` configuration, `r11-r14`, and `r16-r27` are not available
+    > In this `Reduced Register` configuration, **r11-r14**, and **r16-r27** are not available
 
 Register | 32/16-bit (5) | 16-bit (4) | 16-bit (3) | Comments
  :-:     | :-:           | :-:        | :-:        | :-
@@ -119,7 +119,7 @@ r7       | s1            | h7         | o7         | Saved by callee
 r8       | s2            | h8         |            | Saved by callee
 r9       | s3            | h9         |            | Saved by callee
 r10      | s4            | h10        |            | Saved by callee
-r15      | ta            |            |            | Temporary register for assembler
+r15      | ta            |            |            | Temporary register for assembler \
 <space>  |               |            |            | Implied register for slt(s\|i)45, b[eq\|ne]zs8
 r28      | fp            |            |            | Frame pointer / Saved by callee
 r29      | gp            |            |            | Global pointer
