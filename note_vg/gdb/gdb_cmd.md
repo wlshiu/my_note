@@ -411,6 +411,29 @@ GDB_CMD
         ```
 
 
++ 友善的 print structure
+
+    ```
+    (gdb) set print pretty on
+    (gdb) p *my_struct_pointer
+        $3 = {
+          path = {
+            mnt = 0xffff8800070ce1a0,
+            dentry = 0xffff880006850600
+          },
+          last = {
+            {
+              {
+                hash = 3537271320,
+                len = 2
+              },
+              hash_len = 12127205912
+            },
+            name = 0xffff88000659501c "../b.out"
+          },
+        }
+    ```
+
 # gdb tui
 
 GDB Terminal User Interface
