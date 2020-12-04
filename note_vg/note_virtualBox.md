@@ -439,8 +439,8 @@ VirtualBox
             force security mode = 777
             force directory security mode = 777
             hide dot file = no
-            create mask = 0777
-            directory mask = 0777
+            create mask = 0644 ;0777
+            directory mask = 0775 ;0777
             delete readonly = yes
             guest ok = yes
             available = yes
