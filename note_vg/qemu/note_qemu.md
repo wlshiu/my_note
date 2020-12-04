@@ -86,7 +86,7 @@ Qemu
     $ wget https://download.qemu.org/qemu-5.1.0.tar.xz
     $ tar -xJf qemu-5.1.0.tar.xz
 
-    # sudo apt-get install build-essential zlib1g-dev pkg-config libglib2.0-dev binutils-dev libboost-all-dev \
+    $ sudo apt-get install build-essential zlib1g-dev pkg-config libglib2.0-dev binutils-dev libboost-all-dev \
     autoconf libtool libssl-dev libpixman-1-dev libpython-dev python-pip python-capstone virtualenv
         or
     $ sudo apt-get install qemubuilder libpixman-1-dev libpulse-dev libsdl2-dev
