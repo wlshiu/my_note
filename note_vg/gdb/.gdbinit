@@ -34,3 +34,6 @@ document reload-bp
 Usage: source ~/bp.rec
 end
 
+define lasm
+    disassemble $pc-16,+60
+end
