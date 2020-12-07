@@ -740,3 +740,11 @@ GDB Terminal User Interface
     let g:neodbg_keymap_terminate_debugger = '<C-C>'        " terminate debugger
     ```
 
+# build GDB and GDB server
+
++ dependency
+
+    ```
+    $ sudo apt install texinfo
+    ```
+
