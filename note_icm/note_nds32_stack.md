@@ -6,7 +6,7 @@ NDS32
 ```
 Stack Layout:
 
-SP_BOUND
+SP_BOUND (overflow)
                    V8                                              V10
     Low |-----------------------|                       |----------------------|
         |          $FPU         | configSUPPORT_FPU     |          $FPU        | configSUPPORT_FPU
@@ -58,7 +58,7 @@ SP_BOUND
         |-----------------------| ( Stack Pointer )
    High
 
-SP_BASE
+SP_BASE (underflow)
 ```
 
 
