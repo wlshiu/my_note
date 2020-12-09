@@ -185,6 +185,14 @@ $ svn revert [file-path]
     ```
     $ svn revert --depth=infinity .
     ```
+    
++ update
+
+    ```
+    $ svn up -r 10  # 當前的工作版本是版本10
+        or
+    $ svn up        # 更新到最新的版本
+    ```
 
 ## Tag
 
