@@ -32,7 +32,6 @@ converter2()
     out=$(dirname $path)
 
     if [ ! -d "$out_dir/$out" ]; then
-        echo ddd
         mkdir -p $out_dir/$out
     fi
 
@@ -42,17 +41,12 @@ converter2()
 export -f converter
 export -f converter2
 
-
-if [ $# != 4 ]; then
-    help
-fi
-
 case $1 in
     "-d")
         if [ $# != 3 ]; then
             help
         fi
-        
+
         find ${in_dir} -type f -exec bash -c 'converter2 "{}"' \;
 
         # unzip -q ${bin_raw}
@@ -76,4 +70,3 @@ case $1 in
         ;;
 
 esac    # --- end of case ---
-
