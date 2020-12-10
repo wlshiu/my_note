@@ -15,7 +15,7 @@ bin_raw=$4
 
 help()
 {
-    echo -e "usage: $0 <-d/-e> <input-path> <output-path> <bin>"
+    echo -e "usage: $0 <-d/-e> <input-path> <output-path> [bin]"
     exit 1;
 }
 
@@ -49,12 +49,20 @@ fi
 
 case $1 in
     "-d")
+        if [ $# != 3 ]; then
+            help
+        fi
+        
         find ${in_dir} -type f -exec bash -c 'converter2 "{}"' \;
 
-        unzip -q ${bin_raw}
+        # unzip -q ${bin_raw}
         ;;
 
     "-e")
+        if [ $# != 4 ]; then
+            help
+        fi
+
         find ${in_dir} -type f -name '*.c' -exec bash -c 'converter "{}"' \;
         find ${in_dir} -type f -name '*.h' -exec bash -c 'converter "{}"' \;
         find ${in_dir} -type f -iname '*.s' -exec bash -c 'converter "{}"' \;
