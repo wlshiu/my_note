@@ -311,24 +311,45 @@ GDB_CMD
 
 + show 目前執行的 assembly code
 
-    ```
-    set disassemble-next-line on
-    show disassemble-next-line
-    ```
+    - auto
+        ```
+        set disassemble-next-line on
+        show disassemble-next-line
+        ```
 
-    ```
-    (gdb) stepi
-    0x000002ce in ResetISR () at startup_gcc.c:245
-    245 {
-       0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
-    => 0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
-       0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
-    (gdb) stepi
-    0x000002d0  245 {
-       0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
-       0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
-    => 0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
-    ```
+        ```
+        (gdb) stepi
+        0x000002ce in ResetISR () at startup_gcc.c:245
+        245 {
+           0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
+        => 0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
+           0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
+        (gdb) stepi
+        0x000002d0  245 {
+           0x000002cc <ResetISR+0>: 80 b5   push    {r7, lr}
+           0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
+        => 0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
+        ```
+    
+    - view the next n instructions
+        > `x/ni $pc`
+        
+        ```
+        (gdb) x/3i $pc
+        0x401175 <main+37>:     call   0x4103f0 <__main>
+        0x40117a <main+42>:     lea    0xffffffe8(%ebp),%eax
+        0x40117d <main+45>:     mov    %eax,(%esp)
+        (gdb)        
+        ```
+
+        ```
+        # auto display
+        (gdb) display /3i $pc
+        0x401175 <main+37>:     call   0x4103f0 <__main>
+        0x40117a <main+42>:     lea    0xffffffe8(%ebp),%eax
+        0x40117d <main+45>:     mov    %eax,(%esp)
+        (gdb)    
+        ```
 
 + disassembly code maps to source code
 
