@@ -12,4 +12,6 @@ $ sed -i 's/\/\*\!.*$//' $FILENAME
 
 ```
 $ sed -e 's/[[:space:]][[:space:]]*/ /g'
+    or
+$ cat word.txt | sed 's/[ ][ ]*/,/g'
 ```
