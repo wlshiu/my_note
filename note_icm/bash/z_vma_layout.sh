@@ -27,19 +27,23 @@ tmp_file=___tmp
 mem_areas=(
     # start, end
     '0x00000000' '0x00020000' # pram
-    '0x00100000' '0x00200000' # prom
+    '0x20000000' '0x20020000' # prom
 )
+
+echo -e "#!/usr/bin/env python3\n" > t.py
+echo -e "import sys\n" >> t.py
+
+echo -n "mem_areas=[" >> t.py
 
 area_cnt=${#mem_areas[@]}
 for ((i = 0; i < $area_cnt; i += 2));do
-    echo "-${mem_areas[$i]} ~ ${mem_areas[(($i + 1))]}"
+    echo -n "[${mem_areas[$i]}, ${mem_areas[(($i + 1))]}]," >> t.py
 done
 
-cat > t.py << EOF
-#!/usr/bin/env python3
+echo -n "]" >> t.py
+echo -e "\n\n" >> t.py
 
-import sys
-
+cat >> t.py << EOF
 in_file = "${tmp_file}"
 
 def print_range(message, end = '\n'):
@@ -58,7 +62,6 @@ def display(prefix, total_size, start, length, width=60, file=sys.stdout):
     file.flush()
 
 
-mem_areas=[[0x00000000, 0x00020000], [0x20000000, 0x20020000]]
 mem_areas_idx = -1
 
 
@@ -114,6 +117,9 @@ do
 
     rm -f ${out_elf}
 done
+
+
+
 
 
 rm -f t.py
