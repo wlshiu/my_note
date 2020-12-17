@@ -42,9 +42,60 @@ import sys
 
 in_file = "${tmp_file}"
 
+def print_range(message, end = '\n'):
+    sys.stdout.write(message.strip() + end)
+
+
+def display(prefix, total_size, start, length, width=60, file=sys.stdout):
+
+    nTotal_size = int(total_size, 16)
+    nStart      = int(start, 16)
+    nEnd        = nStart + int(length, 16)
+
+    pos_s = int(width * nStart / nTotal_size)
+    pos_e = int(width * nEnd / nTotal_size)
+    file.write("=> \x1b[1;32m%s[%s%s%s]\x1b[0m\n" % (prefix, "."*pos_s, "#"*(pos_e - pos_s), "."*(width - pos_e)))
+    file.flush()
+
+
+mem_areas=[[0x00000000, 0x00020000], [0x20000000, 0x20020000]]
+mem_areas_idx = -1
+
+
 for line in open(in_file):
     d = line.split(', ')
-    print('0x%s ~ 0x%08x\t\t%s' % (d[0], int(d[0], 16) + int(d[1], 10), d[2]), end = '')
+    start_addr = int(d[0], 16)
+    end_addr   = start_addr + int(d[1], 16)
+
+    for i in range(len(mem_areas)):
+        if (start_addr >= mem_areas[i][0]) and (start_addr < mem_areas[i][1] ):
+            if mem_areas_idx != i:
+                print("\n\n\x1b[36m ===== AREA: 0x%08x ~ 0x%08x ====\x1b[0m" %(mem_areas[i][0], mem_areas[i][1]))
+                mem_areas_idx = i
+            print_range('0x%08x ~ 0x%08x (size=%d)\t\t%s' % (start_addr, end_addr, int(d[1], 16), d[2]))
+
+            display("", '0x20000', hex(start_addr - int(hex(mem_areas[i][0]), 16)), d[1], 100)
+
+# class Color:
+#     # Foreground
+#     F_Default = "\x1b[39m"
+#     F_Black = "\x1b[30m"
+#     F_Red = "\x1b[31m"
+#     F_Green = "\x1b[32m"
+#     F_Yellow = "\x1b[33m"
+#     F_Blue = "\x1b[34m"
+#     F_Magenta = "\x1b[35m"
+#     F_Cyan = "\x1b[36m"
+#     F_LightGray = "\x1b[37m"
+#     F_DarkGray = "\x1b[90m"
+#     F_LightRed = "\x1b[91m"
+#     F_LightGreen = "\x1b[92m"
+#     F_LightYellow = "\x1b[93m"
+#     F_LightBlue = "\x1b[94m"
+#     F_LightMagenta = "\x1b[95m"
+#     F_LightCyan = "\x1b[96m"
+#     F_White = "\x1b[97m"
+
 EOF
 
 
@@ -57,7 +108,7 @@ do
     ## trim debug section
     ${OBJCOPY} -S -R .comment -R .shstrtab ${in_elf} ${out_elf}
     ${READELF} -S ${out_elf} | grep '[ ]*\[[ 0-9]*\][ ][.]' | awk -F'] ' '{print $2}' | \
-        awk '{print "0x"$3, "0x"$5, $1}' | xargs printf "%08x, %d, %s(${in_elf})\n" | sort > ${tmp_file}
+        awk '{print "0x"$3, "0x"$5, $1}' | xargs printf "%08x, %x, %s(${in_elf})\n" | sort > ${tmp_file}
 
     python3 t.py
 
