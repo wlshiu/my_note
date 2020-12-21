@@ -7,6 +7,25 @@
     $ sudo apt-get update
     $ sudo apt-get install git
     ```
+- 換行符號
+
+    1. `AutoCRLF`
+
+        ```
+        $ git config --global core.autocrlf true    # 設定成 true 的作用是 commit 時會自動將 CRLF 轉成 LF, checkout 時會自動將 LF 轉成 CRLF
+        $ git config --global core.autocrlf input   # 設定成 input 的作用是 commit 時會自動將 CRLF 轉成 LF, checkout 時不轉換
+        $ git config --global core.autocrlf false   # 設定成 false 的則是停止自動轉換，不管 commit 或是 checkout 都不會進行轉換
+        ```
+
+    1. `SafeCRLF`
+        > 這設定是更加嚴格的過濾換行符, 只要 git add 或是 commit 或是 push 都會過濾
+
+        ```
+        $ git config --global core.safecrlf true    # 不允許 有 LF 與 CRLF 混合的檔案
+        $ git config --global core.safecrlf false   # 允許 有 LF 與 CRLF 混合的檔案
+        $ git config --global core.safecrlf warn    # 允許 有 LF 與 CRLF 混合的檔案, 但是會出現 warning 警告訊息
+        ```
+
 
 - handle MS Word files (https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes)
 
