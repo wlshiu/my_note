@@ -285,6 +285,28 @@ $ svn revert [file-path]
             $ svn propset svn:ignore -R *.class .
             ```
 
++ 換行符號
+
+    設定 SVN 配置文件 (等同強制修改目標文件, 需要 commit 進版)
+
+    > + windows: `%APPDATA%\Roaming\Subversion\config`
+    > + UNIX:    `~/.subversion/config`
+
+    ```
+    [miscellany]
+        enable-auto-props = yes
+
+    [auto-props]
+        *.java = svn:eol-style=native
+        *.c = svn:eol-style=native
+        *.h = svn:eol-style=native
+        *.mk = svn:eol-style=native
+        Makefile = svn:eol-style=native
+        Makefile* = svn:eol-style=native
+        *.sh = svn:eol-style=native;svn:executable
+    ```
+
+
 # reference
 
 + [在linux下, SVN基本的指令](http://dannysun-unknown.blogspot.com/2017/03/linuxsvn.html)
