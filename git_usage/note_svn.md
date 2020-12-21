@@ -116,7 +116,43 @@ $ git remote add origin <git repo url>
 $ git push -u origin master
 ```
 
+## Get remote branch of SVN
 
+```
+$ git svn fetch --all
+```
+
+```
+$ git config --add svn-remote.newbranch.url https://svn/path_to_newbranch/
+$ git config --add svn-remote.newbranch.fetch :refs/remotes/newbranch
+$ git svn fetch newbranch [-r<rev>]
+$ git checkout -b local-newbranch -t newbranch
+$ git svn rebase newbranch
+```
+
++ [git-svn] Change svn repo URL
+
+    不幸遇到需要改變 svn remote repository 的 url. 好不容易找到別人提供的方法, 記錄如下:
+
+    1. 先把專案中的 `.git/config` 裡面的 svn-remote 的 url 改成新的連結.
+    1. 執行 `git svn fetch`, 拉取最新的內容.
+    1. 換回原先的 url.
+    1. 執行 `git svn rebase -l`, 做 local rebase.
+        > `-l` 意思是在 local 做 rebase, 而不從 remote 抓取最新的進度.
+    1. 再換回新的 url.
+    1. 執行 git svn rebase
+
+    順帶說明一下, 一開始我在改變 url 後直接執行 git svn rebase, 得到一個錯誤訊息:
+
+    ```
+    Unable to determine upstream SVN information from working tree history
+    ```
+
+    所以, 1~4就是讓 local 能對得上 remote. 最後再透過 6 把 local-remote 對上.
+
++ reference
+    - [How do I tell git-svn about a remote branch created after I fetched the repo?](https://stackoverflow.com/questions/296975/how-do-i-tell-git-svn-about-a-remote-branch-created-after-i-fetched-the-repo)
+    - [Add an SVN remote to your Git repo](https://coderwall.com/p/vfop7g/add-an-svn-remote-to-your-git-repo)
 
 # SVN Commands
 
@@ -185,7 +221,7 @@ $ svn revert [file-path]
     ```
     $ svn revert --depth=infinity .
     ```
-    
+
 + update
 
     ```
