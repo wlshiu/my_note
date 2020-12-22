@@ -312,4 +312,4 @@ $ svn revert [file-path]
 + [在linux下, SVN基本的指令](http://dannysun-unknown.blogspot.com/2017/03/linuxsvn.html)
 + [linux下svn命令使用大全](https://pxnet2768.pixnet.net/blog/post/66987519)
 + [使用svn進行文件和文件夾的忽略](https://www.jianshu.com/p/c02d8b335495)
-
++ [SVN 組件及指令](https://lamb-mei.com/40/svn-%E7%B5%84%E4%BB%B6%E5%8F%8A%E6%8C%87%E4%BB%A4/)
