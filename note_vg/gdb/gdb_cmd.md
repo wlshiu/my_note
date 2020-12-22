@@ -21,6 +21,14 @@ GDB_CMD
 + print (p)
     > 印出變數內容.例:print i，印出變數 i 的內容.
 
++ `printf`
+    > 格式化輸出
+
+    ```
+    (gdb) print "%d,%d\n",x,y
+    5,2
+    ```
+
 + list (l)
     > 印出程式碼.若在編譯時沒有加上 -g 參數，list 指令將無作用.
 
@@ -89,6 +97,7 @@ GDB_CMD
         ```
 
     + `memory-address`
+        > 需要加 `*`
 
         ```shell
         (gdb) b *0x08048123
@@ -189,6 +198,49 @@ GDB_CMD
             ```
             (gdb) info register $ir3
             ```
+    - `info frame`
+
+        ```
+        (gdb) info frame
+            Stack level 0, frame at 0xbffd0cd0:
+             eip = 0x80483ca in show3 (main.c:4); saved eip 0x80483ef
+             called by frame at 0xbffd0ce0
+             source language c.
+             Arglist at 0xbffd0cc8, args:
+             Locals at 0xbffd0cc8, Previous frame's sp is 0xbffd0cd0
+             Saved registers:
+              ebp at 0xbffd0cc8, eip at 0xbffd0ccc
+        ```
+
+        1. 解讀info frame命令產生的信息
+
+            > `Stack level 0, frame at 0xbffd0cd0`
+            >> 當前棧的起始地址 0xbffd0cd0
+
+            > `eip = 0x80483ca in show3 (main.c:4); saved eip 0x80483ef`
+            >> + `0x80483ca` 表示當前的 eip 寄存器的值(main.c:4)
+            >> + `0x80483ef` 表示調用本函數(當前調用函數為 show3)的指令的地址,
+            即`0x80483ef`應該表示的是源程序第 10 行翻譯成彙編後的地址
+
+            > `called by frame at 0xbffd0ce0`
+            >> 這個表示上一個棧幀的地址, 因為當前函數是 show3, 所以這個地址表示 show2 的棧的地址, 可以用命令查看一下 show2 的棧地址
+
+            > `source language c`
+            >> 源程序是c語言
+
+            > `Arglist at 0xbffd0cc8, args:`
+            >> 存放函數參數的地址從`0xbffd0cc8`開始
+
+            > `Locals at 0xbffd0cc8, Previous frame's sp is 0xbffd0cd0`
+            >> 存放函數局部變量的地址從`0xbffd0cd8`開始
+
+
+            > `Saved registers:`
+              `ebp at 0xbffd0cc8, eip at 0xbffd0ccc`
+            >> 調用函數的過程中, 壓棧時保存的相關寄存器的值
+
+    - `info stack`
+        > like backtrace
 
 + disable
     > 暫時關閉某個 breakpoint 或 display 之功能.
@@ -228,9 +280,21 @@ GDB_CMD
 
     - 設定 input arguments of a program
 
-    ```
-    (gdb) set args -type f
-    ```
+        ```
+        (gdb) set args -type f
+        ```
+
+    - 修改 memory value
+
+        ```
+        (gdb) set {int}0x8048667=32
+        ```
+
+    - 修改當前的 program counter, 可以在 call xxx 時使用.
+
+        ```
+        (gdb) set $pc=0x0804852b
+        ```
 
 + unset
     > 取消特定參數.如:unset env，刪除環境變數.
@@ -246,6 +310,12 @@ GDB_CMD
 
 + shell
     > 執行 Shell 指令.如:shell ls，呼叫 sh 以執行 ls 指令.
+
+    - 用 nm 查詢 function 在哪一個 shared object 裡
+
+        ```
+        nm -C -A *.so | grep xxx_function
+        ```
 
 + quit
     > 離開 gdb.或是按下 <Ctrl + C> 也行.
