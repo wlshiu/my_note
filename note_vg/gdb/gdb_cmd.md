@@ -168,6 +168,28 @@ GDB_CMD
     > - `info share`
     >> 顯示共享函式庫資訊.
 
+    - 列出所有的 symbols
+
+        ```
+        (gdb) info functions
+            or
+        (gdb) info functions Task   # 列出含有 'Task' 的 symbol name
+        ```
+
+    - print GPRs (General Purpose Registers)
+
+        ```
+        (gdb) info register
+            or
+        (gdb) i r
+        ```
+
+        1. print the structure of specific system register
+
+            ```
+            (gdb) info register $ir3
+            ```
+
 + disable
     > 暫時關閉某個 breakpoint 或 display 之功能.
 
@@ -330,16 +352,16 @@ GDB_CMD
            0x000002ce <ResetISR+2>: 82 b0   sub sp, #8
         => 0x000002d0 <ResetISR+4>: 00 af   add r7, sp, #0
         ```
-    
+
     - view the next n instructions
         > `x/ni $pc`
-        
+
         ```
         (gdb) x/3i $pc
         0x401175 <main+37>:     call   0x4103f0 <__main>
         0x40117a <main+42>:     lea    0xffffffe8(%ebp),%eax
         0x40117d <main+45>:     mov    %eax,(%esp)
-        (gdb)        
+        (gdb)
         ```
 
         ```
@@ -348,7 +370,7 @@ GDB_CMD
         0x401175 <main+37>:     call   0x4103f0 <__main>
         0x40117a <main+42>:     lea    0xffffffe8(%ebp),%eax
         0x40117d <main+45>:     mov    %eax,(%esp)
-        (gdb)    
+        (gdb)
         ```
 
 + disassembly code maps to source code
