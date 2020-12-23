@@ -96,12 +96,20 @@ GDB_CMD
         (gdb) b test.c:run
         ```
 
-    + `memory-address`
+    - `memory-address`
         > 需要加 `*`
 
         ```shell
         (gdb) b *0x08048123
         ```
+
+        1. break at a offset of the specific function
+
+            ```
+            (gdb) disassemble func_name
+            (gdb) b *(func_name + 20)
+            ```
+
 
     - 條件式中斷點, 當 `CONDITION` 滿足時才中斷.
         >　`break [LOCATION] [if CONDITION]`
@@ -198,6 +206,21 @@ GDB_CMD
             ```
             (gdb) info register $ir3
             ```
+
+    - 列出所有宣告的 type
+        > pattern 幾乎等同於 grep 的 pattern 用法
+
+        ```
+        (gdb) info types [pattern]
+        ```
+
+    - 列出所有宣告的變數
+        > pattern 幾乎等同於 grep 的 pattern 用法
+
+        ```
+        (gdb) info variables [pattern]
+        ```
+
     - `info frame`
 
         ```
