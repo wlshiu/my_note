@@ -7,7 +7,7 @@ GDB_CMD
     > 顯示指令簡短說明.例:help breakpoint
 
 + file
-    > 開啟執行檔案.等同於 gdb filename
+    > 開啟執行檔案 (elf file).等同於 gdb filename
 
 + run (r)
     > 執行程式，或是從頭再執行程式.
@@ -125,6 +125,7 @@ GDB_CMD
         (gdb) condition 2 (var > 3) # 設置中斷條件, 條件成立時 2 號中斷
         (gdb) condition 2           #　取消 2 號中斷條件
         ```
+
 + H/w break pointer
     > 如果遇到`b start_kernel`停不下來, 可以使用硬體斷點
 
@@ -159,7 +160,7 @@ GDB_CMD
     > 中止執行該 frame(視同該 frame 已執行完畢)，並返回上個 frame 的呼叫點.功用類似 C 裡的 return 指令.
 
 + finish
-    > 直接退出當前函數(執行完這個 frame).
+    > 結束當前函數, ，返回到函數的調用點.
     當進入一個過深的 frame 時，如:C 函式庫，可能必須下達多個 finish 才能回到原來的進入點.
 
 + up
@@ -185,7 +186,7 @@ GDB_CMD
     > - `info share`
     >> 顯示共享函式庫資訊.
 
-    - 列出所有的 symbols
+    - 列出所有的 functions
 
         ```
         (gdb) info functions
@@ -265,6 +266,17 @@ GDB_CMD
     - `info stack`
         > like backtrace
 
+    - `info threads`
+        > 列出目前有的 thread list
+
+        1. 跳到別的 thread
+
+            ```
+            (gdb) info threads
+                ...
+            (gdb) thread 2
+            ```
+
 + disable
     > 暫時關閉某個 breakpoint 或 display 之功能.
 
@@ -294,6 +306,18 @@ GDB_CMD
     2   yyyy
     (gdb) delete 2
     ```
+
+    - delete all breakpoints
+
+        ```
+        (gdb) d
+        ```
+
+    - 刪除多個 breakpoints
+
+        ```
+        (gdb) del <start_breakpoint_num> - <end_breakpoint_num>
+        ```
 
 + clear
     > 清除所有中斷
@@ -424,6 +448,14 @@ GDB_CMD
     end
     ```
 
++ 設定顏色
+
+    - 改變 prompt
+
+        ```
+        set prompt \033[31mgdb$ \033[0m
+        ```
+
 + show 目前執行的 assembly code
 
     - auto
@@ -525,6 +557,16 @@ GDB_CMD
     ...
     (gdb) set logging off
     Done logging to backtrace.log.
+    ```
+
++ 紀錄 log
+
+    ```
+    (gdb) set logging on            # enable logging
+    (gdb) set logging file gdb.log  # 設定 log file name
+    (gdb) set logging overwrite on  # 讓輸出覆蓋之前的日誌文件
+    (gdb) set logging redirect on   # 讓 gdb 的日誌不會打印在終端
+    (gdb) set logging off           # disable logging
     ```
 
 + 重跑 progtam
