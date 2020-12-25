@@ -196,7 +196,7 @@ $ svn commit -m "initial commit"
 ## Delete
 
 ```
-# 只從svn中忽略, 而不刪除文件
+# 只從 svn 中忽略, 而不刪除文件
 $ svn delete --keep-local [path]
 ```
 
@@ -230,8 +230,31 @@ $ svn revert [file-path]
     $ svn up        # 更新到最新的版本
     ```
 
-## Tag
+## List
 
+列出遠端 server 的 directory
+
+```
+$ svn list <https://svn_server_repository>
+    trunk
+    branch
+    tags
+    ...
+
+$ svn list <https://svn_server_repository/tags>
+    TagV1.0
+    TagV2.0
+    TagV3.0
+    ...
+
+$ svn list <https://svn_server_repository/branch>
+    Branch_1
+    Branch_2
+    Branch_3
+    ...
+```
+
+## Tag
 
 ## Log
 

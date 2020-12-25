@@ -380,6 +380,22 @@ GDB_CMD
 + awatch
     > 觀察到變量被讀或者被寫時,停止程序
 
++ dump
+    > dump memory to file
+
+    ```
+    (gdb) dump [format] memory <file-name> <start_addr> <end_addr>
+    ```
+
+    - format
+
+        1. binary
+            > Raw binary form.
+        1. ihex
+            > Intel hex format.
+        1. srec
+            > Motorola S-record format.
+
 + 直接看到 console 訊息 (stdout)
 
     - re-direct output

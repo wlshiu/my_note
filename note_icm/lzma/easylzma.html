@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" style="" lang="en"><script data-savepage-src="moz-extension://e8af3748-cab9-4ad3-8a37-7f418908bdae/js/inject.js" src=""></script><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<title>easylzma</title>
+    
+    <style type="text/css">
+      body {
+	    background-color: #D5D6D7;
+	    padding:20px;
+	    text-align: center;
+        align: center;
+	  }
+      .header {
+	    border-bottom: 1px solid #959596;
+	    padding: 5px;
+        color: #ffffff;
+        background-color: rgb(115, 160, 197);
+	  }
+      .header a {
+	    text-decoration: none;
+        color: #ffffff;
+	  }
+      .pageTitle {
+	    font-size: 3em;
+	    font-weight: normal;
+	  }
+      .small { font-size: 1em; }
+
+      #outerContainer {
+        border:1px solid #959596;
+        font-family: "helvetica"; 
+        color: #000000;
+        margin: 0 auto;
+        background-color: #ffffff;
+      }
+      #container {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        width: 700px;
+        color: #333333;
+      }
+      h1 { font-size: 3.8em; color: #736f30; margin-bottom: 3px; }
+      h1 .small { font-size: 0.4em; }
+      h1 a { text-decoration: none }
+      h2 { font-size: 1.5em; }
+      h3 { text-align: center; }
+      .description {
+	    font-size: 1.2em;
+	    margin-bottom: 30px;
+	    margin-top: 30px;
+	    font-style: italic;
+	  }
+      .download { float: right; }
+      pre { background: #000; color: #fff; padding: 15px;}
+      hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+      .footer { text-align:center; padding-top:30px; font-style: italic; }
+      .styleCredit { font-size: 75%; }
+    </style>
+    
+<style type="text/css">.dp-cpp .datatypes { color: #2E8B57; font-weight: bold; }</style>
+<style id="savepage-cssvariables">
+  :root {
+  }
+</style>
+<script id="savepage-shadowloader" type="application/javascript">
+  "use strict";
+  window.addEventListener("DOMContentLoaded",
+  function(event) {
+    savepage_ShadowLoader(5);
+  },false);
+  function savepage_ShadowLoader(c){createShadowDOMs(0,document.documentElement);function createShadowDOMs(a,b){var i;if(b.localName=="iframe"||b.localName=="frame"){if(a<c){try{if(b.contentDocument.documentElement!=null){createShadowDOMs(a+1,b.contentDocument.documentElement)}}catch(e){}}}else{if(b.children.length>=1&&b.children[0].localName=="template"&&b.children[0].hasAttribute("data-savepage-shadowroot")){b.attachShadow({mode:"open"}).appendChild(b.children[0].content);b.removeChild(b.children[0]);for(i=0;i<b.shadowRoot.children.length;i++)if(b.shadowRoot.children[i]!=null)createShadowDOMs(a,b.shadowRoot.children[i])}for(i=0;i<b.children.length;i++)if(b.children[i]!=null)createShadowDOMs(a,b.children[i])}}}
+</script>
+<meta name="savepage-url" content="https://lloyd.github.io/easylzma/">
+<meta name="savepage-title" content="easylzma">
+<meta name="savepage-from" content="https://lloyd.github.io/easylzma/">
+<meta name="savepage-date" content="Fri Dec 25 2020 22:52:36 GMT+0800 (台北標準時間)">
+<meta name="savepage-state" content="Custom Items; Retain cross-origin frames; Merge CSS images; Remove unsaved URLs; Max frame depth = 5; Max resource size = 50MB; Max resource time = 10s;">
+<meta name="savepage-version" content="24.0">
+<meta name="savepage-comments" content="">
+  </head>
+
+<body style="margin-bottom: 8px !important;">
+  <a href="http://github.com/lloyd/easylzma"><img style="position: absolute; top: 0; right: 0; border: 0;" data-savepage-src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" src="" alt="Fork me on GitHub"></a>
+  
+  <div id="outerContainer">
+  <div class="header">
+    <span class="pageTitle">
+      <a href="http://github.com/lloyd/easylzma">easylzma</a>
+	</span><br>
+    <span class="small">
+	  by <a href="http://github.com/lloyd">lloyd</a>
+	</span>
+  </div>
+  <div id="container">
+    <div class="description">
+      An easy to use, tiny, public domain, C wrapper library around Igor Pavlov's work that can be used to compress and extract lzma files.
+    </div>
+
+    <h2>Overview</h2>
+
+      easylzma is a small and portable C library which wraps Igor Pavlov's
+	  LZMA reference implementation.  It comes with command line tools
+	  to compress and uncompress both lzip and LZMA-Alone disk formats.
+      It's also as <a href="http://gist.github.com/59923">fast as any</a>
+	  implementation out there (largely because
+	  it's based on Igor's recent C implementation of LZMA).
+
+    <h2>Download</h2>
+    <p>
+      </p><ul>
+      <li><a href="http://github.com/lloyd/easylzma/zipball/0.0.7">easylzma-0.0.7.zip</a>
+      </li><li><a href="http://github.com/lloyd/easylzma/tarball/0.0.7">easylzma-0.0.7.tar.gz</a>
+      </li><li><a href="http://github.com/lloyd/easylzma/zipball/master">easylzma-trunk.zip</a>
+      </li><li><a href="http://github.com/lloyd/easylzma/tarball/master">easylzma-trunk.tar.gz</a>
+       </li></ul>
+    <p></p>
+    <p>You can also clone the project with <a data-savepage-href="http://git-scm.com" href="http://git-scm.com/">Git</a>
+      by running:
+      </p><pre>$ git clone git://github.com/lloyd/easylzma</pre>
+    <p></p>
+
+    <h2>Example Programmatic Usage In C</h2>
+
+    <div class="dp-highlighter"><div class="bar"><div class="tools"><a href="#" onclick="dp.sh.Toolbar.Command('ViewSource',this);return false;">view plain</a><a href="#" onclick="dp.sh.Toolbar.Command('PrintSource',this);return false;">print</a><a href="#" onclick="dp.sh.Toolbar.Command('About',this);return false;">?</a></div></div><ol class="dp-cpp" start="1"><li class="alt"><span><span class="comment">/*</span> </span></li><li class=""><span><span class="comment"> * an example of basic LZMA compression to and from memory buffers</span> </span></li><li class="alt"><span><span class="comment"> * using the easylzma library.</span> </span></li><li class=""><span><span class="comment"> */</span><span>  </span></span></li><li class="alt"><span>   </span></li><li class=""><span><span class="preprocessor">#include "easylzma/compress.h"</span><span>  </span></span></li><li class="alt"><span>   </span></li><li class=""><span><span class="preprocessor">#include &lt;string.h&gt;</span><span>  </span></span></li><li class="alt"><span><span class="preprocessor">#include &lt;assert.h&gt;</span><span>  </span></span></li><li class=""><span>   </span></li><li class="alt"><span><span class="keyword">struct</span><span> dataStream  </span></span></li><li class=""><span>{  </span></li><li class="alt"><span>    <span class="keyword">const</span><span> unsigned </span><span class="datatypes">char</span><span> * inData;  </span></span></li><li class=""><span>    <span class="datatypes">size_t</span><span> inLen;  </span></span></li><li class="alt"><span>   </span></li><li class=""><span>    unsigned <span class="datatypes">char</span><span> * outData;  </span></span></li><li class="alt"><span>    <span class="datatypes">size_t</span><span> outLen;  </span></span></li><li class=""><span>};  </span></li><li class="alt"><span>  </span></li><li class=""><span><span class="comment">/* an input callback that will be passed to elzma_compress_run(),</span> </span></li><li class="alt"><span><span class="comment"> * it reads from a memory buffer */</span><span>  </span></span></li><li class=""><span><span class="keyword">static</span><span> </span><span class="datatypes">int</span><span>  </span></span></li><li class="alt"><span>inputCallback(<span class="keyword">void</span><span> *ctx, </span><span class="keyword">void</span><span> *buf, </span><span class="datatypes">size_t</span><span> * size)  </span></span></li><li class=""><span>{  </span></li><li class="alt"><span>    <span class="datatypes">size_t</span><span> rd = 0;  </span></span></li><li class=""><span>    <span class="keyword">struct</span><span> dataStream * ds = (</span><span class="keyword">struct</span><span> dataStream *) ctx;  </span></span></li><li class="alt"><span>    assert(ds != NULL);  </span></li><li class=""><span>      </span></li><li class="alt"><span>    rd = (ds-&gt;inLen &lt; *size) ? ds-&gt;inLen : *size;  </span></li><li class=""><span>   </span></li><li class="alt"><span>    <span class="keyword">if</span><span> (rd &gt; 0) {  </span></span></li><li class=""><span>        memcpy(buf, (<span class="keyword">void</span><span> *) ds-&gt;inData, rd);  </span></span></li><li class="alt"><span>        ds-&gt;inData += rd;  </span></li><li class=""><span>        ds-&gt;inLen -= rd;  </span></li><li class="alt"><span>    }  </span></li><li class=""><span>   </span></li><li class="alt"><span>    *size = rd;  </span></li><li class=""><span>   </span></li><li class="alt"><span>    <span class="keyword">return</span><span> 0;  </span></span></li><li class=""><span>}  </span></li><li class="alt"><span>  </span></li><li class=""><span><span class="comment">/* an ouput callback that will be passed to elzma_compress_run(),</span> </span></li><li class="alt"><span><span class="comment"> * it reallocs and writes to a memory buffer */</span><span>  </span></span></li><li class=""><span><span class="keyword">static</span><span> </span><span class="datatypes">size_t</span><span>  </span></span></li><li class="alt"><span>outputCallback(<span class="keyword">void</span><span> *ctx, </span><span class="keyword">const</span><span> </span><span class="keyword">void</span><span> *buf, </span><span class="datatypes">size_t</span><span> size)  </span></span></li><li class=""><span>{  </span></li><li class="alt"><span>    <span class="keyword">struct</span><span> dataStream * ds = (</span><span class="keyword">struct</span><span> dataStream *) ctx;  </span></span></li><li class=""><span>    assert(ds != NULL);  </span></li><li class="alt"><span>      </span></li><li class=""><span>    <span class="keyword">if</span><span> (size &gt; 0) {  </span></span></li><li class="alt"><span>        ds-&gt;outData = realloc(ds-&gt;outData, ds-&gt;outLen + size);  </span></li><li class=""><span>        memcpy((<span class="keyword">void</span><span> *) (ds-&gt;outData + ds-&gt;outLen), buf, size);  </span></span></li><li class="alt"><span>        ds-&gt;outLen += size;  </span></li><li class=""><span>    }  </span></li><li class="alt"><span>   </span></li><li class=""><span>    <span class="keyword">return</span><span> size;  </span></span></li><li class="alt"><span>}  </span></li><li class=""><span>  </span></li><li class="alt"><span><span class="comment">/* a function that will compress data using a 1mb dictionary and a</span> </span></li><li class=""><span><span class="comment"> * client specified encoding format (one of ELZMA_lzip or ELZMA_lzma) */</span><span>  </span></span></li><li class="alt"><span><span class="datatypes">int</span><span>  </span></span></li><li class=""><span>simpleCompress(elzma_file_format format, <span class="keyword">const</span><span> unsigned </span><span class="datatypes">char</span><span> * inData,  </span></span></li><li class="alt"><span>               <span class="datatypes">size_t</span><span> inLen, unsigned </span><span class="datatypes">char</span><span> ** outData,  </span></span></li><li class=""><span>               <span class="datatypes">size_t</span><span> * outLen)  </span></span></li><li class="alt"><span>{  </span></li><li class=""><span>    <span class="datatypes">int</span><span> rc;  </span></span></li><li class="alt"><span>    elzma_compress_handle hand;  </span></li><li class=""><span>   </span></li><li class="alt"><span>    <span class="comment">/* allocate compression handle */</span><span>  </span></span></li><li class=""><span>    hand = elzma_compress_alloc();  </span></li><li class="alt"><span>    assert(hand != NULL);  </span></li><li class=""><span>  </span></li><li class="alt"><span>    <span class="comment">/* configure the compression run with mostly default parameters  */</span><span>   </span></span></li><li class=""><span>    rc = elzma_compress_config(hand, ELZMA_LC_DEFAULT,  </span></li><li class="alt"><span>                               ELZMA_LP_DEFAULT, ELZMA_PB_DEFAULT,  </span></li><li class=""><span>                               5, (1 &lt;&lt; 20) <span class="comment">/* 1mb */</span><span>,  </span></span></li><li class="alt"><span>                               format, inLen);  </span></li><li class=""><span>  </span></li><li class="alt"><span>    <span class="comment">/* fail if we couldn't allocate */</span><span>    </span></span></li><li class=""><span>    <span class="keyword">if</span><span> (rc != ELZMA_E_OK) {  </span></span></li><li class="alt"><span>        elzma_compress_free(&amp;hand);  </span></li><li class=""><span>        <span class="keyword">return</span><span> rc;  </span></span></li><li class="alt"><span>    }  </span></li><li class=""><span>   </span></li><li class="alt"><span>    <span class="comment">/* now run the compression */</span><span>  </span></span></li><li class=""><span>    {  </span></li><li class="alt"><span>        <span class="comment">/* set up the context structure that will be passed to</span> </span></li><li class=""><span><span class="comment">         * stream callbacks */</span><span>    </span></span></li><li class="alt"><span>        <span class="keyword">struct</span><span> dataStream ds;  </span></span></li><li class=""><span>        ds.inData = inData;  </span></li><li class="alt"><span>        ds.inLen = inLen;  </span></li><li class=""><span>        ds.outData = NULL;  </span></li><li class="alt"><span>        ds.outLen = 0;  </span></li><li class=""><span>  </span></li><li class="alt"><span>        <span class="comment">/* run the streaming compression */</span><span>   </span></span></li><li class=""><span>        rc = elzma_compress_run(hand, inputCallback, (<span class="keyword">void</span><span> *) &amp;ds,  </span></span></li><li class="alt"><span>                                outputCallback, (<span class="keyword">void</span><span> *) &amp;ds);  </span></span></li><li class=""><span>          </span></li><li class="alt"><span>        <span class="keyword">if</span><span> (rc != ELZMA_E_OK) {  </span></span></li><li class=""><span>            <span class="keyword">if</span><span> (ds.outData != NULL) free(ds.outData);  </span></span></li><li class="alt"><span>            elzma_compress_free(&amp;hand);  </span></li><li class=""><span>            <span class="keyword">return</span><span> rc;  </span></span></li><li class="alt"><span>        }  </span></li><li class=""><span>   </span></li><li class="alt"><span>        *outData = ds.outData;  </span></li><li class=""><span>        *outLen = ds.outLen;  </span></li><li class="alt"><span>    }  </span></li><li class=""><span>   </span></li><li class="alt"><span>    <span class="keyword">return</span><span> rc;  </span></span></li><li class=""><span>}  </span></li></ol></div><textarea name="code" class="c" style="display: none;">/*
+ * an example of basic LZMA compression to and from memory buffers
+ * using the easylzma library.
+ */
+ 
+#include "easylzma/compress.h"
+ 
+#include &lt;string.h&gt;
+#include &lt;assert.h&gt;
+ 
+struct dataStream
+{
+    const unsigned char * inData;
+    size_t inLen;
+ 
+    unsigned char * outData;
+    size_t outLen;
+};
+
+/* an input callback that will be passed to elzma_compress_run(),
+ * it reads from a memory buffer */
+static int
+inputCallback(void *ctx, void *buf, size_t * size)
+{
+    size_t rd = 0;
+    struct dataStream * ds = (struct dataStream *) ctx;
+    assert(ds != NULL);
+    
+    rd = (ds-&gt;inLen &lt; *size) ? ds-&gt;inLen : *size;
+ 
+    if (rd &gt; 0) {
+        memcpy(buf, (void *) ds-&gt;inData, rd);
+        ds-&gt;inData += rd;
+        ds-&gt;inLen -= rd;
+    }
+ 
+    *size = rd;
+ 
+    return 0;
+}
+
+/* an ouput callback that will be passed to elzma_compress_run(),
+ * it reallocs and writes to a memory buffer */
+static size_t
+outputCallback(void *ctx, const void *buf, size_t size)
+{
+    struct dataStream * ds = (struct dataStream *) ctx;
+    assert(ds != NULL);
+    
+    if (size &gt; 0) {
+        ds-&gt;outData = realloc(ds-&gt;outData, ds-&gt;outLen + size);
+        memcpy((void *) (ds-&gt;outData + ds-&gt;outLen), buf, size);
+        ds-&gt;outLen += size;
+    }
+ 
+    return size;
+}
+
+/* a function that will compress data using a 1mb dictionary and a
+ * client specified encoding format (one of ELZMA_lzip or ELZMA_lzma) */
+int
+simpleCompress(elzma_file_format format, const unsigned char * inData,
+               size_t inLen, unsigned char ** outData,
+               size_t * outLen)
+{
+    int rc;
+    elzma_compress_handle hand;
+ 
+    /* allocate compression handle */
+    hand = elzma_compress_alloc();
+    assert(hand != NULL);
+
+    /* configure the compression run with mostly default parameters  */ 
+    rc = elzma_compress_config(hand, ELZMA_LC_DEFAULT,
+                               ELZMA_LP_DEFAULT, ELZMA_PB_DEFAULT,
+                               5, (1 &lt;&lt; 20) /* 1mb */,
+                               format, inLen);
+
+    /* fail if we couldn't allocate */  
+    if (rc != ELZMA_E_OK) {
+        elzma_compress_free(&amp;hand);
+        return rc;
+    }
+ 
+    /* now run the compression */
+    {
+        /* set up the context structure that will be passed to
+		 * stream callbacks */  
+        struct dataStream ds;
+        ds.inData = inData;
+        ds.inLen = inLen;
+        ds.outData = NULL;
+        ds.outLen = 0;
+
+        /* run the streaming compression */ 
+        rc = elzma_compress_run(hand, inputCallback, (void *) &amp;ds,
+                                outputCallback, (void *) &amp;ds);
+        
+        if (rc != ELZMA_E_OK) {
+            if (ds.outData != NULL) free(ds.outData);
+            elzma_compress_free(&amp;hand);
+            return rc;
+        }
+ 
+        *outData = ds.outData;
+        *outLen = ds.outLen;
+    }
+ 
+    return rc;
+}
+</textarea>
+
+    <h2>License</h2>
+    <p>All the cruft you find here is public domain.  You don't have to credit
+       anyone to use this code, but my personal request is that you mention
+       Igor Pavlov for his hard, high quality work.</p>
+
+    <h2>Author</h2>
+      <p>Lloyd Hilaiel (lloyd@hilaiel.com)</p>
+
+    <div class="footer">
+      get the source code on GitHub : <a href="http://github.com/lloyd/easylzma">lloyd/easylzma</a>
+    </div>
+    
+    <div class="styleCredit footer">
+      (page style "borrowed" from
+	   <a data-savepage-href="http://kylecordes.com" href="http://kylecordes.com/">Kyle Cordes</a>)
+    </div>
+    
+  </div></div>
+
+
+<style data-savepage-href="dp.SyntaxHighlighter/SyntaxHighlighter.css" type="text/css">.dp-highlighter
+{
+	font-family: "Consolas", "Courier New", Courier, mono, serif;
+	font-size: 12px;
+	background-color: #E7E5DC;
+	width: 99%;
+	overflow: auto;
+	margin: 18px 0 18px 0 !important;
+	padding-top: 1px; /* adds a little border on top when controls are hidden */
+}
+
+/* clear styles */
+.dp-highlighter ol,
+.dp-highlighter ol li,
+.dp-highlighter ol li span 
+{
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+.dp-highlighter a,
+.dp-highlighter a:hover
+{
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+
+.dp-highlighter .bar
+{
+	padding-left: 45px;
+}
+
+.dp-highlighter.collapsed .bar,
+.dp-highlighter.nogutter .bar
+{
+	padding-left: 0px;
+}
+
+.dp-highlighter ol
+{
+	list-style: decimal; /* for ie */
+	background-color: #fff;
+	margin: 0px 0px 1px 45px !important; /* 1px bottom margin seems to fix occasional Firefox scrolling */
+	padding: 0px;
+	color: #5C5C5C;
+}
+
+.dp-highlighter.nogutter ol,
+.dp-highlighter.nogutter ol li
+{
+	list-style: none !important;
+	margin-left: 0px !important;
+}
+
+.dp-highlighter ol li,
+.dp-highlighter .columns div
+{
+	list-style: decimal-leading-zero; /* better look for others, override cascade from OL */
+	list-style-position: outside !important;
+	border-left: 3px solid #6CE26C;
+	background-color: #F8F8F8;
+	color: #5C5C5C;
+	padding: 0 3px 0 10px !important;
+	margin: 0 !important;
+	line-height: 14px;
+}
+
+.dp-highlighter.nogutter ol li,
+.dp-highlighter.nogutter .columns div
+{
+	border: 0;
+}
+
+.dp-highlighter .columns
+{
+	background-color: #F8F8F8;
+	color: gray;
+	overflow: hidden;
+	width: 100%;
+}
+
+.dp-highlighter .columns div
+{
+	padding-bottom: 5px;
+}
+
+.dp-highlighter ol li.alt
+{
+	background-color: #FFF;
+	color: inherit;
+}
+
+.dp-highlighter ol li span
+{
+	color: black;
+	background-color: inherit;
+}
+
+/* Adjust some properties when collapsed */
+
+.dp-highlighter.collapsed ol
+{
+	margin: 0px;
+}
+
+.dp-highlighter.collapsed ol li
+{
+	display: none;
+}
+
+/* Additional modifications when in print-view */
+
+.dp-highlighter.printing
+{
+	border: none;
+}
+
+.dp-highlighter.printing .tools
+{
+	display: none !important;
+}
+
+.dp-highlighter.printing li
+{
+	display: list-item !important;
+}
+
+/* Styles for the tools */
+
+.dp-highlighter .tools
+{
+	padding: 3px 8px 3px 10px;
+	font: 9px Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color: silver;
+	background-color: #f8f8f8;
+	padding-bottom: 10px;
+	border-left: 3px solid #6CE26C;
+}
+
+.dp-highlighter.nogutter .tools
+{
+	border-left: 0;
+}
+
+.dp-highlighter.collapsed .tools
+{
+	border-bottom: 0;
+}
+
+.dp-highlighter .tools a
+{
+	font-size: 9px;
+	color: #a0a0a0;
+	background-color: inherit;
+	text-decoration: none;
+	margin-right: 10px;
+}
+
+.dp-highlighter .tools a:hover
+{
+	color: red;
+	background-color: inherit;
+	text-decoration: underline;
+}
+
+/* About dialog styles */
+
+.dp-about { background-color: #fff; color: #333; margin: 0px; padding: 0px; }
+.dp-about table { width: 100%; height: 100%; font-size: 11px; font-family: Tahoma, Verdana, Arial, sans-serif !important; }
+.dp-about td { padding: 10px; vertical-align: top; }
+.dp-about .copy { border-bottom: 1px solid #ACA899; height: 95%; }
+.dp-about .title { color: red; background-color: inherit; font-weight: bold; }
+.dp-about .para { margin: 0 0 4px 0; }
+.dp-about .footer { background-color: #ECEADB; color: #333; border-top: 1px solid #fff; text-align: right; }
+.dp-about .close { font-size: 11px; font-family: Tahoma, Verdana, Arial, sans-serif !important; background-color: #ECEADB; color: #333; width: 60px; height: 22px; }
+
+/* Language specific styles */
+
+.dp-highlighter .comment, .dp-highlighter .comments { color: #008200; background-color: inherit; }
+.dp-highlighter .string { color: blue; background-color: inherit; }
+.dp-highlighter .keyword { color: #069; font-weight: bold; background-color: inherit; }
+.dp-highlighter .preprocessor { color: gray; background-color: inherit; }
+</style>
+<script language="javascript" data-savepage-src="dp.SyntaxHighlighter/shCore.js" src=""></script><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3downbar.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/contextmenu.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/tooltip.css?googleapis"><div id="s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha" style="box-sizing: initial !important; position: fixed; white-space: nowrap; width: 100% !important; left: 0px; bottom: 0px; border-top: 1px solid rgb(153, 153, 153); transform-origin: left bottom 0px; z-index: 2147483647; margin: 0px; padding: 2px 0px; background-color: rgb(238, 238, 238); color: rgb(34, 34, 34); display: none !important; transform: scale(1) !important;"><style type="text/css" media="print">#s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha { display: none !important; }</style><div style="box-sizing: initial !important; position: absolute !important;" id="s3downbar_resize_pane" is_top="false"><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 4 !important;" class="s3dmBox" id="s3downbar_hide_button" is_hidden="false"><div id="s3downbar_hide_button_img" style="box-sizing: initial !important; background-image: url(&quot;moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3dm_icons.png&quot;) !important; display: inline-block !important;"></div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Hide Download Bar</div><div style="box-sizing: initial !important;" class="tooltipText">Ctrl + Shift + Z = Show/Hide Download Bar</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important;" class="s3dmBox" id="s3downbar_main_menu_button" is_hidden="false"><img style="box-sizing: initial !important;" src="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/logo16.png"><span style="box-sizing: initial !important;">下載</span><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Download Manager (S3)</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 2 !important;" class="s3dmBox" id="s3downbar_clear_button" is_hidden="false">清除<div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">按左鍵: 移除全部已完成檔案</div><div style="box-sizing: initial !important;" class="tooltipText">按右鍵: 復原上次清除項目</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 1 !important;" class="s3dmBox" id="s3downbar_holder_summary_progress" is_hidden="false"><div style="box-sizing: initial !important;">100%</div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">下載歷史記錄</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important;" id="s3downbar_download_data_listbox"><div style="box-sizing: initial !important; max-height: 25px !important;" id="s3downbar_download_data_listbox_scroll" list_count="0"><div style="box-sizing: initial !important;" id="s3downbar_download_data_list_empty">Download list is empty</div></div></div></div>
+<script language="javascript" data-savepage-src="dp.SyntaxHighlighter/shBrushCpp.js" src=""></script>
+<script language="javascript"></script>
+
+</body></html>
