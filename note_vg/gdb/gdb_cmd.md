@@ -3,6 +3,8 @@ GDB_CMD
 
 [GDB Command Reference](https://visualgdb.com/gdbreference/commands/)
 
+[gdb 除錯技術](https://cntofu.com/book/46/gdb/187.md)
+
 + help (h)
     > 顯示指令簡短說明.例:help breakpoint
 
@@ -20,6 +22,14 @@ GDB_CMD
 
 + print (p)
     > 印出變數內容.例:print i，印出變數 i 的內容.
+
+    -  一次印出陣列裡的值
+
+        ```
+        # 從 array[1] 之後 5 個陣列裡的值, 也就是 array[1] ~ array[5] 的值
+        (gdb) p array[1]@5
+            $1 = {7815, 6157, 7479, 9017, 6078}
+        ```
 
 + `printf`
     > 格式化輸出
@@ -90,6 +100,12 @@ GDB_CMD
         (gdb) b foo::test
         ```
 
+        1. 函數調用前加斷點, 可以觀察參數/返回地址/幀地址等的 push 過程
+
+            ```
+            (gdb) b *method_name
+            ```
+
     -  `filename:function `
 
         ```shell
@@ -109,7 +125,6 @@ GDB_CMD
             (gdb) disassemble func_name
             (gdb) b *(func_name + 20)
             ```
-
 
     - 條件式中斷點, 當 `CONDITION` 滿足時才中斷.
         >　`break [LOCATION] [if CONDITION]`
@@ -220,6 +235,12 @@ GDB_CMD
 
         ```
         (gdb) info variables [pattern]
+        ```
+
+    - 列出 address 對應的 行號和函數名
+
+        ```
+        (gdb) info line <address>
         ```
 
     - `info frame`
@@ -604,6 +625,51 @@ GDB_CMD
         [Inferior 1 (process 1234) exited normally]
         ```
 
++ 停在 function 最後一行
+
+    ```
+    (gdb) disassemble <foo>
+        <foo+0>
+        <foo+4>
+        <foo+8>
+        <foo+C>
+        ...
+        <foo+44>
+    (gdb) b *(foo+44)
+    ```
+
++ 測試 deadlock 腳本
+
+        ```
+        $ vi ~/debug.cmd
+            #####################################
+
+            set pagination off
+            set logging file debug.log
+            set logging overwrite
+            set logging on
+            start
+            set $addr1 = pthread_mutex_lock
+            set $addr2 = pthread_mutex_unlock
+            b *$addr1
+            b *$addr2
+            while 1
+                c
+                if $pc != $addr1 && $pc != $addr2
+                    quit
+                end
+                bt
+            end
+
+            #####################################
+
+        # 使用
+        $ gdb xxxx -x debug.cmd
+            ...
+
+        # 解析
+        $ cat debug.log | grep -A1 "^#0.*pthread_mutex_" | sed s/from\ .*$// | sed s/.*\ in\ //
+        ```
 
 + 友善的 print structure
 

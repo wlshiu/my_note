@@ -162,6 +162,45 @@ define do_switch_task
     bt
 end
 
+# input: TCB_t* or TCB address
+define dump_task_backtrace
+	save breakpoints ~/.tmp_brk_____.rec
+
+	delete
+    b vTaskSwitchContext
+
+    continue
+
+	set $P1=$pc
+
+    finish
+	# set $P2=$pc
+	set $pTCB_org=pxCurrentTCB
+    set pxCurrentTCB=$arg0
+
+	# check opcode of return instruction
+    while *(unsigned long *)$pc != 0x4000064
+        si
+    end
+
+    backtrace
+	delete
+
+	set $pc=SWI_ISR
+    while $pc != $P1
+        si
+    end
+
+	return
+	# set $pc=$P2
+	set pxCurrentTCB=$pTCB_org
+
+	source ~/.tmp_brk_____.rec
+	shell rm -f ~/.tmp_brk_____.rec
+
+	c
+
+end
 
 
 
