@@ -383,5 +383,169 @@ standby  | Wait for External Event       | Enter standby state and wait for exte
     sp += 4;
     ```
 
+# C functions to access register
+
+```
+#include <nds32_intrinsic.h>
+```
+
+## `__nds32__break()`
+
+```
+void __nds32__break(const unsigned int swid);
+```
+
+## `__nds32__mfsr()`
+
+```
+unsigned int __nds32__mfsr(const enum nds32_sr srname);
+```
+
++ `srname`  is an SR symbolic mnemonic with a prefix `NDS32_SR_`
+
+    - `NDS32_SR_PSW`
+    - `NDS32_SR_IPSW`
+    - `NDS32_SR_P_IPSW`
+    - `NDS32_SR_ICM_CFG`
+    - `NDS32_SR_DCM_CFG`
+    - `NDS32_SR_MMU_CFG`
+    - `NDS32_SR_CORE_ID`
+    - `NDS32_SR_IVB`
+    - `NDS32_SR_EVA`
+    - `NDS32_SR_P_EVA`
+    - `NDS32_SR_ITYPE`
+    - `NDS32_SR_P_ITYPE`
+    - `NDS32_SR_IPC`
+    - `NDS32_SR_P_IPC`
+    - `NDS32_SR_OIPC`
+
+
+## `__nds32__mtsr()`
+
+```
+void __nds32__mtsr(unsigned int val, const enum nds32_sr srname)
+```
+
++ `srname` is an SR symbolic mnemonic with a prefix `NDS32_SR_`
+
+    ```
+    unsigned int    psw = __nds32__mfsr(NDS32_SR_PSW);
+    ```
+
+## `__nds32__mfusr`
+
+```
+unsigned int __nds32__mfusr(const enum nds32_usr usrname)
+```
+
++ `usrname` is a USR symbolic mnemonic with a prefix `NDS32_USR_`.
+
+    ```c
+    unsigned int    pfm_ctl = __nds32__mfusr(NDS32_USR_PFM_CTL);
+    ```
+
+
++ get pc (program counter)
+
+    ```
+    unsigned long   pc = __nds32__mfusr(NDS32_USR_PC);
+    ```
+
+    ```asm
+    /* assembly */
+    mfusr   <rt5>, $pc
+    ```
+
+## `__nds32__mtusr`
+
+```
+void __nds32__mtusr(unsigned int val, const enum nds32_usr usrname)
+```
+
++ `usrname` is a USR symbolic mnemonic with a prefix `NDS32_USR_`
+
+    ```c
+    #include <nds32_intrinsic.h>
+
+    void func(void)
+    {
+        ...
+        unsigned int    pfm_ctl = __nds32__mfusr(NDS32_USR_PFM_CTL);
+
+        //get PFM_CTL
+        pfm_ctl = pfm_ctl | 0x00000001;
+        __nds32__mtusr(pfm_ctl, NDS32_USR_PFM_CTL); //enable PFMC0
+        ...
+    }
+    /* assume the access permission is enabled in user mode*/
+
+    ```
+
+## `__nds32__setgie_dis()`
+
+disables global interrupts
+(won't take effect immediately)
+
+## `__nds32__setgie_en()`
+
+enables global interrupts
+(won't take effect immediately).
+
+## `__nds32__gie_dis()`
+
+disables global interrupts
+(will take effect immediately)
+
+## `__nds32__gie_en()`
+
+enables global interrupts
+(will take effect immediately)
+
+## `__nds32__get_current_sp`
+
+```
+unsigned long   sp = __nds32__get_current_sp();
+```
+
+## `__nds32__set_current_sp`
+
+```
+void __nds32__set_current_sp(unsigned int sp
+```
+
+```c
+#include <nds32_intrinsic.h>
+
+void func(void)
+{
+    // adjust sp value to sp - 4
+    unsigned int sp;
+    sp = __nds32__get_current_sp();
+    sp = sp - 4;
+    __nds32__set_current_sp(sp);
+}
+```
+
+## `__nds32__nop`
+
+```
+void __nds32__nop()
+```
+
+## `__nds32__return_address`
+
+returns the return address ($lp)
+
+```
+// lp is the return address of func
+unsigned long   lp = __nds32__return_address();
+```
+
+
+
+
+
+
+
 
 
