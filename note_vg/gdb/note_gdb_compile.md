@@ -3,25 +3,6 @@ GDB
 
 # Compile
 
-## ubuntu
-
-+ ubunut apt update fail
-
-    ```
-    $ sudo sed -i -- 's/us.archive/old-releases/g' /etc/apt/source.list
-    $ sudo sed -i -- 's/security/old-releases/g' /etc/apt/source.list
-    $ sudo apt update
-    $ sudo apt install curl
-
-    # 更換公鑰
-    $ curl -L https://debian.datastax.com/debian/repo_key | sudo apt-key add
-
-    # 更換 DNS
-    $ sudo vi /etc/resolv.conf
-        nameserver 8.8.8.8
-
-    ```
-
 + dependency
 
     ```

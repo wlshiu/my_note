@@ -49,6 +49,10 @@ SVN
     $ git svn clone https://svnserver/svn/TestGitSvn test  # 建立 test 資料夾, 並將 source code 下載至 test
         or
     $ git svn clone svn://localhost svn -A author.txt --stdlayout --prefix=svn/
+        or
+
+    # git svn clone -T [指定 SVN trunk 目錄] -b [指定 SVN branches 根目錄] -t [指定 SVN tags 根目錄] <svn repository> [local dir]
+    $ git svn clone -T trunk -b branches -t tags https://github.com/xetorthio/jedis.git /develop/code/jedis
     ```
 
     - `-A`
@@ -59,6 +63,24 @@ SVN
         > + trunk名稱: `--trunk=`
         > + branch 名稱: `--branches=`
         > + tag 名稱: `--tags=`
+
+        1. svn 標準建立時, 會在 repository 目錄下, 同時建立 trunk/branches/tags 目錄.
+            > URL 規則 `svn://<IP>/<svn_project>/<dir_name_1>/<dir_name_2>/...`
+
+            ```
+            svn_project/
+                ├── trunk
+                ├── branches
+                └── tags
+                    ├── v1.0
+                    └── v2.0
+            ```
+
+            ```
+            # assess tag v1.0
+            url= svn://192.168.30.1/svn_project/tags/v1.0
+
+            ```
 
     - `--prefix=svn/`
         > 建立出來的 svn 遠端 branch 用 `svn/`作為前戳, 方便區分哪些是 svn 那邊的 remote branch.
@@ -116,7 +138,7 @@ $ git remote add origin <git repo url>
 $ git push -u origin master
 ```
 
-## Get remote branch of SVN
+## Get remote branch of SVN (not work)
 
 ```
 $ git svn fetch --all
