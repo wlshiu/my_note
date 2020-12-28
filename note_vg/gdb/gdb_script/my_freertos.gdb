@@ -11,6 +11,8 @@ set logging file ~/working/image/gdg.log
 set height 0
 set width 0
 
+set pagination off
+
 
 set $BLUE=\033[34m
 set $CYAN=\033[36m

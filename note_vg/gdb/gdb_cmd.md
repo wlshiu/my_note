@@ -606,6 +606,12 @@ GDB_CMD
     (gdb) set logging off           # disable logging
     ```
 
++ 關掉顯示下一頁功能
+
+    ```
+    (gdb) set pagination off
+    ```
+
 + 重跑 progtam
 
     - `jump`
