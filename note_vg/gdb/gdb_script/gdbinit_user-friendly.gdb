@@ -20,23 +20,23 @@
 #                 If you load the binary from the command line, like $gdb binary-name, this will not work as it should
 #                 For more information, read it here http://reverse.put.as/2008/11/28/apples-gdb-bug/
 #
-#				  UPDATE: This bug can be fixed in gdb source. Refer to http://reverse.put.as/2009/08/10/fix-for-apples-gdb-bug-or-why-apple-forks-are-bad/
-#						  and http://reverse.put.as/2009/08/26/gdb-patches/ (if you want the fixed binary for i386)
+#                 UPDATE: This bug can be fixed in gdb source. Refer to http://reverse.put.as/2009/08/10/fix-for-apples-gdb-bug-or-why-apple-forks-are-bad/
+#                         and http://reverse.put.as/2009/08/26/gdb-patches/ (if you want the fixed binary for i386)
 #
 # CHANGELOG:
 #
-#	Version 7.3 (16/04/2010)
-#	  Support for 64bits targets. Default is 32bits, you should modify the variable or use the 32bits or 64bits to choose the mode.
-#		I couldn't find another way to recognize the type of binaryâ€¦ Testing the register doesn't work that well.
-#	  TODO: fix objectivec messages and stepo for 64bits
+#   Version 7.3 (16/04/2010)
+#     Support for 64bits targets. Default is 32bits, you should modify the variable or use the 32bits or 64bits to choose the mode.
+#       I couldn't find another way to recognize the type of binaryâ€¦ Testing the register doesn't work that well.
+#     TODO: fix objectivec messages and stepo for 64bits
 #
 #   Version 7.2.1 (24/11/2009)
-#	  Another fix to stepo (0xFF92 missing)
+#     Another fix to stepo (0xFF92 missing)
 #
 #   Version 7.2 (11/10/2009)
-#	  Added the smallregisters function to create 16 and 8 bit versions from the registers EAX, EBX, ECX, EDX
-#	  Revised and fixed all the dumpjump stuff, following Intel manuals. There were some errors (thx to rev who pointed the jle problem).
-#	  Small fix to stepo command (missed a few call types)
+#     Added the smallregisters function to create 16 and 8 bit versions from the registers EAX, EBX, ECX, EDX
+#     Revised and fixed all the dumpjump stuff, following Intel manuals. There were some errors (thx to rev who pointed the jle problem).
+#     Small fix to stepo command (missed a few call types)
 #
 #   Version 7.1.7
 #     Added the possibility to modify what's displayed with the context window. You can change default options at the gdb options part. For example, kernel debugging is much slower if the stack display is enabled...
@@ -116,7 +116,7 @@
 #     Add global variables to allow user to control stack, data and code window sizes
 #     Increase readability for registers
 #     Some corrections (hexdump, ddump, context, cfp, assemble, gas_asm, tips, prompt)
-#   
+#
 #   Version 6.1-color-user
 #     Took the Gentoo route and ran sed s/user/user/g
 #
@@ -260,7 +260,7 @@ Or else you can use directly the break command (break [NSControl stringValue])
 end
 
 
-define bpc 
+define bpc
     if $argc != 1
         help bpc
     else
@@ -415,10 +415,10 @@ define flags
 # ZF (zero) flag
     if (($eflags >> 6) & 1)
         printf "Z "
-	set $_zf_flag = 1
+    set $_zf_flag = 1
     else
         printf "z "
-	set $_zf_flag = 0
+    set $_zf_flag = 0
     end
     if (($eflags >> 4) & 1)
         printf "A "
@@ -428,18 +428,18 @@ define flags
 # PF (parity) flag
     if (($eflags >> 2) & 1)
         printf "P "
-	set $_pf_flag = 1
+    set $_pf_flag = 1
     else
         printf "p "
-	set $_pf_flag = 0
+    set $_pf_flag = 0
     end
 # CF (carry) flag
     if ($eflags & 1)
         printf "C "
-	set $_cf_flag = 1
+    set $_cf_flag = 1
     else
         printf "c "
-	set $_cf_flag = 0
+    set $_cf_flag = 0
     end
     printf "\n"
 end
@@ -638,11 +638,11 @@ define reg
     echo \033[0m
  end
 # call smallregisters
-	smallregisters
+    smallregisters
 # display conditional jump routine
-	if ($64BITS == 1)
-	 printf "\t\t\t\t"
-	end
+    if ($64BITS == 1)
+     printf "\t\t\t\t"
+    end
     dumpjump
     printf "\n"
 end
@@ -653,55 +653,55 @@ end
 define smallregisters
  if ($64BITS == 1)
 #64bits stuff
-	# from rax
-	set $eax = $rax & 0xffffffff
-	set $ax = $rax & 0xffff
-	set $al = $ax & 0xff
-	set $ah = $ax >> 8
-	# from rbx
-	set $bx = $rbx & 0xffff
-	set $bl = $bx & 0xff
-	set $bh = $bx >> 8
-	# from rcx
-	set $ecx = $rcx & 0xffffffff
-	set $cx = $rcx & 0xffff
-	set $cl = $cx & 0xff
-	set $ch = $cx >> 8
-	# from rdx
-	set $edx = $rdx & 0xffffffff
-	set $dx = $rdx & 0xffff
-	set $dl = $dx & 0xff
-	set $dh = $dx >> 8
-	# from rsi
-	set $esi = $rsi & 0xffffffff
-	set $si = $rsi & 0xffff
-	# from rdi
-	set $edi = $rdi & 0xffffffff
-	set $di = $rdi & 0xffff		
+    # from rax
+    set $eax = $rax & 0xffffffff
+    set $ax = $rax & 0xffff
+    set $al = $ax & 0xff
+    set $ah = $ax >> 8
+    # from rbx
+    set $bx = $rbx & 0xffff
+    set $bl = $bx & 0xff
+    set $bh = $bx >> 8
+    # from rcx
+    set $ecx = $rcx & 0xffffffff
+    set $cx = $rcx & 0xffff
+    set $cl = $cx & 0xff
+    set $ch = $cx >> 8
+    # from rdx
+    set $edx = $rdx & 0xffffffff
+    set $dx = $rdx & 0xffff
+    set $dl = $dx & 0xff
+    set $dh = $dx >> 8
+    # from rsi
+    set $esi = $rsi & 0xffffffff
+    set $si = $rsi & 0xffff
+    # from rdi
+    set $edi = $rdi & 0xffffffff
+    set $di = $rdi & 0xffff
 #32 bits stuff
  else
-	# from eax
-	set $ax = $eax & 0xffff
-	set $al = $ax & 0xff
-	set $ah = $ax >> 8
-	# from ebx
-	set $bx = $ebx & 0xffff
-	set $bl = $bx & 0xff
-	set $bh = $bx >> 8
-	# from ecx
-	set $cx = $ecx & 0xffff
-	set $cl = $cx & 0xff
-	set $ch = $cx >> 8
-	# from edx
-	set $dx = $edx & 0xffff
-	set $dl = $dx & 0xff
-	set $dh = $dx >> 8
-	# from esi
-	set $si = $esi & 0xffff
-	# from edi
-	set $di = $edi & 0xffff		
+    # from eax
+    set $ax = $eax & 0xffff
+    set $al = $ax & 0xff
+    set $ah = $ax >> 8
+    # from ebx
+    set $bx = $ebx & 0xffff
+    set $bl = $bx & 0xff
+    set $bh = $bx >> 8
+    # from ecx
+    set $cx = $ecx & 0xffff
+    set $cl = $cx & 0xff
+    set $ch = $cx >> 8
+    # from edx
+    set $dx = $edx & 0xffff
+    set $dl = $dx & 0xff
+    set $dh = $dx >> 8
+    # from esi
+    set $si = $esi & 0xffff
+    # from edi
+    set $di = $edi & 0xffff
  end
- 
+
 end
 document smallregisters
 Create the 16 and 8 bit cpu registers (gdb doesn't have them by default)
@@ -785,7 +785,7 @@ define dis
     end
     if $argc == 2
         disassemble $arg0 $arg1
-    end 
+    end
     if $argc > 2
         help dis
     end
@@ -893,15 +893,15 @@ define ddump
         else
          printf "[0x%04X:0x%08X]", $ds, $data_addr
         end
-	echo \033[34m
-	printf "------------------------"
+    echo \033[34m
+    printf "------------------------"
     printf "-------------------------------"
     if ($64BITS == 1)
      printf "-------------------------------------"
-	end
+    end
 
-	echo \033[1;34m
-	printf "[data]\n"
+    echo \033[1;34m
+    printf "[data]\n"
         echo \033[0m
         set $_count = 0
         while ($_count < $arg0)
@@ -988,238 +988,238 @@ define dumpjump
 ## opcode 0x77: JA, JNBE (jump if CF=0 and ZF=0)
 ## opcode 0x0F87: JNBE, JA
  if ( ($_byte1 == 0x77) || ($_byte1 == 0x0F && $_byte2 == 0x87) )
- 	# cf=0 and zf=0
- 	if ($_cf_flag == 0 && $_zf_flag == 0)
-		echo \033[31m
-   		printf "  Jump is taken (c=0 and z=0)"
-  	else
-	# cf != 0 or zf != 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (c!=0 or z!=0)"
-  	end 
+    # cf=0 and zf=0
+    if ($_cf_flag == 0 && $_zf_flag == 0)
+        echo \033[31m
+        printf "  Jump is taken (c=0 and z=0)"
+    else
+    # cf != 0 or zf != 0
+        echo \033[31m
+        printf "  Jump is NOT taken (c!=0 or z!=0)"
+    end
  end
 
 ## opcode 0x73: JAE, JNB, JNC (jump if CF=0)
 ## opcode 0x0F83: JNC, JNB, JAE (jump if CF=0)
  if ( ($_byte1 == 0x73) || ($_byte1 == 0x0F && $_byte2 == 0x83) )
- 	# cf=0
- 	if ($_cf_flag == 0)
-		echo \033[31m
-   		printf "  Jump is taken (c=0)"
-  	else
-	# cf != 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (c!=0)"
-  	end 
+    # cf=0
+    if ($_cf_flag == 0)
+        echo \033[31m
+        printf "  Jump is taken (c=0)"
+    else
+    # cf != 0
+        echo \033[31m
+        printf "  Jump is NOT taken (c!=0)"
+    end
  end
- 	
+
 ## opcode 0x72: JB, JC, JNAE (jump if CF=1)
 ## opcode 0x0F82: JNAE, JB, JC
  if ( ($_byte1 == 0x72) || ($_byte1 == 0x0F && $_byte2 == 0x82) )
- 	# cf=1
- 	if ($_cf_flag == 1)
-		echo \033[31m
-   		printf "  Jump is taken (c=1)"
-  	else
-	# cf != 1
-   		echo \033[31m
-   		printf "  Jump is NOT taken (c!=1)"
-  	end 
+    # cf=1
+    if ($_cf_flag == 1)
+        echo \033[31m
+        printf "  Jump is taken (c=1)"
+    else
+    # cf != 1
+        echo \033[31m
+        printf "  Jump is NOT taken (c!=1)"
+    end
  end
 
 ## opcode 0x76: JBE, JNA (jump if CF=1 or ZF=1)
 ## opcode 0x0F86: JBE, JNA
  if ( ($_byte1 == 0x76) || ($_byte1 == 0x0F && $_byte2 == 0x86) )
- 	# cf=1 or zf=1
- 	if (($_cf_flag == 1) || ($_zf_flag == 1))
-		echo \033[31m
-   		printf "  Jump is taken (c=1 or z=1)"
-  	else
-	# cf != 1 or zf != 1
-   		echo \033[31m
-   		printf "  Jump is NOT taken (c!=1 or z!=1)"
-  	end 
+    # cf=1 or zf=1
+    if (($_cf_flag == 1) || ($_zf_flag == 1))
+        echo \033[31m
+        printf "  Jump is taken (c=1 or z=1)"
+    else
+    # cf != 1 or zf != 1
+        echo \033[31m
+        printf "  Jump is NOT taken (c!=1 or z!=1)"
+    end
  end
 
 ## opcode 0xE3: JCXZ, JECXZ, JRCXZ (jump if CX=0 or ECX=0 or RCX=0)
  if ($_byte1 == 0xE3)
- 	# cx=0 or ecx=0
- 	if (($ecx == 0) || ($cx == 0))
-		echo \033[31m
-   		printf "  Jump is taken (cx=0 or ecx=0)"
-  	else
-	#
-   		echo \033[31m
-   		printf "  Jump is NOT taken (cx!=0 or ecx!=0)"
-  	end 
+    # cx=0 or ecx=0
+    if (($ecx == 0) || ($cx == 0))
+        echo \033[31m
+        printf "  Jump is taken (cx=0 or ecx=0)"
+    else
+    #
+        echo \033[31m
+        printf "  Jump is NOT taken (cx!=0 or ecx!=0)"
+    end
  end
 
 ## opcode 0x74: JE, JZ (jump if ZF=1)
 ## opcode 0x0F84: JZ, JE, JZ (jump if ZF=1)
  if ( ($_byte1 == 0x74) || ($_byte1 == 0x0F && $_byte2 == 0x84) )
  # ZF = 1
-  	if ($_zf_flag == 1)
-   		echo \033[31m
-   		printf "  Jump is taken (z=1)"
-  	else
+    if ($_zf_flag == 1)
+        echo \033[31m
+        printf "  Jump is taken (z=1)"
+    else
  # ZF = 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (z!=1)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (z!=1)"
+    end
  end
 
 ## opcode 0x7F: JG, JNLE (jump if ZF=0 and SF=OF)
 ## opcode 0x0F8F: JNLE, JG (jump if ZF=0 and SF=OF)
  if ( ($_byte1 == 0x7F) || ($_byte1 == 0x0F && $_byte2 == 0x8F) )
  # zf = 0 and sf = of
-  	if (($_zf_flag == 0) && ($_sf_flag == $_of_flag))
-   		echo \033[31m
-   		printf "  Jump is taken (z=0 and s=o)"
-  	else
+    if (($_zf_flag == 0) && ($_sf_flag == $_of_flag))
+        echo \033[31m
+        printf "  Jump is taken (z=0 and s=o)"
+    else
  #
-   		echo \033[31m
-   		printf "  Jump is NOT taken (z!=0 or s!=o)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (z!=0 or s!=o)"
+    end
  end
 
 ## opcode 0x7D: JGE, JNL (jump if SF=OF)
 ## opcode 0x0F8D: JNL, JGE (jump if SF=OF)
  if ( ($_byte1 == 0x7D) || ($_byte1 == 0x0F && $_byte2 == 0x8D) )
  # sf = of
-  	if ($_sf_flag == $_of_flag)
-   		echo \033[31m
-   		printf "  Jump is taken (s=o)"
-  	else
+    if ($_sf_flag == $_of_flag)
+        echo \033[31m
+        printf "  Jump is taken (s=o)"
+    else
  #
-   		echo \033[31m
-   		printf "  Jump is NOT taken (s!=o)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (s!=o)"
+    end
  end
 
 ## opcode: 0x7C: JL, JNGE (jump if SF != OF)
 ## opcode: 0x0F8C: JNGE, JL (jump if SF != OF)
  if ( ($_byte1 == 0x7C) || ($_byte1 == 0x0F && $_byte2 == 0x8C) )
  # sf != of
-  	if ($_sf_flag != $_of_flag)
-   		echo \033[31m
-   		printf "  Jump is taken (s!=o)"
-  	else
+    if ($_sf_flag != $_of_flag)
+        echo \033[31m
+        printf "  Jump is taken (s!=o)"
+    else
  #
-   		echo \033[31m
-   		printf "  Jump is NOT taken (s=o)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (s=o)"
+    end
  end
 
 ## opcode 0x7E: JLE, JNG (jump if ZF = 1 or SF != OF)
 ## opcode 0x0F8E: JNG, JLE (jump if ZF = 1 or SF != OF)
  if ( ($_byte1 == 0x7E) || ($_byte1 == 0x0F && $_byte2 == 0x8E) )
  # zf = 1 or sf != of
-  	if (($_zf_flag == 1) || ($_sf_flag != $_of_flag))
-   		echo \033[31m
-   		printf "  Jump is taken (zf=1 or sf!=of)"
-  	else
+    if (($_zf_flag == 1) || ($_sf_flag != $_of_flag))
+        echo \033[31m
+        printf "  Jump is taken (zf=1 or sf!=of)"
+    else
  #
-   		echo \033[31m
-   		printf "  Jump is NOT taken (zf!=1 or sf=of)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (zf!=1 or sf=of)"
+    end
  end
 
 ## opcode 0x75: JNE, JNZ (jump if ZF = 0)
 ## opcode 0x0F85: JNE, JNZ (jump if ZF = 0)
  if ( ($_byte1 == 0x75) || ($_byte1 == 0x0F && $_byte2 == 0x85) )
  # ZF = 0
-  	if ($_zf_flag == 0)
-   		echo \033[31m
-   		printf "  Jump is taken (z=0)"
-  	else
+    if ($_zf_flag == 0)
+        echo \033[31m
+        printf "  Jump is taken (z=0)"
+    else
  # ZF = 1
-   		echo \033[31m
-   		printf "  Jump is NOT taken (z!=0)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (z!=0)"
+    end
  end
- 
+
 ## opcode 0x71: JNO (OF = 0)
 ## opcode 0x0F81: JNO (OF = 0)
  if ( ($_byte1 == 0x71) || ($_byte1 == 0x0F && $_byte2 == 0x81) )
  # OF = 0
-	if ($_of_flag == 0)
-   		echo \033[31m
-   		printf "  Jump is taken (o=0)"
-	else
+    if ($_of_flag == 0)
+        echo \033[31m
+        printf "  Jump is taken (o=0)"
+    else
  # OF != 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (o!=0)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (o!=0)"
+    end
  end
 
 ## opcode 0x7B: JNP, JPO (jump if PF = 0)
 ## opcode 0x0F8B: JPO (jump if PF = 0)
  if ( ($_byte1 == 0x7B) || ($_byte1 == 0x0F && $_byte2 == 0x8B) )
  # PF = 0
-  	if ($_pf_flag == 0)
-   		echo \033[31m
-   		printf "  Jump is NOT taken (p=0)"
-  	else
+    if ($_pf_flag == 0)
+        echo \033[31m
+        printf "  Jump is NOT taken (p=0)"
+    else
  # PF != 0
-   		echo \033[31m
-   		printf "  Jump is taken (p!=0)"
-  	end 
+        echo \033[31m
+        printf "  Jump is taken (p!=0)"
+    end
  end
 
 ## opcode 0x79: JNS (jump if SF = 0)
 ## opcode 0x0F89: JNS (jump if SF = 0)
  if ( ($_byte1 == 0x79) || ($_byte1 == 0x0F && $_byte2 == 0x89) )
  # SF = 0
-  	if ($_sf_flag == 0)
-   		echo \033[31m
-   		printf "  Jump is taken (s=0)"
-  	else
+    if ($_sf_flag == 0)
+        echo \033[31m
+        printf "  Jump is taken (s=0)"
+    else
  # SF != 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (s!=0)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (s!=0)"
+    end
  end
 
 ## opcode 0x70: JO (jump if OF=1)
 ## opcode 0x0F80: JO (jump if OF=1)
  if ( ($_byte1 == 0x70) || ($_byte1 == 0x0F && $_byte2 == 0x80) )
  # OF = 1
-	if ($_of_flag == 1)
-		echo \033[31m
-   		printf "  Jump is taken (o=1)"
-  	else
+    if ($_of_flag == 1)
+        echo \033[31m
+        printf "  Jump is taken (o=1)"
+    else
  # OF != 1
-   		echo \033[31m
-   		printf "  Jump is NOT taken (o!=1)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (o!=1)"
+    end
  end
 
 ## opcode 0x7A: JP, JPE (jump if PF=1)
 ## opcode 0x0F8A: JP, JPE (jump if PF=1)
  if ( ($_byte1 == 0x7A) || ($_byte1 == 0x0F && $_byte2 == 0x8A) )
  # PF = 1
-  	if ($_pf_flag == 1)
-   		echo \033[31m
-   		printf "  Jump is taken (p=1)"
-  	else
+    if ($_pf_flag == 1)
+        echo \033[31m
+        printf "  Jump is taken (p=1)"
+    else
  # PF = 0
-   		echo \033[31m
-   		printf "  Jump is NOT taken (p!=1)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (p!=1)"
+    end
  end
 
 ## opcode 0x78: JS (jump if SF=1)
 ## opcode 0x0F88: JS (jump if SF=1)
  if ( ($_byte1 == 0x78) || ($_byte1 == 0x0F && $_byte2 == 0x88) )
  # SF = 1
-	if ($_sf_flag == 1)
-   		echo \033[31m
-   		printf "  Jump is taken (s=1)"
-  	else
+    if ($_sf_flag == 1)
+        echo \033[31m
+        printf "  Jump is taken (s=1)"
+    else
  # SF != 1
-   		echo \033[31m
-   		printf "  Jump is NOT taken (s!=1)"
-  	end 
+        echo \033[31m
+        printf "  Jump is NOT taken (s!=1)"
+    end
  end
 
 # end of dumpjump function
@@ -1232,104 +1232,104 @@ end
 # initialize variable
 set $displayobjectivec = 0
 
-define context 
+define context
     echo \033[34m
     if $SHOWCPUREGISTERS == 1
-	    printf "----------------------------------------"
-	    printf "----------------------------------"
-	    if ($64BITS == 1)
-	     printf "---------------------------------------------"
-	    end
-	    echo \033[34m\033[1m
-	    printf "[regs]\n"
-	    echo \033[0m
-	    reg
-	    echo \033[36m
+        printf "----------------------------------------"
+        printf "----------------------------------"
+        if ($64BITS == 1)
+         printf "---------------------------------------------"
+        end
+        echo \033[34m\033[1m
+        printf "[regs]\n"
+        echo \033[0m
+        reg
+        echo \033[36m
     end
     if $SHOWSTACK == 1
-	echo \033[34m
-		if ($64BITS == 1)
-		 printf "[0x%04X:0x%016lX]", $ss, $rsp
-		else
-    	 printf "[0x%04X:0x%08X]", $ss, $esp
-    	end
+    echo \033[34m
+        if ($64BITS == 1)
+         printf "[0x%04X:0x%016lX]", $ss, $rsp
+        else
+         printf "[0x%04X:0x%08X]", $ss, $esp
+        end
         echo \033[34m
-		printf "-------------------------"
-    	printf "-----------------------------"
-	    if ($64BITS == 1)
-	     printf "-------------------------------------"
-	    end
-	echo \033[34m\033[1m
-	printf "[stack]\n"
-    	echo \033[0m
-    	set $context_i = $CONTEXTSIZE_STACK
-    	while ($context_i > 0)
-       	 set $context_t = $sp + 0x10 * ($context_i - 1)
-       	 hexdump $context_t
-       	 set $context_i--
-    	end
+        printf "-------------------------"
+        printf "-----------------------------"
+        if ($64BITS == 1)
+         printf "-------------------------------------"
+        end
+    echo \033[34m\033[1m
+    printf "[stack]\n"
+        echo \033[0m
+        set $context_i = $CONTEXTSIZE_STACK
+        while ($context_i > 0)
+         set $context_t = $sp + 0x10 * ($context_i - 1)
+         hexdump $context_t
+         set $context_i--
+        end
     end
 # show the objective C message being passed to msgSend
    if $SHOWOBJECTIVEC == 1
 #FIXME64
 # What a piece of crap that's going on here :)
 # detect if it's the correct opcode we are searching for
-    	set $__byte1 = *(unsigned char *)$pc
-    	set $__byte = *(int *)$pc
+        set $__byte1 = *(unsigned char *)$pc
+        set $__byte = *(int *)$pc
 #
-    	if ($__byte == 0x4244489)
-      		set $objectivec = $eax
-      		set $displayobjectivec = 1
-    	end
+        if ($__byte == 0x4244489)
+            set $objectivec = $eax
+            set $displayobjectivec = 1
+        end
 #
-    	if ($__byte == 0x4245489)
-     		set $objectivec = $edx
-     		set $displayobjectivec = 1
-    	end
+        if ($__byte == 0x4245489)
+            set $objectivec = $edx
+            set $displayobjectivec = 1
+        end
 #
-    	if ($__byte == 0x4244c89)
-     		set $objectivec = $edx
-     		set $displayobjectivec = 1
-    	end
+        if ($__byte == 0x4244c89)
+            set $objectivec = $edx
+            set $displayobjectivec = 1
+        end
 # and now display it or not (we have no interest in having the info displayed after the call)
-    	if $__byte1 == 0xE8
-     		if $displayobjectivec == 1
-      			echo \033[34m
-      			printf "--------------------------------------------------------------------"
-  			    if ($64BITS == 1)
-			     printf "---------------------------------------------"
-	    		end
-			echo \033[34m\033[1m
-			printf "[ObjectiveC]\n"
-      			echo \033[0m\033[30m
-      			x/s $objectivec
-     		end   
-     		set $displayobjectivec = 0     
-    	end
-    	if $displayobjectivec == 1
-      		echo \033[34m
-      		printf "--------------------------------------------------------------------"
-      		if ($64BITS == 1)
-	     	 printf "---------------------------------------------"
-	    	end
-		echo \033[34m\033[1m
-		printf "[ObjectiveC]\n"
-      		echo \033[0m\033[30m
-      		x/s $objectivec 
-    	end   
+        if $__byte1 == 0xE8
+            if $displayobjectivec == 1
+                echo \033[34m
+                printf "--------------------------------------------------------------------"
+                if ($64BITS == 1)
+                 printf "---------------------------------------------"
+                end
+            echo \033[34m\033[1m
+            printf "[ObjectiveC]\n"
+                echo \033[0m\033[30m
+                x/s $objectivec
+            end
+            set $displayobjectivec = 0
+        end
+        if $displayobjectivec == 1
+            echo \033[34m
+            printf "--------------------------------------------------------------------"
+            if ($64BITS == 1)
+             printf "---------------------------------------------"
+            end
+        echo \033[34m\033[1m
+        printf "[ObjectiveC]\n"
+            echo \033[0m\033[30m
+            x/s $objectivec
+        end
    end
     echo \033[0m
 # and this is the end of this little crap
 
     if $SHOWDATAWIN == 1
-	 datawin
+     datawin
     end
 
     echo \033[34m
     printf "--------------------------------------------------------------------------"
     if ($64BITS == 1)
-	 printf "---------------------------------------------"
-	end
+     printf "---------------------------------------------"
+    end
     echo \033[34m\033[1m
     printf "[code]\n"
     echo \033[0m
@@ -1347,9 +1347,9 @@ define context
     printf "----------------------------------------"
     if ($64BITS == 1)
      printf "---------------------------------------------\n"
-	else
-	 printf "\n"
-	end
+    else
+     printf "\n"
+    end
 
     echo \033[0m
 end
@@ -1492,10 +1492,10 @@ define stepo
     end
     # call *0x??(%ebp) (0xFF55??) || call *0x??(%esi) (0xFF56??) || call *0x??(%edi) (0xFF5F??) || call *0x??(%ebx)
     # call *0x??(%edx) (0xFF52??) || call *0x??(%ecx) (0xFF51??) || call *0x??(%edi) (0xFF57??) || call *0x??(%eax) (0xFF50??)
-    if ($_byte2 == 0x55 || $_byte2 == 0x56 || $_byte2 == 0x5F || $_byte2 == 0x53 || $_byte2 == 0x52 || $_byte2 == 0x51 || $_byte2 == 0x57 || $_byte2 == 0x50) 
+    if ($_byte2 == 0x55 || $_byte2 == 0x56 || $_byte2 == 0x5F || $_byte2 == 0x53 || $_byte2 == 0x52 || $_byte2 == 0x51 || $_byte2 == 0x57 || $_byte2 == 0x50)
      set $_nextaddress = $pc + 0x3
     end
-    # call *0x????????(%ebx) (0xFF93????????) || 
+    # call *0x????????(%ebx) (0xFF93????????) ||
     if ($_byte2 == 0x93 || $_byte2 == 0x94 || $_byte2 == 0x90 || $_byte2 == 0x92)
      set $_nextaddress = $pc + 6
     end
@@ -1505,7 +1505,7 @@ define stepo
     end
    end
  end
-# if we have found a call to bypass we set a temporary breakpoint on next instruction and continue 
+# if we have found a call to bypass we set a temporary breakpoint on next instruction and continue
  if ($_nextaddress != 0)
   tbreak *$_nextaddress
   continue
@@ -1640,15 +1640,15 @@ define nop
     if ($argc > 2 || $argc == 0)
         help nop
     end
-    
+
     if ($argc == 1)
-    	set *(unsigned char *)$arg0 = 0x90
+        set *(unsigned char *)$arg0 = 0x90
     else
-	set $addr = $arg0
-	while ($addr < $arg1)
-		set *(unsigned char *)$addr = 0x90
-		set $addr = $addr + 1
-	end
+    set $addr = $arg0
+    while ($addr < $arg1)
+        set *(unsigned char *)$addr = 0x90
+        set $addr = $addr + 1
+    end
     end
 end
 document nop
@@ -1662,15 +1662,15 @@ define null
     if ( $argc >2 || $argc == 0)
         help null
     end
- 
+
     if ($argc == 1)
-	set *(unsigned char *)$arg0 = 0
+    set *(unsigned char *)$arg0 = 0
     else
-	set $addr = $arg0
-	while ($addr < $arg1)
-	        set *(unsigned char *)$addr = 0
-		set $addr = $addr +1
-	end
+    set $addr = $arg0
+    while ($addr < $arg1)
+            set *(unsigned char *)$addr = 0
+        set $addr = $addr +1
+    end
     end
 end
 document null
@@ -1768,11 +1768,11 @@ define get_insn_type
                 set $INSN_TYPE = 2
             end
         end
-        if ($_byte1 == 0xFF)        
+        if ($_byte1 == 0xFF)
             # opcode extension
             set $_byte2 = *(unsigned char *)($arg0 + 1)
             set $_opext = ($_byte2 & 0x38)
-            if ($_opext == 0x10 || $_opext == 0x18) 
+            if ($_opext == 0x10 || $_opext == 0x18)
                 # "call"
                 set $INSN_TYPE = 3
             end
@@ -1796,11 +1796,11 @@ define step_to_call
     set $_saved_ctx = $SHOW_CONTEXT
     set $SHOW_CONTEXT = 0
     set $SHOW_NEST_INSN = 0
- 
+
     set logging file /dev/null
     set logging redirect on
     set logging on
- 
+
     set $_cont = 1
     while ($_cont > 0)
         stepi
@@ -1818,11 +1818,11 @@ define step_to_call
 
     set $SHOW_CONTEXT = $_saved_ctx
     set $SHOW_NEST_INSN = 0
- 
+
     set logging file ~/gdb.txt
     set logging redirect off
     set logging on
- 
+
     printf "step_to_call command stopped at:\n  "
     x/i $pc
     printf "\n"
@@ -1845,7 +1845,7 @@ define trace_calls
     set $SHOW_NEST_INSN = 0
     set $_nest = 1
     set listsize 0
-  
+
     set logging overwrite on
     set logging file ~/gdb_trace_calls.txt
     set logging on
@@ -1887,7 +1887,7 @@ define trace_calls
 
     set $SHOW_CONTEXT = $_saved_ctx
     set $SHOW_NEST_INSN = 0
- 
+
     printf "Done, check ~/gdb_trace_calls.txt\n"
 end
 document trace_calls
@@ -1897,7 +1897,7 @@ end
 
 
 define trace_run
- 
+
     printf "Tracing...please wait...\n"
 
     set $_saved_ctx = $SHOW_CONTEXT
@@ -2114,7 +2114,7 @@ end
 define tip_syntax
     printf "\n"
     printf "\t    INTEL SYNTAX                        AT&T SYNTAX\n"
-    printf "\tmnemonic dest, src, imm            mnemonic src, dest, imm\n" 
+    printf "\tmnemonic dest, src, imm            mnemonic src, dest, imm\n"
     printf "\t[base+index*scale+disp]            disp(base, index, scale)\n"
     printf "\tregister:      eax                 register:      %%eax\n"
     printf "\timmediate:     0xFF                immediate:     $0xFF\n"
@@ -2158,14 +2158,14 @@ end
 
 # enable and disable shortcuts for stop-on-solib-events fantastic trick!
 define enablesolib
-	set stop-on-solib-events 1
+    set stop-on-solib-events 1
 end
 document enablesolib
 Shortcut to enable stop-on-solib-events trick!
 end
 
 define disablesolib
-	set stop-on-solib-events 0
+    set stop-on-solib-events 0
 end
 document disablesolib
 Shortcut to disable stop-on-solib-events trick!
@@ -2173,28 +2173,28 @@ end
 
 # enable commands for different displays
 define enableobjectivec
-	set $SHOWOBJECTIVEC = 1
+    set $SHOWOBJECTIVEC = 1
 end
 document enableobjectivec
 Enable display of objective-c information in the context window
 end
 
 define enablecpuregisters
-	set $SHOWCPUREGISTERS = 1
+    set $SHOWCPUREGISTERS = 1
 end
 document enablecpuregisters
 Enable display of cpu registers in the context window
 end
 
 define enablestack
-	set $SHOWSTACK = 1
+    set $SHOWSTACK = 1
 end
 document enablestack
 Enable display of stack in the context window
 end
 
 define enabledatawin
-	set $SHOWDATAWIN = 1
+    set $SHOWDATAWIN = 1
 end
 document enabledatawin
 Enable display of data window in the context window
@@ -2202,42 +2202,42 @@ end
 
 # disable commands for different displays
 define disableobjectivec
-	set $SHOWOBJECTIVEC = 0
+    set $SHOWOBJECTIVEC = 0
 end
 document disableobjectivec
 Disable display of objective-c information in the context window
 end
 
 define disablecpuregisters
-	set $SHOWCPUREGISTERS = 0
+    set $SHOWCPUREGISTERS = 0
 end
 document disablecpuregisters
 Disable display of cpu registers in the context window
 end
 
 define disablestack
-	set $SHOWSTACK = 0
+    set $SHOWSTACK = 0
 end
 document disablestack
 Disable display of stack information in the context window
 end
 
 define disabledatawin
-	set $SHOWDATAWIN = 0
+    set $SHOWDATAWIN = 0
 end
 document disabledatawin
 Disable display of data window in the context window
 end
 
 define 32bits
-	set $64BITS = 0
+    set $64BITS = 0
 end
 document 32bits
 Set gdb to work with 32bits binaries
 end
 
 define 64bits
-	set $64BITS = 1
+    set $64BITS = 1
 end
 document 64bits
 Set gdb to work with 64bits binaries
