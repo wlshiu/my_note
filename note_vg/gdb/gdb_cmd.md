@@ -337,7 +337,7 @@ GDB_CMD
     - 刪除多個 breakpoints
 
         ```
-        (gdb) del <start_breakpoint_num> - <end_breakpoint_num>
+        (gdb) d <start_breakpoint_num> - <end_breakpoint_num>
         ```
 
 + clear

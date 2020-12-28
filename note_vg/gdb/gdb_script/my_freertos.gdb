@@ -1,10 +1,32 @@
 
 set prompt \033[31mgdb$ \033[0m
-set trace-commands on
+# set trace-commands on
 set logging file ~/working/image/gdg.log
 # set logging on
 # set logging redirect off
 # set logging off
+
+#######################
+## These make gdb never pause in its output
+set height 0
+set width 0
+
+
+set $BLUE=\033[34m
+set $CYAN=\033[36m
+set $MAGENTA=\033[35m
+set $YELLOW=\033[33m
+set $GREEN=\033[32m
+set $RED=\033[31
+set $NC=\033[0m
+
+# set $BLUE=\e[34m
+# set $CYAN=\e[36m
+# set $MAGENTA=\e[35m
+# set $YELLOW=\e[33m
+# set $GREEN=\e[32m
+# set $RED=\e[31
+# set $NC=\e[0m
 
 
 # input: List_t*
@@ -42,11 +64,19 @@ define dump_list
 	set $pHeadListItem=((List_t*)$arg0)->pxIndex
 	set $pCurListItem=$pHeadListItem
 
-	echo \033[32m
-	printf "Number of Tasks: %d\n\n", ((List_t*)$arg0)->uxNumberOfItems
-	echo \033[0m
-
 	if ((List_t*)$arg0)->uxNumberOfItems > 0
+
+		if $arg1 != -1
+			echo \033[33m
+			printf "@@@ ReadyTasksLists Prior %d \n", $arg1
+			echo \033[0m
+		end
+
+		echo \033[32m
+		printf "Number of Tasks: %d\n\n", ((List_t*)$arg0)->uxNumberOfItems
+		echo \033[0m
+
+
 		while 1
 
 			set $pTCB=((ListItem_t *)$pCurListItem)->pvOwner
@@ -70,10 +100,7 @@ define dump_freertos_tasks
 
 	while $i >= 0
 
-		echo \033[33m
-		printf "@@@ ReadyTasksLists Prior %d \n", $i
-		echo \033[0m
-		dump_list &pxReadyTasksLists[$i]
+		dump_list &pxReadyTasksLists[$i] $i
 
 		set $i-=1
 	end
@@ -81,29 +108,29 @@ define dump_freertos_tasks
 	echo \033[33m
 	printf "@@@ DelayedTaskList1 \n"
 	echo \033[0m
-	dump_list &xDelayedTaskList1
+	dump_list &xDelayedTaskList1 -1
 
 	echo \033[33m
 	printf "@@@ DelayedTaskList2 \n"
 	echo \033[0m
-	dump_list &xDelayedTaskList2
+	dump_list &xDelayedTaskList2 -1
 
 	# Pending
 	echo \033[33m
 	printf "@@@ PendingReadyList \n"
 	echo \033[0m
-	dump_list &xPendingReadyList
+	dump_list &xPendingReadyList -1
 
 	# Suspended
 	echo \033[33m
 	printf "@@@ SuspendedTaskList \n"
 	echo \033[0m
-	dump_list &xSuspendedTaskList
+	dump_list &xSuspendedTaskList -1
 
 	echo \033[33m
 	printf "@@@ OverflowDelayedTaskList \n"
 	echo \033[0m
-	dump_list pxOverflowDelayedTaskList
+	dump_list pxOverflowDelayedTaskList -1
 
 end
 
@@ -163,53 +190,101 @@ define do_switch_task
     bt
 end
 
+set $ISR_SWI=xPortPendSVHandler
+
 # input: TCB_t* or TCB address
 define dump_task_backtrace
-	save breakpoints ~/.tmp_brk_____.rec
+    save breakpoints ~/tmp_brk_____.rec
 
-	delete
-    b vTaskSwitchContext
+    delete
+    delete
+
+	## return from vTaskSwitchContext
+	b *($ISR_SWI + 92)
 
     continue
 
-	set $P1=$pc
+	echo \033[36m
+	echo pxCurrentTCB=
+	p/x pxCurrentTCB
+	echo \033[0m
 
-    finish
-	# set $P2=$pc
 	set $pTCB_org=pxCurrentTCB
     set pxCurrentTCB=$arg0
 
-	# check opcode of return instruction
-    while *(unsigned long *)$pc != 0x4000064
-        si
-    end
+	## stop at the last line of ISR_SWI
+	b *($ISR_SWI + 152)
+	continue
 
-    backtrace
+	echo \033[36m
+	backtrace
+	echo \033[0m
+
+	set $pc=$ISR_SWI
+	delete
 	delete
 
-	set $pc=SWI_ISR
-    while $pc != $P1
-        si
-    end
+	## before enter vTaskSwitchContext
+	b *($ISR_SWI + 80)
+	continue
 
-	return
-	# set $pc=$P2
+	set $pc=*($ISR_SWI + 92)
 	set pxCurrentTCB=$pTCB_org
+	delete
+	delete
 
-	source ~/.tmp_brk_____.rec
-	shell rm -f ~/.tmp_brk_____.rec
+    source ~/tmp_brk_____.rec
+    shell rm -f ~/tmp_brk_____.rec
 
-	c
+	echo \033[36m
+	echo pxCurrentTCB=
+	p/x pxCurrentTCB
+	echo \033[0m
+
+	continue
 
 end
 
+# input: filename, start_addr, end_addr
+define save_mem
+    dump memory $arg0 $arg1 $arg2
+end
+document save_mem
+Write a range of memory to a file in raw format.
+The range is specified by ADDR1 and ADDR2 addresses.
+Usage: save_mem FILENAME Start_ADDR End_ADDR
+end
 
+# enable breakpoint
+define bpe
+    if $argc != 1
+        help bpe
+    else
+        enable $arg0
+    end
+end
+document bpe
+Enable breakpoint with number NUM.
+Usage: bpe NUM
+end
 
+# disable breakpoint
+define bpd
+    if $argc != 1
+        help bpd
+    else
+        disable $arg0
+    end
+end
+document bpd
+Disable breakpoint with number NUM.
+Usage: bpd NUM
+end
 
-
-
-
-
+# list assembly
+define la
+    disassemble ($pc - 16),+60
+end
 
 
 
