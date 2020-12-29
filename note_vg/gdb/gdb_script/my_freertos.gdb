@@ -31,6 +31,11 @@ set $NC=\033[0m
 # set $NC=\e[0m
 
 
+
+define la
+    disassemble $pc-16,+100
+end
+
 # input: List_t*
 define dump_list_2
 
