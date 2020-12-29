@@ -198,7 +198,6 @@ define do_switch_task
 end
 
 set $ISR_SWI=xPortPendSVHandler
-
 # input: TCB_t* or TCB address
 define dump_task_backtrace
     save breakpoints ~/tmp_brk_____.rec
@@ -206,49 +205,48 @@ define dump_task_backtrace
     delete
     delete
 
-	## return from vTaskSwitchContext
-	b *($ISR_SWI + 92)
+    ## return from vTaskSwitchContext
+    b vTaskSwitchContext
 
     continue
 
-	echo \033[36m
-	echo pxCurrentTCB=
-	p/x pxCurrentTCB
-	echo \033[0m
-
-	set $pTCB_org=pxCurrentTCB
+    set $pTCB_org=pxCurrentTCB
     set pxCurrentTCB=$arg0
 
-	## stop at the last line of ISR_SWI
-	b *($ISR_SWI + 152)
-	continue
+    ## stop at the last line of OS_Trap_Interrupt_SWI
+    b *($ISR_SWI + 152)
+    continue
 
-	echo \033[36m
-	backtrace
-	echo \033[0m
+    ni
 
-	set $pc=$ISR_SWI
-	delete
-	delete
+    echo \033[36m
+    backtrace
+    echo \033[0m
 
-	## before enter vTaskSwitchContext
-	b *($ISR_SWI + 80)
-	continue
+    set $pc=$ISR_SWI
+    delete
+    delete
 
-	set $pc=*($ISR_SWI + 92)
-	set pxCurrentTCB=$pTCB_org
-	delete
-	delete
+    ## before enter vTaskSwitchContext
+    b vTaskSwitchContext
+    continue
+    return
+
+    set pxCurrentTCB=$pTCB_org
+
+    delete
+    delete
 
     source ~/tmp_brk_____.rec
     shell rm -f ~/tmp_brk_____.rec
 
-	echo \033[36m
-	echo pxCurrentTCB=
-	p/x pxCurrentTCB
-	echo \033[0m
+    echo \033[36m
+    echo pxCurrentTCB=
+    p/x pxCurrentTCB
+    echo \033[0m
 
-	continue
+    echo \ndone~~~~~\n
+    continue
 
 end
 
