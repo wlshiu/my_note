@@ -364,6 +364,12 @@ GDB_CMD
         (gdb) set $pc=0x0804852b
         ```
 
+    - 存 register
+
+        ```
+        (gdb) set $reg_backup=$r1
+        ```
+
 + unset
     > 取消特定參數.如:unset env，刪除環境變數.
 
@@ -610,6 +616,13 @@ GDB_CMD
 
     ```
     (gdb) set pagination off
+    ```
+
++ 執行某個 function in source code
+    > checking....
+
+    ```
+    (gdb) print add(1, 5)
     ```
 
 + 重跑 progtam
