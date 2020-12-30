@@ -14,13 +14,13 @@ set width 0
 set pagination off
 
 
-set $BLUE=\033[34m
-set $CYAN=\033[36m
-set $MAGENTA=\033[35m
-set $YELLOW=\033[33m
-set $GREEN=\033[32m
-set $RED=\033[31
-set $NC=\033[0m
+# set $BLUE=\033[34m
+# set $CYAN=\033[36m
+# set $MAGENTA=\033[35m
+# set $YELLOW=\033[33m
+# set $GREEN=\033[32m
+# set $RED=\033[31
+# set $NC=\033[0m
 
 # set $BLUE=\e[34m
 # set $CYAN=\e[36m
@@ -41,119 +41,119 @@ define dump_list_2
 
     set $pxList = $arg0
     set $pxListEnd = &($pxList->xListEnd)
-	set $pListItem=$pxList->xListEnd.pxNext
+    set $pListItem=$pxList->xListEnd.pxNext
 
-	set $i = 0
+    set $i = 0
     while $pListItem != $pxListEnd
         set $pxNext = $pListItem->pxNext
 
-		# BLUE
-		# echo \033[34m
+        # BLUE
+        # echo \033[34m
 
-		# CYAN
-		echo \033[36m
+        # CYAN
+        echo \033[36m
 
-		# MAGENTA
-		# echo \033[35m
+        # MAGENTA
+        # echo \033[35m
         p/x *(TCB_t*)$pListItem->pvOwner
-		echo \033[0m
+        echo \033[0m
 
         set $pListItem = $pxNext
-		set $i+=1
+        set $i+=1
     end
 
-	printf "Number of Item: %d\n\n", $i
+    printf "Number of Item: %d\n\n", $i
 end
 
 # arg0: List_t  pointer
 define dump_list
 
-	set $pHeadListItem=((List_t*)$arg0)->pxIndex
-	set $pCurListItem=$pHeadListItem
+    set $pHeadListItem=((List_t*)$arg0)->pxIndex
+    set $pCurListItem=$pHeadListItem
 
-	if ((List_t*)$arg0)->uxNumberOfItems > 0
+    if ((List_t*)$arg0)->uxNumberOfItems > 0
 
-		if $arg1 != -1
-			echo \033[33m
-			printf "@@@ ReadyTasksLists Prior %d \n", $arg1
-			echo \033[0m
-		end
+        if $arg1 != -1
+            echo \033[33m
+            printf "@@@ ReadyTasksLists Prior %d \n", $arg1
+            echo \033[0m
+        end
 
-		echo \033[32m
-		printf "Number of Tasks: %d\n\n", ((List_t*)$arg0)->uxNumberOfItems
-		echo \033[0m
+        echo \033[32m
+        printf "Number of Tasks: %d\n\n", ((List_t*)$arg0)->uxNumberOfItems
+        echo \033[0m
 
 
-		while 1
+        while 1
 
-			set $pTCB=((ListItem_t *)$pCurListItem)->pvOwner
+            set $pTCB=((ListItem_t *)$pCurListItem)->pvOwner
 
-			printf "TASK: %s at 0x%08x\n", ((TCB_t*)$pTCB)->pcTaskName, $pTCB
-			printf "\n"
+            printf "TASK: %s at 0x%08x\n", ((TCB_t*)$pTCB)->pcTaskName, $pTCB
+            printf "\n"
 
-			set $pCurListItem=$pCurListItem->pxNext
+            set $pCurListItem=$pCurListItem->pxNext
 
-			# get head item
-			if ((List_t*)$pCurListItem) == $pHeadListItem
-				loop_break
-			end
-		end
-	end
+            # get head item
+            if ((List_t*)$pCurListItem) == $pHeadListItem
+                loop_break
+            end
+        end
+    end
 end
 
 define dump_freertos_tasks
 
-	set $i=(sizeof(pxReadyTasksLists)/sizeof(pxReadyTasksLists[0]))-1
+    set $i=(sizeof(pxReadyTasksLists)/sizeof(pxReadyTasksLists[0]))-1
 
-	while $i >= 0
+    while $i >= 0
 
-		dump_list &pxReadyTasksLists[$i] $i
+        dump_list &pxReadyTasksLists[$i] $i
 
-		set $i-=1
-	end
+        set $i-=1
+    end
 
-	echo \033[33m
-	printf "@@@ DelayedTaskList1 \n"
-	echo \033[0m
-	dump_list &xDelayedTaskList1 -1
+    echo \033[33m
+    printf "@@@ DelayedTaskList1 \n"
+    echo \033[0m
+    dump_list &xDelayedTaskList1 -1
 
-	echo \033[33m
-	printf "@@@ DelayedTaskList2 \n"
-	echo \033[0m
-	dump_list &xDelayedTaskList2 -1
+    echo \033[33m
+    printf "@@@ DelayedTaskList2 \n"
+    echo \033[0m
+    dump_list &xDelayedTaskList2 -1
 
-	# Pending
-	echo \033[33m
-	printf "@@@ PendingReadyList \n"
-	echo \033[0m
-	dump_list &xPendingReadyList -1
+    # Pending
+    echo \033[33m
+    printf "@@@ PendingReadyList \n"
+    echo \033[0m
+    dump_list &xPendingReadyList -1
 
-	# Suspended
-	echo \033[33m
-	printf "@@@ SuspendedTaskList \n"
-	echo \033[0m
-	dump_list &xSuspendedTaskList -1
+    # Suspended
+    echo \033[33m
+    printf "@@@ SuspendedTaskList \n"
+    echo \033[0m
+    dump_list &xSuspendedTaskList -1
 
-	echo \033[33m
-	printf "@@@ OverflowDelayedTaskList \n"
-	echo \033[0m
-	dump_list pxOverflowDelayedTaskList -1
+    echo \033[33m
+    printf "@@@ OverflowDelayedTaskList \n"
+    echo \033[0m
+    dump_list pxOverflowDelayedTaskList -1
 
 end
 
 # input: Queue_t*
 define dump_queue
     echo \033[36m
-	set $CurQueue=$arg0
-	p/x *(Queue_t*)$CurQueue
-	echo \033[0m
+    set $CurQueue=$arg0
+    p/x *(Queue_t*)$CurQueue
+    echo \033[0m
 
-	echo QData:\n
+    echo QData:\n
 
-	set $Cnt = $CurQueue->uxLength * $CurQueue->uxItemSize
-	printf "Queue buf size: %d\n\n", $Cnt
+    set $Cnt = $CurQueue->uxLength * $CurQueue->uxItemSize
+    printf "Queue buf size: %d\n\n", $Cnt
 
-	# x/$Cntxw $CurQueue->pcHead
+    # x/$Cntxw $CurQueue->pcHead
 
 end
 
@@ -165,17 +165,17 @@ end
 
 # input: EventGroup_t*
 define print_event_group_handle
-	p/x *(EventGroup_t*)$arg0
-	echo \nxTasksWaitingForBits:\n
+    p/x *(EventGroup_t*)$arg0
+    echo \nxTasksWaitingForBits:\n
     dump_list_2 &((EventGroup_t*)$arg0)->xTasksWaitingForBits
 end
 
 # input: TCB_t*
 define print_tcb
-	echo \033[36m
-	echo \nTCB:\n
-	p/x *(TCB_t*)$arg0
-	echo \033[0m
+    echo \033[36m
+    echo \nTCB:\n
+    p/x *(TCB_t*)$arg0
+    echo \033[0m
 end
 
 # input: TCB_t* or TCB address
@@ -188,7 +188,7 @@ define do_switch_task
     finish
     set pxCurrentTCB=$arg0
 
-	# check opcode of return instruction
+    # check opcode of return instruction
     while (*(unsigned long *)$pc != 0x4000064)
         si
     end
@@ -326,8 +326,12 @@ end
 define la
     if $argc == 0
         disassemble $pc-16,+100
-    else
+	end
+    if $argc == 1
         disassemble $arg0,+100
+    end
+    if $argc == 2
+        disassemble $arg0,+$arg1
     end
 end
 
