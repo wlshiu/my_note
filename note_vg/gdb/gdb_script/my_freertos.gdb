@@ -198,7 +198,7 @@ define do_switch_task
 end
 
 set $ISR_SWI=xPortPendSVHandler
-# input: TCB_t* or TCB address
+# input (TCB address of target task): TCB_t* or TCB address
 define dump_task_backtrace
     save breakpoints ~/tmp_brk_____.rec
 
@@ -210,14 +210,32 @@ define dump_task_backtrace
 
     continue
 
+    # echo \033[36m
+    # echo pxCurrentTCB=
+    # p/x pxCurrentTCB
+    # p/x *pxCurrentTCB
+    # print "pxTopOfStack= 0x%x\n", pxCurrentTCB->pxTopOfStack
+    # echo \033[0m
+
     set $pTCB_org=pxCurrentTCB
     set pxCurrentTCB=$arg0
 
-    ## stop at the last line of OS_Trap_Interrupt_SWI
+    # echo \033[32m
+    # echo pxCurrentTCB=
+    # p/x pxCurrentTCB
+    # p/x *pxCurrentTCB
+    # print "pxTopOfStack= 0x%x\n", pxCurrentTCB->pxTopOfStack
+    # x/40xw pxCurrentTCB->pxTopOfStack
+    # echo \033[0m
+
+    ## stop at the last line of xPortPendSVHandler
     b *($ISR_SWI + 152)
     continue
 
     ni
+
+    ## record the return pointer of target task
+    set $link_reg=$pc
 
     echo \033[36m
     backtrace
@@ -232,7 +250,25 @@ define dump_task_backtrace
     continue
     return
 
+    ##### restore the $lr of stack of target task #####
+    set pxCurrentTCB->pxTopOfStack[2]=$link_reg
+
+    # echo \033[32m
+    # echo pxCurrentTCB=
+    # p/x pxCurrentTCB
+    # p/x *pxCurrentTCB
+    # print "pxTopOfStack= 0x%x\n", pxCurrentTCB->pxTopOfStack
+    # x/40xw pxCurrentTCB->pxTopOfStack
+    # echo \033[0m
+
     set pxCurrentTCB=$pTCB_org
+
+    # echo \033[36m
+    # echo pxCurrentTCB=
+    # p/x pxCurrentTCB
+    # p/x *pxCurrentTCB
+    # print "pxTopOfStack= 0x%x\n", pxCurrentTCB->pxTopOfStack
+    # echo \033[0m
 
     delete
     delete
