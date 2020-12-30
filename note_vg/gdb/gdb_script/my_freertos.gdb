@@ -288,7 +288,7 @@ end
 
 # input: filename, start_addr, end_addr
 define save_mem
-    dump memory $arg0 $arg1 $arg2
+    dump binary memory $arg0 $arg1 $arg2
 end
 document save_mem
 Write a range of memory to a file in raw format.
@@ -324,7 +324,11 @@ end
 
 # list assembly
 define la
-    disassemble ($pc - 16),+60
+    if $argc == 0
+        disassemble $pc-16,+100
+    else
+        disassemble $arg0,+100
+    end
 end
 
 
