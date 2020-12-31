@@ -10,6 +10,7 @@ set vertical-split = false
 set ignore-case = true
 set tab-size = 4
 set wrap-lines = yes  # ':toggle wrap-lines'
+set line-graphics = ascii
 
 #
 # Key configuration
