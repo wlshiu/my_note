@@ -110,6 +110,15 @@ $ vim ~/.tmux.conf
 + Hot key
     > the default prefix key is C+b
 
+    - 複製滑鼠選擇到剪貼簿
+
+        ```
+        ## enable mouse mode
+        # set-option -g mouse on
+
+        <Shift> + 滑鼠選範圍
+        ```
+
     - 系統操作
 
         1. `<C+b> d`
