@@ -4,9 +4,9 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>390</x>
+      <x>410</x>
       <y>220</y>
-      <w>100</w>
+      <w>80</w>
       <h>140</h>
     </coordinates>
     <panel_attributes>*CPU*</panel_attributes>
@@ -15,12 +15,12 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>700</x>
+      <x>730</x>
       <y>220</y>
-      <w>100</w>
+      <w>60</w>
       <h>140</h>
     </coordinates>
-    <panel_attributes>*Memory*</panel_attributes>
+    <panel_attributes>*DMA*</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -28,35 +28,35 @@
     <coordinates>
       <x>480</x>
       <y>270</y>
-      <w>240</w>
+      <w>270</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;220.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;250.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
+      <x>780</x>
       <y>240</y>
-      <w>130</w>
+      <w>90</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-DMA read </panel_attributes>
-    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>70.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
+      <x>780</x>
       <y>310</y>
-      <w>130</w>
+      <w>90</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-DMA write</panel_attributes>
-    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+</panel_attributes>
+    <additional_attributes>70.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLObject</id>
@@ -146,11 +146,11 @@ halign=center</panel_attributes>
     <coordinates>
       <x>630</x>
       <y>350</y>
-      <w>120</w>
-      <h>100</h>
+      <w>140</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;80.0;100.0;10.0</additional_attributes>
+    <additional_attributes>10.0;90.0;120.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -210,11 +210,11 @@ halign=center</panel_attributes>
     <coordinates>
       <x>480</x>
       <y>290</y>
-      <w>240</w>
+      <w>270</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;</panel_attributes>
-    <additional_attributes>220.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>250.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -533,6 +533,56 @@ group=2</panel_attributes>
     <panel_attributes>*.*
 fontsize=20
 group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>850</x>
+      <y>220</y>
+      <w>40</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>*Bus*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>790</x>
+      <y>330</y>
+      <w>60</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>DMA
+write
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>790</x>
+      <y>210</y>
+      <w>60</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>DMA
+read 
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>890</x>
+      <y>220</y>
+      <w>40</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>*RAM*</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
