@@ -4,8 +4,8 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>410</x>
-      <y>220</y>
+      <x>340</x>
+      <y>200</y>
       <w>80</w>
       <h>140</h>
     </coordinates>
@@ -15,8 +15,8 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>730</x>
-      <y>220</y>
+      <x>660</x>
+      <y>200</y>
       <w>60</w>
       <h>140</h>
     </coordinates>
@@ -26,8 +26,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>270</y>
+      <x>410</x>
+      <y>250</y>
       <w>270</w>
       <h>30</h>
     </coordinates>
@@ -37,8 +37,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>780</x>
-      <y>240</y>
+      <x>710</x>
+      <y>220</y>
       <w>90</w>
       <h>40</h>
     </coordinates>
@@ -49,8 +49,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>780</x>
-      <y>310</y>
+      <x>710</x>
+      <y>290</y>
       <w>90</w>
       <h>40</h>
     </coordinates>
@@ -61,8 +61,8 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>560</x>
-      <y>110</y>
+      <x>490</x>
+      <y>90</y>
       <w>80</w>
       <h>80</h>
     </coordinates>
@@ -72,8 +72,8 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>560</x>
-      <y>400</y>
+      <x>490</x>
+      <y>380</y>
       <w>80</w>
       <h>80</h>
     </coordinates>
@@ -83,8 +83,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>440</x>
-      <y>130</y>
+      <x>370</x>
+      <y>110</y>
       <w>140</w>
       <h>110</h>
     </coordinates>
@@ -94,8 +94,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>130</y>
+      <x>560</x>
+      <y>110</y>
       <w>140</w>
       <h>110</h>
     </coordinates>
@@ -105,8 +105,8 @@
   <element>
     <id>Text</id>
     <coordinates>
-      <x>700</x>
-      <y>140</y>
+      <x>630</x>
+      <y>120</y>
       <w>70</w>
       <h>50</h>
     </coordinates>
@@ -119,8 +119,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>710</x>
-      <y>400</y>
+      <x>640</x>
+      <y>380</y>
       <w>70</w>
       <h>50</h>
     </coordinates>
@@ -133,8 +133,8 @@ halign=center</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>350</y>
+      <x>560</x>
+      <y>330</y>
       <w>160</w>
       <h>130</h>
     </coordinates>
@@ -144,8 +144,8 @@ halign=center</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>350</y>
+      <x>560</x>
+      <y>330</y>
       <w>140</w>
       <h>110</h>
     </coordinates>
@@ -155,8 +155,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>620</x>
-      <y>350</y>
+      <x>550</x>
+      <y>330</y>
       <w>90</w>
       <h>50</h>
     </coordinates>
@@ -168,8 +168,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>440</x>
-      <y>130</y>
+      <x>370</x>
+      <y>110</y>
       <w>70</w>
       <h>50</h>
     </coordinates>
@@ -182,8 +182,8 @@ halign=center</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>440</x>
-      <y>350</y>
+      <x>370</x>
+      <y>330</y>
       <w>140</w>
       <h>110</h>
     </coordinates>
@@ -193,8 +193,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>420</x>
-      <y>390</y>
+      <x>350</x>
+      <y>370</y>
       <w>90</w>
       <h>60</h>
     </coordinates>
@@ -208,8 +208,8 @@ halign=center</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>290</y>
+      <x>410</x>
+      <y>270</y>
       <w>270</w>
       <h>30</h>
     </coordinates>
@@ -219,8 +219,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>520</x>
-      <y>300</y>
+      <x>450</x>
+      <y>280</y>
       <w>150</w>
       <h>40</h>
     </coordinates>
@@ -233,8 +233,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>530</x>
-      <y>230</y>
+      <x>460</x>
+      <y>210</y>
       <w>130</w>
       <h>50</h>
     </coordinates>
@@ -247,204 +247,123 @@ halign=center</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>480</x>
-      <y>600</y>
+      <x>470</x>
+      <y>580</y>
       <w>60</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>Tag 0
-bg=yellow
-group=2</panel_attributes>
+bg=yellow</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>480</x>
-      <y>650</y>
+      <x>470</x>
+      <y>630</y>
       <w>60</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>Tag 1
-bg=yellow
-group=2</panel_attributes>
+bg=yellow</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>430</x>
-      <y>600</y>
+      <x>410</x>
+      <y>580</y>
       <w>50</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>*Way 0*
 valign=center
 halign=center
-bg=orange
-group=2</panel_attributes>
+bg=orange</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>430</x>
-      <y>640</y>
+      <x>410</x>
+      <y>630</y>
       <w>50</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*Way 1*
 valign=center
 halign=center
-bg=orange
-group=2</panel_attributes>
+bg=orange</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>570</x>
-      <y>600</y>
+      <x>530</x>
+      <y>580</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>status
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>630</y>
       <w>60</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>status
 bg=yellow
-group=2</panel_attributes>
+fg=black</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>570</x>
-      <y>650</y>
-      <w>60</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>status
-bg=yellow
-fg=black
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLObject</id>
-    <coordinates>
-      <x>630</x>
-      <y>600</y>
+      <x>590</x>
+      <y>580</y>
       <w>120</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*Cache -Line*
-bg=orange
-group=2</panel_attributes>
+bg=orange</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>630</x>
-      <y>650</y>
+      <x>590</x>
+      <y>630</y>
       <w>120</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*Cache -Line*
-bg=orange
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>480</x>
-      <y>590</y>
-      <w>70</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>480</x>
-      <y>640</y>
-      <w>70</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>570</x>
-      <y>590</y>
-      <w>70</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>570</x>
-      <y>640</y>
-      <w>70</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>630</x>
-      <y>590</y>
-      <w>130</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLDeployment</id>
-    <coordinates>
-      <x>630</x>
-      <y>640</y>
-      <w>130</w>
-      <h>40</h>
-    </coordinates>
-    <panel_attributes>
-group=2</panel_attributes>
+bg=orange</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>560</x>
-      <y>510</y>
+      <x>490</x>
+      <y>490</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>*Cache Architecture*
 valign=center
 halign=center
-fontsize=16
-group=2</panel_attributes>
+fontsize=16</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>550</x>
-      <y>50</y>
+      <x>480</x>
+      <y>30</y>
       <w>140</w>
       <h>40</h>
     </coordinates>
@@ -457,89 +376,83 @@ fontsize=16</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>540</y>
-      <w>70</w>
-      <h>70</h>
+      <x>390</x>
+      <y>510</y>
+      <w>80</w>
+      <h>80</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-
-group=2</panel_attributes>
-    <additional_attributes>50.0;10.0;10.0;50.0</additional_attributes>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>470</x>
-      <y>540</y>
+      <x>390</x>
+      <y>520</y>
       <w>50</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*Sets*
 valign=center
-halign=center
-group=2</panel_attributes>
+halign=center</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>470</x>
-      <y>700</y>
+      <x>400</x>
+      <y>680</y>
       <w>330</w>
       <h>80</h>
     </coordinates>
     <panel_attributes>*Cache_Size = Way * Set * Cache-line*
 
 e.g.
-16-KBytes = Way(2) * Set(512)* 16-bytes
-fontsize=16
-group=2</panel_attributes>
+16-KBytes = Way(2) * Set(512) * 16-bytes
+fontsize=16</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>540</x>
+      <x>470</x>
+      <y>520</y>
+      <w>20</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*.*
+fontsize=20</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>460</x>
+      <y>530</y>
+      <w>20</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*.*
+fontsize=20</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>450</x>
       <y>540</y>
       <w>20</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*.*
-fontsize=20
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>530</x>
-      <y>550</y>
-      <w>20</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>*.*
-fontsize=20
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>520</x>
-      <y>560</y>
-      <w>20</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>*.*
-fontsize=20
-group=2</panel_attributes>
+fontsize=20</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>850</x>
-      <y>220</y>
+      <x>780</x>
+      <y>200</y>
       <w>40</w>
       <h>140</h>
     </coordinates>
@@ -549,8 +462,8 @@ group=2</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>790</x>
-      <y>330</y>
+      <x>720</x>
+      <y>310</y>
       <w>60</w>
       <h>50</h>
     </coordinates>
@@ -563,8 +476,8 @@ halign=center</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>790</x>
-      <y>210</y>
+      <x>720</x>
+      <y>190</y>
       <w>60</w>
       <h>50</h>
     </coordinates>
@@ -577,12 +490,34 @@ halign=center</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>890</x>
-      <y>220</y>
+      <x>820</x>
+      <y>200</y>
       <w>40</w>
       <h>140</h>
     </coordinates>
     <panel_attributes>*RAM*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>400</x>
+      <y>570</y>
+      <w>330</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>730</x>
+      <y>570</y>
+      <w>70</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*One Set*</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
