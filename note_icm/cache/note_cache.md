@@ -45,6 +45,56 @@ Cache
         相對 Direct Mapped, 連續熱點數據 (會導致一個 set 內的 conflict) 的區間更大
 
 
++ Cache Hit Type
+    > `idex` 跟 `tag`, 分別是兩個拿來判斷資料是屬於誰的資訊.
+    兩者要同時相符合, 才會說是 cache hit, 並回傳資料
+
+    - VIVT (Virtual Indexed Virtual Tagged)
+        > 只使用 `Virtual Address` 去作存取,速度較快 (因為程式執行時, 傳遞的本來就是 virtual address), 但是卻會常常需要作 invalidate 的動作.
+        由於每個 Process 都會有 4G 的 virtual address,
+        雖然對應到的 Physical Address 不同, 但是 VIVT cache 只使用 virtual address
+        造成 context switch 時就一定得進行 clean + invalidate(flush) 的動作, 以防止存取到錯誤的資料。
+
+    - PIPT (Physical Indexed Physical Tagged)
+        > 只使用 `Physical Address` 作存取, 不用擔心資料取錯.
+        但是得進行 physical address 轉換, 如果不巧發生 TLB miss,
+        這轉換的工作就會是個漫長的旅途了
+
+    - VIPT (Virtual Indexed Physical Tagged)
+        > 由於多了 `Physical Tag`, 就能讓資料在 cache 存在的時間拉長.
+        所謂的 physical tag, 指的是當 virtual address 進來後得進行一次轉換;
+        同時 virtual, physical address 都 match 才會取得資料
+
+        > 缺點就是在 physical address 轉換出來之前, 都無法找到正確的資料.
+        不過卻也比 PIPT 來的好很多, 因為當 virtual address 在 cache 中流竄的同時,
+        也能在 TLB 當中流竄進行 physical address 轉換
+
+
++ Aliasing Problem
+    > 當兩個 Virtual Address 指到同一個 Physical Address 時,
+    雖然都是同樣的資料, 但 VIVT, VIPT 皆會保存兩次 (因為 index 不同).
+    此時就會稱之為 cache-line aliasing problem, 為解決此問題, 有人提出了 page coloring 的作法
+
++ Non-Cacheable
+    >  I/O device 時, 每次去跟裝置要資料時應該都是不同的值.
+    若被 cache 住, cache hit 就拿不到裝置上最新的資料了.
+
+    > 所以像這種每次都有可能拿到不同值的, 原則上都不應 cache
+    如此才能確保資料的 Reliability
+
++ Write-Allocate
+    > 在 cache miss 的情況下, 先對 DMA 進行 read 操作, 將操作數讀入 cache, 再進行讀寫, 這樣便 cache hit
+
+
++ Bufferable v.s non-bufferable
+    > 主要表現在 ack 信號的返回上
+
+    - bufferable
+        > 將結果寫入 buffer (某個component) 便返回ack
+
+    - non-bufferable
+        > 等到結果寫入外存, 返回 ack
+
 # NDS32
 
 ## Definitions
