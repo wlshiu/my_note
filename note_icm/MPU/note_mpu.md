@@ -248,6 +248,22 @@ Reserved attribute  | The value read out from the MPU TLB entry          | TLB m
 + `vPortResetPrivilege`
     > 恢復到原本的模式
 
+ + `MPU_TLB`
+    > MPU_TLB(portMPU_ENTRY(entry_id), 4KB_align(area_range), 4KB_align(PA), attribute)
+
+    - entry_id
+        > 0 ~ 7
+
+    - portMPU_ENTRY()
+        > convert entry_id to CSR format
+
+    - PA
+        > Physical Address
+
+    - attribute
+        > C/X/M/V flags
+
+
 ### reference
 
 + `3.4.2.  TLB Access VPN Register`
