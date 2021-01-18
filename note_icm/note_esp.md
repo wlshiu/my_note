@@ -33,15 +33,15 @@ ESP
 ## Operating System
 
 + Non-OS (ESP8266)
-    > 自 2019.12 起，將停止為 ESP8266 NonOS 新增任何功能.
+    > 自 2019.12 起, 將停止為 ESP8266 NonOS 新增任何功能.
     僅修復 ESP8266 NonOS 的關鍵 bug.
-    所有更新僅在 master 分支進行，即基於 v3.0.0 的持續 bug 修復版本.
+    所有更新僅在 master 分支進行, 即基於 v3.0.0 的持續 bug 修復版本.
 
 + FreeRTOS
     > directly use FreeRTOS API
-    
-    - Dual Core 
-    
+
+    - Dual Core
+
 ## Debug
 
 + app_trace
@@ -81,4 +81,67 @@ ESP
     - Print core dump to UART
         > Base64-encoded core dumps are printed on UART upon system panic.
         User should save core dump text body to some file manually (use tool espcoredump.py)
+
+
+
+## MISC
+
++ Virtual file-system (VFS)
+
+    ```
+    // file description
+    typedef struct esp_vfs {
+        int     flags;
+        int     (*open)(const char * path, int flags, int mode);
+        int     (*close)(int fd);
+        ssize_t (*read)(int fd, void * dst, size_t size);
+        ssize_t (*write)(int fd, const void * data, size_t size);
+
+        off_t   (*lseek)(int fd, off_t size, int mode);
+
+        int     (*fstat)(int fd, struct stat * st);
+        int     (*fsync)(int fd);
+
+        int     (*mkdir)(const char* name, mode_t mode);
+        int     (*rmdir)(const char* name);
+
+        int     (*fcntl)(int fd, int cmd, int arg);
+        int     (*ioctl)(int fd, int cmd, va_list args);
+        ...
+    } esp_vfs_t;
+    ```
+
++ Partition Tables
+
+    - 可創建自定義分區表
+        > 以 CSV file 編寫分區表, 再藉由 `gen_esp32part.py` 實現 CSV 和二進制文件之間的轉換
+
+        ```
+        $ python gen_esp32part.py input_partitions.csv binary_partitions.bin
+        $ python gen_esp32part.py binary_partitions.bin input_partitions.csv
+        ```
+    - 參數
+        1. Name
+            > partition name (< 16 char)
+        1. Type
+            > partition type (0x00 ~ 0xFE), `0x00 ~ 0x3F` 保留給 esp-idf 的核心功能
+
+        1. SubType
+            > 當 `Type == app`, SubType 可以指定為 factory (0), ota_0 (0x10) … ota_15 (0x1F) 或者 test (0x20)
+
+            > 當 `Type == data`, SubType 可以指定為 ota (0), phy (1), nvs (2) 或者 nvs_keys (4)
+
+        1. Offset
+            > partition offset (64KB alignment), 偏移地址為空, 則會緊跟著前一個分區之後開始
+            若為首個分區, 則將緊跟著分區表開始
+
+        1. Size
+            > partition size
+
+        1. Flags
+            > encrypted or not
+
+
++ Wear Levelling
+
 
