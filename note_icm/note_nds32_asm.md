@@ -445,7 +445,7 @@ unsigned int __nds32__mfusr(const enum nds32_usr usrname)
     ```
 
 
-+ get pc (program counter)
++ **get pc (program counter)**
 
     ```
     unsigned long   pc = __nds32__mfusr(NDS32_USR_PC);
