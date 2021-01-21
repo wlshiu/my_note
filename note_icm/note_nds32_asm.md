@@ -1,6 +1,8 @@
 NDS32 ASM
 ---
 
+NDS32 D10 為 supper set (可相容 N10), D10F 含有 FPU.
+
 NDS32 有 `32` 個 32-bits 通用暫存器, 也可以使用精簡暫存器 (15 個 32-bits 通用暫存器)以節省成本
 
 # Definitions
