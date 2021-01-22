@@ -21,6 +21,12 @@ SVN
 
 # Git and SVN
 
+command line 使用 `--username` 自動帶上 user name
+
+```
+$ git svn clone svn://your/svn/repo/ --username=xxx
+```
+
 ## compare
 
 | git           | svn
@@ -112,6 +118,7 @@ $ git svn rebase
 
 ```
 $ git svn dcommit
+$ git svn dcommit –username admin
 ```
 
 如果有開 branch, 那麼這個時候應該要用rebase+merge來達到master和branch 合併的時候會是 Fast Forward Merge：
@@ -177,6 +184,13 @@ $ git svn rebase newbranch
     - [Add an SVN remote to your Git repo](https://coderwall.com/p/vfop7g/add-an-svn-remote-to-your-git-repo)
 
 # SVN Commands
+
+command line 加上參數 `--username` 與 `--password`, 自動帶上帳號密碼
+
+```
+$ svn export svn://172.18.41.35/VAD8992_android/AMSS_postCS-1092_LABF64-2820/vad8992_postCS --username Mark --password godofwar --no-auth-cache
+$ svn checkout --username user --password pass svn://server/repo
+```
 
 ## Help
 
