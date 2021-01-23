@@ -1,0 +1,1006 @@
+ICEman commit c9859e72d520672a29eed6b8378ac5e432cce3ae 
+Date: Thu Apr 26 14:47:29 2012
+
+
+hw_ver: 65537, fw_ver: 3, fpga_ver: 2
+-------------------------------------------
+ < AndesCoreV3::init_edm () >
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RemoteSerialProtocolUtil::get_packet -- receive: +$qSupported:xmlRegisters=nds32;qRelocInsn+#c5, result: 46
+qSupported:xmlRegisters=nds32;qRelocInsn+
+get_packet(): send '+'
+COMMAND_TYPE_qSupported
+-------------------------------------------
+ < AndesCoreV3::set_dimbr_ctrl() >
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < hold () >
+-------------------------------------------
+ < hold_epilog () >
+-------------------------------------------
+ < AccessReg::get () > r0(0)
+instruction: 0x64070003, 0x64000008, 0x40000009, 0x4c003ffa
+value = ffffffff
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r1(1)
+instruction: 0x64170003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r2(2)
+instruction: 0x64270003, 0x64000008, 0x40000009, 0x4c003ffa
+value = ffffff00
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir6(50)
+instruction: 0x64026402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir0(44)
+instruction: 0x64020002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 70408
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < generate_description () >
+-------------------------------------------
+ < AccessReg::get () > cr0(37)
+instruction: 0x64000002, 0x64070003, 0x64000008, 0x4c003ffa
+value = f8040002
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr1(38)
+instruction: 0x64002002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 2400
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr2(39)
+instruction: 0x64004002, 0x64070003, 0x64000008, 0x4c003ffa
+value = a400
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr3(40)
+instruction: 0x64006002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 908afe1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr4(41)
+instruction: 0x64008002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 115c61
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+config 0xf8040002, 0x2400, 0xa400, 0x908afe1, 0x115c61
+generate
+val_cr0 = f8040002
+val_edm = 1010009d
+-------------------------------------------
+probe_setting ()
+-------------------------------------------
+ < AccessReg::get () > ir3(47)
+instruction: 0x64022402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 4001
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < InitTLB() >
+-------------------------------------------
+ < InitCache() >
+-------------------------------------------
+ < UpdateStatus() >
+COMMAND_TYPE_qSupported DONE.
+put_packet(): reply buffer -- q X f e r : f e a t u r e s : r e a d + ; P a c k e t S i z e = 4 0 0 0 ; 
+RemoteSerialProtocolUtil::send -- $ q X f e r : f e a t u r e s : r e a d + ; P a c k e t S i z e = 4 0 0 0 ; # 0 a 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $Hg0#df, result: 7
+Hg0
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qXfer:features:read:target.xml:0,fff#7d, result: 40
+qXfer:features:read:target.xml:0,fff
+get_packet(): send '+'
+COMMAND_TYPE_qXfer_features_read
+COMMAND_TYPE_qXfer_features_read DONE.
+put_packet(): reply buffer -- l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   t a r g e t   S Y S T E M   " g d b - t a r g e t . d t d " > < t a r g e t > < a r c h i t e c t u r e > n 1 h < / a r c h i t e c t u r e > < x i : i n c l u d e   h r e f = " n d s 3 2 - c o r e . x m l " / > < x i : i n c l u d e   h r e f = " n d s 3 2 - s y s t e m . x m l " / > < / t a r g e t > 
+RemoteSerialProtocolUtil::send -- $ l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   t a r g e t   S Y S T E M   " g d b - t a r g e t . d t d " > < t a r g e t > < a r c h i t e c t u r e > n 1 h < / a r c h i t e c t u r e > < x i : i n c l u d e   h r e f = " n d s 3 2 - c o r e . x m l " / > < x i : i n c l u d e   h r e f = " n d s 3 2 - s y s t e m . x m l " / > < / t a r g e t > # 3 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qXfer:features:read:nds32-core.xml:0,fff#76, result: 44
+qXfer:features:read:nds32-core.xml:0,fff
+get_packet(): send '+'
+COMMAND_TYPE_qXfer_features_read
+COMMAND_TYPE_qXfer_features_read DONE.
+put_packet(): reply buffer -- l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   f e a t u r e   S Y S T E M   " g d b - t a r g e t . d t d " > < f e a t u r e   n a m e = " o r g . g n u . g d b . n d s 3 2 . c o r e " > < r e g   n a m e = " r 0 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 0 "   / > < r e g   n a m e = " r 1 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 "   / > < r e g   n a m e = " r 2 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 "   / > < r e g   n a m e = " r 3 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 "   / > < r e g   n a m e = " r 4 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 4 "   / > < r e g   n a m e = " r 5 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 5 "   / > < r e g   n a m e = " r 6 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 6 "   / > < r e g   n a m e = " r 7 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 7 "   / > < r e g   n a m e = " r 8 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 8 "   / > < r e g   n a m e = " r 9 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 9 "   / > < r e g   n a m e = " r 1 0 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 0 "   / > < r e g   n a m e = " r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 5 "   / > < r e g   n a m e = " f p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 8 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " g p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 9 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " l p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 0 "   t y p e = " c o d e _ p t r "   / > < r e g   n a m e = " s p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 1 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " p c "   b i t s i z e = " 3 2 "   g r o u p = " s p r "   r e g n u m = " 3 2 "   t y p e = " c o d e _ p t r "   / > < / f e a t u r e > 
+RemoteSerialProtocolUtil::send -- $ l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   f e a t u r e   S Y S T E M   " g d b - t a r g e t . d t d " > < f e a t u r e   n a m e = " o r g . g n u . g d b . n d s 3 2 . c o r e " > < r e g   n a m e = " r 0 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 0 "   / > < r e g   n a m e = " r 1 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 "   / > < r e g   n a m e = " r 2 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 "   / > < r e g   n a m e = " r 3 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 "   / > < r e g   n a m e = " r 4 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 4 "   / > < r e g   n a m e = " r 5 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 5 "   / > < r e g   n a m e = " r 6 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 6 "   / > < r e g   n a m e = " r 7 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 7 "   / > < r e g   n a m e = " r 8 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 8 "   / > < r e g   n a m e = " r 9 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 9 "   / > < r e g   n a m e = " r 1 0 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 0 "   / > < r e g   n a m e = " r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 1 5 "   / > < r e g   n a m e = " f p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 8 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " g p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 2 9 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " l p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 0 "   t y p e = " c o d e _ p t r "   / > < r e g   n a m e = " s p "   b i t s i z e = " 3 2 "   g r o u p = " g p r "   r e g n u m = " 3 1 "   t y p e = " d a t a _ p t r "   / > < r e g   n a m e = " p c "   b i t s i z e = " 3 2 "   g r o u p = " s p r "   r e g n u m = " 3 2 "   t y p e = " c o d e _ p t r "   / > < / f e a t u r e > # a c 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qXfer:features:read:nds32-system.xml:0,fff#72, result: 46
+qXfer:features:read:nds32-system.xml:0,fff
+get_packet(): send '+'
+COMMAND_TYPE_qXfer_features_read
+COMMAND_TYPE_qXfer_features_read DONE.
+put_packet(): reply buffer -- l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   f e a t u r e   S Y S T E M   " g d b - t a r g e t . d t d " > < f e a t u r e   n a m e = " o r g . g n u . g d b . n d s 3 2 . s y s t e m " > < r e g   n a m e = " c r 0 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 7 "   / > < r e g   n a m e = " c r 1 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 8 "   / > < r e g   n a m e = " c r 2 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 9 "   / > < r e g   n a m e = " c r 3 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 0 "   / > < r e g   n a m e = " c r 4 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 1 "   / > < r e g   n a m e = " c r 5 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 2 "   / > < r e g   n a m e = " i r 0 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 4 "   / > < r e g   n a m e = " i r 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 5 "   / > < r e g   n a m e = " i r 3 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 7 "   / > < r e g   n a m e = " i r 6 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 0 "   / > < r e g   n a m e = " i r 9 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 3 "   / > < r e g   n a m e = " i r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 5 "   / > < r e g   n a m e = " i r 1 4 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 8 "   / > < r e g   n a m e = " i r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 9 "   / > < r e g   n a m e = " i r 1 8 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 3 "   / > < r e g   n a m e = " i r 1 9 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 4 "   / > < r e g   n a m e = " m r 0 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 0 "   / > < r e g   n a m e = " m r 4 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 4 "   / > < r e g   n a m e = " m r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 1 8 2 "   / > < r e g   n a m e = " s e c u r 0 "   b i t s i z e = " 3 2 "   g r o u p = " s e c u r 0 "   r e g n u m = " 1 8 3 "   / > < r e g   n a m e = " i r 2 0 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 6 "   / > < r e g   n a m e = " i r 2 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 7 "   / > < r e g   n a m e = " i r 2 2 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 8 "   / > < r e g   n a m e = " i r 2 3 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 9 "   / > < r e g   n a m e = " i r 2 4 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 8 0 "   / > < r e g   n a m e = " i r 2 5 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 8 1 "   / > < r e g   n a m e = " m r 2 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 2 "   / > < r e g   n a m e = " m r 3 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 3 "   / > < r e g   n a m e = " m r 6 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 6 "   / > < r e g   n a m e = " m r 7 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 7 "   / > < r e g   n a m e = " d r 4 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 3 "   / > < r e g   n a m e = " d r 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 1 "   / > < r e g   n a m e = " d r 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 2 "   / > < r e g   n a m e = " d r 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 3 "   / > < r e g   n a m e = " d r 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 4 "   / > < r e g   n a m e = " d r 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 5 "   / > < r e g   n a m e = " d r 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 6 "   / > < r e g   n a m e = " d r 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 7 "   / > < r e g   n a m e = " d r 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 8 "   / > < r e g   n a m e = " d r 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 9 "   / > < r e g   n a m e = " d r 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 0 "   / > < r e g   n a m e = " d r 1 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 1 "   / > < r e g   n a m e = " d r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 2 "   / > < r e g   n a m e = " d r 1 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 3 "   / > < r e g   n a m e = " d r 1 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 4 "   / > < r e g   n a m e = " d r 1 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 5 "   / > < r e g   n a m e = " d r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 6 "   / > < r e g   n a m e = " d r 1 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 7 "   / > < r e g   n a m e = " d r 1 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 8 "   / > < r e g   n a m e = " d r 1 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 9 "   / > < r e g   n a m e = " d r 1 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 0 "   / > < r e g   n a m e = " d r 2 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 1 "   / > < r e g   n a m e = " d r 2 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 2 "   / > < r e g   n a m e = " d r 2 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 3 "   / > < r e g   n a m e = " d r 2 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 4 "   / > < r e g   n a m e = " d r 2 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 5 "   / > < r e g   n a m e = " d r 2 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 6 "   / > < r e g   n a m e = " d r 2 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 7 "   / > < r e g   n a m e = " d r 2 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 8 "   / > < r e g   n a m e = " d r 2 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 9 "   / > < r e g   n a m e = " d r 2 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 0 0 "   / > < r e g   n a m e = " d r 4 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 1 "   / > < r e g   n a m e = " d r 4 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 2 "   / > < r e g   n a m e = " d r 4 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 4 "   / > < r e g   n a m e = " d r 4 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 5 "   / > < r e g   n a m e = " d r 4 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 6 "   / > < / f e a t u r e > 
+RemoteSerialProtocolUtil::send -- $ l < ? x m l   v e r s i o n = " 1 . 0 " ? > < ! D O C T Y P E   f e a t u r e   S Y S T E M   " g d b - t a r g e t . d t d " > < f e a t u r e   n a m e = " o r g . g n u . g d b . n d s 3 2 . s y s t e m " > < r e g   n a m e = " c r 0 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 7 "   / > < r e g   n a m e = " c r 1 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 8 "   / > < r e g   n a m e = " c r 2 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 3 9 "   / > < r e g   n a m e = " c r 3 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 0 "   / > < r e g   n a m e = " c r 4 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 1 "   / > < r e g   n a m e = " c r 5 "   b i t s i z e = " 3 2 "   g r o u p = " c r "   r e g n u m = " 4 2 "   / > < r e g   n a m e = " i r 0 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 4 "   / > < r e g   n a m e = " i r 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 5 "   / > < r e g   n a m e = " i r 3 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 4 7 "   / > < r e g   n a m e = " i r 6 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 0 "   / > < r e g   n a m e = " i r 9 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 3 "   / > < r e g   n a m e = " i r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 5 "   / > < r e g   n a m e = " i r 1 4 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 8 "   / > < r e g   n a m e = " i r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 5 9 "   / > < r e g   n a m e = " i r 1 8 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 3 "   / > < r e g   n a m e = " i r 1 9 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 4 "   / > < r e g   n a m e = " m r 0 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 0 "   / > < r e g   n a m e = " m r 4 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 4 "   / > < r e g   n a m e = " m r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 1 8 2 "   / > < r e g   n a m e = " s e c u r 0 "   b i t s i z e = " 3 2 "   g r o u p = " s e c u r 0 "   r e g n u m = " 1 8 3 "   / > < r e g   n a m e = " i r 2 0 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 6 "   / > < r e g   n a m e = " i r 2 1 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 7 "   / > < r e g   n a m e = " i r 2 2 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 8 "   / > < r e g   n a m e = " i r 2 3 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 7 9 "   / > < r e g   n a m e = " i r 2 4 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 8 0 "   / > < r e g   n a m e = " i r 2 5 "   b i t s i z e = " 3 2 "   g r o u p = " i r "   r e g n u m = " 1 8 1 "   / > < r e g   n a m e = " m r 2 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 2 "   / > < r e g   n a m e = " m r 3 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 3 "   / > < r e g   n a m e = " m r 6 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 6 "   / > < r e g   n a m e = " m r 7 "   b i t s i z e = " 3 2 "   g r o u p = " m r "   r e g n u m = " 6 7 "   / > < r e g   n a m e = " d r 4 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 3 "   / > < r e g   n a m e = " d r 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 1 "   / > < r e g   n a m e = " d r 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 2 "   / > < r e g   n a m e = " d r 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 3 "   / > < r e g   n a m e = " d r 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 4 "   / > < r e g   n a m e = " d r 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 5 "   / > < r e g   n a m e = " d r 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 6 "   / > < r e g   n a m e = " d r 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 7 "   / > < r e g   n a m e = " d r 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 8 "   / > < r e g   n a m e = " d r 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 7 9 "   / > < r e g   n a m e = " d r 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 0 "   / > < r e g   n a m e = " d r 1 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 1 "   / > < r e g   n a m e = " d r 1 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 2 "   / > < r e g   n a m e = " d r 1 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 3 "   / > < r e g   n a m e = " d r 1 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 4 "   / > < r e g   n a m e = " d r 1 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 5 "   / > < r e g   n a m e = " d r 1 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 6 "   / > < r e g   n a m e = " d r 1 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 7 "   / > < r e g   n a m e = " d r 1 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 8 "   / > < r e g   n a m e = " d r 1 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 8 9 "   / > < r e g   n a m e = " d r 1 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 0 "   / > < r e g   n a m e = " d r 2 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 1 "   / > < r e g   n a m e = " d r 2 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 2 "   / > < r e g   n a m e = " d r 2 2 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 3 "   / > < r e g   n a m e = " d r 2 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 4 "   / > < r e g   n a m e = " d r 2 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 5 "   / > < r e g   n a m e = " d r 2 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 6 "   / > < r e g   n a m e = " d r 2 6 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 7 "   / > < r e g   n a m e = " d r 2 7 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 8 "   / > < r e g   n a m e = " d r 2 8 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 9 9 "   / > < r e g   n a m e = " d r 2 9 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 0 0 "   / > < r e g   n a m e = " d r 4 0 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 1 "   / > < r e g   n a m e = " d r 4 1 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 2 "   / > < r e g   n a m e = " d r 4 3 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 4 "   / > < r e g   n a m e = " d r 4 4 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 5 "   / > < r e g   n a m e = " d r 4 5 "   b i t s i z e = " 3 2 "   g r o u p = " d r "   r e g n u m = " 1 1 6 "   / > < / f e a t u r e > # 1 9 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $?#3f, result: 5
+?
+get_packet(): send '+'
+COMMAND_TYPE_QUESTION_PACKET
+-------------------------------------------
+ < clean_breakpoint () >
+Breakpoint::remove_breakpoint ()
+-------------------------------------------
+ < clean_sw_breakpoint () >
+Breakpoint::remove_breakpoint ()
+COMMAND_TYPE_QUESTION_PACKET DONE.
+put_packet(): reply buffer -- S 0 5 
+RemoteSerialProtocolUtil::send -- $ S 0 5 # b 8 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $Hc-1#09, result: 8
+Hc-1
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qC#b4, result: 6
+qC
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qAttached#8f, result: 13
+qAttached
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $g#67, result: 5
+g
+get_packet(): send '+'
+COMMAND_TYPE_g_PACKET
+-------------------------------------------
+ < AccessReg::get () > r3(3)
+instruction: 0x64370003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 5
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r4(4)
+instruction: 0x64470003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r5(5)
+instruction: 0x64570003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 80808080
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r6(6)
+instruction: 0x64670003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r7(7)
+instruction: 0x64770003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r8(8)
+instruction: 0x64870003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1020
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r9(9)
+instruction: 0x64970003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4a270
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r10(10)
+instruction: 0x64a70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 15cd8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r15(15)
+instruction: 0x64f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4ac4
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r28(28)
+instruction: 0x65c70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 166f8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r29(29)
+instruction: 0x65d70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 77cf0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r30(30)
+instruction: 0x65e70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 167fe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r31(31)
+instruction: 0x65f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 7fffc0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_g_PACKET DONE.
+put_packet(): reply buffer -- f f f f f f f f 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 c 4 4 a 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 c 0 f f 7 f 0 0 
+RemoteSerialProtocolUtil::send -- $ f f f f f f f f 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 c 4 4 a 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 c 0 f f 7 f 0 0 # 5 6 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $p20#d2, result: 7
+p20
+get_packet(): send '+'
+COMMAND_TYPE_p_PACKET
+-------------------------------------------
+ < AccessReg::get () > ir11(55)
+instruction: 0x6402ac02, 0x64070003, 0x64000008, 0x4c003ffa
+value = 1680a
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_p_PACKET DONE.
+put_packet(): reply buffer -- 0 a 6 8 0 1 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 a 6 8 0 1 0 0 # c 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qPart:nds32:ask:target#26, result: 26
+qPart:nds32:ask:target
+get_packet(): send '+'
+COMMAND_TYPE_qPart_ask_target
+COMMAND_TYPE_qPart_ask_target DONE.
+put_packet(): reply buffer -- I C E 
+RemoteSerialProtocolUtil::send -- $ I C E # d 1 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qPart:nds32:ask:cpu#e7, result: 23
+qPart:nds32:ask:cpu
+get_packet(): send '+'
+COMMAND_TYPE_qPart_ask_cpu
+COMMAND_TYPE_qPart_ask_cpu DONE.
+put_packet(): reply buffer -- c o r e 0 0 
+RemoteSerialProtocolUtil::send -- $ c o r e 0 0 # 0 9 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qPart:nds32:ask:de#68, result: 22
+qPart:nds32:ask:de
+get_packet(): send '+'
+COMMAND_TYPE_qPart_ask_de
+COMMAND_TYPE_qPart_ask_de DONE.
+put_packet(): reply buffer -- L E 
+RemoteSerialProtocolUtil::send -- $ L E # 9 1 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $p2c#05, result: 7
+p2c
+get_packet(): send '+'
+COMMAND_TYPE_p_PACKET
+COMMAND_TYPE_p_PACKET DONE.
+put_packet(): reply buffer -- 0 8 0 4 0 7 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 8 0 4 0 7 0 0 # 9 3 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qTStatus#49, result: 12
+qTStatus
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qRcmd,726573657420686f6c64#a6, result: 30
+qRcmd,726573657420686f6c64
+get_packet(): send '+'
+get command reset hold
+COMMAND_TYPE_qRcmd_TARGET_RESET_HOLD
+-------------------------------------------
+ < reset_hold () >
+-------------------------------------------
+ < target_reset() >
+reset-and-hold success
+-------------------------------------------
+ < AndesCoreV3::init_edm () >
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < hold_epilog () >
+-------------------------------------------
+ < AccessReg::get () > r0(0)
+instruction: 0x64070003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1680a
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r1(1)
+instruction: 0x64170003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r2(2)
+instruction: 0x64270003, 0x64000008, 0x40000009, 0x4c003ffa
+value = ffffff00
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir6(50)
+instruction: 0x64026402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir0(44)
+instruction: 0x64020002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 70408
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_qRcmd_TARGET_RESET_HOLD DONE.
+put_packet(): reply buffer -- O K 
+RemoteSerialProtocolUtil::send -- $ O K # 9 a 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $p20#d2, result: 7
+p20
+get_packet(): send '+'
+COMMAND_TYPE_p_PACKET
+-------------------------------------------
+ < AccessReg::get () > ir11(55)
+instruction: 0x6402ac02, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_p_PACKET DONE.
+put_packet(): reply buffer -- 0 0 0 0 0 0 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 0 0 0 0 0 0 0 # 8 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qSymbol::#5b, result: 13
+qSymbol::
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $g#67, result: 5
+g
+get_packet(): send '+'
+COMMAND_TYPE_g_PACKET
+-------------------------------------------
+ < AccessReg::get () > r3(3)
+instruction: 0x64370003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 5
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r4(4)
+instruction: 0x64470003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r5(5)
+instruction: 0x64570003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 80808080
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r6(6)
+instruction: 0x64670003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r7(7)
+instruction: 0x64770003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r8(8)
+instruction: 0x64870003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1020
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r9(9)
+instruction: 0x64970003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4a270
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r10(10)
+instruction: 0x64a70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 15cd8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r15(15)
+instruction: 0x64f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4ac4
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r28(28)
+instruction: 0x65c70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 166f8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r29(29)
+instruction: 0x65d70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 77cf0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r30(30)
+instruction: 0x65e70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 167fe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r31(31)
+instruction: 0x65f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_g_PACKET DONE.
+put_packet(): reply buffer -- 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 c 4 4 a 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 c 4 4 a 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 # 0 a 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $p20#d2, result: 7
+p20
+get_packet(): send '+'
+COMMAND_TYPE_p_PACKET
+COMMAND_TYPE_p_PACKET DONE.
+put_packet(): reply buffer -- 0 0 0 0 0 0 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 0 0 0 0 0 0 0 # 8 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $p2c#05, result: 7
+p2c
+get_packet(): send '+'
+COMMAND_TYPE_p_PACKET
+COMMAND_TYPE_p_PACKET DONE.
+put_packet(): reply buffer -- 0 8 0 4 0 7 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 8 0 4 0 7 0 0 # 9 3 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $vCont?#49, result: 10
+vCont?
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $Hc0#db, result: 7
+Hc0
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $s#73, result: 5
+s
+get_packet(): send '+'
+COMMAND_TYPE_s_PACKET
+single_step()
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70c08 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir14(58)
+instruction: 0x64030002, 0x64070003, 0x64000008, 0x4c003ffa
+value = c0000000
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir14(58) to 40000000 >
+instruction: 0x64070002, 0x64030003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < enable_hw_wp() >
+-------------------------------------------
+ < resume_to_go >
+-------------------------------------------
+ < free_run() >
+-------------------------------------------
+ < free_run_prolog() >
+-------------------------------------------
+ < AccessReg::set ir6(50) to 0 >
+instruction: 0x64070002, 0x64026403, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70c08 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r2(2) to ffffff00 >
+instruction: 0x64270002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r1(1) to 20 >
+instruction: 0x64170002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r0(0) to 1680a >
+instruction: 0x64070002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+instruction: 0x40000009, 0x40000009, 0x40000009, 0x64000004
+-------------------------------------------
+ < hold_epilog () >
+-------------------------------------------
+ < AccessReg::get () > r0(0)
+instruction: 0x64070003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1680a
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r1(1)
+instruction: 0x64170003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r2(2)
+instruction: 0x64270003, 0x64000008, 0x40000009, 0x4c003ffa
+value = ffffff00
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir6(50)
+instruction: 0x64026402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir0(44)
+instruction: 0x64020002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 70c08
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir11(55)
+instruction: 0x6402ac02, 0x64070003, 0x64000008, 0x4c003ffa
+value = 4
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < disable_hw_wp () >
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70408 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < get_eva() >
+-------------------------------------------
+ < read_memory () at address 0x4, length 4>
+CPU mode.
+-------------------------------------------
+ < read_memory_word_from_dim() >
+instruction: 0x46000000, 0x58000004, 0x40000009, 0x4c003ffa
+instruction: 0xc100000, 0x64170003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r31(31)
+instruction: 0x65f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r30(30)
+instruction: 0x65e70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 167fe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_s_PACKET DONE.
+put_packet(): reply buffer -- T 0 5 2 0 : 0 4 0 0 0 0 0 0 ; 1 f : 0 0 0 0 0 0 0 0 ; 2 c : 0 8 0 4 0 7 0 0 ; 1 e : f e 6 7 0 1 0 0 ; 
+RemoteSerialProtocolUtil::send -- $ T 0 5 2 0 : 0 4 0 0 0 0 0 0 ; 1 f : 0 0 0 0 0 0 0 0 ; 2 c : 0 8 0 4 0 7 0 0 ; 1 e : f e 6 7 0 1 0 0 ; # 4 1 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $g#67, result: 5
+g
+get_packet(): send '+'
+COMMAND_TYPE_g_PACKET
+-------------------------------------------
+ < AccessReg::get () > r3(3)
+instruction: 0x64370003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 5
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r4(4)
+instruction: 0x64470003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r5(5)
+instruction: 0x64570003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 80808080
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r6(6)
+instruction: 0x64670003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r7(7)
+instruction: 0x64770003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r8(8)
+instruction: 0x64870003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1020
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r9(9)
+instruction: 0x64970003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4a270
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r10(10)
+instruction: 0x64a70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 15cd8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r15(15)
+instruction: 0x64f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r28(28)
+instruction: 0x65c70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 166f8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r29(29)
+instruction: 0x65d70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 77cf0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_g_PACKET DONE.
+put_packet(): reply buffer -- 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 0 0 0 0 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 0 0 0 0 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 # 9 e 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $s#73, result: 5
+s
+get_packet(): send '+'
+COMMAND_TYPE_s_PACKET
+single_step()
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70c08 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir14(58)
+instruction: 0x64030002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 40000000
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir14(58) to 40000000 >
+instruction: 0x64070002, 0x64030003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < enable_hw_wp() >
+-------------------------------------------
+ < resume_to_go >
+-------------------------------------------
+ < free_run() >
+-------------------------------------------
+ < free_run_prolog() >
+-------------------------------------------
+ < AccessReg::set ir6(50) to 0 >
+instruction: 0x64070002, 0x64026403, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70c08 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r2(2) to ffffff00 >
+instruction: 0x64270002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r1(1) to 20 >
+instruction: 0x64170002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r0(0) to 1680a >
+instruction: 0x64070002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+instruction: 0x40000009, 0x40000009, 0x40000009, 0x64000004
+-------------------------------------------
+ < hold_epilog () >
+-------------------------------------------
+ < AccessReg::get () > r0(0)
+instruction: 0x64070003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1680a
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r1(1)
+instruction: 0x64170003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r2(2)
+instruction: 0x64270003, 0x64000008, 0x40000009, 0x4c003ffa
+value = ffffff00
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir6(50)
+instruction: 0x64026402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir0(44)
+instruction: 0x64020002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 70c08
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir11(55)
+instruction: 0x6402ac02, 0x64070003, 0x64000008, 0x4c003ffa
+value = 8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < disable_hw_wp () >
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70408 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < get_eva() >
+-------------------------------------------
+ < read_memory () at address 0x8, length 4>
+CPU mode.
+-------------------------------------------
+ < read_memory_word_from_dim() >
+instruction: 0x46000000, 0x58000008, 0x40000009, 0x4c003ffa
+instruction: 0xc100000, 0x64170003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r15(15)
+instruction: 0x64f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 6d0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r31(31)
+instruction: 0x65f70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r30(30)
+instruction: 0x65e70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 167fe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_s_PACKET DONE.
+put_packet(): reply buffer -- T 0 5 2 0 : 0 8 0 0 0 0 0 0 ; 1 f : 0 0 0 0 0 0 0 0 ; 2 c : 0 8 0 4 0 7 0 0 ; 1 e : f e 6 7 0 1 0 0 ; 
+RemoteSerialProtocolUtil::send -- $ T 0 5 2 0 : 0 8 0 0 0 0 0 0 ; 1 f : 0 0 0 0 0 0 0 0 ; 2 c : 0 8 0 4 0 7 0 0 ; 1 e : f e 6 7 0 1 0 0 ; # 4 5 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $g#67, result: 5
+g
+get_packet(): send '+'
+COMMAND_TYPE_g_PACKET
+-------------------------------------------
+ < AccessReg::get () > r3(3)
+instruction: 0x64370003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 5
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r4(4)
+instruction: 0x64470003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r5(5)
+instruction: 0x64570003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 80808080
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r6(6)
+instruction: 0x64670003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r7(7)
+instruction: 0x64770003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r8(8)
+instruction: 0x64870003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1020
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r9(9)
+instruction: 0x64970003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 4a270
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r10(10)
+instruction: 0x64a70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 15cd8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r28(28)
+instruction: 0x65c70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 166f8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r29(29)
+instruction: 0x65d70003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 77cf0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND_TYPE_g_PACKET DONE.
+put_packet(): reply buffer -- 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 d 0 0 6 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 
+RemoteSerialProtocolUtil::send -- $ 0 a 6 8 0 1 0 0 2 0 0 0 0 0 0 0 0 0 f f f f f f 0 5 0 0 0 0 0 0 2 0 0 0 0 0 0 0 8 0 8 0 8 0 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 1 0 0 0 0 0 7 0 a 2 0 4 0 0 d 8 5 c 0 1 0 0 d 0 0 6 0 0 0 0 f 8 6 6 0 1 0 0 f 0 7 c 0 7 0 0 f e 6 7 0 1 0 0 0 0 0 0 0 0 0 0 # d 8 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $qTStatus#49, result: 12
+qTStatus
+get_packet(): send '+'
+COMMAND_TYPE_UNKNOW
+put_packet(): reply buffer -- 
+RemoteSerialProtocolUtil::send -- $ # 0 0 
+RemoteSerialProtocolUtil::send success
+RemoteSerialProtocolUtil::get_packet -- receive: $k#6b, result: 5
+k
+get_packet(): send '+'
+COMMAND_TYPE_k_PACKET
+-------------------------------------------
+ < clean_breakpoint () >
+Breakpoint::remove_breakpoint ()
+-------------------------------------------
+ < clean_sw_breakpoint () >
+Breakpoint::remove_breakpoint ()
+-------------------------------------------
+ < free_run() >
+-------------------------------------------
+ < free_run_prolog() >
+-------------------------------------------
+ < AccessReg::set ir6(50) to 0 >
+instruction: 0x64070002, 0x64026403, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70408 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r2(2) to ffffff00 >
+instruction: 0x64270002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r1(1) to 20 >
+instruction: 0x64170002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r0(0) to 1680a >
+instruction: 0x64070002, 0x64000008, 0x40000009, 0x4c003ffa
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+instruction: 0x40000009, 0x40000009, 0x40000009, 0x64000004
+COMMAND_TYPE_k_PACKET DONE.
+-------------------------------------------
+ < reset_hold () >
+-------------------------------------------
+ < target_reset() >
+reset-and-hold success
+-------------------------------------------
+ < AndesCoreV3::init_edm () >
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < hold_epilog () >
+-------------------------------------------
+ < AccessReg::get () > r0(0)
+instruction: 0x64070003, 0x64000008, 0x40000009, 0x4c003ffa
+value = f07000
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r1(1)
+instruction: 0x64170003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 20
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > r2(2)
+instruction: 0x64270003, 0x64000008, 0x40000009, 0x4c003ffa
+value = 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir6(50)
+instruction: 0x64026402, 0x64070003, 0x64000008, 0x4c003ffa
+value = 0
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > ir0(44)
+instruction: 0x64020002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 70408
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr1(38)
+instruction: 0x64002002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 2400
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > cr2(39)
+instruction: 0x64004002, 0x64070003, 0x64000008, 0x4c003ffa
+value = a400
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > mr6(66)
+instruction: 0x6404c002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::get () > mr7(67)
+instruction: 0x6404e002, 0x64070003, 0x64000008, 0x4c003ffa
+value = 8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < read_word() addr = e00088>
+<data = 0>
+-------------------------------------------
+ < write_word () addr = e01000, data = 10000052>
+-------------------------------------------
+ < write_word () addr = 0, data = 500050>
+-------------------------------------------
+ < write_word () addr = 0, data = 900090>
+-------------------------------------------
+ < read_word() addr = 0>
+<data = 890089>
+-------------------------------------------
+ < read_word() addr = 4>
+<data = 180018>
+-------------------------------------------
+ < write_word () addr = 0, data = ff00ff>
+-------------------------------------------
+ < write_word () addr = 0, data = 200020>
+-------------------------------------------
+ < write_word () addr = 0, data = d000d0>
+-------------------------------------------
+ < write_word () addr = 0, data = ff00ff>
+-------------------------------------------
+ < write_word () addr = 0, data = 700070>
+-------------------------------------------
+ < read_word() addr = 0>
+<data = 0>
+-------------------------------------------
+ < write_word () addr = 0, data = 700070>
+-------------------------------------------
+ < read_word() addr = 0>
+<data = 0>
+-------------------------------------------
+ < write_word () addr = 0, data = 700070>
+-------------------------------------------
+ < read_word() addr = 0>
+<data = 0>
+-------------------------------------------
+ < write_word () addr = 0, data = 700070>
+-------------------------------------------
+ < read_word() addr = 0>
+<data = 0>
+-------------------------------------------
+ < free_run() >
+-------------------------------------------
+ < target_reset() >
+-------------------------------------------
+ < free_run_prolog() >
+-------------------------------------------
+ < AccessReg::set ir6(50) to 0 >
+instruction: 0x64070002, 0x64026403, 0x64000008, 0x4c003ffa
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expected^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set ir0(44) to 70408 >
+instruction: 0x64070002, 0x64020003, 0x64000008, 0x4c003ffa
+Reset ICEbox timeout status success.
+< resend commands 0 >
+retry ...
+retry success. (2b 0 3 0 )
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expected^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r2(2) to 1 >
+instruction: 0x64270002, 0x64000008, 0x40000009, 0x4c003ffa
+Reset ICEbox timeout status success.
+< resend commands 0 >
+retry ...
+retry success. (2b 0 3 0 )
+no reset
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expected-------------------------------------------
+ < write_word () addr = 0, data = 700070>
+-------------------------------------------
+ < fastwrite_mem() >
+ size > limit 1024 byte !!
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r1(1) to 20 >
+instruction: 0x64170002, 0x64000008, 0x40000009, 0x4c003ffa
+Reset ICEbox timeout status success.
+< resend commands 0 >
+retry ...
+retry success. (2b 0 3 0 )
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expected^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
+ < AccessReg::set r0(0) to f07000 >
+instruction: 0x64070002, 0x64000008, 0x40000009, 0x4c003ffa
+Reset ICEbox timeout status success.
+< resend commands 0 >
+retry ...
+retry success. (2b 0 3 0 )
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expected^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+instruction: 0x40000009, 0x40000009, 0x40000009, 0x64000004
+Reset ICEbox timeout status success.
+< resend commands 0 >
+retry ...
+retry success. (2b 0 3 0 )
+ expect DBGER value: 2
+ !! core 0 DBGER = 0 !!
+Status of DBGER is not expectedDIM execution is not done: 0x40000009 0x40000009 0x40000009 0x64000004
