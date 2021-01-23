@@ -84,3 +84,105 @@ int main ()
     - `#pragma GCC pop_options`
         > 把 `-Os` pop 回來, 恢復原來的 optimize 設定
 
+
+## C語言程式轉成組合語言
+
+```
+$ ds32le-elf-gcc -S hello1.c
+```
+
++ `hello1.c`
+
+```
+#include <stdio.h>
+int empty(void);
+
+int main(void)
+{
+   printf("!!This is program 1!!\n");
+   empty();
+   return 0;
+}
+
+int empty()
+{
+   printf("!!This is an empty function!!\n");
+   return 0;
+}
+```
+
++ `hello1.s`
+
+```asm
+   ! For N1033A-S N1033-S N903A-S N903-S N1233-S
+   ! Use little-endian byte order
+   ! Generate baseline V2 instructions
+   ! Generate 16/32-bit mixed instructions
+   ! Generate multiply with accumulation instructions using register $d0/$d1
+   ! Generate integer div instructions using register $d0/$d1
+   ! Generate performance extension instructions
+   ! Generate instructions for ABI: 2
+   .file   1 "hello1.c"
+   .abi_2
+   .section   .mdebug.abi_nds32
+   .previous
+   .section   .rodata
+   .align   2
+.LC0:
+   .string   "!!This is program 1!!"
+   .text
+   .align   2
+   .globl   main
+   .type   main, @function
+main:
+   ! pretend args size: 0, auto vars size: 0, pushed regs size: 8, outgoing args size: 0
+   ! frame pointer: $fp, needed: yes
+   ! $fp $lp
+   ! use $r8 as function entrypoint: no
+   ! use v3 push/pop: no
+   ! prologue frame size: 8
+   smw.adm   $sp, [$sp], $sp, 10
+   addi   $fp, $sp, 4
+   ! end of prologue
+   la   $r0, .LC0
+   .hint_func_args 62
+   bal   puts
+   .hint_func_args 63
+   bal   empty
+   movi   $r0, 0
+   ! epilogue - AABI
+   addi   $sp, $fp, -4
+   lmw.bim   $sp, [$sp], $sp, 10
+   .hint_func_args 62
+   ret
+   .size   main, .-main
+   .section   .rodata
+   .align   2
+.LC1:
+   .string   "!!This is an empty function!!"
+   .text
+   .align   2
+   .globl   empty
+   .type   empty, @function
+empty:
+   ! pretend args size: 0, auto vars size: 0, pushed regs size: 8, outgoing args size: 0
+   ! frame pointer: $fp, needed: yes
+   ! $fp $lp
+   ! use $r8 as function entrypoint: no
+   ! use v3 push/pop: no
+   ! prologue frame size: 8
+   smw.adm   $sp, [$sp], $sp, 10
+   addi   $fp, $sp, 4
+   ! end of prologue
+   la   $r0, .LC1
+   .hint_func_args 62
+   bal   puts
+   movi   $r0, 0
+   ! epilogue - AABI
+   addi   $sp, $fp, -4
+   lmw.bim   $sp, [$sp], $sp, 10
+   .hint_func_args 62
+   ret
+   .size   empty, .-empty
+   .ident   "GCC: (2011-07-29) 4.4.4"
+```
