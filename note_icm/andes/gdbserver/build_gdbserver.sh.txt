@@ -1,0 +1,265 @@
+#!/bin/bash
+####################################################
+# Copyright (C) 2013 Andes Technology Corporation. #
+###################################################
+
+echo "Command: $0 $@"
+ARG_ERROR=""
+MY_PREFIX=
+if [ "$0" != "${0%/*}" ]; then
+	MY_PREFIX="${0%/*}"
+	case "${MY_PREFIX}" in
+		/*) ;;
+		*) MY_PREFIX="`pwd`/${MY_PREFIX}";;
+	esac
+else
+	MY_PATH_LIST="`printf "%s" "${PATH}" | sed -e 's/:/ /g'`"
+	for MY_PATH in ${MY_PATH_LIST}; do
+		if [ -f ${MY_PATH}/$0 ]; then
+			MY_PREFIX="${MY_PATH}"
+			break
+		fi
+	done
+fi
+if [ "${MY_PREFIX}" = "" ] || [ "${MY_PREFIX}" = "." ]; then
+	MY_PREFIX="`pwd`"
+fi
+if [ -L "$0" ]; then
+	MY_LINK="`readlink "$0"`"
+	MY_LINK="${MY_LINK%/*}"
+	case "${MY_LINK}" in
+		/*) MY_PREFIX="${MY_LINK}";;
+		*) MY_PREFIX="${MY_PREFIX}/${MY_LINK}";;
+	esac
+fi
+#### ========================================
+FUNC_PATH()
+{
+	if [ "$1" != "" ]; then
+		case "$1" in
+			/*) echo "$1";;
+			~*) export ARG_ERROR="Please give us a absolute path or a relative path(with current path): $1"
+			    echo ""
+			;;
+			*) echo "`pwd`/$1";;
+		esac
+	fi
+}
+#### ========================================
+# default variable
+DATE=`date +%Y-%m-%d`
+
+# default option
+OPT_CO=no                   # default no re-co source code #
+OPT_BUILD=yes               # default yes for build gdbserver #
+OPT_BUILDSERVER_UPDATE=no   # default yes for buildserver update #
+OPT_CLEAN_ALL=no            # default no for clean all #
+# ARG_ERROR=""
+
+# environment
+BUILDSERVER_HOME="`pwd`/install"
+#### ========================================
+for ARG in "$@"; do
+	case "$ARG" in
+		--use-toolchain-dir=*)
+		ARG_USE_TOOL_DIR=`FUNC_PATH ${ARG#*=}`
+		;;
+		--src-dir=*)
+		ARG_SRC_DIR=`FUNC_PATH ${ARG#*=}`
+		;;
+		--tmp-dir=*)
+		ARG_TMP_DIR=`FUNC_PATH ${ARG#*=}`
+		;;
+		--src-file=*)
+		ARG_SRC_FILE=`FUNC_PATH ${ARG#*=}`
+		;;
+                --date=*)
+	 	DATE=${ARG#*=}
+		;;
+		--build-dir=*)
+		ARG_BLD_DIR=`FUNC_PATH ${ARG#*=}`
+		;;
+		--clean-all)
+		OPT_CLEAN_ALL=yes
+		;;
+		--install)
+		OPT_INSTALL="yes"
+		;;
+		--help)
+		echo ""
+		echo "==== must argument ===="
+		echo "--use-toolchain-dir=      specify a path to dir of toolchains. (EX: /home/coder/nds32le-linux default is dailybuild path)"
+		echo "--src-dir=                specify a path to dir of source code. (EX: /home/coder/src/gdb)"
+		echo "--src-file=               specify a path to file of source code. (EX: `pwd`/gdbserver-src.tar.gz)"
+		echo "--tmp-dir=                specify a path to temporary directory. (Default: `pwd`/tmp)"
+		echo ""
+		echo "==== choose argument ===="
+		echo "--date=                   if you want to rebuild by date. (EX: 2008-11-11)"
+		echo "--build-dir=              specify a path to dir of build location. (Default: PWD/build-gdbserver)"
+		echo "--clean-all               clean all (remove build folder)"
+#		echo "--install                 copy binary into disk folder"
+                echo ""
+		exit 0
+		;;
+	esac
+done
+
+
+if [ "$ARG_ERROR" = "" ]; then
+	echo ok.
+	echo "${ARG_ERROR}"
+else
+	echo fail.
+	echo ${ARG_ERROR}
+	exit 1
+fi
+
+if [ "${ARG_USE_TOOL_DIR}" = "" ]; then
+	echo "== Error: --use-toolchain-dir=      specify a path to dir of toolchains. (EX: /home/coder/nds32le-linux default is dailybuild path)"
+	exit 1
+fi
+
+
+### ========================================
+# path
+if [ "${ARG_BLD_DIR}" = "" ]; then
+	echo "== Default build-dir: ./build-gdbserver =="
+	ARG_BLD_DIR="`pwd`/build-gdbserver"
+else
+	ARG_BLD_DIR="${ARG_BLD_DIR}/build-gdbserver"
+fi
+
+if [ "${ARG_TMP_DIR}" = "" ]; then
+	echo "== Default tmp-dir: ./tmp =="
+	ARG_TMP_DIR="`pwd`/tmp"
+else
+	ARG_TMP_DIR="${ARG_TMP_DIR}/tmp"
+fi
+
+mkdir -p ${ARG_TMP_DIR}
+
+
+if [ "${ARG_SRC_DIR}" = "" ]; then
+  if [ "${ARG_SRC_FILE}" == "" ]; then
+    echo "== Error: --src-dir or --src-file specify a path to dir of gdb source or a source file tarball."
+    exit 1
+  else
+    cd ${ARG_TMP_DIR}
+    tar -zxvf ${ARG_SRC_FILE}
+    ARG_SRC_DIR=${ARG_TMP_DIR}/gdb-7.3
+  fi
+fi
+
+ARG_JOB_DIR="${BUILDSERVER_HOME}"
+mkdir -p $ARG_JOB_DIR
+
+#### ========================================
+# main
+if [ "${OPT_CLEAN_ALL}" = "yes" ]; then
+	echo "== clean all =="
+	[ -d "${ARG_BLD_DIR}" ] && rm -rf ${ARG_BLD_DIR}
+	[ -d "${ARG_SRC_DIR}" ] && rm -rf ${ARG_SRC_DIR}
+fi
+[ ! -d "${ARG_BLD_DIR}" ] && mkdir -p ${ARG_BLD_DIR}
+[ ! -d "${ARG_SRC_DIR}" ] && mkdir -p ${ARG_SRC_DIR}
+
+# check out source code
+if [ "${OPT_CO}" = "yes" ]; then
+	cd ${ARG_SRC_DIR}
+	if [ "${OSTYPE}" = "cygwin" ]; then
+		if [ -f "${ARG_LINUX_ROOT_DIR}/gdbserver-src.tar.gz" ]; then
+			echo "== copy src from linux environment =="
+			cp -arf ${ARG_LINUX_ROOT_DIR}/gdbserver-src.tar.gz .
+			tar xfz gdbserver-src.tar.gz
+		else
+			echo "== Start co source code on cygwin environment =="
+			sh -x ${MY_PREFIX}/co_src.sh --gdbserver "--project=${ARG_PROJECT}"
+                fi
+	else
+		echo "== Start co source code =="
+		echo "Command: sh -x co_src.sh --gdbserver --project=${ARG_PROJECT}"
+		sh -x ${MY_PREFIX}/co_src.sh --gdbserver "--project=${ARG_PROJECT}"
+		echo "== Finish co source code =="
+	fi
+	cd ${ARG_BLD_DIR}
+else
+	echo "== No co source code, use exist src =="
+fi
+
+# build gdbserver
+if [ "${OPT_BUILD}" = "yes" ]; then
+	ENV_TEP=${PATH}
+	export PATH=${ARG_USE_TOOL_DIR}/bin:${PATH}
+	MY_CONFIG_FILE="${ARG_USE_TOOL_DIR}/config/nds32-target-config.h"
+	MY_CONFIG_NAME="${ARG_USE_TOOL_DIR##*/}"
+	if [ "`cat ${MY_CONFIG_FILE} | grep -e NDS32_TARGET`" != "" ]; then
+		ARG_TARGET=`cat ${MY_CONFIG_FILE} | grep -e NDS32_TARGET | sed -e "s/\ //g" -e "s/\///g" -e "s/#define//g" -e "s/NDS32_TARGET//" -e "s/[^-a-z0-9]//g"`
+		echo GREP Running.
+		echo ARG_TARGET = $ARG_TARGET 
+	else
+		echo GREP FAIL.
+		ARG_TARGET="nds32le-elf"
+	fi
+	if [ "`echo ${ARG_TARGET} |grep -e 'be'`" != "" ]; then
+		MY_ENDIAN="-EB"
+	else
+		MY_ENDIAN="-EL"
+	fi
+
+	# build dynamic linking
+	cd ${ARG_BLD_DIR}
+	mkdir build-gdbserver-${MY_CONFIG_NAME}
+	cd build-gdbserver-${MY_CONFIG_NAME}
+	echo "Command: CC=${ARG_TARGET}-gcc CFLAGS=\"-g -O2 ${MY_ENDIAN}\" LDFLAGS=\"${MY_ENDIAN}\" ${ARG_SRC_DIR}/gdb/gdbserver/configure  --prefix=${ARG_BLD_DIR}/build-gdbserver-${MY_CONFIG_NAME} --host=nds32le-linux --target=${ARG_TARGET}"
+	CC="${ARG_TARGET}-gcc" CFLAGS="-g -O2 -G0 ${MY_ENDIAN}" LDFLAGS="${MY_ENDIAN}" ${ARG_SRC_DIR}/gdb/gdbserver/configure  --prefix=${ARG_BLD_DIR}/build-gdbserver-${MY_CONFIG_NAME} --host=${ARG_TARGET} --target=nds32le-linux --disable-werror
+	make all install
+        if [ -f "gdbserver" ]; then
+		echo "== ${MY_CONFIG_NAME} gdbserver dynamic build : OK =="
+		mv gdbserver ${ARG_BLD_DIR}/gdbserver-${MY_CONFIG_NAME}
+	else
+		echo "== ${MY_CONFIG_NAME} gdbserver dynamic build : FAIL =="
+		exit 1
+	fi
+	# build static linking
+	cd ${ARG_BLD_DIR}
+	mkdir build-gdbserver-${MY_CONFIG_NAME}-static
+	cd build-gdbserver-${MY_CONFIG_NAME}-static
+	echo "Command: CC=${ARG_TARGET}-gcc CFLAGS=\"-g -O2 ${MY_ENDIAN}\" LDFLAGS=\"${MY_ENDIAN} -static\" ${ARG_SRC_DIR}/gdb/gdbserver/configure  --prefix=${ARG_BLD_DIR}/build-gdbserver-${MY_CONFIG_NAME} --host=nds32le-linux --target=${ARG_TARGET}"
+	CC="${ARG_TARGET}-gcc" CFLAGS="-g -O2 ${MY_ENDIAN}" LDFLAGS="${MY_ENDIAN} -static"  ${ARG_SRC_DIR}/gdb/gdbserver/configure  --prefix=${ARG_BLD_DIR}/build-gdbserver-${MY_CONFIG_NAME} --host=${ARG_TARGET} --target=nds32le-linux --disable-werror
+	make all install
+	if [ -f "gdbserver" ]; then
+		echo "== ${MY_CONFIG_NAME} gdbserver static build : OK =="
+		mv gdbserver ${ARG_BLD_DIR}/static-gdbserver-${MY_CONFIG_NAME}
+		OPT_BUILDSERVER_UPDATE="yes"
+	else
+		echo "== ${MY_CONFIG_NAME} gdbserver static build : FAIL =="
+		OPT_BUILDSERVER_UPDATE="no"
+		exit 1
+	fi
+	export PATH=${ENV_TEP}
+
+	# install
+	if [ "${OPT_INSTALL}" == "yes" ]; then
+		if [ -d "${ARG_BLD_DIR}/../build-rootfs/disk-${MY_CONFIG_NAME}" ]; then
+			echo "== Disk ${MY_CONFIG_NAME} ready and install gdbserver =="
+			cp -arf ${ARG_BLD_DIR}/gdbserver-${MY_CONFIG_NAME} ${ARG_BLD_DIR}/../build-rootfs/disk-${MY_CONFIG_NAME}/root/gdbserver
+		else
+			echo "== Error: Disk ${MY_CONFIG_NAME} not found, can not install =="
+			exit 1
+		fi
+	fi
+else
+	echo "== Not need to build gdbserver =="
+fi
+
+#### ========================================
+# Update gdbserver for buildserver
+if [ "${OPT_BUILDSERVER_UPDATE}" = "yes" ]; then
+	echo "== buildserver update =="
+	cd ${ARG_JOB_DIR}
+	rm -rf *gdbserver-${MY_CONFIG_NAME}-*
+	cp -arf ${ARG_BLD_DIR}/gdbserver-${MY_CONFIG_NAME} ${ARG_JOB_DIR}/gdbserver-${MY_CONFIG_NAME}-${DATE}
+	cp -arf ${ARG_BLD_DIR}/static-gdbserver-${MY_CONFIG_NAME} ${ARG_JOB_DIR}/static-gdbserver-${MY_CONFIG_NAME}-${DATE}
+	echo "== gdbserver on buildserver update done =="
+fi
+#### ========================================
