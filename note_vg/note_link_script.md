@@ -140,7 +140,7 @@ Link Script
         output-section-command
         output-section-command
         ...
-    } [>region] [AT>LMA_region] [:phdr :phdr ...] [=fillexp]
+    } [> VMA_region] [AT>LMA_region] [:phdr :phdr ...] [=fillexp]
     ```
     > + `[]`內的內容為可選選項, 一般不需要.
     > + section_name `左右的空白`, `{}`, `:` 是必須的
