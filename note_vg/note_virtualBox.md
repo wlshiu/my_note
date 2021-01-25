@@ -7,6 +7,7 @@ VirtualBox
     > [web](http://cdimages.ubuntu.com/netboot/) download `mini.iso`
 
 + terminal
+
     ```
     sudo apt-get install LXTerminal
     ```
@@ -15,19 +16,26 @@ VirtualBox
     1. virtualBox setup
 
     1. In lubuntu
+
         a. list disk and find your new disk
+
             ```
             $ sudo fdisk -l
             ```
+
         a. format disk
+
             ```
             $ sudo mkfs -t ext4 /dev/sdb
             ```
+
         a. mount device
+
             ```
             $ sudo mkdir /data
             $ sudo mount /dev/sdb /data
             ```
+
         a. set auto mount
 
             ```
@@ -39,7 +47,6 @@ VirtualBox
                 UUID=your_disk_UUID    /data    ext4    defaults     0    1
                 ...
 
-
             # change owner
             $ sudo chown -R username:group /data
 
@@ -47,7 +54,6 @@ VirtualBox
             $ cd ~/
             $ ln -sv /data ./work
             ```
-
 
 + update atp-get
     1. edit sources.list
@@ -66,7 +72,6 @@ VirtualBox
         a. [NCHC, Taiwan, 20 Gbps](http://free.nchc.org.tw/ubuntu/)
         a. [TaiChung County Education Network Center, 1 Gbps](http://ftp.tcc.edu.tw/Linux/ubuntu/)
         a. http://ubuntu.stu.edu.tw/ubuntu/
-        a.
 
     1. update list
         ```
@@ -83,7 +88,7 @@ VirtualBox
 + Environment
     ```
     $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake autoconf libtool pkg-config \
-            vim git ctags cscope id-utils texinfo global libncurses5-dev libreadline6 libreadline6-dev doxygen graphviz tree icdiff silversearcher-ag
+            vim git universal-ctags cscope id-utils texinfo global libncurses5-dev libreadline6 libreadline6-dev doxygen graphviz tree icdiff silversearcher-ag
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
@@ -184,24 +189,32 @@ VirtualBox
 
     1. Setup shard folder setting in VirtualBox
     1. Check active
+
         ```
         $ ls /media/sf_xxxx
 
         # create link for using
         $ ln -s /media/sf_xxx ~/sf_share
         ```
+
     1. If get `Permission denied`
 
         a. Add to group
+
             ```
             $ sudo adduser [yourusername] vboxsf
             ```
+
     1. auto mount share folder
+
         a. Add setting `vboxsf.conf`
+
             ```
             $ sudo touch /etc/modules-load.d/vboxsf.conf
             ```
+
         a. type `vboxsf` to vboxsf.conf
+
             ```
             $ sudo echo 'vboxsf' > /etc/modules-load.d/vboxsf.conf
             ```
@@ -305,6 +318,7 @@ VirtualBox
 + Change graphic/text UI login
     - Text login
         > F1 ~ F6 is txet mode in Linux
+
         1. With Real Linux/
             > ALT+CTRL+F1
 
@@ -312,6 +326,7 @@ VirtualBox
             > ALT+CTRL+SPACE and Keep ALT+CTRL prees F1
     - Graphic login
         > F7 is Graphic mode in Linux
+
         1. With Real Linux/
             > ALT+CTRL+F7
         1. With Virtual Linux
@@ -355,6 +370,7 @@ VirtualBox
             ```
 
         1. ubuntu 16.04 and lastest version
+
             ```
             sudo gedit /etc/network/interfaces
                 # auto lo
@@ -372,6 +388,7 @@ VirtualBox
             a. In VirtualBox Network -> Adapter 2 -> Reflash MAC address (maybe don't need)
 
         1. ubuntu 18.04
+
             ```
             $ sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml_backup
             $ sudo vim /etc/netplan/01-netcfg.yaml
@@ -399,7 +416,9 @@ VirtualBox
             ```
 
     - check connection
+
         1. in lubuntu
+
             ```
             # check link to external server
             $ ping www.google.com
@@ -412,6 +431,7 @@ VirtualBox
                 > Disable the firewall of public network of windows
 
         1. in windows
+
             ```
             # check link to lubuntu
             C:\> ping 192.168.56.2
@@ -448,12 +468,14 @@ VirtualBox
         ```
 
     - Set Samba account and password
+
         ```
         $ sudo touch /etc/samba/smbpasswd # maybe don't need
         $ sudo smbpasswd -a [User name]
         ```
 
     - Restart Samba to enable setting
+
         ```
         $ sudo /etc/init.d/smbd restart
 
@@ -462,6 +484,7 @@ VirtualBox
         ```
 
     - Connect to lubuntu from Windows
+
         ```
         \\192.168.56.2
         (you should get samba_share folder)
@@ -528,6 +551,7 @@ VirtualBox
 
 + Network File System (NFS)
     - VirtualBox
+
         1. set network `Adapter 2`
             a. Atteched to: Bridged Adapter
             a. name: MAC Bridge Miniport
@@ -548,13 +572,17 @@ VirtualBox
             ```
 
         1. setup
+
             a. set network interface
+
                 g. manual setting
+
                     ```
                     $ sudo ifconfig enp0s8 192.168.0.100 network 255.255.255.0
                     ```
 
                 g. edit /etc/network/interface for auto enable
+
                     ```
                     # Add network interface setting
                     auto enp0s8
@@ -573,6 +601,7 @@ VirtualBox
                     ```
 
             a. edit /etc/exports
+
                 ```
                 # Allow connection from any (*)
                 /home/username/my_nfs *(rw,sync,no_root_squash,no_subtree_check)
@@ -580,19 +609,24 @@ VirtualBox
                   # update export info
                 $ exportfs -ra
                 ```
+
             a. Set the share folder
+
                 ```
                 $ mkdir ~/my_nfs
 
                   # it is available by anyone.
                 $ sudo chmod 777 ~/my_nfs
                 ```
+
         1. enable NFS
+
             ```
             $ sudo service nfs-kernel-server restart
             ```
 
         1. test
+
             a. local test
 
                 ```
@@ -603,13 +637,16 @@ VirtualBox
                 ```
     - PCBA
         1. manual setting
+
             ```
               # set eth0 ip, which is in PC ip domain
             $ ifconfig eth0 192.168.0.105 netmask 255.255.255.0
             $ mkdir /tmp/nfs
             $ mount -t nfs -o proto=tcp -o nolock 172.22.49.177:/home/username/my_nfs /tmp/nfs
             ```
+
         1. script
+
             ```
             #!/bin/sh
 
