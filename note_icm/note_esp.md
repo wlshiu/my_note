@@ -1,34 +1,132 @@
 ESP
 ---
 
-# SDK ESP-IDF
++ open source of SDK
+    > 380 contrubuters on github
 
-## Build System
 
-提供 linux/windows/MacOs 三種平台開發
+# Development Environment (ESP-IDF)
 
-+ kconfiglib (kconfig python version)
-    > 參數配置的前端, 使用
+support Ubuntu/Windows/macOS
+
+## ubuntu
+
++ dependency
+
+    ```
+    $ sudo apt install git wget flex bison gperf python3 python3-pip python3-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util
+    $ cd esp-idf
+    $ ./install.sh  # download toolchain
+    ```
+
+    - Python 3.7
+
+        ```
+        # add the deadsnakes PPA to sources list
+        $ sudo add-apt-repository ppa:deadsnakes/ppa
+        $ sudo apt install python3.7
+
+        ```
+
+        1. swithc python3 version
+
+            ```
+            $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
+            $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 2
+            $ sudo update-alternatives --config python3
+                There are 2 choices for the alternative python3 (providing /usr/bin/python3).
+
+                  Selection    Path                Priority   Status
+                ------------------------------------------------------------
+                * 0            /usr/bin/python3.6   2         auto mode
+                  1            /usr/bin/python3.6   1         manual mode
+                  2            /usr/bin/python3.7   2         manual mode
+
+                Press <enter> to keep the current choice[*], or type selection number:
+
+            $ sudo rm /usr/bin/python3
+            $ sudo ln -s python3.7 /usr/bin/python3
+            ```
+
+    - 設置 Python 3 為默認 Python 版本
+
+        ```
+        $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10 && alias pip=pip3
+        ```
+
+## IDE plug-in
+
+    - Eclipse
+    - VS Code
+
+
+## Build system
+
++ CMake
+    - 連接不同的 build tool
+
+        1. eclipse
+        1. microsoft visual studio
+        1. unix makefile
+        1. ninja
+
+    - 便於跨平台 (linux/windows)
+    - 避免 user 直接接觸 makefile (magic symbols)
+
+    - log
+
+        ```
+        $ cd esp-idf
+        $ source ./export.sh
+        $ cd esp-idf/examples/get-started/hello_world
+        $ idf.py set-target esp32s2     # set target SoC
+        $ idf.py build
+
+        ...
+        esptool.py v3.1-dev
+        Generated /home/[user-name]/working/test/ESP/esp-idf/examples/get-started/hello_world/build/bootloader/bootloader.bin
+        [675/983] Generating x509_crt_bundle
+        /home/[user-name]/working/test/ESP/esp-idf/components/mbedtls/esp_crt_bundle/gen_crt_bundle.py:36: CryptographyDeprecationWarning: Python 2 is no longer supported by the Python core team. Support for it is now deprecated in cryptography, and will be removed in the next release.
+          from cryptography import x509
+        [983/983] Generating binary image from built executable
+        esptool.py v3.1-dev
+        Generated /home/[user-name]/working/test/ESP/esp-idf/examples/get-started/hello_world/build/hello-world.bin
+
+        Project build complete. To flash, run this command:
+        /home/[user-name]/.espressif/python_env/idf4.3_py3.7_env/bin/python ../../../components/esptool_py/esptool/esptool.py -p (PORT) -b 460800 --before default_reset --after hard_reset --chip esp32  write_flash --flash_mode dio --flash_size detect --flash_freq 40m 0x1000 build/bootloader/bootloader.bin 0x8000 build/partition_table/partition-table.bin 0x10000 build/hello-world.bin
+        or run 'idf.py -p (PORT) flash'
+        ```
+
+        1. Selecting the Targe Chip
+
+            > + `esp32 `
+            >> SP32-D0WD, ESP32-D2WD, ESP32-S0WD (ESP-SOLO), ESP32-U4WDH, ESP32-PICO-D4
+
+            > + `esp32s2`
+            >> ESP32-S2
+
++ kconfig
+
+    ```
+    $ idf.py menuconfig
+    ```
 
     - 藉由 defconfig 檔案, 可快速完成參數配置
     - 產生 `config.h`, 直接連結 compile options 和 source codes;
     不需額外撰寫 makefile (e.g. -Dxxx), 也便於 trace code
+
     - 使用 python 版本, 便於跨平台使用
-
-+ CMake
-    > 產生 makefile 的前端
-
-    - 便於跨平台 (linux/windows)
-    - 易於產生多種 IDE 的專案檔
-
-        1. Unix makefile
-        1. Eclipse
-        1. Visual studio
-        1. Ninja
-    - 避免 user 直接接觸 makefile (magic symbols)
 
 + `idf.py`
     > ESP 自行研發的工具, 用來控制編譯流程, 並在不當使用時, 提供協助訊息
+
++ Adding user to dialout
+    > 讓 user 也能存取 `/dev/ttyUSB0`
+
+    ```
+    $ sudo usermod -a -G dialout $USER
+    $ sudo reboot
+    ```
 
 ## Operating System
 
@@ -38,7 +136,7 @@ ESP
     所有更新僅在 master 分支進行, 即基於 v3.0.0 的持續 bug 修復版本.
 
 + FreeRTOS
-    > directly use FreeRTOS API
+    > directly use FreeRTOSv10 API
 
     - Dual Core
 
@@ -82,9 +180,10 @@ ESP
         > Base64-encoded core dumps are printed on UART upon system panic.
         User should save core dump text body to some file manually (use tool espcoredump.py)
 
+## Components
 
-
-## MISC
++ heap
+    > Heap algorithm bases on [TLSF memory allocator  v3.1](https://github.com/jserv/tlsf-bsd)
 
 + Virtual file-system (VFS)
 
@@ -120,6 +219,7 @@ ESP
         $ python gen_esp32part.py input_partitions.csv binary_partitions.bin
         $ python gen_esp32part.py binary_partitions.bin input_partitions.csv
         ```
+
     - 參數
         1. Name
             > partition name (< 16 char)
@@ -141,7 +241,103 @@ ESP
         1. Flags
             > encrypted or not
 
++ ptherad
+
+    - pthread_create/pthread_exit/pthread_cancel
+    - pthread_join/pthread_detach
+    - pthread_mutex_init/pthread_mutex_destroy
+    - pthread_mutex_lock/pthread_mutex_unlock
+    - pthread_mutex_timedlock/pthread_mutex_trylock
+    - pthread_cond_init/pthread_cond_destroy
+    - pthread_cond_signal/pthread_cond_broadcast
+    - pthread_cond_wait/pthread_cond_timedwait
 
 + Wear Levelling
 
+
+## 線上文件
+
++ [快速入門](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html#)
++ [與 ESP32 創建串口連接](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/establish-serial-connection.html)
+
+
+# ESP32-LyraT-Mini
+
++ source code
+
+    ```
+    $ mkdir -p $HOME/ESP && cd $HOME/ESP
+    $ git clone --recursive https://github.com/espressif/esp-adf.git
+    $ cd esp-adf
+    $ echo 'source $HOME/ESP/esp-adf/esp-idf/export.sh' > setup.env
+    $ echo 'export ADF_PATH=$HOME/ESP/esp-adf' >> setup.env
+    $ source setup.env
+    $ cd ./examples/get-started/play_mp3
+    ```
+
++ Set config
+
+    ```
+    $ idf.py menuconfig
+        Audio HAL
+            -> Audio board
+                -> ESP32-Lyrat-Mini V1.1
+    ```
+
++ build project
+
+    ```
+    $ cd esp-adf/examples/get-started/play_mp3
+    $ idf.py build
+    ...
+        [985/985] Generating play_mp3.bin
+        esptool.py v2.8
+
+        Project build complete. To flash, run this command:
+        ../../../esp-idf/components/esptool_py/esptool/esptool.py -p (PORT) -b 460800 --after hard_reset write_flash --flash_mode dio --flash_size detect --flash_freq 40m 0x1000 build/bootloader/bootloader.bin 0x8000 build/partition_table/partition-table.bin 0x10000 build/play_mp3.bin
+        or run 'idf.py -p (PORT) flash'
+    ```
+
++ burn to flash
+
+    ```
+    $ idf.py -p /dev/ttyUSB0 flash    # default baud rate 460800, ubuntu don't enable minicom
+        ...
+        esptool.py v2.8
+        Serial port /dev/ttyUSB0
+        Connecting........_____....._____....._____....._____....._____....._____.
+        Detecting chip type... ESP32
+        Chip is ESP32D0WDQ5 (revision 1)
+        Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+        Crystal is 40MHz
+        MAC: bc:dd:c2:d1:f9:c0
+        Uploading stub...
+        Running stub...
+        Stub running...
+        Changing baud rate to 460800
+        Changed.
+        Configuring flash size...
+        Compressed 25728 bytes to 15284...
+        Wrote 25728 bytes (15284 compressed) at 0x00001000 in 0.3 seconds (effective 592.0 kbit/s)...
+        Hash of data verified.
+        Compressed 3072 bytes to 82...
+        Wrote 3072 bytes (82 compressed) at 0x00008000 in 0.0 seconds (effective 2759.4 kbit/s)...
+        Hash of data verified.
+        Compressed 346176 bytes to 216638...
+        Wrote 346176 bytes (216638 compressed) at 0x00010000 in 5.0 seconds (effective 556.2 kbit/s)...
+        Hash of data verified.
+
+        Leaving...
+        Hard resetting via RTS pin...
+        Done
+    ```
+
+## 線上文件
+
++ [ESP32-LyraT-Mini V1.2 入門指南](https://docs.espressif.com/projects/esp-adf/zh_CN/latest/get-started/get-started-esp32-lyrat-mini.html)
+
+
+# reference
+
++ [快速入門](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html#)
 
