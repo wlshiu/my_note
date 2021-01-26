@@ -254,11 +254,92 @@ support Ubuntu/Windows/macOS
 
 + Wear Levelling
 
+## Sub-project
+
++ set environment of esp-idf
+
+    ```
+    $ source <esp-idf-root>/export.sh
+    ```
+
+    - 環境變數設定完成後, sub-projects 不需要放進 esp-idf 目錄結構中.
+        > `idf.py` 會自動偵測整體的目錄結構並串接在一起
+
++ [esp-aws-iot](https://github.com/espressif/esp-aws-iot)
+    > AWS Iot demo project
+    >> **必須先註冊一個 AWS 帳號**
+
+
++ [esp-rainmaker](https://github.com/espressif/esp-rainmaker)
+    > ESP cloud (An end-to-end solution)
+    >> 基於此平台, 用戶可以省略配置 cloud 的步驟, 允許用戶對 ESP32/ESP32-S2 做 remote control 及 monitor
+
+    > ESP RainMaker 的雲中間件基於 AWS 無服務器計算 (Amazon Serverless Computing) 構建, 旨在實現最佳的可擴展性和安全性.
+    使用ESP RainMaker, 用戶無需在雲中編寫代碼, 就能透明地把設備屬性提供給手機 APP 或其他第三方服務.
+    然後, ESP RainMaker 的手機 APP 會根據獲取的信息進行配置, 進而向用戶顯示設備屬性; 用戶可以直接在手機上讀取或更改這些屬性.
+
+    > ESP RainMaker 還能夠在不使用雲接口或手機 APP 時, 通過 Python 命令行 (Host cli)或 Python 程序訪問設備屬性和其他服務.
+    物聯網開發者只需要持續關注設備固件即可.
+
+    > ESP RainMaker 還涉及物聯網設備中常見的功能, 如`用戶與設備的關聯`, `安全的 Wi-Fi 網絡配置`和`OTA升級`等,
+    用戶無需在實現這些功能上花費太多時間.
+
+    - [ESP RainMaker 實現了第三方集成](https://xueqiu.com/2704885039/153307959)
+        > 已經能支持 `Amazon Alexa`和`Google Voice Assistant(GVA)`等語音服務
+        >> 用 ESP-RainMaker 當代理來轉發給 Amazon 或 Google
+
+    - [Build project](https://rainmaker.espressif.com/docs/get-started.html#build-and-flash-firmware)
+    - [ESP-RainMaker-Docs](https://rainmaker.espressif.com/docs/get-started.html)
 
 ## 線上文件
 
 + [快速入門](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html#)
 + [與 ESP32 創建串口連接](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/establish-serial-connection.html)
+
+# ESP-RainMaker Cloud
+
+## definition
+
++ `Provision`
+    > 配網
+
+    - Smart Config (TI 推出)
+        > 通過數據幀中未加密的組播字段和長度字段, 來傳輸編碼後的網絡配置信息.
+        End-device 先 sniffers 封包, 再執行配網程序
+
+        > 由於配網信息是 broadcast, 有可能被側錄並推算出對應的編碼表, 進而還原出 Wi-Fi密碼
+
+    - Wi-Fi Easy Connect
+        > 通過一個擁功能強大設備(手機) 作為配置設備(Configurator), 由它負責配置其他所有設備, 而其他的設備都是待註冊設備(Enrollee devices).
+        一旦 Configurator 連接到無線接入點, 通過掃瞄 Enrollee devices 的二維碼就可以讓它們連上網絡 (也支持輸入字符串的形式).
+
+        1. 好處
+            > + 為 Enrollee devices 提供標準化的方式
+            > + 通過使用二維碼和用戶的設備來簡化管理網絡
+            > + 適用於沒有用戶界面的設備
+            > + 通過公鑰加密進行安全認證
+            > + 支持 WPA2 和 WPA3 網絡
+            > + 替換AP時, 無需將所有設備重新入網到新 AP
+
+        1. 常見的場景
+            > + 用戶使用手機(Configurator) 掃瞄目標設備(Enrollee)的二維碼後, 會自動嘗試與其建立安全連接.
+            > + 連接建立後, 向目標設備(Enrollee)傳遞 Wi-Fi 網絡的配置信息.
+            > + 目標設備(Enrollee)使用這些信息去嘗試掃瞄, 選擇連接到目標網絡.
+
+
++ `Claiming Service`
+    > ESP RainMaker 中, 獲得 Certificate 的程序
+    >> `Claiming` is the process by which the ESP32-S2/ESP32 gets this certificate from the ESP RainMaker Claiming Service.
+
+## Behavior
+
+RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https://play.google.com/store/apps/details?id=com.espressif.rainmaker&hl=zh_TW&gl=US)
+
+
++ 使用 Phone App 當作 Configurator, Esp board 為 Enrollee
++ Phone App 可登入並連接到 Cloud Server. Esp board 則會產生出 QR-code, 等待被配網
++ Phone App 藉 QR-code (output from terminal) 將 Esp board 加入網路 (WiFi provisioning)
++ 接著 Phone App 經由 Cloud Server 來 Control and Monitor Esp board
 
 
 # ESP32-LyraT-Mini
