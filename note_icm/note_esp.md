@@ -342,6 +342,74 @@ RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https
 + 接著 Phone App 經由 Cloud Server 來 Control and Monitor Esp board
 
 
+
+# ESP32-DevKitC_v4
+
++ source code
+
+    ```
+    $ mkdir -p $HOME/ESP && cd $HOME/ESP
+    $ git clone --recursive https://github.com/espressif/esp-adf.git
+    $ cd esp-adf
+    $ echo 'source $HOME/ESP/esp-adf/esp-idf/export.sh' > setup.env
+    $ echo 'export ADF_PATH=$HOME/ESP/esp-adf' >> setup.env
+    $ source setup.env
+    $ cd ./examples/get-started//hello_world
+    ```
+
++ build project
+
+    ```
+    $ cd ~/esp/hello_world
+    $ idf.py set-target esp32
+    $ idf.py menuconfig
+    ```
++ burn to flash
+
+    ```
+    $ idf.py -p /dev/ttyUSB0 flash
+        Executing action: flash
+        Running ninja in directory /home/ics/working/data/test/ESP/esp-idf/examples/get-started/hello_world/build
+        Executing "ninja flash"...
+        [1/4] Performing build step for 'bootloader'
+        ninja: no work to do.
+        [1/2] cd /home/ics/working/data/test/ESP/esp-idf/components/esptool_py && /...e/ics/working/data/test/ESP/esp-idf/components/esptool_py/run_esptool.cmak
+        esptool.py --chip esp32 -p /dev/ttyUSB0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size 2MB 0x8000 partition_table/partition-table.bin 0x1000 bootloader/bootloader.bin 0x10000 hello-world.bin
+        esptool.py v3.1-dev
+        Serial port /dev/ttyUSB0
+        Connecting........_____.....
+    ```
+
+    - ESP32-DevKitC V4 board
+        > 按下 Boot 鍵並保持, 同時按一下 EN 鍵(此時不要鬆開 Boot 鍵)進入 **固件下載**模式, 通過串口下載固件
+
+        1. ubuntu side burning log
+
+            ```
+            Compressed 3072 bytes to 103...
+            Writing at 0x00008000... (100 %)
+            Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (effective 1961.4 kbit/s)...
+            Hash of data verified.
+            Compressed 25136 bytes to 15439...
+            Writing at 0x00001000... (100 %)
+            Wrote 25136 bytes (15439 compressed) at 0x00001000 in 0.4 seconds (effective 560.1 kbit/s)...
+            Hash of data verified.
+            Compressed 159040 bytes to 83786...
+            Writing at 0x00010000... (16 %)
+            Writing at 0x00014000... (33 %)
+            Writing at 0x00018000... (50 %)
+            Writing at 0x0001c000... (66 %)
+            Writing at 0x00020000... (83 %)
+            Writing at 0x00024000... (100 %)
+            Wrote 159040 bytes (83786 compressed) at 0x00010000 in 2.0 seconds (effective 621.1 kbit/s)...
+            Hash of data verified.
+
+            Leaving...
+            Hard resetting via RTS pin...
+            Done
+            ```
+
+
 # ESP32-LyraT-Mini
 
 + source code
