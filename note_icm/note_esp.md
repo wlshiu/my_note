@@ -182,77 +182,149 @@ support Ubuntu/Windows/macOS
 
 ## Components
 
-+ heap
-    > Heap algorithm bases on [TLSF memory allocator  v3.1](https://github.com/jserv/tlsf-bsd)
+### heap
 
-+ Virtual file-system (VFS)
+Heap algorithm bases on [TLSF memory allocator  v3.1](https://github.com/jserv/tlsf-bsd)
+
+![ESP32 Heap](flow/ESP32_heap.jpg)
+
++ Two Level Segregated Fit memory allocator (TLSF)
+
+    ![TLSF](flow/TLSF_basic.jpg)
+
+    - 一種動態內存分配算法
+        > Allocated Length should be 4-bytes alignment
+
+        1. 依 Free Blk 空間大小分類, 建立兩層速查 table
+            > + First level (4 ~ 31)
+            >> 將 Free Blk 的大小根據 2 的冪進行分類
+            > + Second level (1 ~ 32)
+            > 在 First level 的基礎上, 按照一定的間隔, 線性分段
+        1. Allocate 時, 挑選最接近大小的 Free Blk, 將其切割後, 剩餘的空間產生新的 Free Blk, 並回存到對應的 table slot
+        1. Free 時, 先合併前後的 Free Blk 並依空間大小, 回存到對應的 table slot
+
+    - 不支援 MMU
+    - 限定最小可分配大小為16 bytes
+    - Fragmentation 程度低
+        > 當 memory 被釋放後, 立即與相鄰未使用的 memory block 合併
+
++ TLSF source code
+
+    - block_set_size
+        > 設定 block size 到 block header
+    - block_set_free
+        > 設定 block 為 free 到 block header
+    - block_set_used
+        > 設定 block 為 used 到 block header
+    - block_set_prev_used
+        > 設定前一個 block 為 used 到 block header
+    - block_set_prev_free
+        > 設定前一個 block 為 free 到 block header
+
+    - block_link_next
+        > 回傳下一個 block 的 address
+        >> 依照目前 block header 的參數來計算
+    - block_insert
+    - block_remove
+    - block_split
+    - block_absorb
+    - block_merge_prev
+    - block_merge_next
+
+
+
+
+### Virtual file-system (VFS)
+
+```
+// file description
+typedef struct esp_vfs {
+    int     flags;
+    int     (*open)(const char * path, int flags, int mode);
+    int     (*close)(int fd);
+    ssize_t (*read)(int fd, void * dst, size_t size);
+    ssize_t (*write)(int fd, const void * data, size_t size);
+
+    off_t   (*lseek)(int fd, off_t size, int mode);
+
+    int     (*fstat)(int fd, struct stat * st);
+    int     (*fsync)(int fd);
+
+    int     (*mkdir)(const char* name, mode_t mode);
+    int     (*rmdir)(const char* name);
+
+    int     (*fcntl)(int fd, int cmd, int arg);
+    int     (*ioctl)(int fd, int cmd, va_list args);
+    ...
+} esp_vfs_t;
+```
+
+### Partition Tables
+
++ 可創建自定義分區表
+    > 以 CSV file 編寫分區表, 再藉由 `gen_esp32part.py` 實現 CSV 和二進制文件之間的轉換
 
     ```
-    // file description
-    typedef struct esp_vfs {
-        int     flags;
-        int     (*open)(const char * path, int flags, int mode);
-        int     (*close)(int fd);
-        ssize_t (*read)(int fd, void * dst, size_t size);
-        ssize_t (*write)(int fd, const void * data, size_t size);
-
-        off_t   (*lseek)(int fd, off_t size, int mode);
-
-        int     (*fstat)(int fd, struct stat * st);
-        int     (*fsync)(int fd);
-
-        int     (*mkdir)(const char* name, mode_t mode);
-        int     (*rmdir)(const char* name);
-
-        int     (*fcntl)(int fd, int cmd, int arg);
-        int     (*ioctl)(int fd, int cmd, va_list args);
-        ...
-    } esp_vfs_t;
+    $ python gen_esp32part.py input_partitions.csv binary_partitions.bin
+    $ python gen_esp32part.py binary_partitions.bin input_partitions.csv
     ```
 
-+ Partition Tables
++ 參數
+    - Name
+        > partition name (< 16 char)
+    - Type
+        > partition type (0x00 ~ 0xFE), `0x00 ~ 0x3F` 保留給 esp-idf 的核心功能
 
-    - 可創建自定義分區表
-        > 以 CSV file 編寫分區表, 再藉由 `gen_esp32part.py` 實現 CSV 和二進制文件之間的轉換
+    - SubType
+        > 當 `Type == app`, SubType 可以指定為 factory (0), ota_0 (0x10) … ota_15 (0x1F) 或者 test (0x20)
+
+        > 當 `Type == data`, SubType 可以指定為 ota (0), phy (1), nvs (2) 或者 nvs_keys (4)
+
+    - Offset
+        > partition offset (64KB alignment), 偏移地址為空, 則會緊跟著前一個分區之後開始
+        若為首個分區, 則將緊跟著分區表開始
+
+    - Size
+        > partition size
+
+    - Flags
+        > encrypted or not
+
+### ptherad
+
++ pthread_create/pthread_exit/pthread_cancel
++ pthread_join/pthread_detach
++ pthread_mutex_init/pthread_mutex_destroy
++ pthread_mutex_lock/pthread_mutex_unlock
++ pthread_mutex_timedlock/pthread_mutex_trylock
++ pthread_cond_init/pthread_cond_destroy
++ pthread_cond_signal/pthread_cond_broadcast
++ pthread_cond_wait/pthread_cond_timedwait
+
+### Wear Leveling
+
+LBA: Logical Block Address
+PBA: Physical Block Address
+
+![FTL Concept](flow/FTL_basic_concept.jpg)
+
+
++ algorithm
+    > + No bad blocks mark mechanism
+    > + 最差情況下, 單一 block 會在 P/E ratio 達到 PBA_Max, 才會交換 block
+
+    ![Wear leveling](flow/esp_wear_leveling.jpg)
+
+    - 將 flash 切割成多個同等大小的 Blocks, 並將其編號 (PBA)
+    - 預留一個 dummy block, 令其編號為 D (PBA_D)
+    - LBA 對應到 PBA 時, 跳過 PBA_D
+    - 每一次 erease block 時, 將 dummy block 後一個 block 的 data 複製到 dummy block, 並將此 block 設為 dummy block
+        > dummy block 以 Round Robin 的方式循環移動
 
         ```
-        $ python gen_esp32part.py input_partitions.csv binary_partitions.bin
-        $ python gen_esp32part.py binary_partitions.bin input_partitions.csv
+        PBA(D + 1) copy to PBA(D)
+        PBA_D = PBA_D + 1
         ```
-
-    - 參數
-        1. Name
-            > partition name (< 16 char)
-        1. Type
-            > partition type (0x00 ~ 0xFE), `0x00 ~ 0x3F` 保留給 esp-idf 的核心功能
-
-        1. SubType
-            > 當 `Type == app`, SubType 可以指定為 factory (0), ota_0 (0x10) … ota_15 (0x1F) 或者 test (0x20)
-
-            > 當 `Type == data`, SubType 可以指定為 ota (0), phy (1), nvs (2) 或者 nvs_keys (4)
-
-        1. Offset
-            > partition offset (64KB alignment), 偏移地址為空, 則會緊跟著前一個分區之後開始
-            若為首個分區, 則將緊跟著分區表開始
-
-        1. Size
-            > partition size
-
-        1. Flags
-            > encrypted or not
-
-+ ptherad
-
-    - pthread_create/pthread_exit/pthread_cancel
-    - pthread_join/pthread_detach
-    - pthread_mutex_init/pthread_mutex_destroy
-    - pthread_mutex_lock/pthread_mutex_unlock
-    - pthread_mutex_timedlock/pthread_mutex_trylock
-    - pthread_cond_init/pthread_cond_destroy
-    - pthread_cond_signal/pthread_cond_broadcast
-    - pthread_cond_wait/pthread_cond_timedwait
-
-+ Wear Levelling
 
 ## Sub-project
 
@@ -298,6 +370,8 @@ support Ubuntu/Windows/macOS
 
 # ESP-RainMaker Cloud
 
+![scenario](flow/esp_rainmaker.jpg)
+
 ## definition
 
 + `Provision`
@@ -341,6 +415,16 @@ RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https
 + Phone App 藉 QR-code (output from terminal) 將 Esp board 加入網路 (WiFi provisioning)
 + 接著 Phone App 經由 Cloud Server 來 Control and Monitor Esp board
 
+## Setting
+
++ enable `ESP RainMaker Local Control`
+
+    ```
+    ESP RainMaker Config
+        -> ESP RainMaker Local Control
+    ```
+
+## [Amazon-Freertos](IoT/note_aws_freertos.md)
 
 
 # ESP32-DevKitC_v4
@@ -353,6 +437,8 @@ RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https
     $ cd esp-adf
     $ echo 'source $HOME/ESP/esp-adf/esp-idf/export.sh' > setup.env
     $ echo 'export ADF_PATH=$HOME/ESP/esp-adf' >> setup.env
+    $ echo 'export TERM=xterm-new' >> setup.env
+    $ echo 'export TERMINFO=/etc/terminfo' >> setup.env
     $ source setup.env
     $ cd ./examples/get-started//hello_world
     ```
