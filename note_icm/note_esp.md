@@ -495,6 +495,185 @@ RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https
             Done
             ```
 
+## [esp-aws-iot](https://github.com/espressif/esp-aws-iot)
+
++ Verify certificate of AWS server
+
+    - Crete `Policies` on AWS IoT core
+
+        1. AWS IoT -> Secure tab -> Policies -> Create
+
+            ```
+            Name        : <you want policy name>
+            Action      : iot:*
+            Resource ARN: *
+            Effect      : enable 'Allow'
+            ```
+
+    - Crete `Thing` on AWS IoT core
+
+        1. AWS IoT -> Manage tab -> Things -> Create
+        1. Creating AWS IoT things -> Create a single thing
+            > 註冊 `The Thing`
+
+            ```
+            Name: <your device name>
+            ```
+
+        1. Add a certificate for your thing -> Create certificate
+            > 建立並下載 certificates
+            > + A certificate for this thing
+            > + A public key
+            > + A private key
+            > + A root CA for AWS IoT -> `Amazon Root CA 1`
+            >> enable Activate
+
+        1. Add a policy for your thing
+            > 為 `The Thing` 添加 Policies
+            >> 選擇先前建立的 Policies
+
+        1. Register Thing
+
+    - Get URL of endpoint on AWS IoT core
+        > AWS IoT -> Settings tab -> Custom endpoint
+        >> Endpoint Url 用來讓 end_device 去連接提供 service 的伺服器
+
+    - Receive message on AWS IoT core
+        > AWS IoT -> Test tab -> Subscribe to a topic
+
+            ```
+            Subscription topic: test_topic/esp32
+            ```
+
+        1. press `Subscribe to topic` and wait message (from end_device)
+            > 如果沒有訂閱主題, message 會被 server 丟掉
+
+    - download test tool on ubuntu
+
+        ```
+        $ pip3 install AWSIoTPythonSDK
+        $ vi Publish.py
+            #!/usr/bin/python3
+            # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+            # SPDX-License-Identifier: MIT-0
+
+            import time as t
+            import json
+            import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
+
+            # Define ENDPOINT, CLIENT_ID, PATH_TO_CERT, PATH_TO_KEY, PATH_TO_ROOT, MESSAGE, TOPIC, and RANGE
+            ENDPOINT = "xxxxxxxxxxx-ats.iot.us-west-2.amazonaws.com"  # customEndpointUrl
+            CLIENT_ID = "testDevice"
+            PATH_TO_CERT = "aws_crt/certificate.pem.crt"
+            PATH_TO_KEY = "aws_crt/private.pem.key"
+            PATH_TO_ROOT = "aws_crt/aws-root-ca.pem"
+            MESSAGE = "@Hello World"
+            # TOPIC = "test/testing"
+            TOPIC = "test_topic/esp32"
+            RANGE = 20
+
+            myAWSIoTMQTTClient = AWSIoTPyMQTT.AWSIoTMQTTClient(CLIENT_ID)
+            myAWSIoTMQTTClient.configureEndpoint(ENDPOINT, 8883)
+            myAWSIoTMQTTClient.configureCredentials(PATH_TO_ROOT, PATH_TO_KEY, PATH_TO_CERT)
+
+            myAWSIoTMQTTClient.connect()
+            print('Begin Publish')
+            for i in range (RANGE):
+                data = "{} [{}]".format(MESSAGE, i+1)
+                message = {"message" : data}
+                myAWSIoTMQTTClient.publish(TOPIC, json.dumps(message), 1)
+                print("Published: '" + json.dumps(message) + "' to the topic: " + "'%s'" % TOPIC)
+                t.sleep(0.1)
+            print('Publish End')
+            myAWSIoTMQTTClient.disconnect()
+        $ chmod +x Publish.py
+
+        # 將 20 個測試消息發佈到 AWS IoT Core 控制台中創建的主題 'test_topic/esp32'
+        $ Publish.py
+        ```
+
+    - reference
+        1. [如何使用 Python 將 MQTT 消息從我的設備發佈到 AWS IoT Core?](https://aws.amazon.com/cn/premiumsupport/knowledge-center/iot-core-publish-mqtt-messages-python/)
+
++ esp-aws-iot demo
+    > use sha-1: `f0788fc`
+
+    - add certificates
+        ```
+        $ cd ~/esp-aws-iot/examples/subscribe_publish/main/certs
+        $ cp -f <aws_certificate>/xxxxxxxxxxxxx-certificate.pem.crt certificate.pem.crt
+        $ cp -f <aws_certificate>/xxxxxxxxxxxxx-private.pem.key private.pem.key
+        $ cp -f <aws_certificate>/AmazonRootCA1.pem aws-root-ca.pem
+        ```
+
+    - configure
+        > + 設定 local AP 的 SSID/Password
+        > + 設定 Endpoint URL
+
+        ```
+        $ idf.py menuconfig
+            Example Configuration
+                -> (Target SSID) <WIFI_SSID> WiFi SSID
+                -> (<Password>) <WIFI_PASSWORD> WiFi Password
+
+            Component config -> Amazon Web Services IoT Platform
+                -> (Endpoint URL)<AWS_IOT_MQTT_HOST> AWS IoT Endpoint Hostname
+        ```
+
+    - run damo
+
+        ```
+        $ idf.py -p /dev/ttyUSB0 flash monitor
+            ...
+        I (886) subpub: AWS IoT SDK Version 3.0.1-
+        I (1596) wifi:new:<6,0>, old:<1,0>, ap:<255,255>, sta:<6,0>, prof:1
+        I (2516) wifi:state: init -> auth (b0)
+        I (2556) wifi:state: auth -> assoc (0)
+        I (3556) wifi:state: assoc -> init (400)
+        I (3556) wifi:new:<6,0>, old:<6,0>, ap:<255,255>, sta:<6,0>, prof:1
+        I (5616) wifi:new:<6,0>, old:<6,0>, ap:<255,255>, sta:<6,0>, prof:1
+        I (5616) wifi:state: init -> auth (b0)
+        I (5626) wifi:state: auth -> assoc (0)
+        I (5636) wifi:state: assoc -> run (10)
+        I (6676) wifi:connected with HTC-U12-life, aid = 2, channel 6, BW20, bssid = 76:f6:1c:90:16:c6
+        I (6676) wifi:security: WPA2-PSK, phy: bgn, rssi: -60
+        I (6676) wifi:pm start, type: 1
+
+        I (6706) wifi:AP's beacon interval = 102400 us, DTIM period = 2
+        W (9586) wifi:<ba-add>idx:0 (ifx:0, 76:f6:1c:90:16:c6), tid:0, ssn:0, winSize:64
+        I (10656) esp_netif_handlers: sta ip: 192.168.43.5, mask: 255.255.255.0, gw: 192.168.43.1
+        I (10656) subpub: Connecting to AWS...
+        I (13906) subpub: Subscribing...
+        I (14406) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (15746) subpub: Subscribe callback
+        I (15746) subpub: test_topic/esp32      hello from ESP32 (QOS0) : 0
+        I (16156) subpub: Subscribe callback
+        I (16156) subpub: test_topic/esp32      hello from ESP32 (QOS1) : 1
+        I (16246) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (17586) subpub: Subscribe callback
+        I (17586) subpub: test_topic/esp32      hello from ESP32 (QOS0) : 2
+        I (18016) subpub: Subscribe callback
+        I (18016) subpub: test_topic/esp32      hello from ESP32 (QOS1) : 3
+        I (18106) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (19436) subpub: Subscribe callback
+        I (19436) subpub: test_topic/esp32      hello from ESP32 (QOS0) : 4
+        I (19846) subpub: Subscribe callback
+        I (19846) subpub: test_topic/esp32      hello from ESP32 (QOS1) : 5
+        I (19936) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (21276) subpub: Subscribe callback
+        I (21276) subpub: test_topic/esp32      hello from ESP32 (QOS0) : 6
+        I (21696) subpub: Subscribe callback
+        I (21696) subpub: test_topic/esp32      hello from ESP32 (QOS1) : 7
+        I (21786) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (23116) subpub: Subscribe callback
+        I (23116) subpub: test_topic/esp32      hello from ESP32 (QOS0) : 8
+        I (23326) subpub: Subscribe callback
+        I (23326) subpub: test_topic/esp32      hello from ESP32 (QOS1) : 9
+        I (23416) subpub: Stack remaining for task 'aws_iot_task' is 3608 bytes
+        I (24756) subpub: Subscribe callback
+            ...
+        ```
+
 
 # ESP32-LyraT-Mini
 

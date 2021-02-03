@@ -95,6 +95,24 @@ Cache
     - non-bufferable
         > 等到結果寫入外存, 返回 ack
 
+## volatile vs. D-Cache
+
++ `volatile` of C
+    > 禁止 compiler 將其優化, 直接存取原始記憶體地址
+    >> volatile 是在 instruction 上影響 C 語言到 assembly 的層級 (去 SRAM or GPRs 存取)
+
++ D-Cache
+    > CPU 硬體層級, CPU 存取記憶體地址時, 實際上都轉到 Cache 去 (CPU 不知道被 forward), 由 cache module 去處理 hit or miss
+
++ Example
+    >  while loop 退出依賴於一個 memory address 的值, 並且這個 address 的值由另外一個 peripheral 負責更新.
+    如果開啟 D-Cache, 那麼 CPU 總是從 cache 中讀取數據, 這時 cache 中的數據和 memory 中的數據出現不一致, 程序執行出現邏輯錯誤.
+    注意, 此時 CPU 是使用 LDR instruction 來訪問 memory, 但是仍然沒有得到正確的內存數據.
+    即使使用 volatile 關鍵字也無濟於事, 因為 volatile 是在指令級上影響C語言到彙編語言的關鍵字,
+    但是 CPU 在訪問內存時, 仍然需要經過 cache 的緩衝.
+
+    > 藉由設定 memory page 的 Cache 屬性 (write through or write back) 來避免上述的情況
+
 # NDS32
 
 ## Definitions
