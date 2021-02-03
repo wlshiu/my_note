@@ -118,7 +118,7 @@ $ git svn rebase
 
 ```
 $ git svn dcommit
-$ git svn dcommit –username admin
+$ git svn dcommit --username=admin
 ```
 
 如果有開 branch, 那麼這個時候應該要用rebase+merge來達到master和branch 合併的時候會是 Fast Forward Merge：
