@@ -326,6 +326,12 @@ PBA: Physical Block Address
         PBA_D = PBA_D + 1
         ```
 
+### esp_event
+
+### Secure Boot
+
+### Flash encryption
+
 ## Sub-project
 
 + set environment of esp-idf
@@ -368,64 +374,7 @@ PBA: Physical Block Address
 + [快速入門](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html#)
 + [與 ESP32 創建串口連接](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/establish-serial-connection.html)
 
-# ESP-RainMaker Cloud
-
-![scenario](flow/esp_rainmaker.jpg)
-
-## definition
-
-+ `Provision`
-    > 配網
-
-    - Smart Config (TI 推出)
-        > 通過數據幀中未加密的組播字段和長度字段, 來傳輸編碼後的網絡配置信息.
-        End-device 先 sniffers 封包, 再執行配網程序
-
-        > 由於配網信息是 broadcast, 有可能被側錄並推算出對應的編碼表, 進而還原出 Wi-Fi密碼
-
-    - Wi-Fi Easy Connect
-        > 通過一個擁功能強大設備(手機) 作為配置設備(Configurator), 由它負責配置其他所有設備, 而其他的設備都是待註冊設備(Enrollee devices).
-        一旦 Configurator 連接到無線接入點, 通過掃瞄 Enrollee devices 的二維碼就可以讓它們連上網絡 (也支持輸入字符串的形式).
-
-        1. 好處
-            > + 為 Enrollee devices 提供標準化的方式
-            > + 通過使用二維碼和用戶的設備來簡化管理網絡
-            > + 適用於沒有用戶界面的設備
-            > + 通過公鑰加密進行安全認證
-            > + 支持 WPA2 和 WPA3 網絡
-            > + 替換AP時, 無需將所有設備重新入網到新 AP
-
-        1. 常見的場景
-            > + 用戶使用手機(Configurator) 掃瞄目標設備(Enrollee)的二維碼後, 會自動嘗試與其建立安全連接.
-            > + 連接建立後, 向目標設備(Enrollee)傳遞 Wi-Fi 網絡的配置信息.
-            > + 目標設備(Enrollee)使用這些信息去嘗試掃瞄, 選擇連接到目標網絡.
-
-
-+ `Claiming Service`
-    > ESP RainMaker 中, 獲得 Certificate 的程序
-    >> `Claiming` is the process by which the ESP32-S2/ESP32 gets this certificate from the ESP RainMaker Claiming Service.
-
-## Behavior
-
-RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https://play.google.com/store/apps/details?id=com.espressif.rainmaker&hl=zh_TW&gl=US)
-
-
-+ 使用 Phone App 當作 Configurator, Esp board 為 Enrollee
-+ Phone App 可登入並連接到 Cloud Server. Esp board 則會產生出 QR-code, 等待被配網
-+ Phone App 藉 QR-code (output from terminal) 將 Esp board 加入網路 (WiFi provisioning)
-+ 接著 Phone App 經由 Cloud Server 來 Control and Monitor Esp board
-
-## Setting
-
-+ enable `ESP RainMaker Local Control`
-
-    ```
-    ESP RainMaker Config
-        -> ESP RainMaker Local Control
-    ```
-
-## [Amazon-Freertos](IoT/note_aws_freertos.md)
-
+# [ESP Rainmaker Cloud](note_esp_rainmaker.md)
 
 # ESP32-DevKitC_v4
 
@@ -674,6 +623,7 @@ RainMaker CLI 用來模擬外部 control, 建議使用 [ESP RainMaker App](https
             ...
         ```
 
+## [Amazon-Freertos](IoT/note_aws_freertos.md)
 
 # ESP32-LyraT-Mini
 

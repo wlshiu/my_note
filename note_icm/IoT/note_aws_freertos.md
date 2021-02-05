@@ -119,7 +119,7 @@ $ sudo apt-get install git wget libncurses-dev flex bison gperf python python-pi
 
         ```
         $ cd $HOME/AWS/amazon-freertos
-        $ source ./vendors/espressif/esp-idf/export.sh  # configure esp-idf environment 
+        $ source ./vendors/espressif/esp-idf/export.sh  # configure esp-idf environment
         $ cmake -DVENDOR=espressif -DBOARD=esp32_devkitc -DCOMPILER=xtensa-esp32 -S . -B ./build
         $ cd build && make
 
@@ -129,6 +129,12 @@ $ sudo apt-get install git wget libncurses-dev flex bison gperf python python-pi
 
     - reference
         1. [Getting Started with Amazon FreeRTOS and the Espressif ESP32-DevKitC](https://blog.alikhalil.tech/2019/06/getting-started-with-amazon-freertos-and-the-espressif-esp32-devkitc/)
+
+# Porting
+
++ 需使用 CMake build system
++ [AWS IoT Device SDK for Embedded C](https://github.com/aws/aws-iot-device-sdk-embedded-C)
+
 
 # Reference
 + [Espressif ESP32-DevKitC 和 ESP-WROVER-KIT 入門](https://docs.aws.amazon.com/zh_tw/freertos/latest/userguide/getting_started_espressif.html)
