@@ -192,6 +192,8 @@ $ svn export svn://172.18.41.35/VAD8992_android/AMSS_postCS-1092_LABF64-2820/vad
 $ svn checkout --username user --password pass svn://server/repo
 ```
 
+ps. `<>` 表示必要, `[]`表示可選
+
 ## Help
 
 ```
@@ -199,12 +201,13 @@ $ svn　help              # list all commands
 $ svn　help　<command>    # list detail of this command
 ```
 
-## Copy
+## CheckOut
 
-複製遠端倉儲
+從遠端倉儲複製到 local
 
 ```
 $ svn co svn+ssh://noob@yourdomain.com/path/foo/repository1
+$ svn co svn+ssh://noob@yourdomain.com/path/foo/repository1 -r <版本號> [local path]
 ```
 
 ## Status
