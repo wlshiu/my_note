@@ -466,6 +466,7 @@ PBA: Physical Block Address
             > 註冊 `The Thing`
 
             ```
+            # 此處的 Name 相當於 device id, 不可跟其他 'Thing' 重複
             Name: <your device name>
             ```
 

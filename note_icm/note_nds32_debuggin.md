@@ -3,11 +3,130 @@ NDS32 Debugging
 
 # Excepteions
 
+## Reset/NMI
++ Cold Reset
++ Warm Reset
++ Non-Maskable Interrupt (NMI)
+
+## Interrupt
++ External interrupt
++ Software interrupt
++ Performance counter interrupt
++ Local DMA interrupt
+
+## TLB fill exception (Instruction/Data)
+
+## PTE not present exception (Instruction/Data)
++ Non-Leaf PTE not present
++ Leaf PTE not present
+
+## TLB miscellaneous exception
++ Read protection violation (Data)
++ Write protection violation (Data)
++ Page modified (Data)
++ Non-executable page (Instruction)
++ Access bit (Instruction/Data)
++ Reserved PTE Attribute (Instruction/Data)
++ TLB VLPT miss (Instruction/Data)
+
+## System Call exception
+
+## Debug exception
++ Instruction breakpoint
++ Data address & value break
++ BREAK exception
++ Hardware single stepping
++ Load/store instruction global stop
+
 ## General exceptin
 
-+ type
-    > reason
++ Branch target alignment (Instruction) or alignment check exception (Data) exception
++ Reserved instruction exception
++ Trap exception
++ Arithmetic exception
++ Precise bus error (Instruction/Data)
+    - 不存在的位址
++ Imprecise bus error (Instruction/Data)
+    - 不存在的位址 (Non-existent address)
+        > S/w 令 CPU 讀寫特定的 physical address 時, CPU 會將這個 physical address 填入 Address Bus, 並等待所有其他連接著 CPU 的硬體來認領並回應這個請求.
+        當沒有任何硬體回應 CPU 時, CPU會觸發一個異常, 表示整個電腦系統都無法辨識上述請求的 physical address
 
+    - Unaligned access (非對齊存取)
+
++ Coprocessor N not-usable exception
++ Coprocessor N-related exception
++ Privileged instruction exception
++ Reserved value exception
++ Nonexistent memory address (Instruction/Data)
++ MPZIU control (Instruction/Data)
++ Next-precise stack overflow exception
+    > Stack overflow
+
+## Machine error exception (Instruction/Data)
++ Cache locking error
++ TLB locking error
++ TLB multiple hit
++ Parity/ECC error
++ Unimplemented page size error
++ Illegal parallel memory accesses (Audio extension)
++ Local memory base setup error (for Unified Local Memory configuration)
+
+# Priority Table
+
+| Interruption Name (highest to lowest)                 | Vector Entry Point            |
+|-------------------------------------------------------|-------------------------------|
+| cold reset/warm reset                                 | Reset/NMI                     |
+| Local memory base setup error - next-precise          | Machine error                 |
+| Stack overflow/underflow exception - next-precise     | General exception             |
+| Debug data address watchpoint - next-precise          | Debug                         |
+| Debug data value watchpoint - next-precise            | Debug                         |
+| Hardware single-stepping                              | Debug                         |
+| NMI                                                   | Reset/NMI                     |
+| External debug request (debug interrupt)              | Debug                         |
+| ECC error - imprecise                                 | Machine error                 |
+| Data bus error - imprecise*                           | General exception             |
+| Instruction bus error - imprecise* (e.g. HW prefetch) | General exception             |
+| Interrupt                                             | (Based on interrupt priority) |
+| Debug instruction breakpoint                          | Debug                         |
+| Instruction alignment check                           | General exception             |
+| ITLB multiple hit                                     | Machine error                 |
+| ITLB fill                                             | TLB fill                      |
+| ITLB VLPT miss                                        | TLB VLPT miss                 |
+| IPTE not present (non-leaf)                           | PTE not present               |
+| IPTE not present (leaf)                               | PTE not present               |
+| Reserved IPTE attribute                               | TLB misc                      |
+| Instruction MPZIU control                             | General exception             |
+| ITLB non-execute page                                 | TLB misc                      |
+| IAccess bit                                           | TLB misc                      |
+| Instruction machine error                             | Machine error                 |
+| Instruction nonexistent memory address                | General exception             |
+| Instruction bus error (precise)                       | General exception             |
+| Reserved instruction                                  | General exception             |
+| Privileged instruction                                | General exception             |
+| Reserved value                                        | General exception             |
+| Unimplemented page size error                         | Machine error                 |
+| Break                                                 | Debug                         |
+| Coprocessor                                           | General exception             |
+| Trap/syscall                                          | General exception             |
+| Arithmetic                                            | General exception             |
+| Branch target alignment                               | General exception             |
+| Debug data address watchpoint                         | Debug                         |
+| Load/store instruction global stop                    | Debug                         |
+| Data alignment check                                  | General exception             |
+| DTLB multiple hit                                     | Machine error                 |
+| DTLB fill                                             | TLB fill                      |
+| DTLB VLPT miss                                        | TLB VLPT miss                 |
+| DPTE not present (non-leaf)                           | PTE not present               |
+| DPTE not present (leaf)                               | PTE not present               |
+| Reserved DPTE attribute                               | TLB misc                      |
+| Data MPZIU control                                    | General exception             |
+| DTLB permission (R/W)                                 | TLB misc                      |
+| Dpage modified                                        | TLB misc                      |
+| DAccess bit                                           | TLB misc                      |
+| Data machine error                                    | Machine error                 |
+| Data nonexistent memory address                       | General exception             |
+| Debug data value watchpoint - precise                 | Debug                         |
+| Data bus error - precise                              | General exception             |
 
 
 # Andes ICE (ICEman)
