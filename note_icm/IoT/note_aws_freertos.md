@@ -132,8 +132,8 @@ $ sudo apt-get install git wget libncurses-dev flex bison gperf python python-pi
 
 # Porting
 
-+ 需使用 CMake build system
-+ [AWS IoT Device SDK for Embedded C](https://github.com/aws/aws-iot-device-sdk-embedded-C)
++ 需使用 CMake build-system
++ [aws-iot-device-sdk-embedded-C](https://github.com/aws/aws-iot-device-sdk-embedded-C)
 
 
 # Reference
