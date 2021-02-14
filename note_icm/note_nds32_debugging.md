@@ -159,3 +159,69 @@ NDS32 Debugging
         ICEman is ready to use.
     ```
 
+# NDS32 Debug tips
+
++ NDS32 可以只 reset CPU, 且保留 GPRs (只會 reset $sp, $pc, $fp)
+
+    ```
+    # '-H': ICE 連線時, 強制 reset CPU
+    $ ICEman -N reset-hold-script.tpl -H
+    ```
+
+
++ 強制 Blocking 在 General Exception 的進入點
+    > 無法重新編譯情況下, 且原本的 General Exception handler 會做比較多的事情, 可能會破壞當時資訊
+
+    ```
+    gdb) set *0x0=0x000000d5
+    ```
+
+    - instruction `j8`
+
+        ```
+        opcode | offset (8-bits)
+        0xd5   | 0x00
+        ```
+
+        1. example
+
+            ```asm
+            000009d2 <1>:
+            1:
+                b 1
+            9d2:    d5 00    j8 9d2 <1>
+            ```
+
++ 確認 ILM/DLM 是否活著
+    > ILM/DLM 不通過 BUS. CPU 可以直通
+
+    - Dump ILM/DLM memory
+
+        ```
+        gdb) x/12xw 0x00000000
+        ```
+
++ 確認 BUS 是否活著
+    > 存取掛在 Bus 上的 module
+
+    - access Bus Ram
+
+        ```
+        gdb) x/12xw 0x60000000
+        ```
+
+    - read/write CSRs (Control and Status Registers) of H/w module
+
+        ```
+        gdb) x/12xw 0xC0001000
+        ```
+
++ 查看 system register info
+
+    ```
+    gdb) info registers <Simple Mnemonics>
+    gdb) info registers cr0
+    gdb) info registers mr8
+    ```
+
+
