@@ -38,7 +38,7 @@ NDS32 Debugging
 + Hardware single stepping
 + Load/store instruction global stop
 
-## General exceptin
+## General exception
 
 + Branch target alignment (Instruction) or alignment check exception (Data) exception
 + Reserved instruction exception

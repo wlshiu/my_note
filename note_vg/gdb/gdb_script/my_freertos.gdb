@@ -1,6 +1,6 @@
 
 set prompt \033[31mgdb$ \033[0m
-# set trace-commands on
+set trace-commands on
 set logging file ~/working/image/gdg.log
 # set logging on
 # set logging redirect off
