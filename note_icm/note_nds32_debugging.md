@@ -173,7 +173,7 @@ NDS32 Debugging
     > 無法重新編譯情況下, 且原本的 General Exception handler 會做比較多的事情, 可能會破壞當時資訊
 
     ```
-    gdb) set *0x0=0x000000d5
+    gdb) set *0x0=0x00d500d5
     ```
 
     - instruction `j8`
