@@ -37,7 +37,7 @@ define la
 end
 
 # input: List_t*
-define dump_list_2
+define z_dump_list_2
 
     set $pxList = $arg0
     set $pxListEnd = &($pxList->xListEnd)
@@ -66,7 +66,7 @@ define dump_list_2
 end
 
 # arg0: List_t  pointer
-define dump_list
+define z_dump_list
 
     set $pHeadListItem=((List_t*)$arg0)->pxIndex
     set $pCurListItem=$pHeadListItem
@@ -101,7 +101,7 @@ define dump_list
     end
 end
 
-define dump_freertos_tasks
+define z_dump_freertos_tasks
 
     set $i=(sizeof(pxReadyTasksLists)/sizeof(pxReadyTasksLists[0]))-1
 
@@ -142,7 +142,7 @@ define dump_freertos_tasks
 end
 
 # input: Queue_t*
-define dump_queue
+define z_dump_queue
     echo \033[36m
     set $CurQueue=$arg0
     p/x *(Queue_t*)$CurQueue
@@ -158,20 +158,20 @@ define dump_queue
 end
 
 
-define dump_current_task
+define z_dump_current_task
     printf "%s: 0x%x\n", ((TCB_t *)pxCurrentTCB)->pcTaskName, pxCurrentTCB
 end
 
 
 # input: EventGroup_t*
-define print_event_group_handle
+define z_print_event_group_handle
     p/x *(EventGroup_t*)$arg0
     echo \nxTasksWaitingForBits:\n
     dump_list_2 &((EventGroup_t*)$arg0)->xTasksWaitingForBits
 end
 
 # input: TCB_t*
-define print_tcb
+define z_print_tcb
     echo \033[36m
     echo \nTCB:\n
     p/x *(TCB_t*)$arg0
@@ -179,7 +179,7 @@ define print_tcb
 end
 
 # input: TCB_t* or TCB address
-define do_switch_task
+define z_do_switch_task
     d
     b vTaskSwitchContext
 
@@ -199,7 +199,7 @@ end
 
 set $ISR_SWI=xPortPendSVHandler
 # input (TCB address of target task): TCB_t* or TCB address
-define dump_task_backtrace
+define z_dump_task_backtrace
     save breakpoints ~/tmp_brk_____.rec
 
     delete
@@ -287,7 +287,7 @@ define dump_task_backtrace
 end
 
 # input: filename, start_addr, end_addr
-define save_mem
+define z_save_mem
     dump binary memory $arg0 $arg1 $arg2
 end
 document save_mem
@@ -297,7 +297,7 @@ Usage: save_mem FILENAME Start_ADDR End_ADDR
 end
 
 # enable breakpoint
-define bpe
+define z_bpe
     if $argc != 1
         help bpe
     else
@@ -310,7 +310,7 @@ Usage: bpe NUM
 end
 
 # disable breakpoint
-define bpd
+define z_bpd
     if $argc != 1
         help bpd
     else
@@ -335,7 +335,28 @@ define la
     end
 end
 
+# treace heap (free block list)
+# if free-blcok list is polluted, pxNextFreeBlock should be a invalid value,
+# 	e.g. out heap range or magic number
+define z_trace_heap
+	set $cur_blk=$arg0
+	set $i=0
 
+    while $i < 6
+
+		if ((BlockLink_t*)$cur_blk)->pxNextFreeBlock == 0
+			printf "[%d]: pxNextFreeBlock=0x0\n", $i
+			loop_break
+		end
+
+        printf "[%d]: pxNextFreeBlock=0x%x\n", $i, ((BlockLink_t*)$cur_blk)->pxNextFreeBlock
+
+		$cur_blk = ((BlockLink_t*)$cur_blk)->pxNextFreeBlock
+
+        set $i+=1
+    end
+
+end
 
 
 

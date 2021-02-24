@@ -151,6 +151,12 @@ GDB_CMD
 + continue (c, cont)
     > 繼續執行.和 breakpoint 搭配使用.
 
+    - 設定 忽略斷點的次數 (只設定一個斷點時)
+
+        ```
+        (gdb) c 5   # 忽略 (5 - 1)次 斷點
+        ```
+
 + frame (memory stack)
     > 顯示正在執行的行數、副程式名稱、及其所傳送的參數等等 frame 資訊.
     >> - `frame 2`
@@ -190,8 +196,17 @@ GDB_CMD
 + display
     > 在遇到中斷點時，自動顯示某變數的內容.
 
+    ```
+    (gdb) display/x $r0
+    ```
+
 + undisplay
     > 取消 display，取消自動顯示某變數功能.
+
+    ```
+    (gdb) info display
+    (gdb) undisplay 1
+    ```
 
 + commands
     > 在遇到中斷點時要自動執行的指令.
@@ -355,7 +370,7 @@ GDB_CMD
     - 修改 memory value
 
         ```
-        (gdb) set {int}0x8048667=32
+        (gdb) set *(int*)0x8048667=32
         ```
 
     - 修改當前的 program counter, 可以在 call xxx 時使用.
@@ -400,6 +415,12 @@ GDB_CMD
 + watch
     > 觀察到變量變化時,停止程序
     >> watchpoint 和 breakpoint 類似,但是斷點是 **program 執行前**設置,觀察點是**program 執行中**設置,只能是變量
+
+    - 觀察 memory address 被寫時停下來
+
+        ```
+        (gdb) watch *0x123456
+        ```
 
 + rwatch
     > 觀察到變量被讀時,停止程序
