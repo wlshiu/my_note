@@ -339,19 +339,19 @@ end
 # if free-blcok list is polluted, pxNextFreeBlock should be a invalid value,
 # 	e.g. out heap range or magic number
 define z_trace_heap
-	set $cur_blk=$arg0
-	set $i=0
+    set $cur_blk=$arg0
+    set $i=0
 
     while $i < 6
 
-		if ((BlockLink_t*)$cur_blk)->pxNextFreeBlock == 0
-			printf "[%d]: pxNextFreeBlock=0x0\n", $i
-			loop_break
-		end
+        if ((BlockLink_t*)$cur_blk)->pxNextFreeBlock == 0
+            printf "[%d]: pxNextFreeBlock=0x0\n", $i
+            loop_break
+        end
 
         printf "[%d]: pxNextFreeBlock=0x%x\n", $i, ((BlockLink_t*)$cur_blk)->pxNextFreeBlock
 
-		$cur_blk = ((BlockLink_t*)$cur_blk)->pxNextFreeBlock
+        set $cur_blk = ((BlockLink_t*)$cur_blk)->pxNextFreeBlock
 
         set $i+=1
     end
