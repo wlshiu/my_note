@@ -107,7 +107,7 @@ define z_dump_freertos_tasks
 
     while $i >= 0
 
-        dump_list &pxReadyTasksLists[$i] $i
+        z_dump_list &pxReadyTasksLists[$i] $i
 
         set $i-=1
     end
@@ -167,7 +167,7 @@ end
 define z_print_event_group_handle
     p/x *(EventGroup_t*)$arg0
     echo \nxTasksWaitingForBits:\n
-    dump_list_2 &((EventGroup_t*)$arg0)->xTasksWaitingForBits
+    z_dump_list_2 &((EventGroup_t*)$arg0)->xTasksWaitingForBits
 end
 
 # input: TCB_t*
@@ -290,36 +290,36 @@ end
 define z_save_mem
     dump binary memory $arg0 $arg1 $arg2
 end
-document save_mem
+document z_save_mem
 Write a range of memory to a file in raw format.
 The range is specified by ADDR1 and ADDR2 addresses.
-Usage: save_mem FILENAME Start_ADDR End_ADDR
+Usage: z_save_mem FILENAME Start_ADDR End_ADDR
 end
 
 # enable breakpoint
 define z_bpe
     if $argc != 1
-        help bpe
+        help z_bpe
     else
         enable $arg0
     end
 end
-document bpe
+document z_bpe
 Enable breakpoint with number NUM.
-Usage: bpe NUM
+Usage: z_bpe NUM
 end
 
 # disable breakpoint
 define z_bpd
     if $argc != 1
-        help bpd
+        help z_bpd
     else
         disable $arg0
     end
 end
-document bpd
+document z_bpd
 Disable breakpoint with number NUM.
-Usage: bpd NUM
+Usage: z_bpd NUM
 end
 
 # list assembly
