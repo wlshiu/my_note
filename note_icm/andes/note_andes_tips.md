@@ -84,6 +84,18 @@ int main ()
     - `#pragma GCC pop_options`
         > 把 `-Os` pop 回來, 恢復原來的 optimize 設定
 
+## How to get PC value?
+
+```c
+#include "nds32_intrinsic.h"
+...
+int tmp;
+tmp=__nds32__mfusr(NDS32_USR_PC);
+```
+
+```asm
+MFUSR rt5,PC
+```
 
 ## C語言程式轉成組合語言
 
