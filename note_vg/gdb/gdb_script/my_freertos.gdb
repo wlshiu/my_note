@@ -288,7 +288,7 @@ end
 
 # input: filename, start_addr, end_addr
 define z_save_mem
-    dump binary memory $arg0 $arg1 $arg2
+    dump memory $arg0 $arg1 $arg2
 end
 document z_save_mem
 Write a range of memory to a file in raw format.
