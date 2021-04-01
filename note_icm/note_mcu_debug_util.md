@@ -1,4 +1,4 @@
-MCU Debugging
+MCU Debugging utilities
 ---
 
 # Memory usage
