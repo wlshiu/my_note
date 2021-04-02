@@ -137,9 +137,13 @@ xxxQueue =>   xEventListItem <-> xEventListItem <-> xEventListItem
 + overflow
 + suspend
 
+# Task Schedule
+
+## vTaskStartScheduler
+## vTaskSwitchContext
+
 # TaskDelay
 
-# xNextTaskUnblockTime
 
 # TaskNotify
 

@@ -88,7 +88,10 @@ VirtualBox
 + Environment
     ```
     $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake autoconf libtool pkg-config \
-            vim git universal-ctags cscope id-utils texinfo global libncurses5-dev libreadline6 libreadline6-dev doxygen graphviz tree icdiff silversearcher-ag
+            vim git exuberant-ctags id-utils texinfo global libncurses5-dev libreadline5 libreadline-dev doxygen graphviz tree icdiff silversearcher-ag tmux
+
+    $ sudo apt -y install ssh openssh-server
+    $ sudo apt -y install python-pip python3-pip
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
@@ -120,7 +123,6 @@ VirtualBox
         1. Install 32-bit libraries
             ```
             $ apt-get install libc6:i386 libstdc++6:i386 lib32ncurses5 lib32z1
-
             ```
 
         1. codeblocks
@@ -183,6 +185,49 @@ VirtualBox
     $ pip install icdiff
     $ git icdiff
     ```
+
+    - github ssh
+
+        1. ssh-keygen
+
+            ```shell
+            $ ssh-keygen
+                Generating public/private rsa key pair.
+                Enter file in which to save the key (/home/wl/.ssh/id_rsa):
+                Created directory '/home/wl/.ssh'.
+                Enter passphrase (empty for no passphrase):
+                Enter same passphrase again:
+                Your identification has been saved in /home/wl/.ssh/id_rsa.
+                Your public key has been saved in /home/wl/.ssh/id_rsa.pub.
+                The key fingerprint is:
+                SHA256:ww70FnJrvuXNN661IEBqWZuDEbcIpayhBBrJ/dmyg6w wl@lubu
+                The key's randomart image is:
+                +---[RSA 2048]----+
+                |+.. ..o .        |
+                |+o o o + .       |
+                |... + B *        |
+                |.. o = & =       |
+                |. o . O S        |
+                |   o + * +       |
+                |  .   . o o . .  |
+                | E       + + oo. |
+                |        . . ++o. |
+                +----[SHA256]-----+
+            ```
+
+        1. id_rsa.pub
+            > `$HOME/.ssh/id_rsa.pub`
+
+        1. comfirm
+
+            ```shell
+            $ ssh -T git@github.com
+                The authenticity of host 'github.com (52.192.72.89)' can't be established.
+                RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
+                Are you sure you want to continue connecting (yes/no)? yes
+                Warning: Permanently added 'github.com,52.192.72.89' (RSA) to the list of known hosts.
+                Hi wlshiu! You've successfully authenticated, but GitHub does not provide shell access.
+            ```
 
 + Share Folder
     > Need to Install `VboxGuestAdditions`

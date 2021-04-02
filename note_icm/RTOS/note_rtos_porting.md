@@ -9,6 +9,13 @@ RTOS Port
 + system tick
     > priority 最高
 
+# 開關中斷總線的時機
+
++ 在 start schedule 前, 中斷應關閉
+
++ 第一次 context switch 時, 根據 CPU 特性, 可在 restore GPRs 時打開中斷總線
+
+
 # Heap configuration
 
 # Stack layout

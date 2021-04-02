@@ -60,3 +60,42 @@ $ vim ~/.bashrc
     ```
     $ python -m pip install pandas
     ```
+
+# configure
+
++ Python 3.7
+
+    ```
+    # add the deadsnakes PPA to sources list
+    $ sudo add-apt-repository ppa:deadsnakes/ppa
+    $ sudo apt install python3.7
+
+    ```
+
+    1. swithc python3 version
+
+        ```
+        $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
+        $ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 2
+        $ sudo update-alternatives --config python3
+            There are 2 choices for the alternative python3 (providing /usr/bin/python3).
+
+              Selection    Path                Priority   Status
+            ------------------------------------------------------------
+            * 0            /usr/bin/python3.6   2         auto mode
+              1            /usr/bin/python3.6   1         manual mode
+              2            /usr/bin/python3.7   2         manual mode
+
+            Press <enter> to keep the current choice[*], or type selection number:
+
+        $ sudo rm /usr/bin/python3
+        $ sudo ln -s python3.7 /usr/bin/python3
+        ```
+
++ 設置 Python 3 為默認 Python 版本
+
+    ```
+    $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10 && alias pip=pip3
+    ```
+
+
