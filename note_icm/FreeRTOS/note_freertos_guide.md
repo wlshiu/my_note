@@ -33,9 +33,12 @@ FreeRTOS Guide
         > + 函數的返回值為 structure pointer
         > + 在 port.c 這個文件中定義
 
+# [Compile Options](note_freertos_compile_options.md)
+
+ 
 # List/ListItem
 
-list 被 FreeRTOS 調度器使用, 用於跟蹤 task, 處於 ready (就緒), suspend (掛起), delay (延時)的 task, 都會被接到各自的 list 中
+list 被 FreeRTOS 調度器使用, 用於紀錄 task; 處於 ready (就緒), suspend (掛起), delay (延時)的 task, 都會被接到各自的 list 中
 
 ![list_arch](list_structure.jpg)
 

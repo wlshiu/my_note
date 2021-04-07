@@ -15,7 +15,9 @@ typedef struct tskTaskControlBlock
     #endif
 
     ListItem_t          xStateListItem;     /* 任務的狀態列表項, 以引用的方式表示 task 的狀態, 紀錄 blocking time */
-    ListItem_t          xEventListItem;     /* 事件列表項, 用於將任務以引用的方式掛接到事件列表, 紀錄 priority */
+    ListItem_t          xEventListItem;     /* 事件列表項, 用於將任務以引用的方式掛接到事件列表, 
+                                               紀錄 priority 的補數，這意味著 xItemValue 的值越大，對應的任務優先級越小 
+                                               (xItemValue = configMAX_PRIORITIES - tskPriority)*/
     UBaseType_t         uxPriority;         /* 保存任務優先級, 0 表示最低優先級 */
     StackType_t         *pxStack;           /* stack pool 的 base address */
     char                pcTaskName[configMAX_TASK_NAME_LEN]; /* 任務名字 */
@@ -132,10 +134,15 @@ xxxQueue =>   xEventListItem <-> xEventListItem <-> xEventListItem
 
 # Task status
 
-+ ready
-+ delay
-+ overflow
-+ suspend
+![task_state](tskstate.jpg)
+
+# Task Create/Delete
+
+## create
+
++ pxPortInitialiseStack()
+
+## delete
 
 # Task Schedule
 

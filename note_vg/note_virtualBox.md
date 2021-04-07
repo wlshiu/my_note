@@ -88,7 +88,7 @@ VirtualBox
 + Environment
     ```
     $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake autoconf libtool pkg-config \
-            vim git exuberant-ctags id-utils texinfo global libncurses5-dev libreadline5 libreadline-dev doxygen graphviz tree icdiff silversearcher-ag tmux
+            vim git exuberant-ctags id-utils texinfo global libncurses5-dev libreadline5 libreadline-dev doxygen graphviz tree icdiff silversearcher-ag tmux bison flex
 
     $ sudo apt -y install ssh openssh-server
     $ sudo apt -y install python-pip python3-pip
