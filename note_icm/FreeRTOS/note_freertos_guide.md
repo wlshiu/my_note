@@ -189,6 +189,8 @@ list 被 FreeRTOS 調度器使用, 用於紀錄 task; 處於 ready (就緒), sus
 
 # reference
 
++ [FreeRTOS基礎篇-朱工的專欄](https://blog.csdn.net/zhzht19861011/category_9265276.html)
++ [FreeRTOS高級篇-朱工的專欄](https://blog.csdn.net/zhzht19861011/category_9265965.html)
 + [FreeRTOS高級篇1---FreeRTOS列表和列表項](https://freertos.blog.csdn.net/article/details/51190095)
 
 
