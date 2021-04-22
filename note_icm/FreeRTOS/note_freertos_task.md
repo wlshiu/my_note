@@ -92,12 +92,19 @@ xxxQueue =>   xEventListItem <-> xEventListItem <-> xEventListItem
 ## 重要的 Global variables
 
 + Task List
-    - `pxReadyTasksLists[configMAX_PRIORITIES]`
-    - `pxDelayedTaskList`
-    - `pxOverflowDelayedTaskList`
-    - `xPendingReadyList`
-    - `xSuspendedTaskList`
+    > + `pxReadyTasksLists[configMAX_PRIORITIES]`
+    > + `pxDelayedTaskList`
+    > + `pxOverflowDelayedTaskList`
+    > + `xPendingReadyList`
+    > + `xSuspendedTaskList`
 
+    - 當 create 一個 task 時 (ready state), 將其 TCB 依照優先權串接在 `pxReadyTasksLists`, scheduler 就會根據優先權依序切換 task.
+        > 當高優先權有 TCB, scheduler 就會一直執行高優先權的 ready tasks
+        >> 當 task 沒有 sleep 或 delay function 時, 此 task 會將 OS 整個佔住
+
+    - task 執行的過程中, 會依 **task state** 或是 OS functions (system API),
+    將 TCB 從 ready list 搬移到 state list (e.g. pxDelayedTaskList, xSuspendedTaskList) 或是 qeueu 的 **xTasksWaitingToReceive**/**xTasksWaitingToSend**
+        > ready list 裡的 TCBs 會逐漸減少, 低優先權的 task 就有機會可以執行. 同樣也會有 TCB 搬回 ready list
 
 
 + **pxCurrentTCB**
