@@ -1,0 +1,13 @@
+*.swp
+*.bak
+*.files
+*.out
+tags
+*.scc
+*.vim
+*.viminfo
+*~$*
+*.git/*
+build/openrtos/*/
+build/win32/*/
+tool/*.cmd
