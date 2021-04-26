@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <help_text/>
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>510</x>
+      <y>240</y>
+      <w>190</w>
+      <h>550</h>
+    </coordinates>
+    <panel_attributes>*TCB_t 1*
+{innerclass
+pxTopOfStack
+innerclass}
+{innerclass
+...
+innerclass}
+{innerclass
+List_t
+*xStateListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(xTimeToWake)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+List_t
+*xEventListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(uxBitsToWaitFor*
+or 
+*uxPriority)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+...
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>230</x>
+      <y>120</y>
+      <w>180</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>*pxDelayedTaskList*
+{innerclass
+uxNumberOfItems=1
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue (-1)
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>200</x>
+      <y>430</y>
+      <w>190</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>*EventGroup_t*
+or
+*Queue_t*
+{innerclass
+...
+innerclass}
+{innerclass
+List_t
+*xTasksWaitingForBits*
+or
+*xTasksWaitingToSend*
+*xTasksWaitingToReceive*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue (-1)
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+...
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>190</x>
+      <y>170</y>
+      <w>90</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;30.0;10.0;30.0;10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>230</y>
+      <w>210</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>190.0;100.0;130.0;100.0;130.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>190</y>
+      <w>160</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>210</x>
+      <y>640</y>
+      <w>170</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>790</x>
+      <y>240</y>
+      <w>190</w>
+      <h>530</h>
+    </coordinates>
+    <panel_attributes>*TCB_t 2*
+{innerclass
+pxTopOfStack
+innerclass}
+{innerclass
+...
+innerclass}
+{innerclass
+List_t
+*xStateListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(xTimeToWake)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+List_t
+*xEventListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(uxBitsToWaitFor*
+or 
+*uxPriority)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+...
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>210</y>
+      <w>480</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>460.0;110.0;370.0;110.0;370.0;10.0;100.0;10.0;100.0;60.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>520</x>
+      <y>340</y>
+      <w>170</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>800</x>
+      <y>340</y>
+      <w>170</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>520</x>
+      <y>540</y>
+      <w>170</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>
+bg=green</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>1060</x>
+      <y>540</y>
+      <w>170</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>
+bg=green
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>190</y>
+      <w>200</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;300.0;180.0;300.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>660</x>
+      <y>320</y>
+      <w>170</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>670</x>
+      <y>310</y>
+      <w>170</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>190</y>
+      <w>590</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;570.0;10.0;570.0;270.0;520.0;270.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1050</x>
+      <y>240</y>
+      <w>190</w>
+      <h>550</h>
+    </coordinates>
+    <panel_attributes>*TCB_t 3*
+{innerclass
+pxTopOfStack
+innerclass}
+{innerclass
+...
+innerclass}
+{innerclass
+List_t
+*xStateListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(xTimeToWake)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+List_t
+*xEventListItem*
+{innerclass
+uxNumberOfItems
+innerclass}
+{innerclass
+pxIndex
+innerclass}
+{innerclass
+xListEnd
+{innerclass
+xItemValue
+*(uxBitsToWaitFor*
+or 
+*uxPriority)*
+innerclass}
+{innerclass
+pxNext
+innerclass}
+{innerclass
+pxPrevious
+innerclass}
+innerclass}
+innerclass}
+{innerclass
+...
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>620</y>
+      <w>90</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;30.0;10.0;30.0;10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>520</y>
+      <w>220</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>200.0;10.0;90.0;10.0;90.0;170.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>520</y>
+      <w>460</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>440.0;10.0;370.0;10.0;370.0;300.0;90.0;300.0;90.0;170.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>640</y>
+      <w>1150</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0;1130.0;200.0;1130.0;50.0;1030.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>660</x>
+      <y>520</y>
+      <w>460</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;10.0;100.0;270.0;340.0;270.0;340.0;200.0;440.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>640</y>
+      <w>230</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0;140.0;80.0;210.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>710</y>
+      <w>420</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>400.0;110.0;90.0;110.0;90.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1130</x>
+      <y>140</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*/End/*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>580</x>
+      <y>140</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*/Head/*</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

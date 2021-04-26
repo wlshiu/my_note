@@ -117,13 +117,13 @@ bg=yellow</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>360</x>
+      <x>300</x>
       <y>290</y>
-      <w>150</w>
+      <w>210</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>130.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>190.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -241,13 +241,13 @@ layer=0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>490</x>
+      <x>300</x>
       <y>450</y>
-      <w>100</w>
+      <w>290</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>270.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
@@ -268,7 +268,7 @@ layer=0</panel_attributes>
       <w>200</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
@@ -279,7 +279,7 @@ layer=0</panel_attributes>
       <w>70</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>SWi IRQ</panel_attributes>
+    <panel_attributes>SWI-IRQ</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

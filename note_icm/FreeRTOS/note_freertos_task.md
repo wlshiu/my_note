@@ -14,8 +14,8 @@ typedef struct tskTaskControlBlock
         xMPU_SETTINGS   xMPUSettings;       /* MPU設置, 必須位於結構體的第二項 */
     #endif
 
-    ListItem_t          xStateListItem;     /*  task的狀態列表項, 以引用的方式表示 task 的狀態, 紀錄 blocking time */
-    ListItem_t          xEventListItem;     /* 事件列表項, 用於將 task以引用的方式掛接到事件列表,
+    ListItem_t          xStateListItem;     /* task的狀態列表項, 以引用的方式表示 task 的狀態, 紀錄 blocking time */
+    ListItem_t          xEventListItem;     /* 事件列表項, 用於將 task 以引用的方式掛接到事件列表,
                                                紀錄 priority 的補數, 這意味著 xItemValue 的值越大, 對應的 task優先級越小
                                                (xItemValue = configMAX_PRIORITIES - tskPriority)*/
     UBaseType_t         uxPriority;         /* 保存 task優先級, 0 表示最低優先級 */
@@ -80,14 +80,9 @@ typedef tskTCB TCB_t;
 
     ![xStateListItem of task](Task_State_ListItem.jpg)
 
++ xEventListItem
 
-```
-# xEventListItem
-
-                TCB_2             TCB_3             TCB_5
-xxxQueue =>   xEventListItem <-> xEventListItem <-> xEventListItem
-
-```
+    ![TCB State and Event](tcb_state_event.jpg)
 
 ## 重要的 Global variables
 
@@ -933,6 +928,102 @@ BaseType_t xTaskIncrementTick( void )
 
 
 # MISC
+
+## vTaskPlaceOnUnorderedEventList
+
+```c
+/* 將 current task 加入 EventList */
+void vTaskPlaceOnUnorderedEventList( List_t * pxEventList, const TickType_t xItemValue, const TickType_t xTicksToWait )
+{
+    configASSERT( pxEventList );
+
+    /* 此函數必須在掛起調度程序的情況下調用 */
+    configASSERT( uxSchedulerSuspended != 0 );
+
+    /* 存儲 Item 值在 EventList Item 中.
+     * 在這裡訪問 task 的 xEventListItem 是安全的, 因為中斷不會訪問未處於 blocking 狀態的 task 的 xEventListItem
+     * ps. taskEVENT_LIST_ITEM_VALUE_IN_USE = 0x80000000UL
+     */
+    listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xEventListItem ), xItemValue | taskEVENT_LIST_ITEM_VALUE_IN_USE );
+
+    /* 將 pxCurrentTCB->xEventListItem 放到 pxEventList 的末尾.
+     * 在這裡訪問事件列表是安全的, 因為它是事件組的一部分.
+     * - 中斷不直接訪問事件組(相反，它們通過掛起任務級別的函數調用, 來間接訪問事件組)
+     */
+    vListInsertEnd( pxEventList, &( pxCurrentTCB->xEventListItem ) );
+
+    /* 將 current task 移動到 delay 列表 */
+    prvAddCurrentTaskToDelayedList( xTicksToWait, pdTRUE );
+}
+```
+
+## prvAddCurrentTaskToDelayedList
+
+```c
+static void prvAddCurrentTaskToDelayedList( TickType_t xTicksToWait, const BaseType_t xCanBlockIndefinitely )
+{
+    TickType_t xTimeToWake;
+    const TickType_t xConstTickCount = xTickCount;
+
+    #if( INCLUDE_xTaskAbortDelay == 1 )
+    {
+        /* 即將進入一個 Delay 列表, 因此確保 ucDelayAborted 標志被重置為pdFALSE,
+         * 這樣當 task 離開阻塞狀態時, 就可以檢測到它被設置為 pdTRUE
+         */
+        pxCurrentTCB->ucDelayAborted = pdFALSE;
+    }
+    #endif
+
+    /* 在將該 task 添加到 blocking 列表之前, 請從 ready 列表中刪除該 task */
+    if( uxListRemove( &( pxCurrentTCB->xStateListItem ) ) == ( UBaseType_t ) 0 )
+    {
+        /* 當前 task 必須在 ready 列表中, 因此不需要檢查, 可以直接調用端口重置宏 */
+        portRESET_READY_PRIORITY( pxCurrentTCB->uxPriority, uxTopReadyPriority );
+    }
+
+    #if ( INCLUDE_vTaskSuspend == 1 )
+    {
+        if( ( xTicksToWait == portMAX_DELAY ) && ( xCanBlockIndefinitely != pdFALSE ) )
+        {
+            /* 將 task 添加到掛起的 task 列表而不是延遲的 task 列表中, 以確保它不會被計時事件喚醒。它會無限期地阻塞 */
+            vListInsertEnd( &xSuspendedTaskList, &( pxCurrentTCB->xStateListItem ) );
+        }
+        else
+        {
+            /* 如果事件沒有發生, 計算 task 應該被喚醒的時間
+             * 這可能會 overflow, 但這無關緊要, 內核會正確地管理它
+             */
+            xTimeToWake = xConstTickCount + xTicksToWait;
+
+            /* 列表項將按照喚醒時間來'排序'插入 */
+            listSET_LIST_ITEM_VALUE( &( pxCurrentTCB->xStateListItem ), xTimeToWake );
+
+            if( xTimeToWake < xConstTickCount )
+            {
+                /* 喚醒的時間已經過了. 將此項放在 overflow 列表中 */
+                vListInsert( pxOverflowDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
+            }
+            else
+            {
+                /* 喚醒時間沒有 overflow, 因此使用當前的 blocking 列表 */
+                vListInsert( pxDelayedTaskList, &( pxCurrentTCB->xStateListItem ) );
+
+                /* 如果進入 blocking 狀態的 task, 位於 blocking 列表的最前面, 那麼 xNextTaskUnblockTime 也需要更新 */
+                if( xTimeToWake < xNextTaskUnblockTime )
+                {
+                    /* Wake up 的時間提前, 因此更新 xNextTaskUnblockTime */
+                    xNextTaskUnblockTime = xTimeToWake;
+                }
+            }
+        }
+    }
+    #else /* INCLUDE_vTaskSuspend */
+    ...
+    #endif /* INCLUDE_vTaskSuspend */
+}
+```
+
+
 
 ## Task Run-Time Statistics
 

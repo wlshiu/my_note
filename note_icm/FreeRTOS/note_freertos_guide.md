@@ -182,7 +182,7 @@ list 被 FreeRTOS 調度器使用, 用於紀錄 task; 處於 ready (就緒), sus
 
 # [Event](note_freertos_event.md)
 
-# S/w Timer
+# [S/w Timer](note_freertos_sw_timer.md)
 
 # [Idle Task](note_freertos_idle.md)
 
