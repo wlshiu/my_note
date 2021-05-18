@@ -266,6 +266,36 @@ VirtualBox
 
     1. MUST reboot system
 
++ 手動掛載 disk
+
+    - VirtualBox
+        > setting -> storage -> Controler:SATA -> add Share disk
+
+    - ubuntu
+
+        1. 格式化 disk
+
+            ```shell
+            # 一般名為:Disk /dev/sdb
+            $ sudo fdisk -l
+            $ sudo fdisk /dev/sdb
+                command (m for help):m
+                command (m for help):n      # new a partition
+                Partition number(1-4):1     # select the target partition
+                ...
+                command (m for help):w      # write and exit
+            $ sudo mkfs.ext4 /dev/sdb1      # file system format
+            ```
+
+        1. 掛載
+
+            ```shell
+            $ ls /dev/sd*
+            $ mkdir $HOME/working/data/
+            $ sudo mount /dev/sdb1 $HOME/working/data/
+            # $ sudo chown <username>:<groupname> $HOME/working/data/
+            ```
+
 + USB
 
     - windows side
