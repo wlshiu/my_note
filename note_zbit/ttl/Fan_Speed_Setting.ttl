@@ -1,0 +1,33 @@
+;  macro for Tera Term
+;
+;  thermal test macro for fan speeds and drive temps for ARAPAHO in JOSHUA
+;  Donovan Metcalf 08/04/2015
+;
+;  SET POINTS = 3600, 4500, 5500, 6500, 7500
+
+setdebug 0
+setsync 0
+show 1    ; Show MACRO dialog
+inputbox 'RPM value to set:' 'Enter RPM Value' '3600'
+RPMvalue=inputstr
+
+do
+    sprintf2 tempStr 'pwsplmSetFanSpeed 0,0,%s' RPMvalue
+    sendln tempStr
+    
+    wait '->'
+    sprintf2 tempStr 'pwsplmSetFanSpeed 0,1,%s' RPMvalue
+    sendln tempStr
+    
+    wait '->'
+    sprintf2 tempStr 'pwsplmSetFanSpeed 1,0,%s' RPMvalue
+    sendln tempStr
+    
+    wait '->'
+    sprintf2 tempStr 'pwsplmSetFanSpeed 1,1,%s' RPMvalue
+    sendln tempStr
+    
+    wait '->'
+    
+    mpause 900
+loop

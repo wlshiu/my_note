@@ -1,0 +1,250 @@
+; ===================================================================
+; Switch the background color of the Teraterm based on environment
+; ===================================================================
+
+; -------------------------------------------------------------------
+; Auther    :   Yusuke Watanabe (@yusukew62)
+; Date      :   2017/2/12
+; Version   :   0.1.0
+; License   :   MIT
+; -------------------------------------------------------------------
+
+
+; ===================================================================
+; Configuration
+; ===================================================================
+; define the teraterm init files
+strdim INITLIST 3
+INITLIST[0] = 'prd.ini'    ; production
+INITLIST[1] = 'stg.ini'    ; staging
+INITLIST[2] = 'dev.ini'    ; development
+
+; define the environment identifiers
+strdim ENVLIST 3
+ENVLIST[0] = 'prd'         ; production
+ENVLIST[1] = 'stg'         ; staging
+ENVLIST[2] = 'dev'         ; development
+
+; define the hosts file name
+HOSTS_FILE = 'hosts.txt'
+
+; define the password
+PW_FILE = 'password.txt'
+
+; define the path
+TTERMPRO_PATH = 'C:\Program Files (x86)\teraterm\ttermpro.exe'
+TTERMLOG_PATH = 'C:\Users\Yusuke\Desktop\'
+TTERMLOG_FILE = 'test.log'
+PASSWORD_FILE = 'password.txt'
+
+
+; ===================================================================
+; Main
+; ===================================================================
+; select the connection host
+strdim hostsname 300
+hostsname[0] = "other"
+i = 1
+fileopen fhandle HOSTS_FILE 0
+while 1
+    filereadln fhandle line
+    fhandle_result = result
+
+    if fhandle_result=1 then
+        break
+    endif
+
+    ; split line
+    ;; strsplit <strval> <separator> [<count>]
+    strsplit line ',' 3
+    hostsname[i] = groupmatchstr2
+
+    i = i + 1
+    ; messagebox i 'conter'
+    ;; messagebox <message> <title> [<special>]
+endwhile
+
+; fle close
+;; fileclose <file handle>
+fileclose fhandle
+
+
+; display the connection hosts list
+;; listbox <message> <title> <string array> [<selected>]
+listbox 'Select the connection hostname' 'Login' hostsname
+hostnum = result
+strcompare hostsname[hostnum] "other"
+hostcheck_result = result
+
+if hostcheck_result=0 then
+    ; manual login
+    call manual_login
+    end
+else
+    ; auto login
+    call auto_login
+    end
+endif
+
+; end of macro
+end
+
+
+; ===================================================================
+; Sub routines
+; ===================================================================
+; manual login sub routine
+:manual_login
+    exec TTERMPRO_PATH
+return
+
+
+; auto login sub routine
+:auto_login
+    ; open the configuration file
+    ;; fileopen <file handle> <filename> <append flag> [<readonly flag>]
+    fileopen fhandle HOSTS_FILE 0
+    
+    ; loop
+    ;; while <expression>
+    ;;   ...
+    ;;   ...
+    ;; endwhile
+    while 1
+        ; read line of the configuration file
+        ;; filereadln <file handle> <strvar>
+        ;; return result (1: EOF, 0: Not EOF)
+        filereadln fhandle line
+        fhandle_result = result
+
+        ; split line
+        ;; strsplit <strval> <separator> [<count>]
+        ; messagebox groupmatchstr1 "groupmatchstr1" ; IP Address
+        ; messagebox groupmatchstr2 "groupmatchstr2" ; Hostname
+        ; messagebox groupmatchstr3 "groupmatchstr3" ; Environment
+        ; messagebox groupmatchstr4 "groupmatchstr4" ; Password
+        strsplit line ',' 4
+
+	find_host = hostsname[hostnum]
+        strcompare groupmatchstr2 find_host
+	find_host_result = result
+
+        if find_host_result=0 then
+            ;; strcompare <string1> <string2>
+            ;; <string1> < <string2> -1
+            ;; <string1> = <string2> 0
+            ;; <string1> > <string2> 1
+            ; check the environment
+            strcompare groupmatchstr3 ENVLIST[0]
+	    env_check_result = result
+
+            if env_check_result=0 then
+                environment = INITLIST[0]
+            endif
+        
+            ; check the environment
+            strcompare groupmatchstr3 ENVLIST[1]
+	    env_check_result = result
+
+            if env_check_result=0 then
+                environment = INITLIST[1]
+            endif
+        
+            ; check the environment
+            strcompare groupmatchstr3 ENVLIST[2]
+	    env_check_result = result
+
+            if env_check_result=0 then
+                environment = INITLIST[2]
+            endif
+
+	    ; result parameter
+            ipaddress = groupmatchstr1
+            hostname = groupmatchstr2
+	    uniq_user = groupmatchstr4 
+
+	    getpassword PW_FILE uniq_user password
+            strsplit uniq_user '.' 2
+            username = groupmatchstr1
+
+            ; exec teraterm
+            call exec_teraterm
+            end
+    
+	    ; exit this macro
+	    end
+        endif
+    
+        ; check the EOF
+        if fhandle_result=1 then
+        	break
+        endif
+    
+        ; messagebox line HOSTS_FILE
+    endwhile
+    
+    ; fle close
+    ;; fileclose <file handle>
+    fileclose fhandle
+    
+return
+
+
+; exec teraterm sub routine
+:exec_teraterm
+    ; TTERMPRO [ <host>[[:]<TCP port#>] | telnet://<host>[:<TCP port#>][/] ]
+    ;          [/B] [/BAUD=<baud rate>] [/C=<serial port#>] [/DS] [/E] [/ES]
+    ;          [/F=<setup file>] [/FD=<file transfer directory>]
+    ;          [/H] [/I] [/K=<keyboard setup file>]
+    ;          [/KR=<kanji code (receive)>] [/KT=<kanji code (transmit)>]
+    ;          [/L=<log file>] [/LA=<language>] [/M=<macro file>] [/NOLOG]
+    ;          [/P=<TCP port#>] [/R=<replay file>] [/T=<telnet flag>]
+    ;          [/TEKICON=<icon name>] [/TIMEOUT=<connecting timeout value>]
+    ;          [/V] [/VTICON=<icon name>] [/W="<window title>"] [/WAITCOM]
+    ;          [/X=<window pos (x)] [/Y=<window pos (y)]
+    ;          [/NAMEDPIPE]
+    ;          [/AUTOWINCLOSE=<flag>]
+    ;          [;<comment>]
+    
+    ; set the information of the connection host
+    ;; strconcat <strvar> <string>
+
+    ; create logfile name
+    strsplit TTERMLOG_FILE '.' 2
+    logfile_name = groupmatchstr1
+    logfile_extension = groupmatchstr2
+    getdate date "%Y%m%d"
+    
+    ;; <host>:<TCP port#>
+    ; hostname
+    COMMAND = ipaddress
+    ; ssh connection port
+    strconcat COMMAND ':22'
+    ; ssh version
+    strconcat COMMAND ' /ssh /2'
+    ; ssh authentication method
+    strconcat COMMAND ' /auth=password'
+    ; username
+    strconcat COMMAND ' /user='
+    strconcat COMMAND username
+    ; password
+    strconcat COMMAND ' /passwd='
+    strconcat COMMAND password
+    ; reading config file
+    ;; /F=<setup file>
+    strconcat COMMAND ' /F='
+    strconcat COMMAND environment
+    ;; /L=<log file>
+    strconcat COMMAND ' /L='
+    strconcat COMMAND TTERMLOG_PATH
+    strconcat COMMAND logfile_name
+    strconcat COMMAND '_'
+    strconcat COMMAND hostname
+    strconcat COMMAND '_'
+    strconcat COMMAND date
+    strconcat COMMAND '.'
+    strconcat COMMAND logfile_extension
+    ; conect to the host
+    connect COMMAND
+return
+

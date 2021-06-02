@@ -1,0 +1,32 @@
+; static unsigned long crc32(unsigned char *c, int n)
+; {
+; #define CRC32POLY1  0x04C11DB7UL
+; #define CRC32POLY2  0xEDB88320UL  /* left-right reversal */
+;     int i, j;
+;     unsigned long r;
+;
+;     r = 0xFFFFFFFFUL;
+;     for (i = 0; i < n; i++)
+;     {
+;         r ^= c[i];
+;         for (j = 0; j < 8; j++)
+;         {
+;             if (r & 1) r = (r >> 1) ^ CRC32POLY2;
+;             else       r >>= 1;
+;         }
+;
+;     }
+;     return r ^ 0xFFFFFFFFUL;
+; }
+
+
+crc32file crc 'C:\Users\redegg\Desktop\test.bin'
+if result = -1 then
+    messagebox 'file open error' 'CRC32 = '
+else
+    sprintf '0x%08X' crc
+    messagebox inputstr 'CRC32 = '
+
+    sprintf2 tempStr 'CRC32= 0x%08X' crc
+    sendln tempStr
+endif

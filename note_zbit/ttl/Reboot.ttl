@@ -1,0 +1,52 @@
+ setdlgpos 300 300
+
+for i 1 1000
+    sprintf2 s "Warm Reset TEST is on going, Counter %d: " i
+    statusbox s 'Test ongoing'
+
+    wait 'Hit any key to stop autoboot:'
+    sendln "
+    wait '=>'
+    sendln 'md.b 0xffdf0000 80'
+    
+    pause 1
+    sendln 'mw.b 0xffdf0019 0xff'
+    sendln 'mw.b 0xffdf001a 0xff
+    sendln 'mw.b 0xffdf001b 0xff'
+    sendln 'mw.b 0xffdf001c 0xff'
+    sendln 'mw.b 0xffdf001d 0xff'
+    sendln 'mw.b 0xffdf001e 0xff'
+    
+    pause 1
+    wait '=>'
+    sendln 'md.b 0xffdf0000 80'
+    
+    pause 1
+    wait '=>'
+    sendln 'boot'
+    wait 'login:'
+    
+    pause 10
+    sendln "
+    wait 'login:'
+    sendln 'root'
+    wait 'username:'
+    sendln 'labuser'
+    wait 'password for (labuser):'
+    sendln 'tellabs'
+   
+    pause 1
+    sendln 'debug;shell'
+    
+    pause 20
+    wait 'craft@MDS1-IO16:/#'
+    
+    pause 1
+    sendln 'devmem 0xfffdf0014 8 0x00'
+
+next
+    closesbox
+
+    setdlgpos 300 300
+    messagebox 'Power Reset Test is complete!' 'Test Complete'
+end
