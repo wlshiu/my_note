@@ -1,0 +1,24 @@
+sendln  'AT+DUT_START=1'
+wait    "AT+DUT_START=OK"
+
+sendln  'AT+SCAN'
+wait    "end"
+sendln  'AT+ACTIVECONNECT=my_ap,12345678'
+wait    "rlt = 0"
+
+looptimes = 1;
+
+while 1
+
+    statusbox looptimes ' Access No. ';
+
+    sendln  'AT+WIFIDISCONNECT'
+    wait    "WIFI Disconnect"
+
+    sendln  'AT+WIFICONNECT'
+    wait    "AT+WIFICONNECT OK"
+    pause   1
+
+    looptimes = looptimes + 1
+
+endwhile

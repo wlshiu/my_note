@@ -1,0 +1,18 @@
+clearscreen 0
+
+dispstr "ABC123"
+dispstr #13
+dispstr #10
+
+strdim msg 3
+msg[0] = 'Banana' 
+msg[1] = 'Apple' 
+msg[2] = 'Orange'
+listbox 'Select your favorite food.' 'Confirmation' msg
+sprintf2 var "%d" result
+messagebox var "result"
+
+inputbox 'Path:' 'Login'
+dispstr inputstr
+dispstr #13
+dispstr #10
