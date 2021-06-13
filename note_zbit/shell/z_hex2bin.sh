@@ -38,7 +38,7 @@ fin = open(args.Input, 'r')
 for line in fin.readlines():
     value = int(line, 16)
     # print("%08x" % value)
-    a = struct.pack("L", value)
+    a = struct.pack("I", value)
     fout.write(a)
 
 
