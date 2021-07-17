@@ -90,7 +90,7 @@ Use Absolute path
 
             ```
             monitor reset halt
-            monitor stm32f1x mass_erase 0
+            # monitor stm32f1x mass_erase 0
             load
-            monitor reset halt
+            # monitor reset halt
             ```
