@@ -87,3 +87,29 @@ Windows 10 automatically install
 
 
 
+# 故障排除
+
+## STM32 不小心把 SWD/JTAG 都給關了
+
++ 建立開啟 SWD/JTAG 的 project, 並 compile project
++ CMSIS-DAP Cortex-M Target Driver Setup
+    > `Options for Target` -> `Debug` -> `CMSIS-DAP Debugger` Settings
+    > + `Max Clock`: 10MHz
+
+    - tab `Debug`
+        > `Connect & Reset Options`
+        > + `Connect`: under Reset
+        > + `Reset`: HW Reset
+        > + `Reset after Connect` : enable
+        > + `Stop after Reset`: enable
+
+    - tab `Flash Download`
+        > `Erase Full Chip`: enable
+
++ Hold `Reset key` on 魔女開發版
++ press `Download code to flash memory` in Keil-MDK
+    > wait the first message in `Build Output`
+
++ Release `Reset key`
+    > start erase flash
+
