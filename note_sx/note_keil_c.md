@@ -29,6 +29,16 @@ keil c
     extern uint32_t foo[2];
     printf("%08x %d\n", foo[0], foo[1]);
     ```
+    
+# Customize Tools Menu
+
++ External editor
+    > Tools -> Customize Tools Menu
+
+    ```
+    Command   : .../notepad++.exe
+    Arguments : #F -> open current file
+    ```
 
 # Tips
 + [command window](http://www.keil.com/support/man/docs/uv4/uv4_db_dbg_outputwin.htm)
