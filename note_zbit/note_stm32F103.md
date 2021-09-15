@@ -90,11 +90,11 @@ Windows 10 automatically install
 
     以 STM32F103 為例, STM32的三種Boot模式如下:
 
-    | BOOT1 |  BOOT0  | STM32的啟動方式
-    | :-:   | :-:     |
-    | x     | 0       | 內部 FLASH
-    | 1     | 1       | 內部 SRAM
-    | 0     | 1       | 系統儲存器(也稱ISP啟動方式)
+    | BOOT1 |  BOOT0  | STM32的啟動方式 |
+    | :-:   | :-:     | :-:             |
+    | x     | 0       | 內部 FLASH      |
+    | 1     | 1       | 內部 SRAM       |
+    | 0     | 1       | 系統儲存器(也稱ISP啟動方式) |
 
     使用者可以通過設定`BOOT0`和`BOOT1`的三種狀態, 來選擇復位後的啟動方式:
 
