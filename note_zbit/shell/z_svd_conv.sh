@@ -1,5 +1,16 @@
 #!/bin/bash
 
+help()
+{
+    echo -e "usage: $0 [svd file]"
+    exit -1
+}
+
+if [ $# != 1 ]; then
+    help
+fi
+
+
 SVD_FILE=$1
 
 KEIL_MDK="/C/Keil_v5/UV4"
