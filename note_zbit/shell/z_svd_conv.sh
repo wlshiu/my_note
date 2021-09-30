@@ -48,12 +48,23 @@ args = parser.parse_args()
 with open(args.Output, 'w') as fout:
     with open(args.Input) as fin:
         for line in fin:
+            match_line = re.search(r'^}\s+\w+_Type;', line)
+            if match_line:
+                if not "IRQn_Type" in line:
+                    line = line.replace('_Type;', '_TypeDef;')
+
+            match_line = re.search(r'^\#define\s+\w+\s+\(\(\w+_Type\*\)', line)
+            if match_line:
+                line = line.replace('_Type', '_TypeDef')
+
             fout.writelines(line)
             match_line = re.search(r'^\#define\s+\w+_Msk', line)
             if match_line:
-                new_line = match_line.group().split('_Msk')
-                if new_line:
-                    fout.writelines(new_line[0] + '\n')
+                cur_line = match_line.group().split('_Msk')
+                if cur_line:
+                    new_line = cur_line[0]
+                    new_line = new_line.replace('#define', '')
+                    fout.writelines('#define' + new_line + '                     ' + new_line + '_Msk\n')
 
         print('done~~')
 
