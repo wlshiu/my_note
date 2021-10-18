@@ -71,7 +71,7 @@ def parse_func_symbols():
                 symbol_item.append(int(matchObj.group(1), 16))  # base address
                 symbol_item.append(int(matchObj.group(3), 16))  # symbol size
                 symbol_item.append(matchObj.group(5))           # type, RO
-                symbol_item.append(matchObj.group(6))           # object name
+                symbol_item.append(matchObj.group(6) + '.o)')   # object name
                 symbol_table.append(symbol_item)
                 # print("addr= 0x%08X, size= %5d, %s, %s.o)" %(int(matchObj.group(1), 16), int(matchObj.group(3), 16), matchObj.group(5), matchObj.group(6)))
 
@@ -80,7 +80,7 @@ def parse_func_symbols():
                 symbol_item.append(int(matchObj.group(1), 16))  # base address
                 symbol_item.append(int(matchObj.group(3), 16))  # symbol size
                 symbol_item.append(matchObj.group(5))           # type, RO
-                symbol_item.append(matchObj.group(6))           # object name
+                symbol_item.append(matchObj.group(6) + '.o')    # object name
                 symbol_table.append(symbol_item)
                 # print("addr= 0x%08X, size= %5d, %s, %s.o" %(int(matchObj.group(1), 16), int(matchObj.group(3), 16), matchObj.group(5), matchObj.group(6)))
 
@@ -127,6 +127,11 @@ def parse_data_symbols():
                 break
 
 
+def save_file(fout, sym_start_addr, sym_size, type, sym_name):
+
+        fout.write("%s, %6d, %s, %s\n" % ("{0:#0{1}x}".format(sym_start_addr, 8), sym_size, type, sym_name))
+
+
 def draw():
     fig, gnt = plt.subplots()
 
@@ -163,12 +168,18 @@ def main():
         addr_end  = region_list_sort[i][0] + region_list_sort[i][1]
         # print("0x%08x ~ 0x%08X" % (addr_star, addr_end))
 
-        for j in range(len(symbol_table_sort)):
-            sym_base_addr = symbol_table_sort[j][0]
-            sym_size      = symbol_table_sort[j][1]
-            sym_end_addr  = sym_base_addr + sym_size
+        out_path = "%s/%08X_%08X.csv" % (args.Output, addr_star, addr_end)
+        with open(out_path, 'w') as fout:
+            fout.write("address, size, type, obj_name\n")
 
+            for j in range(len(symbol_table_sort)):
+                sym_base_addr = symbol_table_sort[j][0]
+                sym_size      = symbol_table_sort[j][1]
+                sym_end_addr  = sym_base_addr + sym_size
 
+                if (addr_star <= sym_base_addr and sym_end_addr <= addr_end) or \
+                   (sym_base_addr <= addr_end and sym_end_addr >= addr_end):
+                    save_file(fout, sym_base_addr, sym_size, symbol_table_sort[j][2], symbol_table_sort[j][3])
 
 if __name__ == "__main__":
     main()
