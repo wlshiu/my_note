@@ -7,6 +7,8 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
 
 parser = argparse.ArgumentParser(description='Analyze Map file of Kail-MDk')
 parser.add_argument("-o", "--Output", type=str, help="output directory")
@@ -127,22 +129,82 @@ def parse_data_symbols():
                 break
 
 
-def save_file(fout, sym_start_addr, sym_size, type, sym_name):
+def save_csv_file(fout, sym_start_addr, sym_size, type, sym_name):
 
         fout.write("%s, %6d, %s, %s\n" % ("{0:#0{1}x}".format(sym_start_addr, 8), sym_size, type, sym_name))
 
 
-def draw():
+def draw(symbol_table, addr_start, addr_end):
+    # colors = ['#3B9DD3', '#41ADE8', '#48BEFF', '#44D5FF', '#40EBFF', '#40E0CF', '#43C59E', '#42B091', '#409B83', '#51A48E']
+    colors = ['r', 'pink', 'orange', 'y', 'g', 'b', 'deeppink', 'purple', 'brown', 'black']
+
     fig, gnt = plt.subplots()
 
-    gnt.set_xlim(0x20000000, 0x20000100)
+    # gnt.set_xlim(addr_start, addr_end)
+    # xlabels = map(lambda t: '0x%08X' % int(t), gnt.get_xticks())
+    # gnt.set_xticklabels(xlabels);
+    # plt.xticks(rotation = 45)
 
-    gnt.set_xlabel('address')
+    target_dpi = 200
+    max_addr = 0
+    sym_cnt = 1
+    for j in range(len(symbol_table)):
+        sym_base_addr = symbol_table[j][0]
+        sym_size      = symbol_table[j][1]
+        sym_end_addr  = sym_base_addr + sym_size
+        sym_name      = symbol_table[j][3]
+        sym_type      = symbol_table[j][2]
+        if (addr_start <= sym_base_addr and sym_end_addr <= addr_end) or \
+           (sym_base_addr <= addr_end and sym_end_addr >= addr_end):
+
+            if sym_end_addr > max_addr:
+                max_addr = sym_end_addr
+
+            sym_color = "green"
+            if "RO" in sym_type:
+                sym_color = "orange"
+
+            sym_name = sym_name.replace('$', '#')
+
+            if sym_size == 0:
+                plt.barh(sym_cnt, 2, left=sym_base_addr, height=1.0, color="red")
+                plt.text(sym_base_addr + 2, sym_cnt, '%s @0x%08X' % (sym_name, sym_base_addr), color="red", size=6)
+
+            else:
+                plt.barh(sym_cnt, sym_size, left=sym_base_addr, height=1.0, color=sym_color)
+                plt.text(sym_base_addr + sym_size, sym_cnt, '%s @0x%08X~0x%08X' % (sym_name, sym_base_addr, sym_base_addr + sym_size), color="black", size=6)
+
+            sym_cnt = sym_cnt + 1
+
+
+    gnt.set_xlim(addr_start, max_addr)
+    # gnt.set_xlim(addr_start, addr_end)
+    xlabels = map(lambda t: '0x%08X' % int(t), gnt.get_xticks())
+    gnt.set_xticklabels(xlabels);
+    plt.xticks(rotation = 45)
+    # gnt.xaxis.set_ticks(np.arange(addr_start, max_addr, 64))
+
+    # plt.xlabel('address')
+    # plt.ylabel('symbols')
+    gnt.set_xlabel('address (used: %d KB, free: %d KB)' % ((max_addr - addr_start) / 1024, (addr_end - max_addr) / 1024))
     gnt.set_ylabel('symbols')
 
-    gnt.grid(True)
+    plt.grid(True)
+    plt.tight_layout()
 
+    # fig.set_figheight(6) # 600
+    # fig.set_figwidth(8)  # 800
+
+    fig.set_figheight(10.80) # 1080
+    fig.set_figwidth(19.20)  # 1920
+
+    out_path = args.Output + '/' + args.Input
+    out_path = out_path.replace('.map', '.png')
+    pos = out_path.find('.png')
+    out_path = out_path[:pos] + "%08X_%08X" % (addr_start, addr_end) + out_path[pos:]
+    plt.savefig(out_path, dpi=target_dpi)
     plt.show()
+
 
 def main():
     global  symbol_table
@@ -163,23 +225,49 @@ def main():
     # for i in range(len(region_list_sort)):
     #     print(region_list_sort[i])
 
+    wbook = Workbook()
+
     for i in range(len(region_list_sort)):
-        addr_star = region_list_sort[i][0]
-        addr_end  = region_list_sort[i][0] + region_list_sort[i][1]
+        addr_start = region_list_sort[i][0]
+        addr_end   = region_list_sort[i][0] + region_list_sort[i][1]
         # print("0x%08x ~ 0x%08X" % (addr_star, addr_end))
 
-        out_path = "%s/%08X_%08X.csv" % (args.Output, addr_star, addr_end)
-        with open(out_path, 'w') as fout:
-            fout.write("address, size, type, obj_name\n")
+        draw(symbol_table_sort, addr_start, addr_end)
 
-            for j in range(len(symbol_table_sort)):
-                sym_base_addr = symbol_table_sort[j][0]
-                sym_size      = symbol_table_sort[j][1]
-                sym_end_addr  = sym_base_addr + sym_size
+        sheet_name = "%08X_%08X" % (addr_start, addr_end)
+        wsheet = wbook.create_sheet(sheet_name, 0)
+        row = ["address", "size", "type", "obj_name"]
+        wsheet.append(row)
 
-                if (addr_star <= sym_base_addr and sym_end_addr <= addr_end) or \
-                   (sym_base_addr <= addr_end and sym_end_addr >= addr_end):
-                    save_file(fout, sym_base_addr, sym_size, symbol_table_sort[j][2], symbol_table_sort[j][3])
+        for j in range(len(symbol_table_sort)):
+            sym_base_addr = symbol_table_sort[j][0]
+            sym_size      = symbol_table_sort[j][1]
+            sym_end_addr  = sym_base_addr + sym_size
+
+            if (addr_start <= sym_base_addr and sym_end_addr <= addr_end) or \
+               (sym_base_addr <= addr_end and sym_end_addr >= addr_end):
+                wsheet.append(["{0:#0{1}x}".format(sym_base_addr, 8), sym_size, symbol_table_sort[j][2], symbol_table_sort[j][3]])
+
+
+
+        # out_path = "%s/%08X_%08X.csv" % (args.Output, addr_star, addr_end)
+        # with open(out_path, 'w') as fout:
+        #     fout.write("address, size, type, obj_name\n")
+        #
+        #     for j in range(len(symbol_table_sort)):
+        #         sym_base_addr = symbol_table_sort[j][0]
+        #         sym_size      = symbol_table_sort[j][1]
+        #         sym_end_addr  = sym_base_addr + sym_size
+        #
+        #         if (addr_star <= sym_base_addr and sym_end_addr <= addr_end) or \
+        #            (sym_base_addr <= addr_end and sym_end_addr >= addr_end):
+        #             save_csv_file(fout, sym_base_addr, sym_size, symbol_table_sort[j][2], symbol_table_sort[j][3])
+
+
+    out_path = args.Output + '/' + args.Input
+    out_path = out_path.replace('.map', '.xlsx')
+    wbook.save(out_path)
+
 
 if __name__ == "__main__":
     main()
