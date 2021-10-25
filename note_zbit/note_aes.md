@@ -180,4 +180,7 @@ KDF is a [cryptographic hash function](https://en.wikipedia.org/wiki/Cryptograph
 KDF 還可用於確保衍生金鑰具有其他屬性, 例如避免某些特定加密系統中的 **弱金鑰**
 
 
+# Reference
 
++ [進階加密標準](https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86)
++ [區塊加密法工作模式](https://zh.wikipedia.org/wiki/%E5%88%86%E7%BB%84%E5%AF%86%E7%A0%81%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F)
