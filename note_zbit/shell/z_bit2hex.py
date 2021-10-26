@@ -58,7 +58,7 @@ var_name = os.path.splitext(basename)[0]
 
 with open(args.Input, 'r') as fin:
     with open(args.Output, 'a') as fout:
-        fout.write("\nstatic const    cdce913_%s[] = \n{\n    " % (var_name))
+        fout.write("\nstatic const uint8_t      cdce913_%s[] = \n{\n    " % (var_name))
 
         for line in fin:
             matchObj = re.search(r'^Byte (\d+) - ([0,1]+)$', line)
