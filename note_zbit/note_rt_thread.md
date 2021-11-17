@@ -8,6 +8,13 @@
 + [RT-Thread env](https://download-sh-cmcc.rt-thread.org:9151/www/aozima/env_released_1.2.0.7z)
     > 依照 `Add_Env_To_Right-click_Menu.png` 加入右鍵啟動 rt-thread 環境
 
+    - Upgrade packages configuration
+
+        ```
+        $ cd env\packages\packages
+        $ git pull origin master
+        ```
+
 + Get rt-thread source
 
     ```
@@ -20,6 +27,10 @@
 
         ```
         > cd rt-thread\bsp\stm32f10x-HAL
+            or
+        > rt-thread\bsp\stm32\stm32l496-st-nucleo
+            or
+        > rt-thread\bsp\stm32\stm32f446-st-nucleo
         ```
 
     - Build
