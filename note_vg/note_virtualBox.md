@@ -17,43 +17,43 @@ VirtualBox
 
     1. In lubuntu
 
-        a. list disk and find your new disk
+        > + list disk and find your new disk
 
-            ```
-            $ sudo fdisk -l
-            ```
+        ```
+        $ sudo fdisk -l
+        ```
 
-        a. format disk
+        > + format disk
 
-            ```
-            $ sudo mkfs -t ext4 /dev/sdb
-            ```
+        ```
+        $ sudo mkfs -t ext4 /dev/sdb
+        ```
 
-        a. mount device
+        > + mount device
 
-            ```
-            $ sudo mkdir /data
-            $ sudo mount /dev/sdb /data
-            ```
+        ```
+        $ sudo mkdir /data
+        $ sudo mount /dev/sdb /data
+        ```
 
-        a. set auto mount
+        > + set auto mount
 
-            ```
-            $ sudo blkid  # get UUID of new disk
-            $ sudo vim /etc/fstab
+        ```
+        $ sudo blkid  # get UUID of new disk
+        $ sudo vim /etc/fstab
 
-                ...
-                # add infomation
-                UUID=your_disk_UUID    /data    ext4    defaults     0    1
-                ...
+            ...
+            # add infomation
+            UUID=your_disk_UUID    /data    ext4    defaults     0    1
+            ...
 
-            # change owner
-            $ sudo chown -R username:group /data
+        # change owner
+        $ sudo chown -R username:group /data
 
-            # set link
-            $ cd ~/
-            $ ln -sv /data ./work
-            ```
+        # set link
+        $ cd ~/
+        $ ln -sv /data ./work
+        ```
 
 + update atp-get
     1. edit sources.list
@@ -116,16 +116,20 @@ VirtualBox
 
     - `32bits-toolchain` in `64bits-OS`
         1. Enable the i386 architecture (as root user)
+
             ```
             $ dpkg --add-architecture i386
             $ apt-get update
             ```
+
         1. Install 32-bit libraries
+
             ```
             $ apt-get install libc6:i386 libstdc++6:i386 lib32ncurses5 lib32z1
             ```
 
         1. codeblocks
+
             ```
             $ sudo add-apt-repository ppa:damien-moore/codeblocks-stable
             $ sudo apt-get update
@@ -159,11 +163,13 @@ VirtualBox
 
 + useful cmd
     - check network interface
+
     ```
     $ ifconfig -a
     ```
 
     - check network connection
+
     ```
     $ ping www.google.com
     ```
@@ -244,25 +250,25 @@ VirtualBox
 
     1. If get `Permission denied`
 
-        a. Add to group
+        > + Add to group
 
-            ```
-            $ sudo adduser [yourusername] vboxsf
-            ```
+        ```
+        $ sudo adduser [yourusername] vboxsf
+        ```
 
     1. auto mount share folder
 
-        a. Add setting `vboxsf.conf`
+        > + Add setting `vboxsf.conf`
 
-            ```
-            $ sudo touch /etc/modules-load.d/vboxsf.conf
-            ```
+        ```
+        $ sudo touch /etc/modules-load.d/vboxsf.conf
+        ```
 
-        a. type `vboxsf` to vboxsf.conf
+        > + type `vboxsf` to vboxsf.conf
 
-            ```
-            $ sudo echo 'vboxsf' > /etc/modules-load.d/vboxsf.conf
-            ```
+        ```
+        $ sudo echo 'vboxsf' > /etc/modules-load.d/vboxsf.conf
+        ```
 
     1. MUST reboot system
 
@@ -419,19 +425,24 @@ VirtualBox
         # ubuntu 18.04
         $ sudo apt install tasksel
         $ sudo tasksel install samba-server
+        
+        # ubuntu 20.04
+        $ sudo apt install tasksel
+        $ sudo apt-get install samba samba-common
         ```
 
     - VirtualBox: Enable network card
         1. set network `Adapter 2`
-            a. Atteched to: Host only Adapter
-            a. Name: VirtualBox Host only ethernet adapter
-            a. Promiscuous Mode: Deny
-            a. Reflash MAC address
-            a. cable connected: enable
+            > + Atteched to: Host only Adapter
+            > + Name: VirtualBox Host only ethernet adapter
+            > + Promiscuous Mode: Deny
+            > + Reflash MAC address
+            > + cable connected: enable
 
 
     - Check network device status on Ubuntu and *Add* network setting
         1. ubuntu 14.04
+
             ```
             sudo gedit /etc/network/interfaces
                 # auto lo
