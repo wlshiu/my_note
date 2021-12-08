@@ -65,7 +65,15 @@ Open OCD
 
 + Run OpenOCD server
 
-    - `z_run_ocd_server.bat`
+    - `z_run_ocd_server.sh` **shell file**
+
+        ```shell
+        #!/bin/bash
+
+        openocd -f interface/cmsis-dap.cfg -f target/stm32f1x.cfg
+        ```
+
+    - `z_run_ocd_server.bat` **batch file**
         > use **absolute path**
         >>
 
@@ -73,18 +81,18 @@ Open OCD
         > .\bin\openocd.exe -f C:\OpenOCD\share\openocd\scripts\interface\cmsis-dap.cfg -f C:\OpenOCD\share\openocd\scripts\target\stm32f1x.cfg
         ```
 
-    - path
-        > `C:\OpenOCD\share\openocd\scripts\target\stm32f1x.cfg`
+        1. path
+            > `C:\OpenOCD\share\openocd\scripts\target\stm32f1x.cfg`
 
-        ```
-        source [find target/swj-dp.tcl]
-        source [find mem_helper.tcl]
+            ```
+            source [find target/swj-dp.tcl]
+            source [find mem_helper.tcl]
 
-            modify to absolute path
+                modify to absolute path
 
-        source [find C:/OpenOCD/share/openocd/scripts/target/swj-dp.tcl]
-        source [find C:/OpenOCD/share/openocd/scripts/mem_helper.tcl]
-        ```
+            source [find C:/OpenOCD/share/openocd/scripts/target/swj-dp.tcl]
+            source [find C:/OpenOCD/share/openocd/scripts/mem_helper.tcl]
+            ```
 
 ## build source MSYS2
 
