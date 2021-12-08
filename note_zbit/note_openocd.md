@@ -3,7 +3,90 @@ Open OCD
 
 # Source code
 
-## build source
+## build source Cygwin (verified)
+
+[Cygwin-64](https://www.gushiciku.cn/jump/aHR0cHM6Ly93d3cub3NjaGluYS5uZXQvYWN0aW9uL0dvVG9MaW5rP3VybD1odHRwcyUzQSUyRiUyRmN5Z3dpbi5jb20lMkZzZXR1cC14ODZfNjQuZXhl)
+> + select `Install from Internet`
+> + select `Use System Proxy Setting`
+
++ dependency
+    > use `setup-x86_64.exe` to intall packages
+
+    - autobuild
+    - autoconf (all packages)
+    - autoconf-archive
+    - automake (all packages)
+    - dos2unix
+    - git
+    - gcc-core
+    - gcc-g++
+    - libtool
+    - libusb1.0
+    - libusb1.0-devel
+    - libusb-devel
+    - libhidapi-devel (for cmsis-dap)
+    - wget
+    - make
+    - pkg-config
+    - Usbutils
+    - patch
+    - mingw64-x86_64-pthreads
+    - mingw64-x86_64-winpthreads
+
++ Building
+
+    ```shell
+    $ git clone https://git.code.sf.net/p/openocd/code  openocd
+    $ cd openocd
+    $ git checkout f342aa   # released v0.11
+    $ ./bootstrap
+    $ mkdir build && cd build
+    $ ../configure --disable-werror \
+        --disable-aice --disable-ti-icdi \
+        --disable-osbdm --disable-opendous \
+        --disable-vsllink --disable-usbprog \
+        --disable-rlink --disable-armjtagew \
+        --disable-usb-blaster-2 \
+        --enable-ftdi --enable-jlink --enable-stlink --enable-cmsis-dap
+    $ make
+    $ make install
+    ```
+
++ Cygwin dll
+
+    ```
+    cp usr/bin/cygftdi1-2.dll         ~/my_openocd/bin/cygftdi1-2.dll
+    cp usr/bin/cyghidapi-0.dll        ~/my_openocd/bin/cyghidapi-0.dll
+    cp usr/bin/cygncursesw-10.dll     ~/my_openocd/bin/cygncursesw-10.dll
+    cp usr/bin/cygusb-1.0.dll         ~/my_openocd/bin/cygusb-1.0.dll
+    cp usr/bin/cygusb0.dll            ~/my_openocd/bin/cygusb0.dll
+    cp usr/bin/cygwin1.dll            ~/my_openocd/bin/cygwin1.dll
+    ```
+
++ Run OpenOCD server
+
+    - `z_run_ocd_server.bat`
+        > use **absolute path**
+        >>
+
+        ```
+        > .\bin\openocd.exe -f C:\OpenOCD\share\openocd\scripts\interface\cmsis-dap.cfg -f C:\OpenOCD\share\openocd\scripts\target\stm32f1x.cfg
+        ```
+
+    - path
+        > `C:\OpenOCD\share\openocd\scripts\target\stm32f1x.cfg`
+
+        ```
+        source [find target/swj-dp.tcl]
+        source [find mem_helper.tcl]
+
+            modify to absolute path
+
+        source [find C:/OpenOCD/share/openocd/scripts/target/swj-dp.tcl]
+        source [find C:/OpenOCD/share/openocd/scripts/mem_helper.tcl]
+        ```
+
+## build source MSYS2
 
 + dependency
 
@@ -49,6 +132,15 @@ Open OCD
 
 + [OpenOCD-build-script](https://github.com/arduino/OpenOCD-build-script/tree/static)
 + [Building OpenOCD from Sources for Windows](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/jtag-debugging/building-openocd-windows.html)
++ [*如何搭建OpenOCD環境基於Window10+Cygwin?](https://www.gushiciku.cn/pl/gYov/zh-tw)
++ [系統架構秘辛：瞭解RISC-V 架構底層除錯器的秘密！ :: 2018 iT 邦幫忙鐵人賽](https://ithelp.ithome.com.tw/users/20107327/ironman/1359?page=3)
++ [Day 02: 簡介OpenOCD背景與編譯 - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10192529)
++ [Day 05: OpenOCD 軟體架構 - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10193390)
++ [Day 06: \[Lab\] 簡簡單單新增OpenOCD Command - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10193537)
++ [Day 23: 您不可不知的FT2232H (1/3) - Overview - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10196693)
++ [Day 27: 高手不輕易透露的技巧(1/2) - Flash Programming - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197190)
++ [Day 28: 高手不輕易透露的技巧(2/2) - Flash Driver & Target Burner - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197309)
++ [Day 29: 深藏不露的GDB - Remote Serial Protocol的秘密 - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197385)
 
 # Embitz
 
