@@ -1,7 +1,8 @@
 Qt (sound like cute)
 ---
 
-[Qt Downloads](http://download.qt.io/archive/qt/)
++ [Qt Downloads](http://download.qt.io/archive/qt/)
++ [Prebuilt-Tool](https://download.qt.io/development_releases/prebuilt/)
 
 # code::blocks
 
