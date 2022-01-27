@@ -205,5 +205,17 @@ Qt (sound like cute)
 + reference
     - [mingw_w64-qt5_static-cmake-console-example](https://github.com/tim-lebedkov/mingw_w64-qt5_static-cmake-console-example)
 
-# QT Creator
+# QT Designer
 
+[Download](https://build-system.fman.io/qt-designer-download)
+
+## Qt ui file convert to C++
+
++ `uic`
+    > `QtDesigner/uic.exe`
+
+    ```
+    > uic -o my_window.h my_window.ui
+    ```
+
+# QT Creater
