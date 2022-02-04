@@ -218,4 +218,76 @@ Qt (sound like cute)
     > uic -o my_window.h my_window.ui
     ```
 
+# qmake
+
+## Command line build project
+
++ Setup environment
+
+    ```
+    $ vi run.bat
+        set myPath=C:\Qt\Qt5.9.0\5.9\mingw53_32\bin
+        set PATH=%myPath%;%PATH%;
+        set makePath=C:\Qt\Qt5.9.0\Tools\mingw530_32\bin
+        set PATH=%makePath%;%PATH%;
+    ```
+
++ App code
+
+    ```cpp
+    $ vi hello.cpp
+        #include <QPushButton>
+        #include <QApplication>
+        int main(int argc,char *argv[])
+        {
+            QApplication a(argc,argv);
+            QPushButton hellobtn("Hello World!",0);
+            hellobtn.resize(200,50);
+            hellobtn.show();
+            return a.exec();
+        }
+    ```
+
++ Build
+
+    - Create project file
+
+        ```
+        $ run.bat
+        $ qmake -project  # generate project file *.pro
+        ```
+
+    - Add configuration to project file
+
+        ```
+        $ vi hello.pro
+            TEMPLATE = app
+
+            ### add +
+            QT += core gui
+            greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+            #### add -
+
+            TARGET = hello
+            ...
+        ```
+
+    - Launch project file
+
+        ```
+        $ qmake hello.pro
+        ```
+
+    - Compile
+
+        ```
+        $ mingw32-make
+        ```
+
+    - Execture program
+
+        ```
+        $ ./release/hello.exe
+        ```
+
 # QT Creater
