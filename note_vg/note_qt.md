@@ -170,7 +170,8 @@ Qt (sound like cute)
 
     ```batch
     @echo off
-    @ '-debug-and-release' or '-debug' or '-release'
+    rem '-debug-and-release' or '-debug' or '-release'
+    rem '-static' or '-shared'
     .\configure.bat -confirm-license -opensource -platform win32-g++ -mp -release -static ^
         -prefix C:\QT_5.14.2_static ^
         -qt-sqlite ^
