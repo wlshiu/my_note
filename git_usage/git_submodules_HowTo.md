@@ -9,7 +9,7 @@ git submodules 使用
 
 + On local
     > + `git clone <prj_1.git>`
-    > + `git submodule add <lib_1.git> <destination_path>`
+    > + `git submodule add -b master <lib_1.git> <destination_path>`
     >> 成功將會被新增file ".gitmodules"
 
 + On local
