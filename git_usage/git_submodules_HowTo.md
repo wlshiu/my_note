@@ -53,6 +53,26 @@ git submodules 使用
     > + `git push origin master`
     >> 更新 submodule引用的 SHA1 id到 remote端 <prj_1.git> repo
 
+## 變更 submodul_repo 版本 (SHA-id)
+
+直接操作 `submodul_repo`, 然後到 `root_repo` 直接 commint
+
++ On local
+    > + `cd <submodule_path>`
+    > + `git checkout new_branch`
+    > + `cd root_repo`
+    > + `git diff`
+    >> 確認變更 SHA-id
+
+    ```
+    $ git diff
+    ...
+    -subporject commint: a809fdcf95
+    +subporject commint: fbd2e44f85
+    ```
+
+    > + `git add --all`
+    > + `git commit -m 'change submodule version'`
 
 # 同步主項目的Submodules
 
