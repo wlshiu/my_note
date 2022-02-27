@@ -1,10 +1,9 @@
-Qt (sound like cute)
----
+# Qt (sound like cute)
 
 + [Qt Downloads](http://download.qt.io/archive/qt/)
 + [Prebuilt-Tool](https://download.qt.io/development_releases/prebuilt/)
 
-# Code::Blocks
+## Code::Blocks
 
 + Setup IDE
 
@@ -101,9 +100,9 @@ Qt (sound like cute)
     - execute `qmake static`
     - compiler with gcc
 
-# Build static library
+## Build static library
 
-## Official
+### Official
 
 + [Qt Online Installer](https://download.qt.io/archive/online_installers/4.2/)
 
@@ -115,7 +114,7 @@ Qt (sound like cute)
 + Install `Python` by self
 
 
-## Self Tools
+### Self Tools
 
 + [cmder_mini](https://cmder.net/)
 + mingw
@@ -136,7 +135,7 @@ Qt (sound like cute)
 
     - Enter QT source code folder
 
-## Configure
+### Configure
 
 + check `gcc` version
 
@@ -196,22 +195,22 @@ Qt (sound like cute)
     > mingw32-make install
     ```
 
-## Reference
+### Reference
 
 + [Qt5.14.2 MinGW-32靜態編譯及壓縮過程配置教程-CSDN博客](https://blog.csdn.net/zhoufoxcn/article/details/120999085?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.2&utm_relevant_index=4)
 + [Qt5.14.2 MInGW靜態編譯配置教程-CSDN博客\_qt5.14靜態編譯](https://blog.csdn.net/weixin_42508702/article/details/118784750?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-4.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-4.pc_relevant_default&utm_relevant_index=9)
 
 
-# Build App with console
+## Build App with console
 
 + reference
     - [mingw_w64-qt5_static-cmake-console-example](https://github.com/tim-lebedkov/mingw_w64-qt5_static-cmake-console-example)
 
-# QT Designer
+## QT Designer
 
 [Download](https://build-system.fman.io/qt-designer-download)
 
-## Qt ui file convert to C++
+### Qt ui file convert to C++
 
 + `uic`
     > `QtDesigner/uic.exe`
@@ -220,9 +219,19 @@ Qt (sound like cute)
     > uic -o my_window.h my_window.ui
     ```
 
-# qmake
+### Reference
 
-## Command line build project
++ [6.2 Hello Qt -> 6.2.5 第 3 種方法](https://wizardforcel.gitbooks.io/wudi-qt4/content/39.html)
++ [使用 Qt Designer 進行 GUI 設計](https://wizardforcel.gitbooks.io/wudi-qt4/content/32.html)
+
+## qmake
+
+make for QT and involve
+> + moc (Meta-Object Compiler)
+> + uic (User Interface Compiler)
+> + rcc (Resource Compiler)
+
+### Command line build project
 
 + Setup environment
 
@@ -398,15 +407,22 @@ Qt (sound like cute)
         $ ./release/hello.exe
         ```
 
-# UPX
+## UPX
 
 [UPX](https://upx.github.io/) is used to compress executable files.
 
-# Enigma virtual box
+
+## Enigma virtual box
 
 [Enigma virtual box](https://enigmaprotector.com/en/downloads.html) is used
 to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
 
 > In real-time, it will un-pack in background.
 
-# QT Creater
+
+## QT Creater
+
+### [Programming concept](note_qt_prog.md)
+
+### Reference
++ [第 12 章 使用 Qt Creator](https://wizardforcel.gitbooks.io/wudi-qt4/content/88.html)
