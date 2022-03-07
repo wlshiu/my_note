@@ -49,6 +49,52 @@ int main(int argc, char *argv[])
     > + I/O control
     > + Object Inheritance relation
 
+
+## C++
+
++ `MainWindow` class
+    > Creaded from `QT Designer`
+
+    - Call a component in MainWindow
+
+        ```c++
+        MainWindow::MainWindow(QWidget *parent)
+          : QMainWindow(parent)
+          , ui(new Ui::MainWindow)
+        {
+            ui->setupUi(this);    // ui is a instance
+        }
+
+        MainWindow::~MainWindow()
+        {
+            delete ui;
+        }
+
+        /**
+         * objectName is from QT Designer
+         * method definition: on_[objectName]_[slot name]()
+         */
+        void MainWindow::on_open_clicked()
+        {
+            QString     filePath = QFileDialog::getOpenFileName(this, tr("Open"),
+                                                                QDir::homePath(),
+                                                                tr("*.bin"));
+            if( filePath.isEmpty() )
+            return;
+
+            /**
+             * call the method of this 'lineEdit' object
+             *    'lineEdit' is the objectName of a QLineEdit component
+             */
+            ui->lineEdit->setText(filePath);
+        }
+        ```
+
++ Reference
+
+    - [Qt Tutorials For Beginners - YouTube](https://www.youtube.com/watch?v=EkjaiDsiM-Q&list=PLS1QulWo1RIZiBcTr5urECberTITj7gjA)
+
+
 ## QML
 
 QML(Qt Meta-Object Language,Qt 元對象語言),是用於描述應用程序用戶界面的聲明式可編程語言, 高可讀性, 容易實現復用和自定義.

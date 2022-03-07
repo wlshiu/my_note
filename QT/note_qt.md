@@ -219,6 +219,23 @@
     > uic -o my_window.h my_window.ui
     ```
 
+
+### IDE tips
+
++ `Edit Signal/Slot` (hot key: F4)
+    > Enter Signal/Slot mode
+    >> 可用 Drag/Drop 來連接元件
+
++ `Edit Widgets` (hot key: F3)
+    > Enter Widgets mode
+    >> 可用 Drag/Drop 來編輯元件 layout
+
++ 在元件上 `Right click`
+
+    - `Go to slot`
+        > Generate **method code** of this component
+
+
 ### Reference
 
 + [6.2 Hello Qt -> 6.2.5 第 3 種方法](https://wizardforcel.gitbooks.io/wudi-qt4/content/39.html)
@@ -421,6 +438,19 @@ to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
 
 
 ## QT Creater
+
+### IDE Tips
+
++ Project pane
+    > `Window -> Show Left Sidebar`
+
+    1. `+ (split)`
+        > 分割側邊欄
+
+    1. 下拉選擇 View
+        > e.g. Projects, Open Documnets, ..., etc.
+
+
 
 ### [Programming concept](note_qt_prog.md)
 
