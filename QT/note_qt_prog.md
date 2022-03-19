@@ -31,7 +31,7 @@ signals:
 };
 
 /**
- *  '#include "main.moc"' is necessary 
+ *  '#include "main.moc"' is necessary
  *  if you define QObject subclasses with the Q_OBJECT macro in a .cpp file.
  */
 #include "main.moc"
@@ -142,6 +142,13 @@ int main(int argc, char *argv[])
             ui->lineEdit->setText(filePath);
         }
         ```
+
++ 移除 Widget
+    > `delete [pointer_of_a_widget]` 會自動通知 **parent**, 並更新 list
+
++ 抽離出 Widget
+    > `setParent()` 會將此 widget object 從 parent object 剝離出來
+
 
 + Reference
 

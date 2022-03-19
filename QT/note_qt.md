@@ -439,6 +439,8 @@ to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
 
 ## QT Creater
 
++ `Windows 7` use **QT Creater 4.11.1** base on **QT5.14.1**
+
 ### IDE Tips
 
 + Project pane
