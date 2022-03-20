@@ -144,7 +144,19 @@ int main(int argc, char *argv[])
         ```
 
 + 移除 Widget
-    > `delete [pointer_of_a_widget]` 會自動通知 **parent**, 並更新 list
+    - `delete [pointer_of_a_widget]` 會自動通知 **parent**, 並更新 list
+        > 立及執行 delete, 有可能造成 crash
+
+    - `deleteLater()`
+        > 是 **QObject** 的一個 method, 並依賴於 QEvent loop 機制
+
+        > + 如果在 EventLoop 啟用前被呼叫, 那麼 EventLoop 啟用後 Object 才會被銷毀
+        > + 如果在 EventLoop 結束後被呼叫, 那麼 Object 不會被銷毀
+        > + 如果在沒有 EventLoop 使用, 那麼 thread 結束後銷毀 Object.
+
+        1. 可以多次呼叫此 method
+        1. This method is thread-safe.
+
 
 + 抽離出 Widget
     > `setParent()` 會將此 widget object 從 parent object 剝離出來
