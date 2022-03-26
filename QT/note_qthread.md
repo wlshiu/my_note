@@ -50,6 +50,69 @@ Official description
         > 相當於 `pthread_create(&th, 0, Server::run(), 0);`
 
 
+## Methods
+
++ QPthread::run()
+    > the routine of a thread, 離開 run() 即表示離開開 thread routine
+
++ QPthread::exec()
+    > 啟動 thread 內部的 Event Loop (Signals & Slots), 必須在 run() 內呼叫
+
++ QThread::wait()
+    > 相當於 pthread_join(),
+    >> 通常會考慮發出 Signal finished() 來取代 wait()
+
++ QThread::isFinished() 和 QThread::isRunning()
+    > Get thread status
+
++ QThread::exit() 或 QThread::quit()
+    > leave thread
+
++ QThread *QThread::currentThread()
+    > Returns a pointer to a QThread which manages the currently executing thread.
+
++ Qt::HANDLE QThread::currentThreadId()
+    > Returns the thread handle of the currently executing thread.
+
++ QThread::sleep(), QThread::msleep(), QThread::usleep()
+    > 通常會考慮使用 QTimer 來取代 sleep, 以提升效率
+
++ QThread::yieldCurrentThread()
+    > 強制 context switch 到別的 thread
+
++ Slots
+
+    - QThread::start(QThread::Priority priority = InheritPriority)
+        > 相當於 pthread_create()
+
+    - QThread::quit()
+
++ Signals
+
+    - QThread::finished()
+        > Signal finished() 連接到 Slot QObject::deleteLater()
+        >> After Qt 4.8
+
+    - QThread::started()
+
+
++ QThread::setPriority(QThread::Priority priority)
+    > 設定優先權
+
++ enum Qthread::Priority
+
+    | enumeration                     | value | description |
+    | :-                              | :-:   | :-         |
+    | QThread::IdlePriority           | 0     | 沒有其他 thread 執行時才進行排程 |
+    | QThread::LowestPriority         | 1     | 不比 LowPriority 排程頻繁       |
+    | QThread::LowPriority            | 2     | 不比 NormalPriority 排程頻繁    |
+    | QThread::NormalPriority         | 3     | 作業系統的預設優先順序           |
+    | QThread::HighPriority           | 4     | 比 NormalPriority 排程頻繁      |
+    | QThread::HighestPriority        | 5     | 比 HighPriority 排程頻繁       |
+    | QThread::TimeCriticalPriority   | 6     | 儘可能頻繁的進行排程            |
+    | QThread::InheritPriority        | 7     | 使用和建立自己的 thread 同樣的優先順序，這是預設屬性 |
+
+
 ## 分析
 
 ### 建議用法 (Recommend from Bradley T. Hughes)
