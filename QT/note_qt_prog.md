@@ -105,43 +105,49 @@ int main(int argc, char *argv[])
 
 ## C++
 
-+ `MainWindow` class
-    > Creaded from `QT Designer`
+### Syntax
 
-    - Call a component in MainWindow
++ `explicit` keyword
 
-        ```c++
-        MainWindow::MainWindow(QWidget *parent)
-          : QMainWindow(parent)
-          , ui(new Ui::MainWindow)
-        {
-            ui->setupUi(this);    // ui is a instance
-        }
 
-        MainWindow::~MainWindow()
-        {
-            delete ui;
-        }
+### `MainWindow` class
+
+Creaded from `QT Designer`
+
++ Call a component in MainWindow
+
+    ```c++
+    MainWindow::MainWindow(QWidget *parent)
+      : QMainWindow(parent)
+      , ui(new Ui::MainWindow)
+    {
+        ui->setupUi(this);    // ui is a instance
+    }
+
+    MainWindow::~MainWindow()
+    {
+        delete ui;
+    }
+
+    /**
+     * objectName is from QT Designer
+     * method definition: on_[objectName]_[slot name]()
+     */
+    void MainWindow::on_open_clicked()
+    {
+        QString     filePath = QFileDialog::getOpenFileName(this, tr("Open"),
+                                                            QDir::homePath(),
+                                                            tr("*.bin"));
+        if( filePath.isEmpty() )
+        return;
 
         /**
-         * objectName is from QT Designer
-         * method definition: on_[objectName]_[slot name]()
+         * call the method of this 'lineEdit' object
+         *    'lineEdit' is the objectName of a QLineEdit component
          */
-        void MainWindow::on_open_clicked()
-        {
-            QString     filePath = QFileDialog::getOpenFileName(this, tr("Open"),
-                                                                QDir::homePath(),
-                                                                tr("*.bin"));
-            if( filePath.isEmpty() )
-            return;
-
-            /**
-             * call the method of this 'lineEdit' object
-             *    'lineEdit' is the objectName of a QLineEdit component
-             */
-            ui->lineEdit->setText(filePath);
-        }
-        ```
+        ui->lineEdit->setText(filePath);
+    }
+    ```
 
 + 移除 Widget
     - `delete [pointer_of_a_widget]` 會自動通知 **parent**, 並更新 list
@@ -165,6 +171,17 @@ int main(int argc, char *argv[])
 + Reference
 
     - [Qt Tutorials For Beginners - YouTube](https://www.youtube.com/watch?v=EkjaiDsiM-Q&list=PLS1QulWo1RIZiBcTr5urECberTITj7gjA)
+
+
+### Multi-thread
+
++ [QThread](note_qthread.md)
+
++ [Synchronous](note_qt_thread_sync.md)
+
+### Event
+
+[Signals & Slots](note_qt_signals_slots.md)
 
 
 ## QML
