@@ -146,39 +146,66 @@ void Thread_B::run()
 ## QQueue
 
 Provide a generic container (Template attribute) with FIFO (First In, First Out) queue.
-> Inherits:	QList
+> Inherits: QList
 
 可用於 Multi-thread 間 Asynchronous 訊息傳遞,
 
 ```c++
-void foo()
+#include <QQueue>
+#include <QDebug>
+
+int main(int argc, char * argv[])
 {
-    QQueue<int>     queue;
+    QQueue<int>     Q;                           // 定義一個int型隊列
+    qDebug() << "queue empty:  " << Q.isEmpty(); // 返回隊列是否為空
 
-    queue.enqueue(1);
-    queue.enqueue(2);
-    queue.enqueue(3);
+    for(int i = 0; i < 5; i++)
+    {
+        Q.enqueue(i);      //入隊
+    }
 
-    while( !queue.isEmpty() )
-        cout << queue.dequeue() << Qt::endl;
+    qDebug() << "queue empty:  " << Q.isEmpty();
+    qDebug() << "queue size:  " << Q.size();
 
-    /**
-     *  Output reault:
-     *      1 2 3
-     */
+    for(int i = 0; i < 5; i++)
+    {
+        qDebug() << "queue last:  " << Q.last();        // 返回當前隊列最後一個個元素
+        qDebug() << "queue head:  " << Q.dequeue();     // 出隊列, 並且返回當前隊列第一個元素
+    }
+
+    qDebug() << "queue empty:  " << Q.isEmpty();
+    qDebug() << "queue size:  " << Q.size();
+
+    return 0;
 }
 ```
 
 + Methods
 
     - `T QQueue::dequeue()`
-        > Get item from this QQueue with FIFO order
+        > Get the first element and delete it from this QQueue with FIFO order
+        >> 與 QList::takeFirst() 相同
 
     - `void QQueue::enqueue(const T &t)`
-        > Push item to this QQueue
+        > Push an element to the end of this QQueue
+        >> 與 QList::append() 相同
 
-    - `QQueue::isEmpty()`
+    - `bool QQueue::isEmpty()`
         > method of QList
+
+    - `int QQueue::size()`
+        > 回傳隊列中元素個數
+
+    - `void QQueue::clear()`
+        > 清空隊列
+
+    - `T & QQueue::head()`
+        > 返回當前隊列第一個元素
+        >> This is the same as QList::first().
+
+    - `T & QQueue::last()`
+        > 返回當前隊列尾部的元素
+
 
 # Reference
 
