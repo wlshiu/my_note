@@ -1,0 +1,6 @@
+[InternetShortcut]
+URL=javascript:(function(){var%20newSS,%20styles='*%20{%20background:%20#2b2b2b%20!%20important;%20color:%20#bebebe%20!important;%20line-height:%20160%%20!important;%20letter-spacing:2px%20!important%20}%20:link,%20:link%20*%20{%20color:%20#55ffff%20!important%20}%20:visited,%20:visited%20*%20{%20color:%20#aa8faf%20!important%20}';%20if(document.createStyleSheet)%20{%20document.createStyleSheet("javascript:'"+styles+"'");%20}%20else%20{%20newSS=document.createElement('link');%20newSS.rel='stylesheet';%20newSS.href='data:text/css,'+escape(styles);%20document.getElementsByTagName("head")[0].appendChild(newSS);%20}%20})();
+IDList=
+HotKey=0
+IconFile=C:\Users\redegg\AppData\Local\Mozilla\Firefox\Profiles\r4qrp0zx.default\shortcutCache\2qpp0Dvs1lMi9QNoQQ2wbg==.ico
+IconIndex=0
