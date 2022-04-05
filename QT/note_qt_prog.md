@@ -183,6 +183,9 @@ Creaded from `QT Designer`
 
 [Signals & Slots](note_qt_signals_slots.md)
 
+### Timer
+
+[Timer](note_qt_timer.md)
 
 ## QML
 
