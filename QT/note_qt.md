@@ -452,7 +452,10 @@ to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
     1. 下拉選擇 View
         > e.g. Projects, Open Documnets, ..., etc.
 
-
++ Add a new ui file
+    - [File]->[New file or Project]
+    - [Files and Classes]->[QT]
+    - [Qt Designer Form Class]
 
 ### [Programming concept](note_qt_prog.md)
 
