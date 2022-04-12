@@ -457,6 +457,29 @@ to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
     - [Files and Classes]->[QT]
     - [Qt Designer Form Class]
 
++ Use static Qt lib
+
+    - Add new Qt lib
+
+        1. [Tools] -> [Options...]
+
+            > + Qt Version (add qmake path)
+            >> `C:\Qt\QT_5.14.2_static\bin\qmake.exe`
+
+            > + Kits (add QT_5.14.2_static)
+            >> Compile C   : `MinGW 7.3.0 32-bit for C` <br>
+            >> Compile C++ : `MinGW 7.3.0 32-bit for C++` <br>
+            >> Debugger    : `GNU gdb 8.1 for MinGW 7.3.0 32-bit` <br>
+            >> Qt Version  : `QT_5.14.2_static`
+
+    - Enable Build & Run environment
+
+        1. [Sidebar- Projects] -> [Build & Run]
+
+            > + Expand `QT_5.14.2_static`
+            > + [Right key] -> [Enable for All Projects]
+
+
 ### [Programming concept](note_qt_prog.md)
 
 ### Reference
