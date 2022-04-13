@@ -479,6 +479,15 @@ to pack all files (e.g. *.dll, *.lib, *.exe, ...etc) to an executable file
             > + Expand `QT_5.14.2_static`
             > + [Right key] -> [Enable for All Projects]
 
++ Enable console log
+
+    - [Sidebar- Projects] -> [Build & Run] -> [Run]
+        > select `Run in terminal`
+
+    - [Sidebar- Edit] -> `*.pro`
+        > add `CONFIG += console`
+
+    - progam use `QDebug`
 
 ### [Programming concept](note_qt_prog.md)
 
