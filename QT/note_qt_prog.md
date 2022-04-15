@@ -107,8 +107,41 @@ int main(int argc, char *argv[])
 
 ### Syntax
 
-+ `explicit` keyword
++ `implicit` (隱性轉換)  and `explicit` (顯性轉換)
+    > 出現在 constructor 前面
 
+    - `implicit` conversion
+        > compiler 自動轉換成某個 constructor interface
+
+        ```c++
+        class MyInteger
+        {
+        public:
+            MyInteger(int n);
+        }
+
+        void main()
+        {
+            MyInteger   n1 = 5; // compiler 自動轉換成 n1(5)
+        }
+        ```
+
+    - `explicit` conversion
+        > 強制必須符合宣告的 interface
+        >> 一般用在**避免 user 混淆而使用錯誤**, 甚至有強調的意味
+
+        ```c++
+        class MyInteger
+        {
+        public:
+            explicit MyInteger(int n);
+        }
+
+        void main()
+        {
+            MyInteger   n2(5); // 強制語法必須符合
+        }
+        ```
 
 ### `MainWindow` class
 
