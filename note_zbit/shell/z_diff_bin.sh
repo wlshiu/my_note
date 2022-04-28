@@ -21,8 +21,20 @@ if [ $# != 2 ]; then
 fi
 
 
+# xxd.exe -u -g 1 $1 > $1.tmp
+# xxd.exe -u -g 1 $2 > $2.tmp
+
 #################
 # only show the difference part
-diff --color -ua  <(xxd -g 1 $1) <(xxd -g 1 $2)
+# diff --color -ua  <(xxd -g 1 $1) <(xxd -g 1 $2)
 
-# icdiff  <(xxd -g 1 $1) <(xxd -g 1 $2)
+
+
+hexdump -e '16/1 "%02x " "\n"' $1 > $1.tmp
+hexdump -e '16/1 "%02x " "\n"' $2 > $2.tmp
+
+# pip install icdiff
+icdiff.py  $1.tmp $2.tmp
+
+rm -f ./$1.tmp
+rm -f ./$2.tmp
