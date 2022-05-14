@@ -1,9 +1,8 @@
 STM32F103
 ---
 
-# SOC
-
-## STM32的三種Boot模式
+# STM32的三種Boot模式
+---
 
 以 STM32F103 為例, STM32的三種Boot模式如下:
 
@@ -41,88 +40,25 @@ STM32F103
 可使用跳線帽設定它們的電平從而控制晶片的啟動方式, 它支援從內部 FLASH 啟動、系統儲存器啟動以及內部 SRAM 啟動方式.
 我們現在是在 SRAM 中除錯程式碼, 因此把 BOOT0 和 BOOT1 引腳都使用跳線帽連線到 3.3V, 使晶片從 SRAM 中啟動
 
-## Timer
 
-+ Prescaler
-    > 對 PCLK 除頻
+# [Timer](note_stm32_timer.md)
+---
 
-    ```
-    TIMER_clk = PCLK / (Prescaler + 1)  # H/w 自動 +1
+## WDG
 
-    假設 PCLK = 72MHz, Prescaler = (72 - 1)
+IWDG/WWDG 在一旦啟用, **運行過程中就不能再被關閉** (除非 system reset).
 
-    TIMER_clk = 72MHz / 72 = 1 MHz => 1us / sample
-    ```
++ IWDG (Independent Watch Dog) 有自己的獨立 clock (通常使用內部 LSI clock), 獨立於 system clock 之外
+    > + 可以用來監視源於系統 S/w 或 H/w 方面的故障或錯誤, 側重對整個系統正常運行的監測
+    > + 適用於那些需要一個 WDG 在主程序之外, 能夠獨立工作並且**對時間精度要求較低**的場合
 
-+ ARR (Auto-Reload Reg)
-    > 設定多少個 samples (基於 TIMER_clk) 為一個週期 (Period)
-
-    ```
-    假設 TIMER_clk = 1MHz (1us/sample), ARR = (65536 - 1)
-
-    65536 個 samples 為一個週期, 則一個周期的時間為 65536 us
-
-    Period_us = ARR * (1000000 usec / (PCLK / Prescaler)) = 65536 us
-    ```
-
-+ Channel
-    > 會綁定 Pin
-
-    - Input Channel x (ICx, x= 1 ~ 4)
-
-    - Output Channel x (OCx, x= 1 ~ 4)
-
-+ CCRx (Capture/Compare Reg, channel x= 1 ~ 4)
-
-+ Overflow
-    > 已經過了一個週期 (Period)
-
-### PWM
-
-+ Prescaler 對 PCLK 除頻 (Get TIMER_clk)
-
-+ ARR 決定 PWM 的週期
-
-    ```
-    FREQ_pwm = TIMER_clk / (ARR + 1)
-             = PCLK / ((Prescaler + 1) * (ARR + 1))
-
-    Period_us = 1000000 us / FREQ_pwm
-              = (1000000 us * (Prescaler + 1) * (ARR + 1)) / PCLK
-    ```
-
-+ CCRx 決定了輸出有效信號的時間
-    > 在一個週期 `(ARR + 1) 個 samples` 中, 連續幾個 samples 輸出有效信號
-
-    ```
-    // 設置 duty cycle (1 ~ 99%)
-    pulse_width = (ARR + 1) * duty_cycle
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pulse_width);
-    ```
-
-+ PWM mode
-
-    - mode 1
-        > 不管是向上還是向下計數, 當計數值小於 ARR 時, 輸出 `HIGH`
-
-    - mode 2
-        > 不管是向上還是向下計數, 當計數值小於 ARR 時, 輸出 `LOW`
++ WWDG (Window Watch Dog) 由 bus clock 經除頻後得到的 CLKwwdg, 通過設定 window value 來監測 app 是否按用戶預定的時序或流程正常運行.
+    > + 著重特定程序運行段的流程或時序監測
+    > + 適合用於那些要求 WDG 在**精確計時** (window value 有特別計算過) 的應用場合
 
 
-### Input capture
-
-+ Prescaler 相當於設定 Sample Rate (TIMER_clk)
-
-+ ARR 相當於 Capturing Duration time
-
-+ CCRx 紀錄 counter value (channel x= 1 ~ 4)
-
-
-
-
-
-# Windows
-
+# Windows platform
+---
 ## CMSIS-DAP CDC
 
 Windows 10 automatically install
@@ -207,6 +143,7 @@ Windows 10 automatically install
 
 
 # 故障排除
+---
 
 ## STM32 不小心把 SWD/JTAG 都給關了
 
