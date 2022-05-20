@@ -105,9 +105,17 @@
 
 - git save password
 
-    ```
-    $ git config --global credential.helper 'cache --timeout 86400'
-    ```
+    + linux
+
+        ```
+        $ git config --global credential.helper 'cache --timeout 86400'
+        ```
+
+    + windows
+
+        ```
+        git config --global credential.helper wincred
+        ```
 
 - 檢查目前 Git 的狀態
 
