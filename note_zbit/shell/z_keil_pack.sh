@@ -38,17 +38,16 @@ if [[ -d "./pack" ]]; then
 fi
 
 mkdir pack
+mkdir -p ./pack/Drivers/CMSIS/Device/ST/STM32F1xx/
+cp -fr Drivers/CMSIS/Device/ST/STM32F1xx/Include/ ./pack/Drivers/CMSIS/Device/ST/STM32F1xx
+cp -fr Flash/                 ./pack
+cp -fr SVD/                   ./pack
 
+mkdir -p ./pack/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/
+cp -fr Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/ ./pack/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/
+cp -f  Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c ./pack/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c
 
-cp -fr ./Common             ./pack/
-cp -fr ./Docs               ./pack/
-cp -fr ./Drivers            ./pack/
-cp -fr ./Examples           ./pack/
-cp -fr ./Flash/             ./pack
-cp -fr ./SVD                ./pack/
-cp -fr ./Tools/             ./pack/
-cp -fr ./README.md              ./pack/
-cp -fr ./<vendor>.<name>.pdsc   ./pack/
+cp -f Keil.STM32F0xx_DFP.pdsc    ./pack
 
 cd pack
 
@@ -77,7 +76,9 @@ echo -e "$out_pack_name"
 
 7z a ${out_pack_name} -tzip
 
-mv ./*pack ../
+mv ./*.pack ../
+
+cd ..
 rm -fr pack
 
 cd ${cur_path}
