@@ -31,7 +31,8 @@ echo -e "${Yellow} Info size ${NC}"
 git count-objects -vH
 
 echo -e "${Green} Remove ${obj_path} ${NC}"
-git filter-branch --force --tree-filter 'rm -f -r "${obj_path}"' -- --all
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch "${obj_path}"' --prune-empty --tag-name-filter cat -- --all
+# git filter-branch --force --tree-filter 'rm -f -r "${obj_path}"' -- --all
 
 echo -e "${Green} Refresh ${NC}"
 git filter-branch --force
