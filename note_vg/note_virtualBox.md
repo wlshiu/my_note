@@ -3,6 +3,12 @@ VirtualBox
 
 # lubuntu
 
+> You can also use ubuniu server version and install `Minimal LXDE Desktop`
+```
+$ sudo apt-get install lubuntu-desktop
+```
+
+
 + install `Lubuntu minimal installation`
     > + [web](http://cdimages.ubuntu.com/netboot/) download `mini.iso`
     > + [MinimalCD](https://help.ubuntu.com/community/Installation/MinimalCD)
