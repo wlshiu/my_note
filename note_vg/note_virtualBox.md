@@ -4,7 +4,8 @@ VirtualBox
 # lubuntu
 
 + install `Lubuntu minimal installation`
-    > [web](http://cdimages.ubuntu.com/netboot/) download `mini.iso`
+    > + [web](http://cdimages.ubuntu.com/netboot/) download `mini.iso`
+    > + [MinimalCD](https://help.ubuntu.com/community/Installation/MinimalCD)
 
 + terminal
 
