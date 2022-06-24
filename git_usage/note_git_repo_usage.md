@@ -165,6 +165,7 @@
     $ git tag v1 ebff       # log 是 commit ebff810c461ad1924fc422fd1d01db23d858773b 的內容, 設定簡短好記得 Tag: v1
     $ git tag 中文 ebff     # tag 也可以下中文, 任何文字都可以
     $ git tag -d 中文       # 把 tag=中文 刪掉
+    $ git push --delete origin [tagname]  # delete tag of remote
     ```
 
 - Git merge 合併
