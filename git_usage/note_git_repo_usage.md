@@ -216,6 +216,7 @@
     ```
     $ git blame filename            # 關於此檔案的所有 commit 紀錄, 可以顯示檔案每行修改的人
     $ git log -L 1,1:some_file.txt  # 修改 line 1 ~ line 1 的 commit
+    $ git blame -L 5,10 index.html  # 查看是誰改了檔案的哪行code(L表示顯示哪幾行)
     ```
 
 - Git reset 還原
@@ -308,6 +309,10 @@
     $ git log -S'foo()'                                         # log 裡面有 foo() 這字串的.
     $ git log --no-merges                                       # 不要秀出 merge 的 log
     $ git log --since="2 weeks ago"                             # 最後這 2週的 log
+    $ git log --oneline                                         # 只顯示所有 commits的第一行
+    $ git log --oneline --grep="world123"                       # 搜尋 log 中有特定字串 "world123"
+    $ git log --oneline --author="user1"                        # 找某個人的commit
+    $ git log --oneline --author="user1\|user2"                 # 找某些人的commit
     $ git log --pretty=oneline                                  # 秀 log 的方式
     $ git log --pretty=short                                    # 秀 log 的方式
     $ git log --pretty=format:'%h was %an, %ar, message: %s'
