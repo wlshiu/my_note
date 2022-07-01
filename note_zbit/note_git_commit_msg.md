@@ -25,95 +25,59 @@ Git Commit Message
 
 ## Message Format
 
-一個 Commit Message 主要由 `Header (what)` + `Body(why)` + `Footer` 組成
-> 各部分以空行區隔, 為了讓 `git log` 顯示乾淨
+[Angular Git Commit Message](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#)
+> 目前使用最廣泛的 commit message rule
+>> 可以參考 [github:angular-cli](https://github.com/angular/angular-cli)
 
-```
-Message Header
-<CR/LF>
-Message Body
-<CR/LF>
-Message Footer
-```
++ 一個 Commit Message 主要由 `Header (what)` + `Body(why)` + `Footer` 組成
+    > 其中 `<>` 尖括號中的為具體內容, `<BLANK LINE>`為空行.
+
+    ```
+    <type>(<scope>): <subject>
+    <BLANK LINE>
+    <body>
+    <BLANK LINE>
+    <footer>
+    ```
 
 ### Example
 
 ```
-commit eb0b56b19017ab5c16c745e6da39c53126924ed6
-Author: Pieter Wuille
-Date:   Fri Aug 1 22:57:55 2014 +0200
+commit ff963de73ab8913bce27a1e75ac01f53e8ece1d9
+Author: Alan Agius <alanagius@google.com>
+Date:   Thu Feb 6 19:05:57 2020 -0500
 
-    Summarize changes in around 50 characters or less
+    fix(@angular-devkit/build-angular): Exit localized builds when CTRL+C is pressed
 
-    More detailed explanatory text, if necessary. Wrap it to about 72
-    characters or so. In some contexts, the first line is treated as the
-    subject of the commit and the rest of the text as the body. The
-    blank line separating the summary from the body is critical (unless
-    you omit the body entirely); various tools like `log`, `shortlog`
-    and `rebase` can get confused if you run the two together.
+    When using localization we setup `SIGINT` signal to delete the temporary directory.
+    In some cases this resulted in delaying the process from exiting a couple of seconds.
 
-    Explain the problem that this commit is solving. Focus on why you
-    are making this change as opposed to how (the code explains that).
-    Are there side effects or other unintuitive consequences of this
-    change? Here's the place to explain them.
-
-    Further paragraphs come after blank lines.
-
-     - Bullet points are okay, too
-     - Typically a hyphen or asterisk is used for the bullet, preceded
-       by a single space, with blank lines in between, but conventions
-       vary here
-
-    If you use an issue tracker, put references to them at the bottom,
-    like this:
-
-    Resolves: #123
-    See also: #456, #789
+    Closes #22216
 ```
 
 + Header
 
 ```
-Summarize changes in around 50 characters or less
+fix(@angular-devkit/build-angular): exit localized builds when CTRL+C is pressed
 ```
 
 + Body
 
 ```
-More detailed explanatory text, if necessary. Wrap it to about 72
-characters or so. In some contexts, the first line is treated as the
-subject of the commit and the rest of the text as the body. The
-blank line separating the summary from the body is critical (unless
-you omit the body entirely); various tools like `log`, `shortlog`
-and `rebase` can get confused if you run the two together.
-
-Explain the problem that this commit is solving. Focus on why you
-are making this change as opposed to how (the code explains that).
-Are there side effects or other unintuitive consequences of this
-change? Here's the place to explain them.
-
-Further paragraphs come after blank lines.
-
- - Bullet points are okay, too
- - Typically a hyphen or asterisk is used for the bullet, preceded
-   by a single space, with blank lines in between, but conventions
-   vary here
+When using localization we setup `SIGINT` signal to delete the temporary directory.
+In some cases this resulted in delaying the process from exiting a couple of seconds.
 ```
 
 + Footer
 
 ```
-If you use an issue tracker, put references to them at the bottom,
-like this:
-
-Resolves: #123
-See also: #456, #789
+Closes #22216
 ```
 
 ### Message Header
 
 ```
-<type> [scope]: <subject>
+<type>(scope): <subject>
 ```
 
 + type(必要): commit 的類別
@@ -139,8 +103,16 @@ See also: #456, #789
     - `chore`
         > 建構程序或輔助工具的變動 (maintain)
     - `revert`
-        > 撤銷回覆先前的 commit
-        >> e.g: `revert: type(scope): subject (回復版本: xxxx)`
+        > 撤銷回覆先前的 commit.
+        >> `Message Body` 必須寫成 `This reverts commit <sha1-id>`
+
+        1. example
+
+            ```
+            revert: "ci: use ramdisk for setup job"
+
+            This reverts commit a7a990b5657b1cfdbb2435d9c053a76e3b2bf902. ---> body
+            ```
 
 + scope(可選): commit 影響的範圍
     > e.g. 資料庫, 控制層, 模板層等, 視專案不同改變
@@ -148,15 +120,18 @@ See also: #456, #789
 + subject(必要): commit 的簡短描述
 
     - **不超過 50 個字元**
-        > display issue
+        > git 自動換行因素
+
     - 結尾不加句號
+    - 首字大寫
     - 儘量讓 Commit 單一化, 一次只更動一個主題
 
 ### Message Body
 
 + 對本次 Commit 的詳細描述
 + 可以分成多行, **每一行不超過 72 個字元**
-    > display issue
+    > git display 因素
+
 + 說明程式碼變動的項目與原因, 必要時與先前行為做對比
 
 ### Message Footer
@@ -372,6 +347,10 @@ docs: 移除過期的註解
 
 issue #1229
 ```
+
+
+# [Generate Changelog](note_git_gen_change_log.md)
+
 
 # Reference
 ---
