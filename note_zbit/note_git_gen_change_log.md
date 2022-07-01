@@ -79,6 +79,7 @@ It specifies that a version number always contains these three parts:
         ```
 
     - git hooks/commit-msg
+        > hooks 資料不會被 commit, 需要每個 repository 都手動去加入
 
         ```
         $ vi .git_commit-msg
@@ -171,9 +172,123 @@ It specifies that a version number always contains these three parts:
 
     - `npx` 可以臨時性的安裝非全局性必要的套件, 省下許多安裝及使用的流程與步驟, 省下了磁碟空間, 也避免了長期汙染
 
-+ `standard-version`
++ `husky-hook`
+    > + 基於husky(版本7.x)
+    > + 增加校驗commit message的腳本
+    > + `git commit` 會運行 `.husky/commit-msg` hook
+    > + 校驗成功之後, 執行`.git/hooks`目錄下的默認 `commit-msg` hook
 
-+ `Conventional Commits`
+    - install
+
+        ```
+        $ cd ~/
+        $ npm install -g husky-hook --save-dev  # '-g' global install
+        ```
+
+    - uninstall
+
+        ```
+        $ npx husky-hook uninstall
+        $ npm uninstall husky-hook
+        ```
+
++ `commitlint`
+    > 用來校驗 commit 提交信息
+
+    - install
+
+        ```
+        $ cd ~/
+        $ npm install -g @commitlint/cli @commitlint/config-conventional --save-dev  # '-g' global install
+        ```
+
+    - uninstall
+
+        ```
+        $ npx @commitlint/cli @commitlint/config-conventional uninstall
+        $ npm uninstall @commitlint/cli @commitlint/config-conventional
+        ```
+
++ `conventional-changelog`
+    > 自動生成 CHANGELOG 文件
+
+    - install
+
+        ```
+        $ npm install -g conventional-changelog-cli --save-dev
+        ```
+
+
+## 檢查 commit message `husky + commitlint`
+
++ Generate script to execute
+    > System MUST be installed `husky` and `commitlint`
+
+    ```
+    $ vi z_gcm_monitor.sh`
+        #!/bin/bash
+
+        # Configure commitlint to use conventional config
+        echo -e "module.exports = {                  \n\
+          extends: [                                 \n\
+            '@commitlint/config-conventional'        \n\
+          ],                                         \n\
+          rules: {                                   \n\
+            'type-enum': [2, 'always', [             \n\
+                'feat',                              \n\
+                'fix',                               \n\
+                'perf',                              \n\
+                'refactor',                          \n\
+                'docs',                              \n\
+                'style',                             \n\
+                'test',                              \n\
+                'build',                             \n\
+                'revert',                            \n\
+                'ci',                                \n\
+                'chore',                             \n\
+                'release',                           \n\
+             ]],                                     \n\
+            'type-case': [0],                        \n\
+            'type-empty': [0],                       \n\
+            'scope-empty': [0],                      \n\
+            'scope-case': [0],                       \n\
+            'subject-full-stop': [0],                \n\
+            'subject-empty': [0],                    \n\
+            'subject-case': [0],                     \n\
+            'header-max-length': [1, 'always', 50],  \n\
+          }
+        };" > commitlint.config.js
+
+
+        # Activate hooks
+        npx husky install
+
+        # Add hook
+        npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
+    ```
+
+# Auto-Generate Changelog
+
+System MUST be installed `conventional-changelog`
+
++ Generate change log
+    > 以下 command 將基於上次 tag 版本後的變更內容添加到 **CHANGELOG.md** 文件中, CHANGELOG.md **之前的內容不會消失**
+
+    ```
+    $ npx conventional-changelog -p angular -i CHANGELOG.md -s
+    ```
+    - `-p` 指定提交信息的規范, 有以下選擇: angular, atom, codemirror, ember, eslint, express, jquery, jscs or jshint
+    - `-i` 指定讀取 CHANGELOG 內容的文件
+    - `-s` 表示將新生成的 CHANGELOG 輸出到 `-i` 指定的文件中
+
++ Re-generate change log
+    > 如果想要重新生成所有版本完整的 CHANGELOG 內容, 使用以下命令:
+
+    ```
+    $ npx conventional-changelog -p angular -i CHANGELOG.md -s -r 0
+    ```
+
+    - `-r` 默認為 `1`, 設為 `0` 將重新生成所有版本的變更信息
 
 # Reference
 
