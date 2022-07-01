@@ -255,6 +255,7 @@ It specifies that a version number always contains these three parts:
             'subject-full-stop': [0],                \n\
             'subject-empty': [0],                    \n\
             'subject-case': [0],                     \n\
+            'body-empty': [0],                       \n\
             'header-max-length': [1, 'always', 50],  \n\
           }
         };" > commitlint.config.js
