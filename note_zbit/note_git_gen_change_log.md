@@ -202,7 +202,7 @@ It specifies that a version number always contains these three parts:
 
         ```
         $ cd ~/
-        $ npm install -g @commitlint/cli @commitlint/config-conventional --save-dev  # '-g' global install
+        $ npm install -g @commitlint/cli @commitlint/config-conventional  # '-g' global install
         ```
 
     - uninstall
@@ -218,11 +218,11 @@ It specifies that a version number always contains these three parts:
     - install
 
         ```
-        $ npm install -g conventional-changelog --save-dev
+        $ npm install -g conventional-changelog
+        $ npm install -g conventional-changelog-cli
 
         ## These maybe do NOT be installed
         $ npm install -g conventional-changelog-custom-config --save-dev  ---> 客製化 changelog
-        $ npm install -g conventional-changelog-cli --save-dev
         ```
 
 
@@ -268,14 +268,14 @@ It specifies that a version number always contains these three parts:
         };" > commitlint.config.js
 
 
-        # Activate hooks
-        npx husky install
+        # # Activate hooks
+        # npx husky install
 
         # Add hook
         npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
     ```
 
-# Auto-Generate Changelog
+## Auto-Generate Changelog
 
 System MUST be installed `conventional-changelog`
 
@@ -364,6 +364,136 @@ System MUST be installed `conventional-changelog`
           {{~/if}}{{/each}}
         {{~/if}}
         ```
+
+## Setup flow
+
++ Install [Official Git](https://git-scm.com/downloads)
+
++ Download [node-v16.15.1-win-x64](https://nodejs.org/download/release/v16.15.1/node-v16.15.1-win-x64.7z) and decompress to `C:/`
+
++ Generate `z_gcm_config.sh`
+
+    ```
+    $ vi z_gcm_config.sh
+        #!/bin/bash
+
+        RED='\e[0;31m'
+        GREEN='\e[0;32m'
+        YELLOW='\e[1;33m'
+        NC='\e[0m'
+
+        # check git command exist or not
+        git --version 2>&1 >/dev/null
+        if [ $? -ne 0 ]; then
+            echo -e "Please install git (https://git-scm.com/)"
+            exit -1;
+        fi
+
+        user_name=$(git config user.name)
+        email=$(git config user.email)
+
+        if [[ -z "$user_name" ]]; then
+            read -p "Enter your name: " user_name
+            git config --global user.email "$user"
+        fi
+
+        if [[ -z "$email" ]]; then
+            read -p "Enter e-mail: " email
+        fi
+
+        # permission check with e-mail domain name
+        if printf '%s\n' "$email" | grep -qP '^[a-zA-Z0-9_.+-]+@(mydomain)\.com$'; then
+            git config --global user.email "$email"
+        else
+            echo -e "E-mail MUST be xxx@mydomain.com"
+            exit -1;
+        fi
+
+        # only use 'LF'
+        git config --global core.autocrlf input
+        git config --global core.ignorecase false
+        git config --global core.editor vim
+
+        echo -e "export PATH=\"/C/node-v16.15.1-win-x64:${PATH}\"" >> ${HOME}/.bash_profile
+
+        echo -e "$YELLOW done~~ $NC"
+
+        # # set commit template
+        # git config commit.template .gitcommit
+        # git config --global commit.template ./.gitcommit
+        # git config --global --add commit.cleanup strip
+        #
+        # if [ -d ".git/hooks" ]; then
+        #     cp -f ./.git_commit-msg ./.git/hooks/commit-msg
+        #     chmod +x ./.git/hooks/commit-msg
+        #     echo "done"
+        # else
+        #     echo -e "fail"
+        # fi
+    ```
+
++ Generate `z_gcm_env.sh`
+
+    ```
+    $ vi z_gcm_env.sh
+        #!/bin/bash
+
+        RED='\e[0;31m'
+        GREEN='\e[0;32m'
+        YELLOW='\e[1;33m'
+        NC='\e[0m'
+
+        npm install -g husky-hook
+        npm install -g @commitlint/cli @commitlint/config-conventional
+        npm install -g conventional-changelog
+
+        cur_dir=$(pwd)
+        npm_root=$(where npm | sed "s:\\\:\/:g" | sed "s@:@@g" | xargs printf "%s " | awk '{print "/"$1}' | xargs dirname)
+
+        cd $npm_root/node_modules/conventional-changelog/node_modules/conventional-changelog-angular
+
+        if [ $? != 0 ]; then
+            echo -e "$RED No npm command ! $NC"
+            exit -1;
+        fi
+
+        echo -e "{{#if isPatch~}}\n ##\n{{~else~}}\n # [{{version}}]\n{{~/if}}\n{{~#if title}} \"{{title}}\"\n{{~/if}}\n{{~#if date}} ({{date}})\n{{/if}}" > templates/header.hbs
+
+        F=templates/commit.hbs
+        S=`grep -n '{{~!-- commit link --}} {{#if @root.linkReferences~}}' ${F} | awk -F ":" '{print $1}'`
+        E=`grep -n '{{~!-- commit references --}}' ${F} | awk -F ":" '{print $1}'`
+
+        E=$(($E-1))
+
+        sed -i ${S},${E}d ${F}
+
+        cd $cur_dir
+    ```
+
++ Open `Git Bash Here`
+
+    ```
+    $ ./z_gcm_config.sh
+    $ source ~/.bash_profile
+    $ npm -v
+        16.15.1
+    $ ./z_gcm_env.sh
+    ```
+
++ Troubleshoot
+
+    - No `COMMIT_EDITMSG` file
+        > 沒有用 git terminal commit 過的訊息檔
+
+        ```
+        [Error: ENOENT: no such file or directory, open 'D:\test\changelog-generator-demo\.git\COMMIT_EDITMSG']
+        ```
+
+        1. 只需產生出 `COMMIT_EDITMSG` file
+
+            ```
+            $ echo "" > .git/COMMIT_EDITMSG
+            ```
 
 
 # Reference

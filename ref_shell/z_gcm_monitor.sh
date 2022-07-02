@@ -33,8 +33,8 @@ echo -e "module.exports = {                  \n\
 };" > commitlint.config.js
 
 
-# Activate hooks
-npx husky install
+# # Activate hooks
+# npx husky install
 
 # Add hook
 npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
