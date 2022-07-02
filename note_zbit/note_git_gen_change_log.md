@@ -57,7 +57,7 @@ It specifies that a version number always contains these three parts:
 
     - commit template
 
-        ```
+        ```bash
         $ vi .gitcommit
             # head: <type>(<scope>): <subject>
             # - type: feat, fix, docs, style, refactor, test, chore
@@ -81,7 +81,7 @@ It specifies that a version number always contains these three parts:
     - git hooks/commit-msg
         > hooks 資料不會被 commit, 需要每個 repository 都手動去加入
 
-        ```
+        ```bash
         $ vi .git_commit-msg
             #!/bin/bash
 
@@ -108,7 +108,7 @@ It specifies that a version number always contains these three parts:
     - `z_git_config.sh`
         > configurate git
 
-        ```
+        ```bash
         #!/bin/bash
 
         # check git command exist or not
@@ -164,6 +164,9 @@ It specifies that a version number always contains these three parts:
 
     - [Node.JS](https://nodejs.org/en/)
         > 須設定 install path (`.../nodejs`)到 global PATH
+        > + [Win7 version](https://nodejs.org/download/release/v13.14.0/)
+
+    - [NPM-Usage](./NPM/note_npm_usage.md)
 
 + `npx` => 在 `npm v5.2.0` 之後內建的指令
     > 是一種 CLI 工具, 也可以讓我們更方便的安裝或是管理 dependencies
@@ -215,6 +218,10 @@ It specifies that a version number always contains these three parts:
     - install
 
         ```
+        $ npm install -g conventional-changelog --save-dev
+
+        ## These maybe do NOT be installed
+        $ npm install -g conventional-changelog-custom-config --save-dev  ---> 客製化 changelog
         $ npm install -g conventional-changelog-cli --save-dev
         ```
 
@@ -290,6 +297,74 @@ System MUST be installed `conventional-changelog`
     ```
 
     - `-r` 默認為 `1`, 設為 `0` 將重新生成所有版本的變更信息
+
++ 變更 Change Log 輸出的格式
+    > `[conventional-changelog]->[packages]->[conventional-changelog-angular]->[templates]`
+
+    - `header.hbs`
+        > 刪除每一個 version 的 git tag link
+
+        ```
+        {{#if isPatch~}}
+          ##
+        {{~else~}}
+          # [{{version}}]
+        {{~/if}}
+        {{~#if title}} "{{title}}"
+        {{~/if}}
+        {{~#if date}} ({{date}})
+        {{/if}}
+        ```
+
+    - `commit.hbs`
+        > 刪除每一個 commit 的 git SHA1-ID link
+
+        ```
+        *{{#if scope}} **{{scope}}:**
+        {{~/if}} {{#if subject}}
+          {{~subject}}
+        {{~else}}
+          {{~header}}
+        {{~/if}}
+
+
+        {{~!-- commit references --}}
+        {{~#if references~}}
+          , closes
+          {{~#each references}} {{#if @root.linkReferences~}}
+            [
+            {{~#if this.owner}}
+              {{~this.owner}}/
+            {{~/if}}
+            {{~this.repository}}#{{this.issue}}](
+            {{~#if @root.repository}}
+              {{~#if @root.host}}
+                {{~@root.host}}/
+              {{~/if}}
+              {{~#if this.repository}}
+                {{~#if this.owner}}
+                  {{~this.owner}}/
+                {{~/if}}
+                {{~this.repository}}
+              {{~else}}
+                {{~#if @root.owner}}
+                  {{~@root.owner}}/
+                {{~/if}}
+                  {{~@root.repository}}
+                {{~/if}}
+            {{~else}}
+              {{~@root.repoUrl}}
+            {{~/if}}/
+            {{~@root.issue}}/{{this.issue}})
+          {{~else}}
+            {{~#if this.owner}}
+              {{~this.owner}}/
+            {{~/if}}
+            {{~this.repository}}#{{this.issue}}
+          {{~/if}}{{/each}}
+        {{~/if}}
+        ```
+
 
 # Reference
 

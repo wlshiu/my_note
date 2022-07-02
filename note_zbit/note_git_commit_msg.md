@@ -26,8 +26,8 @@ Git Commit Message
 ## Message Format
 
 [Angular Git Commit Message](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#)
-> 目前使用最廣泛的 commit message rule
->> 可以參考 [github:angular-cli](https://github.com/angular/angular-cli)
+> 目前使用最廣泛的 commit message rule, 由 Google 推出的一套提交消息規範標準, 也是目前使用範圍最廣的規範. 有一套合理的手冊也較為系統化, 並且還有配套的工具可以供使用
+>> 可以參考 [github:angular-cli commints](https://github.com/angular/angular-cli)
 
 + 一個 Commit Message 主要由 `Header (what)` + `Body(why)` + `Footer` 組成
     > 其中 `<>` 尖括號中的為具體內容, `<BLANK LINE>`為空行.
@@ -358,5 +358,6 @@ issue #1229
 + [撰寫有效的 Git Commit Message](http://blog.fourdesire.com/2018/07/03/%E6%92%B0%E5%AF%AB%E6%9C%89%E6%95%88%E7%9A%84-git-commit-message/)
 + [學習筆記- 如何撰好的 Git Commit Message](https://heidiliu2020.github.io/git-commit-message/)
 + [如何寫一個 Git Commit Message](https://blog.louie.lu/2017/03/21/%E5%A6%82%E4%BD%95%E5%AF%AB%E4%B8%80%E5%80%8B-git-commit-message/)
++ [約定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0-beta.4/#%e7%ba%a6%e5%ae%9a%e5%bc%8f%e6%8f%90%e4%ba%a4%e8%a7%84%e8%8c%83)
 + [Git Commit Message 這樣寫會更好, 替專案引入規範與範例](https://wadehuanglearning.blogspot.com/2019/05/commit-commit-commit-why-what-commit.html)
 + [How to Write a Git Commit Message](https://cbea.ms/git-commit/)
