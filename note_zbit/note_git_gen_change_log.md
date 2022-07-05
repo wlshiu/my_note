@@ -458,6 +458,10 @@ System MUST be installed `conventional-changelog`
         git config --global core.ignorecase false
         git config --global core.editor vim
 
+        # set git hook path
+        git config --global core.hooksPath .husky
+        git config core.hooksPath .husky  # set config of the local repository
+
         echo -e "export PATH=\"/C/node-v16.15.1-win-x64:${PATH}\"" >> ${HOME}/.bash_profile
 
         echo -e "$YELLOW done~~ $NC"
@@ -475,6 +479,8 @@ System MUST be installed `conventional-changelog`
         #     echo -e "fail"
         # fi
     ```
+
+    - 藉由設定 `core.hooksPath` 讓 git (git v2.9或者更高) 自動執行 hook
 
 + Generate `z_gcm_env.sh`
 
