@@ -1,4 +1,8 @@
 #!/bin/bash
+# Copyright (c) 2022, All Rights Reserved.
+# @file    z_gcm_monitor.sh
+# @author  Wei-Lun Hsu
+# @version 0.1
 
 # Configure commitlint to use conventional config
 echo -e "module.exports = {                  \n\
