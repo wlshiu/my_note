@@ -51,7 +51,7 @@ It specifies that a version number always contains these three parts:
     > prepare files at the root of a repository
     > + `.gitcommit`
     > + `.git_commit-msg`
-    > + `z_git_config.sh`
+    > + `z_gcm_config.sh`
 
     > exec `z_git_config.sh`
 
@@ -116,6 +116,15 @@ It specifies that a version number always contains these three parts:
         if [ $? -ne 0 ]; then
             echo -e "Please install git (https://git-scm.com/)"
             exit -1;
+        fi
+
+        git_ver="$(git --version | awk '{printf $3}' | awk -F "." '{print $1"."$2"."$3}')"
+        req_ver="2.10.0"
+        if [ "$(printf '%s\n' "$req_ver" "$git_ver" | sort -V | head -n1)" = "$req_ver" ]; then
+            echo "Git is greater than or equal to ${req_ver}"
+        else
+            echo "Error: git is less than ${req_ver}"
+            exit -1
         fi
 
         user_name=$(git config user.name)
