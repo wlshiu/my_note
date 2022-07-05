@@ -1,4 +1,8 @@
 #!/bin/bash
+# Copyright (c) 2022, All Rights Reserved.
+# @file    z_gcm_env.sh
+# @author  Wei-Lun Hsu
+# @version 0.1
 
 RED='\e[0;31m'
 GREEN='\e[0;32m'
