@@ -105,7 +105,7 @@ It specifies that a version number always contains these three parts:
             fi
         ```
 
-    - `z_git_config.sh`
+    - `z_gcm_config.sh`
         > configurate git
 
         ```bash
@@ -143,17 +143,23 @@ It specifies that a version number always contains these three parts:
         git config --global core.ignorecase false
         git config --global core.editor vim
 
-        # set commit template
-        git config commit.template .gitcommit
-        git config --global commit.template ./.gitcommit
-        git config --global --add commit.cleanup strip
+        # set git hook path
+        git config --global core.hooksPath .husky
+        git config core.hooksPath .husky  # set config of the local repository
 
-        if [ -d ".git/hooks" ]; then
-            cp -f ./.git_commit-msg ./.git/hooks/commit-msg
-            chmod +x ./.git/hooks/commit-msg
-            echo "done"
-        fi
+        # # set commit template
+        # git config commit.template .gitcommit
+        # git config --global commit.template ./.gitcommit
+        # git config --global --add commit.cleanup strip
+        #
+        # if [ -d ".git/hooks" ]; then
+        #     cp -f ./.git_commit-msg ./.git/hooks/commit-msg
+        #     chmod +x ./.git/hooks/commit-msg
+        #     echo "done"
+        # fi
         ```
+
+        1. 藉由設定 `core.hooksPath` 讓 git (git v2.9或者更高) 自動執行 hook
 
 # 3-th Party tool
 
@@ -185,15 +191,44 @@ It specifies that a version number always contains these three parts:
 
         ```
         $ cd ~/
-        $ npm install -g husky-hook --save-dev  # '-g' global install
+        $ npm install -g husky --save-dev  # '-g' global install
         ```
 
     - uninstall
 
         ```
         $ npx husky-hook uninstall
-        $ npm uninstall husky-hook
+        $ npm uninstall husky
         ```
+
+    - add hook of husky(v7.x)
+
+        ```
+        $ npx husky add .husky/pre-commit "<bash script>"
+        $ npx husky add .husky/commit-msg "<bash script>"
+        $ npx husky add .husky/pre-push "<bash script>"
+        ```
+
+    - hooks
+        > + **applypatch-msg**
+        > + **pre-applypatch**
+        > + **post-applypatch**
+        > + **pre-commit**
+        > + **pre-merge-commit**
+        > + **prepare-commit-msg**
+        > + **commit-msg**
+        > + **post-commit**
+        > + **pre-rebase**
+        > + **post-checkout**
+        > + **post-merge**
+        > + **pre-push**
+        > + **post-update**
+        > + **push-to-checkout**
+        > + **pre-auto-gc**
+        > + **post-rewrite**
+        > + **sendemail-validate'
+
+
 
 + `commitlint`
     > 用來校驗 commit 提交信息
