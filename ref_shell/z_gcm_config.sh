@@ -45,7 +45,7 @@ git config --global core.editor vim
 
 # set git hook path
 git config --global core.hooksPath .husky
-git config core.hooksPath .husky
+git config core.hooksPath .husky  # set config of the local repository
 
 echo -e "export PATH=\"/C/node-v13.14.0-win-x64:${PATH}\"" >> ${HOME}/.bash_profile
 
