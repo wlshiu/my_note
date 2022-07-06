@@ -1,17 +1,40 @@
-# head: <type>(<scope>): <subject>
-# - type: feat, fix, docs, style, refactor, test, chore
-# - scope: can be empty (eg. if the change is a global or difficult to assign to a single component)
-# - subject: start with verb (such as 'change'), 50-character line#
+#  <type>(<scope>): <subject>
+#  <BLANK LINE>
+#  <body>
+#  <BLANK LINE>
+#  <footer>
+
+## Allowed <type>
+#  1.feat (feature)
+#  2.fix (bug fix)
+#  3.docs (documentation)
+#  4.style (formatting, missing semi colons, ...)
+#  5.refactor
+#  6.test (when adding missing tests)
+#  7.chore (maintain)
+#  8.perf (performance)
+#  9.build (build or dependency)
+# 10.revert
+# 11.release
+# 12.ci (continue integrate)
 
 
-# body: 72-character wrapped. This should answer:
-# * Why was this change necessary?
-# * How does it address the problem?
-# * Are there any side effects?#
+
+## Allowed <scope>
+# Scope could be anything specifying place of the commit change.
+# For example $location, $browser, $compile, $rootScope, ngHref, ngClick, ngView, etc...
+
+## Message footer
+# * Breaking changes
+# * Referencing issues: `Closes #123, #245, #992`
 
 
-# footer:
-# - Include a link to the ticket, if any.
-# - BREAKING CHANGE
+## Example
+# feat(directive): ng:disabled, ng:checked, ng:multiple, ng:readonly, ng:selected
+#
+# New directives for proper binding these attributes in older browsers (IE).
+# Added coresponding description, live examples and e2e tests.
+#
+# Closes #351
 
-# Commitizen
+## ref: https://gist.github.com/stephenparish/9941e89d80e2bc58a153
