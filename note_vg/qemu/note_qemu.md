@@ -118,33 +118,160 @@ Qemu
     - [qemu-system-gnuarmeclipse](https://github.com/xpack-dev-tools/qemu-arm-xpack/releases/)
         > this qemu is for Cortex-M serial
 
-    ```shell
-    # -memory size=kb
-    $ qemu-system-gnuarmeclipse --verbose \
-        --board STM32F4-Discovery --mcu STM32F407VG \
-        -d unimp,guest_errors \
-        -memory size=512 \
-        --nographic \
-        --image hello_rtos.elf
+        ```shell
+        # -memory size=kb
+        $ qemu-system-gnuarmeclipse --verbose \
+            --board STM32F4-Discovery --mcu STM32F407VG \
+            -d unimp,guest_errors \
+            -memory size=512 \
+            --nographic \
+            --image hello_rtos.elf
 
-    $ qemu-system-gnuarmeclipse --verbose --board STM32F4-Discovery \
-      --mcu STM32F407VG --gdb tcp::1234 -d unimp,guest_errors \
-      --semihosting-config enable=on,target=native \
-      --semihosting-cmdline \
-      --image hello_rtos.elf
-    ```
+        $ qemu-system-gnuarmeclipse --verbose --board STM32F4-Discovery \
+          --mcu STM32F407VG --gdb tcp::1234 -d unimp,guest_errors \
+          --semihosting-config enable=on,target=native \
+          --semihosting-cmdline \
+          --image hello_rtos.elf
+        ```
 
     - reference
         1. [STM32F429_Discovery_FreeRTOS_9](https://github.com/cbhust/STM32F429_Discovery_FreeRTOS_9)
+            > + Add `CFLAG += -g` to makefile
+            > + Use soft-FPU.
+            >> Modify `-mfloat-abi=hard` to `-mfloat-abi=soft`
 
-    ```shell
-    # -m size=256 (SRAM = 256KB)
-    $ qemu-system-gnuarmeclipse --verbose --verbose \
-        --board STM32F429I-Discovery --mcu STM32F429ZI \
-        -d unimp,guest_errors -m size=256 \
-        --image hello_rtos.elf \
-        --semihosting-config enable=on,target=native --semihosting-cmdline hello_rtos 1 2 3
-    ```
+        ```shell
+        # -m size=256 (SRAM = 256KB)
+        $ qemu-system-gnuarmeclipse --verbose --verbose \
+            --board STM32F429I-Discovery --mcu STM32F429ZI \
+            -d unimp,guest_errors -m size=256 \
+            --image hello_rtos.elf \
+            --semihosting-config enable=on,target=native --semihosting-cmdline hello_rtos 1 2 3
+        ```
+
+    - Example (MCU)
+
+        1. qemu server
+
+        ```
+        $ vi z_qemu_mcu_gdb_server.sh
+            #!/bin/bash
+
+            help()
+            {
+                echo -e "usage: $0 [elf file]"
+                exit -1;
+            }
+
+
+            if [ $# -lt 1 ]; then
+                help
+            fi
+
+            img_elf=$1
+
+            #
+            # $ qemu-system-gnuarmeclipse -machine help
+            #
+            # (qemu) c  # directly run
+            #
+
+            qemu-system-gnuarmeclipse --verbose --verbose \
+                --board STM32F4-Discovery \
+                -d unimp,guest_errors \
+                --nographic \
+                --image $img_elf \
+                --gdb tcp::1234 -S \
+                --semihosting-config enable=on,target=native \
+                --semihosting-cmdline test 5
+
+        $ ./z_qemu_mcu_gdb_server.sh ./STM32F429_Discovery_FreeRTOS_9/Projects/Hello_Qemu/hello_qemu.elf
+
+        xPack 64-bit QEMU v2.8.0 (C:\wl\tool_portable\msys64\home\xpack-qemu-arm-6.2.0-1\bin\qemu-system-gnuarmeclipse.exe).
+        Board: 'STM32F4-Discovery' (ST Discovery kit for STM32F407/417 lines).
+        Device file: 'C:\wl\tool_portable\msys64\home\xpack-qemu-arm-6.2.0-1\devices\STM32F40x-qemu.json'.
+        Device: 'STM32F407VG' (Cortex-M4 r0p0, MPU, ITM, 4 NVIC prio bits, 82 IRQs), Flash: 1024 kB, RAM: 128 kB.
+        Image: './STM32F429_Discovery_FreeRTOS_9/Projects/Hello_Qemu/hello_qemu.elf'.
+        Command line: 'test 5' (6 bytes).
+        Load  31524 bytes at 0x08000000-0x08007B23.
+        Load  79452 bytes at 0x08007B24-0x0801B17F.
+        Cortex-M4 r0p0 core initialised.
+        '/machine/mcu/stm32/RCC', address: 0x40023800, size: 0x0400
+        '/machine/mcu/stm32/FLASH', address: 0x40023C00, size: 0x0400
+        '/machine/mcu/stm32/PWR', address: 0x40007000, size: 0x0400
+        '/machine/mcu/stm32/SYSCFG', address: 0x40013800, size: 0x0400
+        '/machine/mcu/stm32/EXTI', address: 0x40013C00, size: 0x0400
+        '/machine/mcu/stm32/GPIOA', address: 0x40020000, size: 0x0400
+        '/machine/mcu/stm32/GPIOB', address: 0x40020400, size: 0x0400
+        '/machine/mcu/stm32/GPIOC', address: 0x40020800, size: 0x0400
+        '/machine/mcu/stm32/GPIOD', address: 0x40020C00, size: 0x0400
+        '/machine/mcu/stm32/GPIOE', address: 0x40021000, size: 0x0400
+        '/machine/mcu/stm32/GPIOF', address: 0x40021400, size: 0x0400
+        '/machine/mcu/stm32/GPIOG', address: 0x40021800, size: 0x0400
+        '/machine/mcu/stm32/GPIOH', address: 0x40021C00, size: 0x0400
+        '/machine/mcu/stm32/GPIOI', address: 0x40022000, size: 0x0400
+        '/machine/mcu/stm32/USART1', address: 0x40011000, size: 0x0400
+        '/machine/mcu/stm32/USART2', address: 0x40004400, size: 0x0400
+        '/machine/mcu/stm32/USART3', address: 0x40004800, size: 0x0400
+        '/machine/mcu/stm32/USART6', address: 0x40011400, size: 0x0400
+        '/peripheral/led:green' 8*10 @(258,218) active high '/machine/mcu/stm32/GPIOD',12
+        '/peripheral/led:orange' 8*10 @(287,246) active high '/machine/mcu/stm32/GPIOD',13
+        '/peripheral/led:red' 8*10 @(258,274) active high '/machine/mcu/stm32/GPIOD',14
+        '/peripheral/led:blue' 8*10 @(230,246) active high '/machine/mcu/stm32/GPIOD',15
+        GDB Server listening on: 'tcp::1234'...
+        QEMU 2.8.0 monitor - type 'help' for more information
+        (qemu) Cortex-M4 r0p0 core reset.
+        ```
+
+        1. gdb client
+
+            ```
+            $ vi z_qemu_mcu_gdb_client.sh
+                #!/bin/bash
+
+                help()
+                {
+                    echo -e "usage: $0 [srctree path] [elf file]"
+                    exit -1;
+                }
+
+                if [ $# -lt 2 ]; then
+                    help
+                fi
+
+                src_path=$1
+                img_elf=$2
+                
+                arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf
+
+            $ ./z_qemu_mcu_gdb_client.sh ./STM32F429_Discovery_FreeRTOS_9/ ./STM32F429_Discovery_FreeRTOS_9/Projects/Hello_Qemu/hello_qemu.elf
+
+                GNU gdb (GNU Arm Embedded Toolchain 10-2020-q4-major) 10.1.90.20201028-git
+                Copyright (C) 2020 Free Software Foundation, Inc.
+                License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+                This is free software: you are free to change and redistribute it.
+                There is NO WARRANTY, to the extent permitted by law.
+                Type "show copying" and "show warranty" for details.
+                This GDB was configured as "--host=i686-w64-mingw32 --target=arm-none-eabi".
+                Type "show configuration" for configuration details.
+                For bug reporting instructions, please see:
+                <https://www.gnu.org/software/gdb/bugs/>.
+                Find the GDB manual and other documentation resources online at:
+                    <http://www.gnu.org/software/gdb/documentation/>.
+
+                For help, type "help".
+                Type "apropos word" to search for commands related to "word"...
+                Reading symbols from ./STM32F429_Discovery_FreeRTOS_9/Projects/Hello_Qemu/hello_qemu.elf...
+                target remote localhost:1234: No such file or directory.
+                (gdb)
+                (gdb) target remote :1234     <--- link to gdb server
+                Remote debugging using :1234
+                Reset_Handler ()
+                    at ../../Libraries/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f4xx.s:69
+                69        movs  r1, #0
+                (gdb)
+
+            ```
 
 + u-boot (for test)
 
@@ -299,27 +426,27 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
 
     - compile
 
-    ```shell
-    $ vi ./z_build_linux.sh
-        #!/bin/bash -
+        ```shell
+        $ vi ./z_build_linux.sh
+            #!/bin/bash -
 
-        set -e
+            set -e
 
-        out=setting.env
-        echo "export ARCH=arm" > ${out}
-        echo "export CROSS_COMPILE=arm-none-eabi-" >> ${out}
-        echo "export SRCARCH=arm" >> ${out}
+            out=setting.env
+            echo "export ARCH=arm" > ${out}
+            echo "export CROSS_COMPILE=arm-none-eabi-" >> ${out}
+            echo "export SRCARCH=arm" >> ${out}
 
-        source ${out}
-        make vexpress_defconfig
-        make menuconfig
-        make
+            source ${out}
+            make vexpress_defconfig
+            make menuconfig
+            make
 
-        make COMPILED_SOURCE=1 cscope
+            make COMPILED_SOURCE=1 cscope
 
-    $ sudo chmod +x ./z_build_linux.sh
-    $ ./z_build_linux.sh
-    ```
+        $ sudo chmod +x ./z_build_linux.sh
+        $ ./z_build_linux.sh
+        ```
 
         1. configure for QEMU
 
@@ -342,67 +469,67 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
 
     - run kernel on QEMU
 
-    ```
-    $ vi z_start_kernel.sh
-        #!/bin/bash
+        ```
+        $ vi z_start_kernel.sh
+            #!/bin/bash
 
-        sudo qemu-system-arm \
-        -M vexpress-a9 \
-        -m 512M \
-        -kernel arch/arm/boot/zImage \
-        -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
-        -nographic \
-        -append "console=ttyAMA0"
-    $ sudo chmod +x ./z_start_kernel.sh
-    $ ./z_start_kernel.sh
-    audio: Could not init 'oss' audio driver
-    ...
-    # fail because no 'rootfs'
-    ```
+            sudo qemu-system-arm \
+            -M vexpress-a9 \
+            -m 512M \
+            -kernel arch/arm/boot/zImage \
+            -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
+            -nographic \
+            -append "console=ttyAMA0"
+        $ sudo chmod +x ./z_start_kernel.sh
+        $ ./z_start_kernel.sh
+        audio: Could not init 'oss' audio driver
+        ...
+        # fail because no 'rootfs'
+        ```
 
     - build `rootfs`
 
-    ```
-    $ vi z_mkrootfs.sh
-        #!/bin/bash
+        ```
+        $ vi z_mkrootfs.sh
+            #!/bin/bash
 
-        sudo rm -rf rootfs
-        sudo rm -rf tmpfs
-        sudo rm -f a9rootfs.ext3
+            sudo rm -rf rootfs
+            sudo rm -rf tmpfs
+            sudo rm -f a9rootfs.ext3
 
-        ## create rootfs
-        sudo mkdir rootfs
+            ## create rootfs
+            sudo mkdir rootfs
 
-        ## copy busybox cmds to rootfs (Be careful the path of busybox)
-        sudo cp -r busybox-1.27.2/_install/* rootfs/
+            ## copy busybox cmds to rootfs (Be careful the path of busybox)
+            sudo cp -r busybox-1.27.2/_install/* rootfs/
 
-        # copy the libraries of toolchain to rootfs
-        sudo mkdir rootfs/lib
-        sudo cp -P /usr/arm-linux-gnueabi/lib/* rootfs/lib
+            # copy the libraries of toolchain to rootfs
+            sudo mkdir rootfs/lib
+            sudo cp -P /usr/arm-linux-gnueabi/lib/* rootfs/lib
 
-        ## create 4 tty devices.
-        # ps. c= character device, 4= master device number
-        #     1, 2, 3, 4 is sub device number
-        sudo mkdir -p rootfs/dev
-        sudo mknod rootfs/dev/tty1 c 4 1
-        sudo mknod rootfs/dev/tty2 c 4 2
-        sudo mknod rootfs/dev/tty3 c 4 3
-        sudo mknod rootfs/dev/tty4 c 4 4
+            ## create 4 tty devices.
+            # ps. c= character device, 4= master device number
+            #     1, 2, 3, 4 is sub device number
+            sudo mkdir -p rootfs/dev
+            sudo mknod rootfs/dev/tty1 c 4 1
+            sudo mknod rootfs/dev/tty2 c 4 2
+            sudo mknod rootfs/dev/tty3 c 4 3
+            sudo mknod rootfs/dev/tty4 c 4 4
 
-        ## make image
-        dd if=/dev/zero of=a9rootfs.ext3 bs=1M count=32
+            ## make image
+            dd if=/dev/zero of=a9rootfs.ext3 bs=1M count=32
 
-        ## format to ext3 file system
-        mkfs.ext3 a9rootfs.ext3
+            ## format to ext3 file system
+            mkfs.ext3 a9rootfs.ext3
 
-        ## copy data to image
-        sudo mkdir tmpfs
-        sudo mount -t ext3 a9rootfs.ext3 tmpfs/ -o loop
-        sudo cp -r rootfs/* tmpfs/
-        sudo umount tmpfs
-    $ sudo chmod +x ./z_mkrootfs.sh
-    $ ./z_mkrootfs.sh
-    ```
+            ## copy data to image
+            sudo mkdir tmpfs
+            sudo mount -t ext3 a9rootfs.ext3 tmpfs/ -o loop
+            sudo cp -r rootfs/* tmpfs/
+            sudo umount tmpfs
+        $ sudo chmod +x ./z_mkrootfs.sh
+        $ ./z_mkrootfs.sh
+        ```
 
         1. simple rootfs
 
@@ -490,20 +617,20 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
 
     - compile
 
-    ```shell
-    $ vi ./z_run_buildroot.sh
-        #!/bin/bash -
+        ```shell
+        $ vi ./z_run_buildroot.sh
+            #!/bin/bash -
 
-        set -e
+            set -e
 
-        make qemu_arm_vexpress_defconfig
-        make
+            make qemu_arm_vexpress_defconfig
+            make
 
-        make COMPILED_SOURCE=1 cscope
+            make COMPILED_SOURCE=1 cscope
 
-    $ sudo chmod +x ./z_run_buildroot.sh
-    $ ./z_run_buildroot.sh
-    ```
+        $ sudo chmod +x ./z_run_buildroot.sh
+        $ ./z_run_buildroot.sh
+        ```
 
         1. images
             > `output/images`
@@ -516,29 +643,29 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
 
     - run kernel on QEMU
 
-    ```
-    $ vi z_start_kernel.sh
-        #!/bin/bash
+        ```
+        $ vi z_start_kernel.sh
+            #!/bin/bash
 
-        ## only kernel and rootfs and start GDB server
-        sudo qemu-system-arm \
-        -M vexpress-a9 -cpu cortex-a9 -smp 4 -m 256M \
-        -kernel ./output/images/zImage \
-        -serial stdio \
-        -sd ./output/images/rootfs.ext2 \
-        -dtb ./output/images/vexpress-v2p-ca9.dtb \
-        -nographic \
-        -net nic,model=lan9118 \
-        -net user \
-        -append "root=/dev/mmcblk0 console=ttyAMA0" \
-        -gdb tcp::1234 \
-        -S
+            ## only kernel and rootfs and start GDB server
+            sudo qemu-system-arm \
+            -M vexpress-a9 -cpu cortex-a9 -smp 4 -m 256M \
+            -kernel ./output/images/zImage \
+            -serial stdio \
+            -sd ./output/images/rootfs.ext2 \
+            -dtb ./output/images/vexpress-v2p-ca9.dtb \
+            -nographic \
+            -net nic,model=lan9118 \
+            -net user \
+            -append "root=/dev/mmcblk0 console=ttyAMA0" \
+            -gdb tcp::1234 \
+            -S
 
-        # -S: qemu to freeze CPU when start
-        # -s: default GDB port 1234 (the same with '-gdb tcp::1234')
-    $ sudo chmod +x ./z_start_kernel.sh
-    $ ./z_start_kernel.sh
-    ```
+            # -S: qemu to freeze CPU when start
+            # -s: default GDB port 1234 (the same with '-gdb tcp::1234')
+        $ sudo chmod +x ./z_start_kernel.sh
+        $ ./z_start_kernel.sh
+        ```
 
         1. open the other terminal
 
