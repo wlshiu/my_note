@@ -242,7 +242,8 @@ Qemu
                 src_path=$1
                 img_elf=$2
                 
-                arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf
+                arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf # -tui
+                # cgdb -d arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf  <--- cgdb: 是 gdb 的前端, 可用來取代 -tui mode
 
             $ ./z_qemu_mcu_gdb_client.sh ./STM32F429_Discovery_FreeRTOS_9/ ./STM32F429_Discovery_FreeRTOS_9/Projects/Hello_Qemu/hello_qemu.elf
 
