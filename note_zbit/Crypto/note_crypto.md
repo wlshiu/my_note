@@ -105,8 +105,8 @@ Alice 是簽名者, 假設她要對 msg_A 進行簽名時, 先產生其 Public-P
 
 + 比特幣區塊鏈上使用 Hash 函數, 來當做是一種證明.
     > 區塊鏈上許多礦工們彼此要爭打包(也就是幫你把交易內容寫到區塊鏈裡面)的工作,
-    因此他們要做的事情, 就是將交易內容(e.g. 此次交易資訊, Signature, ...etc.)附加上一個值，並算出 SHA-2 的值;
-    不斷更改後面的值, 直到輸出的雜湊值符合某一個格式, 那麼他就有打包這個區塊的權利，同時也會獲得獎賞.
+    因此他們要做的事情, 就是將交易內容(e.g. 此次交易資訊, Signature, ...etc.)附加上一個值, 並算出 SHA-2 的值;
+    不斷更改後面的值, 直到輸出的雜湊值符合某一個格式, 那麼他就有打包這個區塊的權利, 同時也會獲得獎賞.
     >> 由於雜湊值的結果是無法預測的, 在沒有辦法推論的結果之下, 最快的方法就是窮舉, 因此才要競爭比算力
 
 
@@ -205,11 +205,108 @@ MAC 是一種對稱式加密, 而數位簽章是公鑰加密, 因此 MAC 會比�
 ## MAC Algorithm
 
 + HMAC
+    >  H 就是 Hash 的意思; 利用 Hash 來達到訊息識別碼 (Message Authentication Code) 的功能
 
-+ CBC-MAC
++ CBC-MAC (Cipher Block Chaining)
+    > 一般指使用 AES 的 CBC mode 來建立 MAC.
+    >> CBC 是用前一個區塊加密結果, 來做為下一個區塊的加密參數;
+    由於前面的區塊會影響後面區塊的加密結果, 因此記錄最後一個區塊, 來達到訊息識別碼的功能
 
-+ GCM
 
++ GCM (Galois/Counter Mode)
+    > 一般指在 AES-CTR (Counter mode) 基礎上增加 Galois-field 來擴充建立 GMAC (Galois Message Authentication Code).
+    >> 解決了 AES-CTR 不能對加密消息進行完整性校驗的問題
+
+# Certificate authority (CA)
+
+為了使公開金鑰密碼系統得以順利運作, 必需有效的證明某一把公開金鑰確實為某人或某單位所擁有, 讓他人無法假冒或偽造. <br>
+解決方法是由可信賴的第三者或機構(Trusted Third Parity)來當作公鑰授權單位, 以簽發公鑰電子憑證的方式來證明公鑰的效力. <br>
+而 CA 就是其可信賴的第三方機構
+
+CA 是一個憑證管理中心, 它在做的事情, 就是驗證你真正擁有這個 **Public-Key**. <br>
+如果它認證此人真正擁有此 **Public-Key**, 那他就會頒發一個數位憑證(Certification)
+> 數位憑證 (Certification) 其實就是用 CA 的 `Private-Key` 去做 Signature.
+所以 CA 自己也會有一個 Key-Pair, `Private-Key` 用來簽章, **Public-Key** 讓使用者驗章確認數位憑證.
+>> 這 `Private-Key` 必須保管的非常好.
+
+而有 User, CA, Database(Key-Pair), CA 為 User 頒發 Certification 的整個架構, 就叫做公鑰基礎建設(PKI, Public Key Infrastructure)
+
+
+## TLS（Transport Layer Security, 傳輸層安全性協定）/SSL（Secure Sockets Layer, 安全通訊協定）
+
+SSL 總共有三個版本, SSL1.0/SSL2.0/SSL3.0; 而 SSL1.0 因為漏洞太多所以沒有公開. <br>
+在 2014 年時 SSL3.0 被發現缺陷, 因此在 2015 年時被棄用了, 之後誕生 TLS 做為 SSL 的繼任者.
+
+TLS 總共有四個版本 TLS1.0/TLS1.1/TLS1.2/TLS1.3
+> 在雙方進行通訊時(或是造訪網站等廣義的通訊)所共同遵守的規範, 更明確來規範步驟.
+>> 白話來說, 這個協定就是來決定我們要使用哪些加密方式, 以及怎麼使用
+
++ TLS1.2 Handshake
+
+    ![TLS1.2_Handshake](TLS1.2_Handshake.jpg)
+
+    - 首先 Client 會先傳送一個訊息, 稱為 **ClientHello**. 內容包含該 Client 可使用的最高 TLS 版本, 以及一清單的密碼套件(cipher suites)和一個亂數
+        > 單個 Cipher Suites 形如這樣 `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`, 須包含
+        > + 密鑰交換演算法(e.g. DHKE, ECDH, ...)
+        > + 對稱式加密演算法
+        > + MAC演算法(e.g. SHA-256)
+
+        > 客戶要提供一個密碼套件清單表示他所能提供的加密方式
+
+    - 接著 Server 會根據 Client 的訊息回傳 ServerHello
+        > 內容包括這次通訊要使用的加密方式 (從 Client 傳回的 Cipher Suites 中挑選)
+
+    - 當雙方都協議好要使用哪種加密方式, 接著是加密的準備.
+
+        1. 伺服器會傳來他的證書(Certification, 由 CA 頒發), 讓客戶端確認身份
+        1. 傳來 DHKE 的公開參數
+        1. 以上所有資料的數位簽章(當然經過 Hash)
+        1. 最後補上一句 ServerHelloDone 代表 Server 傳完了
+
+        > + 有了 Server 的證書，你可以確認他就是你要連的網站
+        > + 有 Server 的數位簽章, 你確認訊息是由他傳送過來的;
+        > + 有了 DHKE 的公開參數, 你可以和 Server 進行秘密訊息傳遞
+
+    - Client 必須將你的  **Public-Key** 傳給 Server, 才算完成一次 DHKE
+    - Client 還要傳一個 `Change cipher spec`, 告知 Server, 接下來都會傳送經過加密後的訊息
+    - Client 將以上所有的通訊結果摘要加密後, 傳送給伺服器，
+        > 這個步驟可以用來防範 MITM
+
+    - 最後 Server 回傳一個 `Change cipher spec`, 開始進行加密傳輸
+
+## Certificates (憑證)
+
+使用 `ITU-T X.509` 格式, 而憑證內容包括
+> + 使用者名稱
+> + 公開金鑰
+> + 發證者(issuer)
+> + 生效和到期日期
+> + 擁有者等資訊
+
+
++ X.509
+    > `X.509` 數位憑證乃以 `ASN.1` 符號表示法(Abstract Syntax Notation 1)定義, 詳細記載了組成該數位憑證的二進位資料
+    >> `ASN.1` 可以用多種方式加以編碼, 現今標準多為使用簡單的 DER (Distinguished Encoding Rules), 可以產生二進位數位憑證;
+    並用 `BASE64` 產生文字模式編碼格式
+
+    - 數位憑證通常以 Base64 編碼
+
+        ```
+        -----BEGIN CERTIFICATE-----MIICWDCCAgICAQAwDQYJKoZIhvcNAQEEBQAwgbYxCzAJBgNVBAYTAlpBMRUwEwYD
+        VQQIEwxXZXN0ZXJuIENhcGUxEjAQBgNVBAcTCUNhcGUgVG93bjEdMBsGA1UEChMUV
+        Ghhd3RlIENvbnN1bHRpbmcgY2MxHzAdBgNVBAsTFkNlcnRpZmljYXRpb24gU2VydmljZX
+        MxFzAVBgNVBAMTDnd3dy50aGF3dGUuY29tMSMwIQYJKoZIhvcNAQkBFhR3ZWJtYXN0
+        ZXJAdGhhd3RlLmNvbTAeFw05NjExMTQxNzE1MjVaFw05NjEyMTQxNzE1MjVaMIG2MQs
+        wCQYDVQQGEwJaQTEVMBMGA1UECBMMV2VzdGVybiBDYXBlMRIwEAYD
+        VQQHEwlDYXBlIFRvd24xHTAbBgNVBAoTFFRoYXd0ZSBDb25zdWx0aW5nIGNjMR8wHQ
+        YDVQQLExZDZXJ0aWZpY2F0aW9uIFNlcnZpY2VzMRcwFQYDVQQDEw53d3cudGhhd3Rl
+        LmNvbTEjMCEGCSqGSIb3DQEJARYUd2VibWFzdGVyQHRoYXd0ZS5jb20wXDANBgkqhki
+        G9w0BAQEFAANLADBIAkEAmpIl7aR3aSPUUwUrHzpVMrsm3gpI2PzIwMh39l1h/RszI0/0q
+        C2WRMlfwm5FapohoyjTJ6ZyGUUenICllKyKZwIDAQABMA0GCSqGSIb3DQEBBAUAA0EA
+        fI57WLkOKEyQqyCDYZ6reCukVDmAe7nZSbOyKv6KUvTCiQ5ce5L4y3c/ViKdlou5BcQYAb
+        xA7rwO/vz4m51w4w==
+        -----END CERTIFICATE-----
+        ```
 
 # Reference
 + [學密碼學也猜不到你的手機密碼](https://ithelp.ithome.com.tw/users/20140112/ironman/3930)
