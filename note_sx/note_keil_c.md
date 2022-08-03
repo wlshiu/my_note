@@ -207,6 +207,85 @@ Link external static libraries
     - [Linker - Command Line Options](https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_node/ld_3.html)
     - [Building a two-part firmware image using GCC toolchain](https://stackoverflow.com/questions/35183874/building-a-two-part-firmware-image-using-gcc-toolchain?lq=1)
 
+# fromelf
+
+## Keil-MDK 環境變數
+
++ Target Output
+    > 在 axf file 相同目錄下生成 bin file
+
+    ```
+    $ fromelf --bin -o "$L@L.bin" "$L@L.axf"
+    ```
+
+    > 生成 disassembly
+
+    ```
+    $ fromelf -c !L --output $P@L.S
+    ```
+
+    - `L` 指 axf 檔案路徑, 包括文件名
+
+        ```
+        假設 axf 檔案路徑為 'D:\out\aa.axf'
+        'L' 內容為 'D:\out\aa.axf'
+        ```
+
+    - `$L` 指 axf 檔案路徑, 但不包括文件名
+
+        ```
+        假設 axf 檔案路徑為 'D:\out\aa.axf'
+        'L' 內容為 'D:\out\' 包含最後的 '\'
+        ```
+
+    - `@L` 指 axf 檔案名, 但不包括副檔名
+
+        ```
+        假設 axf 檔案路徑為 'D:\out\aa.axf'
+        '@L' 內容為 'aa' 不包含最後的 '.axf'
+        ```
+
+    - ` #L` 絕對路徑, 等價 `L`
+
+    - `!L` 和 project file (`*.uvprojx`) 所在目錄的相對路徑
+
++ Project name (`*.uvprojx`)
+
+    - `P` project file path
+
+        ```
+        假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
+        'P' 內容為 'D:\app_sdk\meterAPP\app.uvprojx'
+        ```
+
+    - `#P` 絕對路徑, 等同於 `P`
+
+        ```
+        假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
+        '#P' 內容為 'D:\app_sdk\meterAPP\app.uvprojx'
+        ```
+
+    - `$P` 指 uvprojx 檔案路徑, 但不包括文件名
+
+        ```
+        假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
+        '$P' 內容為 'D:\app_sdk\meterAPP\'
+        ```
+
+    - `!P` 和 project file 的相對路徑
+
+        ```
+        假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
+        ```
+
+    - `@P` prject file name (no file extension)
+
+        ```
+        假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
+        '@P' 內容為 'app'
+        ```
+
+
 # Customize Tools Menu
 
 + External editor
