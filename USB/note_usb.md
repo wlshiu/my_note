@@ -104,7 +104,8 @@ USB 的設計為非對稱式的, 它由一個 Host controller 和若干通過集
 + Transport Layer (Packet Protocol)
 
     - Handshake
-    - USB Descriptors
+    - Package to packets
+        > USB Descriptors
 
 + App layer
 
@@ -180,7 +181,7 @@ USB 是一種 **Polled Bus**, 由 Host 啟動(Initiates)資料傳輸, 而 Device
     > + Low-Speed 和 Full-Speed 的時候是以 `1 ms` 為單位, 稱為一個 Frame
     > + High-Speed 時再把一個 Frame 切成 8 等分, 一個 `0.125 ms` 為單位, 稱為 `Microframe`
 
-    ![usb_frames](usb_frames.jpg)
+    ![usb_frames](usb_frames.png)
 
     > SOF (Start-of-Frame packet) 是一種特殊的封包, 他在每一個 frame 開始時發送
 
@@ -209,7 +210,47 @@ USB 是一種 **Polled Bus**, 由 Host 啟動(Initiates)資料傳輸, 而 Device
     xHCI 支援所有種類速度的 USB devices (USB 3.0 SuperSpeed, USB 2.0 Low/Full/High Speed, USB 1.1 Low/Full Speed). <br>
     xHCI 的目的是為了替換前面 3種(UHCI/OHCI/EHCI).
 
-## Device
+## [Device](note_usb_device.md)
+
+由多個 Endpoints 構成一個 Interface; 多個 Interfaces 組合成 USB logic Device;
+
+當 Device 接上 USB Bus 時, Host 會分配一個唯一的地址, 而 Device 會提供自己所有 Endpoints 的 attribute.
+> 每一個 Endpoint 都有唯一的 Endpoint Number(port number); 同時也包括支持的 Transfer types, Max packet length, data direction (IN or OUT).
+
+藉由 `Device Address`, `Endpoint Number`, `Data direction`, 可以讓 Host 找到 THE endpoint of THE Device.
+
++ Endpoint 描述內容包括:
+    - Bus access frequency/latency requirement
+    - Bandwidth requirement
+    - Endpoint number
+    - Error handling behavior requirements
+    - Maximum packet size that the endpoint is capable of sending or receiving
+    - The transfer type for the endpoint
+    - The direction in which data is transferred between the endpoint and the host
+
+
+## USB Hub
+
+提供了一種低成本, 低復雜度的 USB 裝置擴展方法. Hub 的上行 PORT (upstream) 連接到 Host, 下行 PORT (downstream) 連接到 Device (Hub 或 function Device). <br>
+
+在下行 PORT 中, Hub 須提供以下支援
+> + Connectivity behavior
+> + Power management
+> + Device connect/disconnect detection
+> + Bus fault detection and recovery
+> + High, Full, and Low-speed device support
+>> 不同 PORT 可以工作在不同的速度等級
+
++ Hub Architecture
+    > 由 Hub Repeater (重發器), Transaction Translator (轉發器) 以及 Hub Controller (Hub 控制器) 三部分組成
+
+    - Hub Repeater 是 upstream 和 downstream 之間的一個協議控制的開關, 它負責 packet 的 repeat 與 broadcast.
+    - Hub Controller 負責和 Host 的通信
+        > Host 通過 Hub class 請求和 Hub Controller 通訊, 獲得關於 Hub 本身和 downstream 的 Hub Descriptors, 並進行 Hub 和 downstream 的監控和管理
+    - Transaction Translator 提供了 High-Speed to Full/Low Speed 的轉換能力 (類似 bridge)
+        > 通過 Hub 可以在 High-Speed Host 和 Full/Low Speed Device 之間進行匹配
+        >> Hub 在硬件上支援 `Reset`, `Resume`, `Suspend`
+
 
 # [Protocol](note_usb_protocol.md)
 
@@ -224,6 +265,10 @@ OTG device 使用插頭中的 ID pin 來區分 type A/B Device.
 
 USB OTG 與 USB2.0 相比, 多三種新的傳輸協定。
 
+
+# STM32 USB
+
+![STM32_USB_Lib](STM32_USB_Lib.png)
 
 # Reference
 
