@@ -127,25 +127,54 @@ Host 控制器通過`Set_Address` Request, 向 Device 分配一個唯一的地�
 
 ##  Host 獲取 Device 的資訊
 
-主機發送 Get_Descriptor請求到新地址讀取裝置描述符,這次主機發送Get_Descriptor請求可算是誠心,它會認真解析裝置描述符的內容。裝置描述符內資訊包括端點0的最大包長度,裝置所支援的配置(Configuration)個數,裝置型別,VID(Vendor ID,由USB-IF分配), PID(Product ID,由廠商自己定製)等資訊。Get_Descriptor請求(Device type)和裝置描述符(已抹去VID,PID等資訊)
+Host 用新地址發送 `Get_Descriptor` Request 去讀取 Device Descriptor, 這次 Host 發送 `Get_Descriptor` Request 是會認真解析 Device Descriptor 的內容.
+> Device Descriptor 內資訊包括
+> + Endpoint0 的最大 packet size,
+> + Device 所支援的配置(Configuration)個數,
+> + Device 型別,
+> + VID(Vendor ID, 由 USB-IF 分配),
+> + PID(Product ID, 由廠商自己定製)
+> + 其他資訊
 
-之後主機發送Get_Descriptor請求,讀取配置描述符(Configuration Descriptor),字串等,逐一瞭解裝置更詳細的資訊。事實上,對於配置描述符的標準請求中,有時wLength一項會大於實際配置描述符的長度(9位元組),比如255。這樣的效果便是:主機發送了一個Get_Descriptor_Configuration 的請求,裝置會把介面描述符,端點描述符等後續描述符一併回給主機,主機則根據描述符頭部的標誌判斷送上來的具體是何種描述符。
-      接下來,主機就會獲取配置描述符。配置描述符總共為9位元組。主機在獲取到配置描述符後,根據裡面的配置集合總長度,再獲取配置集合。配置集合包括配置描述符,介面描述符,端點描符等等。
-     如果有字串描述符的話,還要獲取字串描述符。另外HID裝置還有HID描述符等
+之後 Host 發送 `Get_Descriptor` Request, 讀取 Configuration Descriptor, String Descriptor 等, 逐一瞭解 Device 更詳細的資訊.
+> 實務上, `Get_Descriptor` 的標準請求中, 有時 wLength 欄位會大於實際 Target Descriptor 的長度. <br>
+這樣的效果便是: Host 發送了一個 `Get_Descriptor_Configuration` 的請求, Device 會把 Interface Descriptor, Endpoint Descriptor 等後續 Descriptor, 一併回報給 Host; <br>
+Host 則根據 `Descriptor` header 的標誌判斷送來的具體是何種 Descriptor
 
-##  Host 給 Device 掛載驅動(複合 Device 除外)
+Host 在取得 Configuration Descriptor 後, 根據裡面的配置集合總長度, 再獲取配置集合
+> 配置集合包括
+> + Configuration Descriptor
+> + Interface Descriptor
+> + Endpoint Descriptor
+> + String Descriptor (如果有的話)
+> + HID Descriptor (如果是 HID Device)
 
-主機通過解析描述符後對裝置有了足夠的瞭解,會選擇一個最合適的驅動給裝置。  然後tell the world(announce_device)說明裝置已經找到了,最後呼叫裝置模型提供的介面device_add將裝置新增到 usb 匯流排的裝置列表裡,然後 usb匯流排會遍歷驅動列表裡的每個驅動,呼叫自己的 match(usb_device_match) 函式看它們和你的裝置或介面是否匹配,匹配的話呼叫device_bind_driver函式,現在就將控制權交到裝置驅動了。
+## Host 給 Device 掛載驅動(複合 Device 除外)
 
-     對於複合裝置,通常應該是不同的介面(Interface)配置給不同的驅動,因此,需要等到當裝置被配置並把介面使能後才可以把驅動掛載上去。
+> 偏向 OS 操作流程
 
-實際情況沒有上述關係複雜。一般來說,一個裝置就一個配置,一個介面,如果裝置是多功能符合裝置,則有多個介面。端點一般都有好幾個,比如Mass Storage裝置一般就有兩個端點(控制端點0除外)。
+Host 通過解析 Descriptor 後, 對 Device 有了足夠的瞭解, 會選擇一個最合適的 driver 給 Device.
+
+然後 `announce_device` 說明 Device 已經找到了, 最後呼叫 Device 模型提供的介面 `device_add`, 將 Device 新增到 USB Bus 的 Device 列表裡.
+
+接這 USB Bus 會遍歷驅動列表裡的每個驅動, 呼叫自己的 `usb_device_match()`, 看它們和你的 Device 或介面是否匹配,
+匹配的話呼叫`device_bind_driver()`, 現在就將控制權交到 Device Driver了
+
+> 對於複合 Device, 通常是不同的介面(Interface)配置給不同的驅動, 因此, 需要等到當 Device 被配置並把介面開啟後, 才可以把驅動掛載上去
+
+實際情況沒有上述關係複雜; 一般來說,一個 Device 就一個 Configuration 及一個 Interface;
+如果 Device 是多功能符合 Device, 則有多個 Interface. <br>
+Endpoint 一般都有好幾個, e.g. Mass Storage Device 一般就有兩個 Endpoints(除 Endpoint0 外, 一讀一寫)
 
 
 ##  Device 驅動選擇一個配置
 
-驅動(注意,這裡是驅動,之後的事情都是有驅動來接管負責與裝置的通訊)根據前面裝置回覆的資訊,傳送Set_Configuration請求來正式確定選擇裝置的哪個配置(Configuration)作為工作配置(對於大多數裝置來說,一般只有一個配置被定義)。至此,裝置處於配置狀態(Configured),當然,裝置也應該使能它的各個介面(Interface)。
-    對於複合裝置,主機會在這個時候根據裝置介面資訊,給它們掛載驅動
+> 偏向 OS 操作流程
+
+Device Driver 根據前面 Device 回覆的資訊 (之後的事情, 都由 Device Driver 來負責與 Device 的通訊),
+傳送 `Set_Configuration` Request, 來正式確定選擇 Device 的哪一個 Configuration, 作為工作配置(對於大多數 Device 來說,一般只有一個配置被定義).
+至此 Device 處於 Configured state, 當然 Device 也應該開啟它的各個 Interface
+> 對於複合 Device, Host 會在這個時候, 根據 Device 介面資訊, 給它們掛載驅動
 
 # Reference
 + [USB 列舉教學，詳解](https://wwssllabcd.github.io/2012/11/28/usb-emulation/)

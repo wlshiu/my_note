@@ -39,11 +39,92 @@ USB Device [[Back]](note_usb.md#Device)
 > 主要進行的操作, 就是獲取 Configuration Descriptor, parsing Configuration Descriptor, parsing Endpoint Descriptor
 >> 簡而言之就是從 Device 端獲取其性能和配置
 
-Enumeration 過程中使用了控制傳輸, 這種傳輸保證數據傳輸的正確性. <br>
+Enumeration 過程中使用了控制傳輸, 這種傳輸保證數據傳輸的正確性.
 
+# Standard Device Requests
 
+Host 會經由 Endpoint0 的 Control Pipe 與 Device 溝通, 依 `Standard Device Requests` 格式, 對 Device 發出各種 Requests.
+
++ Standard Device Requests format (Ref. Table 9-2. Format of Setup Data in USB 2.0 Spec)
+
+    | Offset  | Field          | Size   | Value             |Description                                           |
+    | :-:     | :-:            | :-:    | :-:               | :-                                                   |
+    | 0       | bmRequestType  | 1      | Bit-Map           | Bit[7] Data Phase Transfer Direction<br/>&ensp; 0 = Host to Device <br/>&ensp; 1 = Device to Host |
+    |         |                |        |                   | Bit[6:5] Type <br/>&ensp; 0 = Standard <br/>&ensp; 1 = Class <br/>&ensp; 2 = Vendor <br/>&ensp; 3 = Reserved <br/> |
+    |         |                |        |                   | Bit[4:0] Recipient <br/>&ensp; 0 = Device <br/>&ensp; 1 = Interface <br/>&ensp; 2 = Endpoint <br/>&ensp; 3 = Other<br/>&ensp; 4~31 = Reserved <br/> |
+    | 1       | bRequest       | 1      | Value             | Request                                              |
+    | 2       | wValue         | 2      | Value             | Value                                                |
+    | 4       | wIndex         | 2      | Index or Offset   | Index                                                |
+    | 6       | wLength        | 2      | Count             | Number of bytes to transfer if there is a data phase |
+
+## Requests type (Ref. 9.4 Standard Device Requests in USB 2.0 Spec)
+
++ GET_DESCRIPTOR (Ref. 9.4.3 Get Descriptor in USB 2.0 Spec)
+    > 要求 Device 返回存在的 Descriptor.
+
+    ```
+    +---------------+----------------+----------------------------------+-------------+------------+------------+
+    | bmRequestType |    bRequest    |          wValue                  | wIndex      | wLength    | Data       |
+    +---------------+----------------+----------------------------------+-------------+------------+------------+
+    | 10000000B     | GET_DESCRIPTOR | Descriptor Type (Bit[15:8]) and  | Zero or     | Descriptor | Descriptor |
+    |               |                | Descriptor Index (Bit[7:0])      | Language ID | Length     |            |
+    +---------------+----------------+----------------------------------+-------------+------------+------------+
+    ```
+
+    - `bmRequestType`
+
+        ```
+        typedef struct
+        {
+            union {
+                uint8_t        RequestType;
+                struct {
+                    /**
+                     *  D4...0: Recipient
+                     *      0 = Device
+                     *      1 = Interface
+                     *      2 = Endpoint
+                     *      3 = Other
+                     *      4 ~ 31 = Reserved
+                     */
+                    uint8_t     recipient : 5;
+
+                    /**
+                     *  D6...5: Type
+                     *      0 = Standard
+                     *      1 = Class
+                     *      2 = Vendor
+                     *      3 = Reserved
+                     */
+                    uint8_t         type  : 2;
+
+                    /**
+                     *  D7: Data transfer direction
+                     *      0 = Host-to-device
+                     *      1 = Device-to-host
+                     */
+                    uint8_t     direction : 1;
+                } RequestType_b;
+            };
+        };
+        ```
+
+    - `GET_DESCRIPTOR`
+        > Ref. Table 9-4. Standard Request Codes in USB 2.0 Spec
+
+    - `Descriptor Type`
+        > Ref. Table 9-5. Descriptor Types in USB 2.0 Spec
+
+    - `wLength`
+        > 表示要接收或發送多少 bytes (bmRequestType->RequestType_b.direction 決定方向)
+
+        > + Descriptor 長度大於 wLength, 那麼只有 Descriptor 的前半部被返回
+        > + Descriptor 長度小於 wLength, 則傳送一個短包來標誌傳輸的結束
+        >> 一個短包被定義成一個長度短於最大負載長度或一個空(NULL)包
 
 # Standard Descriptor
+
+USB Device 經由 Endpoint0 的 Control Pipe, 依 `Standard Descriptor` 格式, 將自己的資訊回報給 Host
 
 Standard Descriptor 有 5種, USB 為這些 Descriptor 定義了編號 (Table 9-5. Descriptor Types in USB 2.0 Spec)
 > + 1 == Device Descriptor
