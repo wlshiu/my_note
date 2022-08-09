@@ -1,4 +1,4 @@
-Open OCD
+OpenOCD 實務 [[Back](note_openocd.md#實務範例操作)]
 ---
 
 # Source code
@@ -136,6 +136,93 @@ Open OCD
     make
     ```
 
+## Auto-build script
+
++ `build.sh`
+    > **Ubuntu 16.04**
+
+    ```shell
+    #!/bin/bash
+
+    # Parameter
+    # $1: build-dir (must)
+    # $2: source-dir (must)
+    # $3: 1 for checkout source code (must)
+
+    # How to run?
+    if [ $# -lt 2 ]; then
+        echo "<Usage>: $0 build-dir source-dir [need_clone 0/1?]"
+        exit 1
+    fi
+
+    # Param
+    BUILD_DIR=`readlink -f $1`
+    SOURCE_DIR=`readlink -f $2`
+    UNAMESTR=`uname`
+
+    # Setup Source path
+    LIBUSB_SRC_1=$SOURCE_DIR/libusb-1.0.18
+    OPENOCD_SRC=$SOURCE_DIR/openocd
+
+    # Clean build/source folder
+    rm -rf $BUILD_DIR
+
+    # Clone source or not
+    if [ "$3" == '1' ]; then
+        CLONE_FLAG="--recursive"
+
+        rm -rf $SOURCE_DIR
+        wget https://ncu.dl.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18.tar.bz2 -P $SOURCE_DIR --no-check-certificate
+        git clone $CLONE_FLAG https://github.com/riscv/riscv-openocd.git $OPENOCD_SRC
+    else
+        echo 'Do not clone openocd source codes'
+    fi
+
+    # Build libusb-1.0.18
+    printf "\n\n\nBuild libusb-1.0.18\n"
+    tar -jxf $SOURCE_DIR/libusb-1.0.18.tar.bz2 -C $SOURCE_DIR
+    mkdir -p $BUILD_DIR/build/libusb
+    cd $BUILD_DIR/build/libusb
+    $LIBUSB_SRC_1/configure --prefix=$BUILD_DIR/usr PKG_CONFIG_LIBDIR=$BUILD_DIR/usr/lib/pkgconfig \
+        --disable-shared \
+        --disable-udev \
+        --disable-timerfd
+
+    make install -j8
+
+    # Build RISC-V OpenOCD
+    printf "\n\n\nBuild OpenOCD\n"
+    cd $OPENOCD_SRC
+    patch -p1 < openocd.patch
+    ./bootstrap
+    mkdir -p $BUILD_DIR/build/openocd
+    cd $BUILD_DIR/build/openocd
+    $OPENOCD_SRC/configure --prefix=$BUILD_DIR/usr PKG_CONFIG_LIBDIR=$BUILD_DIR/usr/lib/pkgconfig \
+        --disable-aice \
+        --disable-ti-icdi \
+        --disable-jlink \
+        --disable-osbdm \
+        --disable-opendous \
+        --disable-vsllink \
+        --disable-usbprog \
+        --disable-rlink \
+        --disable-ulink \
+        --disable-armjtagew \
+        --disable-usb-blaster-2 \
+        --enable-stlink \
+        --enable-ftdi
+
+    make -j8
+    make install-strip
+    ```
+
+    - usage
+
+        ```
+        $ build.sh build src 1   # 包含 clone source code
+        $ build.sh build src     # 純 build code
+        ```
+
 ## reference
 
 + [OpenOCD-build-script](https://github.com/arduino/OpenOCD-build-script/tree/static)
@@ -150,7 +237,9 @@ Open OCD
 + [Day 28: 高手不輕易透露的技巧(2/2) - Flash Driver & Target Burner - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197309)
 + [Day 29: 深藏不露的GDB - Remote Serial Protocol的秘密 - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197385)
 
+
 # Embitz
+---
 
 Use Absolute path
 
@@ -243,4 +332,5 @@ Use Absolute path
             load
             # monitor reset halt
             ```
+
 
