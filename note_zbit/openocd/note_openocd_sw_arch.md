@@ -6,7 +6,18 @@ OpenOCD Software Architecture [[Back]](note_openocd.md#OpenOCD-Software-Architec
 
 ```
 <openocd/
-+ contrib/
+~ contrib/
+  + libdcc/
+  ~ loaders/
+    + checksum/
+    + debug/
+    + erase_check/
+    + flash/    <---- like FLM of Keil
+    + watchdog/
+  + remote_bitbang/
+  + rpc_examples/
+  + rtos-helpers/
+  + xsvf_tools/
 + doc/
 + jimtcl/
 ~ src/
@@ -519,16 +530,22 @@ struct flash_driver {
 
 ### method `auto_probe` and `probe`
 
+主要負責初始化這個 Bank 中, 內部的 Setors 資料內容
+
+
 ### method `erase`
+
+將 Flash 進行 Erase
 
 ### method `write`
 
+Flash Program 的實作
 
-## Target Burner
+## Target Burner (contrib/loaders/flash/)
 
 OpenOCD 每做一次的 Tx/Rx 就是多筆 `USB + JTAG + FlashCtrl` 傳輸, 中間 protocol 的 overhead 相當高.
 
-若一次性將 data 搬到 Target 的 SRAM, 然後透過一個預先設計好並載入到 Target 上面的 **Burner Program(like FLM)**,
+若一次性將 data 搬到 Target 的 SRAM, 然後透過一個預先設計好並載入到 Target 上面的 **Burner Program (like FLM of Keil-C)**,
 負責將 data 透過 Flash Controller 寫入到 Flash 上, 如此就能加速燒錄效率
 > overhead of protocol 就只有 **傳輸到 SRAM** 的部分
 
@@ -541,3 +558,6 @@ OpenOCD 每做一次的 Tx/Rx 就是多筆 `USB + JTAG + FlashCtrl` 傳輸, 中�
 + [Day 05: OpenOCD 軟體架構](https://ithelp.ithome.com.tw/articles/10193390)
 + [Day 27: 高手不輕易透露的技巧(1/2) - Flash Programming](https://ithelp.ithome.com.tw/articles/10197190)
 + [Day 28: 高手不輕易透露的技巧(2/2) - Flash Driver & Target Burner](https://ithelp.ithome.com.tw/articles/10197309)
++ [OpenOCD代碼結構淺析(基於RISCV)](https://zhuanlan.zhihu.com/p/259494491)
+
+

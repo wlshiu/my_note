@@ -59,7 +59,7 @@ Info : Listening on port 3333 for gdb connections               <-------- GDB �
         > 執行 <command>
 
         ```
-        $ openocd.exe -f interface/cmsis-dap.cfg -f target/stm32f1x.cfg -c -c "verify reset exit;"
+        $ openocd.exe -f interface/cmsis-dap.cfg -f target/stm32f1x.cfg -c "verify reset exit;"
         ```
 
 ## Telnet Connect to OpenOCD Server
@@ -100,6 +100,55 @@ Open On-Chip Debugger
     >> Jim-Tcl 是著名的 Tcl 語言的精簡版本 (Jim-Tcl 的功能要少得多)
 
 # Command Overview
+
++ OpenOCD 常用命令
+
+    ```
+    - halt
+        暫停 CPU
+
+    - reset
+        復位目標板
+
+    - resume
+        恢復執行
+
+    - resume 0x123456
+        從 0x123456 地址恢復執行
+
+    - reg <register>
+        列印 register 暫存器的值
+
+    - load_image <File Name> <Addr>
+        燒寫二進位制檔案到指定地址
+        e.g. load_image image.bin 0x4000000   # 燒寫 image.bin 到 0x4000000
+
+    - dump_image <File Name> <Addr> <Size>
+        從地址 <Addr> 開始的 <Size> bytes 資料讀出, 並儲存到檔案 <File Name> 中
+
+    - verify_image <File Name> <Addr> [bin|ihex|elf]
+        將檔案 <File Name> 與記憶體 <Addr> 開始的資料進行比較, 格式可選 bin/ihex/elf
+
+    - step [Addr]
+        不加地址: 從當前位置單步執行
+        加地址:   從 Addr 處單步執行
+
+    - poll
+        查詢目標板當前狀態
+
+    - bp <Addr> <Length> [hw]
+        在 <Addr> 地址設定斷點, 指令長度為 <Length>, [hw] 代表硬體斷點
+
+    - rbp <Addr>
+        刪除 <Addr> 處的斷點
+
+    - mdw <Addr> [Count]   -顯示從實體地址 <Addr> 開始的 [Count](預設為 1 word)
+    - mdh <Addr> [Count]   -顯示從實體地址 <Addr> 開始的 [Count](預設為 1 half-word)
+    - mdb <Addr> [Count]   -顯示從實體地址 <Addr> 開始的 [Count](預設為 1 byte)
+    - mww <Addr> <Value>   -向實體地址 <Addr> 寫入 <Value> (大小 1 word)
+    - mwh <Addr> <Value>   -向實體地址 <Addr> 寫入 <Value> (大小 1 half-word)
+    - mwb <Addr> <Value>   -向實體地址 <Addr> 寫入 <Value> (大小 1 byte)
+    ```
 
 ## Setup (Server & Debug Adapter Configuration)
 
@@ -161,7 +210,6 @@ TAPs 全名為`Test Access Ports`, 為 JTAG 中的核心部分, 而 OpenOCD 在�
                 arm11 ls1_sap mips_m4k avr dsp563xx dsp5680xx testee avr32_ap7k hla_target nds32_v2 nds32_v3 nds32_v3m or1k quark_x10xx
                 quark_d20xx stm8 riscv mem_ap esirisc arcv2 aarch64 mips_mips64
             >
-
             ```
 
 + `<$target_name> configure [config params]`
