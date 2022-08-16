@@ -894,6 +894,314 @@ OpenOCD 每做一次的 Tx/Rx 就是多筆 `USB + JTAG + FlashCtrl` 傳輸, 中�
     # tcl/target/my_nor_flash.cfg
     ```
 
+# Source code trace
+
+## main
+
+```c
+//===============================================
+//  the main entry
+//===============================================
+openocd_main()
+    setup_command_handler()
+        command_init()                              // "startup_tcl.inc' initialization"
+        (*command_registrants[i]) (cmd_ctx) ----+   // "register all commands below in the table"
+                                                |
+                                                v
+                                static const command registrant_t   command registrants[] = {
+                                    &openocd_register_commands,
+                                    &server_register_commands,
+                                    &gdb_register_commands,
+                                    &log_register_commands,
+                                    &transport register_commands,
+                                    &interface_register_commands,
+                                    &target_register_commands,
+                                    &flash register_commands,
+                                    &nand_register_commands,
+                                    &pld_register_commands,
+                                    &mflash_register_commands,
+                                    &cti_register_commands,
+                                    &dap_register_commands,
+                                    NULL
+                                };
+
+
+    util_init ()            // "register the command 'util command_handlers'"
+    openocd_thread()        // "*** start the execute ***
+        server_loop()
+    flash_free_all_banks()  // "free all bank"
+    gdb_service_free()
+    server_free()
+    unregister_all_commands()
+```
+
++ `command_registrants[]` 中存放的是, 所有需要進行注冊的 command handler, 當 configure 文件在解析處理的過程中, 會最終調用這些 handler 進行處理
+
++ 以注冊 trace handler 為例, 以下是 trace handler 的結構
+    > 注意其中的 name 與 handler 是對應的, `Jim module` 在查找特定 handler 的時候, 就是通過 name 來定位的
+
+    - `.mode = COMMAND_EXEC`
+        > 表示該 handler 是在 CLI 中, 通過輸入命令才會觸發的預注冊函數.
+
+    - `.mode = COMMAND_CONFIG`
+        > 表示該 handler 是在 OpenOCD 啟動階段, 並解析 cfg 文件的時候, 才會觸發的預注冊函數.
+
+    - `.mode = COMMAND_ANY`
+        > 表示該以上兩種情況下, 都會觸發的預注冊 handler.
+
+        ```
+        // the trace command list below
+        static const struct command_registration trace_exec_command_handlers[] =
+        {
+            {
+                .name    = "history",
+                .handler = handle_trace_history_command,
+                .mode    = COMMAND_EXEC,
+                .help    = "display trace history, clear history or set size",
+                .usage   = "['clear'|size]",
+            },
+            {
+                .name    = "point",
+                .handler = handle trace_point_command,
+                .mode    = COMMAND_EXEC,
+                .help    = "display trace points, clear list of trace points,"
+                            "or add new tracepoint at address",
+                .usage   = "['clear's address]",
+            },
+            COMMAND_REGISTRATION_DONE
+        };
+
+        static const struct command_registration trace_command_handlers[] =
+        {
+            {
+                .name  = "trace",
+                .mode  = COMMAND_EXEC,
+                .help  = "trace command group",
+                .usage = "",
+                .chain = trace exec command_handlers,
+            },
+            COMMAND_REGISTRATION_DONE
+        };
+        ```
+
+    - Command link list
+        > 先找到對應的 `Cmd Root handler`, 在往 `children` 找
+
+        ```
+                                    Cmd Root
+                                +----------------------+  *children   +-----------------+  *next   +---------------+
+          command_context   --> |     "trace" cmd      | -----------> |   "point" cmd   | -------> | "history" cmd |
+                                +----------------------+              +-----------------+          +---------------+
+                                  |
+                                  | *next
+                                  v
+                                +----------------------+  *children   +-----------------+
+                                | "target_request" cmd | -----------> | "debugmsgs" cmd |
+                                +----------------------+              +-----------------+
+                                  |
+                                  | *next
+                                  v
+                                +----------------------+  *children   +-----------------+  *next   +---------------+
+                                |     "mflash" cmd     | -----------> |   "bank " cmd   | -------> |  "init " cmd  |
+                                +----------------------+              +-----------------+          +---------------+
+                                  |
+                                  | *next
+                                  v
+                                +----------------------+  *children   +-----------------+  *next   +---------------+  *next   +-------------+  *next   +------------+
+                                |     "flash" cmd      | -----------> |   "bank" cmd    | -------> |  "init" cmd   | -------> | "banks" cmd | -------> | "list" cmd |
+                                +----------------------+              +-----------------+          +---------------+          +-------------+          +------------+
+                                  |
+                                  | *next
+                                  v
+                                +----------------------+  *children   +-----------------+
+                                |   "transport" cmd    | -----------> |    "xx" cmd     | -------> ...
+                                +----------------------+              +-----------------+
+                                  |
+                                  | *next
+                                  v
+                                  ....
+        ```
+
+## OpenOCD link to GDB
+
++ `server_loop()`
+    > `server_loop()` 本身是一個大循環, 接收來自 GDB 或 Telnet 等, 通過 socket 傳過來的數據. <br>
+    呼叫 `server->input()` 對接收到的數據進行解析, 然後再調用特定的函數進行處理
+
+    ```
+
+    socket_loop()
+        service->input(c)               // "register the handler by add_service() function, such as: gdb_input()"
+            gdb_input()                 // "the command coming from GDB will be received in gdb_packet_buffer[] buffer"
+                gdb_input_inner()
+                    gdb_get_packet()
+                    gdb_thread_packet()
+                    gdb_get_registers_packet()
+                    gdb_set_registers_packet()
+    ```
+
+
+
++ GDB 命令執行 flow
+
+    - **Add S/w Break-point flow**
+        > 其中 `Z0,100310,4` 是來自 GDB 發送過來的命令字符串,
+        > + `Z0`表示設置軟斷點,
+        >> `0`表示 S/w Break-point, `1`則表示 H/w Break-point
+        > + `100310`為 16 進制值, 表示斷點設置的 address,
+        > + `4` 表示該地址處的機器碼長度為 4 個 bytes.
+        > + `$OK#9a` 表示 OpenOCD 處理完該命令後, 要反饋給 GDB 的訊息
+
+        ```
+        "Z0,100310,4"   // add the software breakpoint, command from GDB
+        --> "$OK#9a"    // feedback to GDB
+
+        gdb_input()
+            gdb_input_inner()
+                gdb_breakpoint_watchpoint_packet()
+                    breakpoint_add()
+                        breakpoint_add_internal()
+                            target_add_breakpoint()
+                                target->type->add_breakpoint()
+                                    riscv_add_breakpoint()
+
+                                        target_read_memory()
+                                            target->type->read_memory()
+                                                riscv_read_memory()
+
+                                        target_write_memory()   // 'ebreak()/ebreak_c()' write into target memory
+                                            target->type->write_memory ()
+                                                riscv_write_memory ()
+
+                    gdb_put_packet()    // feedback response to GDB
+
+        ```
+
+        1. 上例子是基於 RISC-V 平台, 通過 backtrace 可以看到, 對於 S/w Break-point 的設置, OpenOCD 會做兩個步驟
+            > + 先將 Break-point Address 中的 machine code, 讀取到 OpenOCD 中, 並保存起來
+            >> 通過 `riscv_read_memory()`
+            > + 再將 Break-point 的 machine code, 寫入到 Target 的內存中
+            >> 通過 `riscv_write_memory()` <br>
+            在 RISC-V 中, 是將 ebreak(4-byte) 或 c.ebreak(2-bytes) 的 machine code, 寫入到 Target 內存中.
+
+        1. 當 Target (Core) 運行程序的時, 執行到替換後的 break 指令, 就會觸發 exception 並 halt 住;
+            > 此時 Target(Core) 就進入 debug 狀態停止下來, 等待來自 OpenOCD 的 polling.
+
+        1. OpenOCD 在處理完來自 GDB 的命令後, 一般都會呼叫 `gdb_put_packet()`, 將結果反饋給 GDB
+            > 反饋的 message 必需滿足 GDB 的命令格式
+
+
+    - **Delete S/w Break-point flow**
+        > OpenOCD 收到來自 GDB 的命令 `z0,100310,4`, 其中 `z0` 表示要刪除 S/w Break-point
+        >> 刪除 S/w Break-point 的處理, 與新增 S/w Break-point 的處理邏輯相反. <br>
+        需要將保存在 OpenOCD 中, 原地址處的機器碼, 寫回到 Target 的原位置(通過 `riscv_remove_breakpoint`).
+
+        ```
+        "z0,100310,4"   // delete the software breakpoint
+        --> "$OK#9a"    // feedback to GDB
+
+        gdb_input()
+            gdb_input_inner()
+                gdb_breakpoint_watchpoint_packet()
+                    breakpoint_remove()
+                        breakpoint_remove_internal()
+                            breakpoint_free()
+                                target_remove_breakpoint()
+                                    target->type->remove_breakpoint()
+                                        riscv_remove_breakpoint())
+
+                                            target_write_memory ()  // for software breakpoint delete
+                                                target->type->write_memory()
+                                                    riscv_write_memory()
+                                                        target->type->virt2phys()
+                                                        tt->write_memory()
+
+                                            remove_trigger()        // for hardware breakpoint delete
+
+        gdb_put_packet()    // feedback response to GDB
+        ```
+
+    - **Step by Step flow**
+        > 在處理程序的最底層, 實際調用的是 `dmi_write()/dmi_read()`
+        此 APIs 涉及到 OpenOCD 對 Target 中 Debug Module 的 registers 訪問.
+
+        ```
+        "vCont;s:0;c:0"                                         // single step
+        --> "$05b305d20466f756e6420312074726967676572730a#cf"   // feedback response to GDB
+        --> "$T05#b9"
+
+        gdb_input()
+            gdb_input_inner()
+                gdb_v_packet()
+                    gdb_handle_vcont_packet()
+                        target_step()   // execute step command
+                            target->type->step()
+                                old_or_new_riscv_step()
+                                    riscv_openocd_step()
+                                        riscv_step_rtos_hart()
+                                            r->step_current_hart()
+                                                riscv013_step_current_hart()
+                                                    riscv013_step_or_resume_current_hart()
+                                                        dmi_write() / dmi_read()    // send the command to Debug Module in MCU target through JLINK
+                                                                                    // poll target MCU state
+                            target_poll()
+                                target->type->poll()
+                                    old_or_new_riscv_poll()
+                                        riscv_openocd_poll()
+                            gdb_signal_reply()      // send response to GDB
+                                gdb_put_packet()
+        ```
+
+    - ** Read Vector register of RISC-V**
+        > 通過建構兩條 instructions 的方式, 將結果暫時讀到 CPU 的 s0 Reg 中, 最終通過 DATAn Reg 將數據獲取出來
+
+        ```
+        "p1043" // 讀取 vector register (v1), 1043 是 v1 reg 的號碼
+
+        gdb_input())
+            gdb_input_inner()
+                gdb_get_register_packet()
+                    target_get_gdb_reg_list()   // 獲取所有 register list
+                        target->type->get_gdb_reg_list()
+                            riscv_get_gdb_reg_list_internal()
+                                /* 分配空間容納所有 registers */
+                                target->reg_cache->reg_list[i].type->get()
+                                    register_get()
+                                        r->get_register_buf) // 讀取 vector reg
+                                            riscv013_get_register_buf()
+                                                register_read()             // 讀取 CPU Reg 's0'並保存
+                                                prep_for_register_access()  // 讀 Reg 前, 設定 'mstatus.VS= 1', 允許訪問 vector
+
+                                                    /* 判斷是否為 FPU 或 WEC Reg */
+                                                    register_read()         // 讀取 CPU中 mstatus Reg
+                                                    /* 若訪問 FPU Reg, 且 'mstatus.FS= 0', 則 register_write_direct() 設定 'mstatus.FS= 1' */
+                                                    /* 若訪問 VEC Reg, 且 'mstatus.VS= 0', 則 register_write_direct() 設定 'mstatus.VS= 1' */
+                                                prep_for_vector_access()
+                                                    register_read()         // 讀取 CPU 中的 VTYPE Reg, 並保存
+                                                    register_read()         // 讀取 CPU 中的 VL Reg, 並保存
+                                                    register_write_direct() // 變更 CPU 的 vtype.VSEW: element-size 32/64 bits
+                                                    register_write_direct() // 更改 CPU 中的 vl, 當前 vector Reg 最大 elements 的數量
+                                                riscv_program_init()        // 建構指令的準備工作
+                                                riscv_program_insert()      // 建構指令: vmx.x.s s0, vnum [0] 將 vector Reg 中 index= 0 的 elements 複製到 s0 Reg中
+                                                riscv_program_insert()      /* 建構指令: vslide1down.vx vnum, vnum, s0 和上一條指令構成一個循環 slide操作;
+                                                                               每次把 High index 的 element 移入 Low index 中 */
+
+                                                /* 循環開始, 共 element size 的次數 */
+                                                riscv_program_exec()        // 執行上述建構好的 instructions, 將 v Reg中的 data 按 element大小順序讀出並放到 s0 Reg 中
+                                                register_read_direct()      // 從 s0 Reg 中讀出並放入 DATA0/DATA1 Reg 中, 然後再通過 DMI 讀取出來
+                                                buf_set_u64()               // 進行 data 拼接
+                                                /* 循環結束 */
+
+                                                cleanup_after_vector_access()   // 恢復原來的 vtype 和 vl Reg 的值
+                                                    register_write_direct()     // 恢復原來的 vtype
+                                                    register_write_direct()     // 恢復原來的 v
+
+                                                cleanup_after_register_access() // 恢復原來 mstatus Reg 的狀態
+                                                    register_write_direct()
+                                                register_write_direct()         // 恢復 CPU Reg s0 原來的值
+        ```
+
+
 # Reference
 ---
 + [Day 05: OpenOCD 軟體架構](https://ithelp.ithome.com.tw/articles/10193390)

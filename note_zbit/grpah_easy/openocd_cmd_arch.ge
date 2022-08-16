@@ -1,0 +1,10 @@
+[command_context]->["trace" cmd]-- *children -->["point" cmd]-- *next -->["history" cmd]
+["target_request" cmd]-- *children -->["debugmsgs" cmd]
+["mflash" cmd]-- *children -->["bank " cmd]-- *next -->["init " cmd]
+["flash" cmd]-- *children -->["bank" cmd]-- *next -->["init" cmd]-- *next -->["banks" cmd]-- *next -->["list" cmd]
+["transport" cmd]-- *children -->["xx" cmd]
+
+["trace" cmd] -- *next --> { start: right; } ["target_request" cmd] { origin: "trace" cmd; offset: 0,2; }
+["target_request" cmd] -- *next --> { start: right; } ["mflash" cmd] { origin: "target_request" cmd; offset: 0,2; }
+["mflash" cmd]-- *next --> { start: right; } ["flash" cmd] { origin: "mflash" cmd; offset: 0,2; }
+["flash" cmd]-- *next --> { start: right; } ["transport" cmd] { origin: "flash" cmd; offset: 0,2; }
