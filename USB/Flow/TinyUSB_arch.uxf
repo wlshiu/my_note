@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>72</x>
+      <y>261</y>
+      <w>945</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;1030.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>693</x>
+      <y>351</y>
+      <w>207</w>
+      <h>279</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>855</x>
+      <y>306</y>
+      <w>90</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>*Device*
+(src/device)
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>162</x>
+      <y>306</y>
+      <w>81</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>*Host*
+(src/host)
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>693</x>
+      <y>657</y>
+      <w>171</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*USBD (USB Device Driver)*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>198</x>
+      <y>351</y>
+      <w>207</w>
+      <h>279</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>234</x>
+      <y>657</y>
+      <w>171</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*USBH (USB Host Driver)*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>621</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>315</x>
+      <y>621</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>450</x>
+      <y>720</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>OSAL</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>675</x>
+      <y>747</y>
+      <w>225</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>162</x>
+      <y>936</y>
+      <w>783</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>*HAL*
+(hw/mcu/...)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>198</x>
+      <y>756</y>
+      <w>225</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>
+bg=orange
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>369</x>
+      <y>693</y>
+      <w>99</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>90.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>693</y>
+      <w>27</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>315</x>
+      <y>693</y>
+      <w>27</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>477</x>
+      <y>504</y>
+      <w>162</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*BSP*
+(hw/bsp/stm32f1/family)
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>477</x>
+      <y>774</y>
+      <w>144</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>*FIFO/Queue*
+(src/common/tusb_fifo)
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>738</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>459</x>
+      <y>738</y>
+      <w>27</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;220.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>567</x>
+      <y>540</y>
+      <w>99</w>
+      <h>414</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>90.0;440.0;90.0;160.0;10.0;160.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>522</x>
+      <y>540</y>
+      <w>126</w>
+      <h>414</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;170.0;120.0;170.0;120.0;440.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>495</x>
+      <y>567</y>
+      <w>36</w>
+      <h>18</h>
+    </coordinates>
+    <panel_attributes>*IRQ*
+valign=center
+halign=left
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>603</x>
+      <y>693</y>
+      <w>135</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;130.0;40.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>891</y>
+      <w>27</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>315</x>
+      <y>900</y>
+      <w>27</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>513</y>
+      <w>108</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>513</y>
+      <w>135</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>828</x>
+      <y>522</y>
+      <w>63</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;300.0;50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>207</x>
+      <y>621</y>
+      <w>27</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>684</x>
+      <y>792</y>
+      <w>207</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>dcd_int_handler
+(IRQ_Handler)
+
+{innerclass
+dcd_event_bus_signal
+ (event )
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>675</x>
+      <y>747</y>
+      <w>198</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>*DCD: Device Controller Driver*
+(src\portable)
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>738</x>
+      <y>351</y>
+      <w>162</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*TDU (Device Class APIs)*
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>702</x>
+      <y>549</y>
+      <w>144</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*dcd_event_handler*
+
+{innerclass
+osal_queue_send
+
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>828</x>
+      <y>558</y>
+      <w>108</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;10.0;100.0;330.0;50.0;330.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>576</x>
+      <y>594</y>
+      <w>171</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;150.0;170.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>198</x>
+      <y>351</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*TDH (Host Class APIs)*
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>252</x>
+      <y>549</y>
+      <w>144</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>*hcd_event_handler*
+
+{innerclass
+osal_queue_send
+
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>594</y>
+      <w>144</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=blue</panel_attributes>
+    <additional_attributes>140.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>216</x>
+      <y>756</y>
+      <w>198</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>HCD: Host Controller Driver
+(src\portable)
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>207</x>
+      <y>801</y>
+      <w>207</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>hcd_int_handler
+(IRQ_Handler)
+
+{innerclass
+hcd_event_xxx
+ (event )
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>171</x>
+      <y>558</y>
+      <w>108</w>
+      <h>324</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0;10.0;340.0;70.0;340.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>657</x>
+      <y>306</y>
+      <w>279</w>
+      <h>603</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>162</x>
+      <y>306</y>
+      <w>270</w>
+      <h>612</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>702</x>
+      <y>513</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*tud_int_handler*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>252</x>
+      <y>513</y>
+      <w>144</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*tuh_int_handler*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>666</x>
+      <y>117</y>
+      <w>81</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;300.0;70.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>513</x>
+      <y>99</y>
+      <w>180</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>*App*
+{innerclass
+*USB Device*
+{innerclass
+cdc_task (handle data)
+--
++ tud_cdc_line_state_cb
++ tud_cdc_rx_cb
++ tud_mount_cb
++ tud_umount_cb
++ tud_suspend_cb
++ tud_resume_cb
+innerclass}
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>189</x>
+      <y>117</y>
+      <w>180</w>
+      <h>117</h>
+    </coordinates>
+    <panel_attributes>*App*
+{innerclass
+*USB Host*
+{innerclass
+hid_app_task
+--
++ tuh_cdc_xfer_isr
+
+innerclass}
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>342</x>
+      <y>135</y>
+      <w>63</w>
+      <h>270</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;280.0;50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>702</x>
+      <y>387</y>
+      <w>144</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*tud_task*
+{innerclass
+osal_queue_receive
+
+innerclass}
+{innerclass
+Parsing data
+innerclass}</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>369</x>
+      <y>414</y>
+      <w>144</w>
+      <h>333</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>252</x>
+      <y>387</y>
+      <w>144</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>*tuh_task*
+{innerclass
+osal_queue_receive
+
+innerclass}
+{innerclass
+Parsing data
+innerclass}</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>567</x>
+      <y>414</y>
+      <w>171</w>
+      <h>333</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>675</x>
+      <y>189</y>
+      <w>297</w>
+      <h>261</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;310.0;10.0;310.0;270.0;170.0;270.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>873</x>
+      <y>171</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*Callback*
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>135</x>
+      <y>189</y>
+      <w>153</w>
+      <h>261</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;10.0;10.0;10.0;270.0;150.0;270.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>99</x>
+      <y>171</y>
+      <w>81</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*Callback*
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>729</x>
+      <y>117</y>
+      <w>54</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*Polling*
+valign=center
+halign=center
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>387</x>
+      <y>135</y>
+      <w>54</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>*Polling*
+valign=center
+halign=center
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

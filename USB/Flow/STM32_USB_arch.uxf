@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>0</y>
+      <w>480</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>250</x>
+      <y>720</y>
+      <w>640</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;620.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>250</x>
+      <y>160</y>
+      <w>640</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;620.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>360</x>
+      <y>460</y>
+      <w>400</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>lt=.
+
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>290</x>
+      <y>190</y>
+      <w>550</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>470</x>
+      <y>810</y>
+      <w>180</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Low Level Driver
+(stm32f1xx_ll_usb)
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>310</x>
+      <y>220</y>
+      <w>170</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>Core
+{innerclass
+*usbd_core*
+innerclass}
+{innerclass
+*usbd_ctlreq*
+innerclass}
+{innerclass
+*usbd_ioreq*
+innerclass}
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>460</x>
+      <y>190</y>
+      <w>200</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*STM32_USB_Device_Library*
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>650</x>
+      <y>220</y>
+      <w>170</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>Class
+{innerclass
+*CDC*
+innerclass}
+{innerclass
+*HID*
+innerclass}
+{innerclass
+*MSC*
+innerclass}
+{innerclass
+*DFU*
+innerclass}
+{innerclass
+*Audio*
+innerclass}
+{innerclass
+*Video*
+innerclass}
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>140</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>140</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>410</x>
+      <y>760</y>
+      <w>310</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*HAL Driver PCD (Peripheral Controller Driver)*
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>250</x>
+      <y>410</y>
+      <w>640</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;620.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>360</x>
+      <y>750</y>
+      <w>400</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>700</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>310</y>
+      <w>30</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;150.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>470</x>
+      <y>270</y>
+      <w>200</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;180.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>780</y>
+      <w>30</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+group=1</panel_attributes>
+    <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>420</x>
+      <y>510</y>
+      <w>280</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=-
++ HAL_PCD_SetupStageCallback
++ HAL_PCD_DataOutStageCallback
++ HAL_PCD_DataInStageCallback
++ HAL_PCD_SOFCallback
++ HAL_PCD_ResetCallback
++ HAL_PCD_SuspendCallback
++ HAL_PCD_ResumeCallback
++ HAL_PCD_ISOOUTIncompleteCallback
++ HAL_PCD_ISOINIncompleteCallback
++ HAL_PCD_ConnectCallback
++ HAL_PCD_DisconnectCallback
+valign=center
+halign=left
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>450</x>
+      <y>460</y>
+      <w>230</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>*USB Device Configuration*
+(USB_DEVICE/Target/usbd_conf)
+halign=center
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>670</x>
+      <y>540</y>
+      <w>150</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;10.0;130.0;240.0;70.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>770</x>
+      <y>520</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*IRQ Callback*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>270</x>
+      <y>240</y>
+      <w>170</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0;10.0;280.0;150.0;280.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>70</x>
+      <y>190</y>
+      <w>210</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>*usbd_core*
++ USBD_LL_SetupStage
++ USBD_LL_DataOutStage
++ USBD_LL_DataInStage
++ USBD_LL_Reset
++ USBD_LL_SetSpeed
++ USBD_LL_Suspend
++ USBD_LL_Resume
++ USBD_LL_SOF
++ USBD_LL_IsoINIncomplete
++ USBD_LL_IsoOUTIncomplete
++ USBD_LL_DevConnected
++ USBD_LL_DevDisconnected
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>450</x>
+      <y>240</y>
+      <w>220</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>200.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>380</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>740</x>
+      <y>430</y>
+      <w>120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*USBD_LL_xxx*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>490</x>
+      <y>220</y>
+      <w>150</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>USBD_ClassTypeDef </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>50</y>
+      <w>340</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>*Operator Interface*
++ USBD_CDC_ItfTypeDef   (usbd_cdc_interface)
++ USBD_StorageTypeDef   (usbd_storage)
++ USBD_DFU_MediaTypeDef (usbd_dfu_flash)
++ USBD_AUDIO_ItfTypeDef (usbd_audio_if)
+valign=center
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>430</x>
+      <y>0</y>
+      <w>260</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*Application*
+(USB_DEVICE/App)
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>50</y>
+      <w>180</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0;160.0;180.0;130.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>810</x>
+      <y>20</y>
+      <w>100</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*File Operator*
+*Interface*
+valign=center
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
