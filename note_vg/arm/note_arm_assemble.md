@@ -1,6 +1,27 @@
 GNU ARM assemble
 ---
 
+# ISA(Instruction Set Architecture) 符號定義
+
+默認定義
+
++ `Rs`
+    > source'or the first source operand.
+
++ `Rt`
+    > target or the second source operand.
+
++ `Rd`
+    > destination operand.
+
++ `Ra`
+    > accumulate results
+
++ `Rn` or `Rm`
+    > just mean two input registers, (n, m 通常是 `0 ~ 12`)
+
+
+
 # format
 
 + 任何彙編行都是如下架構, 註釋用 `@`, `[]` or `{}`中的內容為可選, 可有可無
@@ -174,7 +195,7 @@ GNU ARM assemble
 + `PC` (Program Counter) or `R15`
     >
 
-+  `LR` (Link Register) or `R14`
++ `LR` (Link Register) or `R14`
 
 + `SP` (Stack Pointer) or `R13`
 
@@ -325,10 +346,10 @@ GNU ARM assemble
     ldr  r0 , = 0x123    @ 立即值放入r0
     ldr  r0 , [r1,#4]    @ 將 (r1+4)地址中的內容值放入r0
     ldr  r0, [r1],#4     @ 將 (r1+0)地址中的內容值放入r0,並且 --> r1=r1+4
-    
+
     @ 跳轉到對應的絕對地址去執行
     ldr pc, 0xAABBCCDD   @ 這是uboot中的用法
-    ldr pc, do_und       @ symbol name    
+    ldr pc, do_und       @ symbol name
     ldr  pc, =main       @ ldr偽指令可以在立即數前加上 '=', 以表示把一個地址寫到某寄存器中
     ```
 
