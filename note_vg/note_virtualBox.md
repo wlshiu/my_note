@@ -432,9 +432,8 @@ $ sudo apt-get install lubuntu-desktop
         # ubuntu 18.04
         $ sudo apt install tasksel
         $ sudo tasksel install samba-server
-        
+
         # ubuntu 20.04
-        $ sudo apt install tasksel
         $ sudo apt-get install samba samba-common
         ```
 
@@ -508,6 +507,8 @@ $ sudo apt-get install lubuntu-desktop
             $ sudo bash -c 'grep -v -E "^#|^;" /etc/samba/smb.conf_backup | grep . > /etc/samba/smb.conf'
             ```
 
+        1. ubuntu 20.04
+
     - check connection
 
         1. in lubuntu
@@ -572,7 +573,7 @@ $ sudo apt-get install lubuntu-desktop
         ```
         $ sudo /etc/init.d/smbd restart
 
-        # ubuntu 18.04
+        # ubuntu 18.04/20.04
         $ sudo service smbd restart
         ```
 
@@ -583,7 +584,15 @@ $ sudo apt-get install lubuntu-desktop
         (you should get samba_share folder)
         ```
 
+    - Windows 10
+        1. Open Control Panel.
+        1. Click on Programs.
+        1. Click on Turn Windows features on or off link.
+        1. Expand the SMB 1.0/CIFS File Sharing Support option.
+        1. Check the SMB 1.0/CIFS Client option.
+
     - [reference](https://bryceknowhow.blogspot.tw/2013/10/virtualbox-samba-ubuntu-host-onlywin7.html#more)
+    - [Windows 10 存取 Ubuntu Samba 問題](https://blog.richliu.com/2021/04/15/4453/windows-10-%E5%AD%98%E5%8F%96-ubuntu-samba-%E5%95%8F%E9%A1%8C/)
 
 + locale
 
