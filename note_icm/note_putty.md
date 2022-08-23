@@ -11,17 +11,25 @@ Putty
 
 + 無法使用 home end 鍵
 
-- putty版本 > 0.6
+    - putty版本 > 0.6
 
-    ```
-    putty -> Connection -> Data -> Terminal type string 從 xterm 改成 Linux
-    ```
+        ```
+        putty -> Connection -> Data -> Terminal type string 從 xterm 改成 Linux
+        ```
 
-- putty版本 <= 0.6
+    - putty版本 <= 0.6
 
-    ```
-    putty->Terminal -> Keyboard -> The home and End keys 改成 Standard
+        ```
+        putty->Terminal -> Keyboard -> The home and End keys 改成 Standard
 
-    putty->Terminal -> Keyboard -> The function keys and keypad 改成 SCO
-    ```
+        putty->Terminal -> Keyboard -> The function keys and keypad 改成 SCO
+        ```
+
++ Copy/Paste
+
+    + Paste something from Windows clipboard into Vim
+        > Use `Shift + Insert`.
+
+    + Copy something from Vim into the Windows clipboard
+        > hold `Shift + Select with Left Mouse`.
 
