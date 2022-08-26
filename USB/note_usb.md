@@ -268,7 +268,13 @@ USB OTG 與 USB2.0 相比, 多三種新的傳輸協定。
 
 # STM32 USB
 
+## Library organization overview
+
 ![STM32_USB_Lib](STM32_USB_Lib.png)
+
+## HUSB peripheral block diagram
+![USB peripheral block diagram](Flow/STM32_USB_HWIP.jpg)
+
 
 # Reference
 

@@ -76,8 +76,8 @@ GCC
 # __attribute__
 
 + constructor/destructor
-    - 在執行 main()前, 先 call 有 __attribute__((constructor))修飾的 function
-    - 在結束 main()後, 再 call 有 __attribute__((destructor))修飾的 function
+    - 在執行 `main()` 前, 先 call 有 ` __attribute__((constructor))` 修飾的 function
+    - 在結束 `main()` 後, 再 call 有 `__attribute__((destructor))` 修飾的 function
 
     ```c
     static  __attribute__((constructor)) void before()
@@ -134,6 +134,104 @@ GCC
             return 0;
         }
         ```
+
++ aligned
+
+    ```c
+    int x   __attribute__ ((aligned (16))) = 0;
+
+    struct foo
+    {
+        int x[2]    __attribute__ ((aligned (8)));
+    };
+
+    struct __attribute__ ((aligned (8)))  S
+    {
+        short f[3];
+    };
+
+    typedef int more_aligned_int  __attribute__ ((aligned (8)));
+
+    typedef struct
+    {
+         char           Data1;
+         int            Data2;
+         unsigned short Data3;
+         char           Data4;
+
+    } __attribute__((aligned(1))) SampleStruct;
+    ```
+
++ packed
+    > alignment 1-byte
+
+    ```c
+    struct foo
+    {
+        char a;
+        int x[2] __attribute__ ((packed));
+    };
+    ```
+
++ section
+
+    ```
+    struct duart bb     __attribute__ ((section ("DUART_B"))) = { 0 };
+
+    char stack[10000]   __attribute__ ((section ("STACK"))) = { 0 };
+
+    int init_data __attribute__ ((section ("INITDATA"))) = 0;
+    int init_data()
+    {
+        ...
+        return 0;
+    }
+    ```
+
++ `warn_if_not_aligned (alignment)`
+    > Issue an warning on `struct foo`, like **warning: alignment 4 of 'struct foo' is less than 8**
+
+    ```c
+    typedef unsigned long long __u64   __attribute__((aligned (4), warn_if_not_aligned (8)));
+
+    struct foo
+    {
+        int     i1;
+        int     i2;
+        __u64   x;
+    };
+    ```
+
++ `vector_size(bytes)`
+
+    ```
+    typedef __attribute__ ((vector_size (32)))  int int_vec32_t ;
+    typedef __attribute__ ((vector_size (32)))  int *int_vec32_ptr_t;
+    typedef __attribute__ ((vector_size (32)))  int int_vec32_arr3_t[3];
+    ```
+
++ Reference
+    - [GCC Attributes](https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html#index-aligned-type-attribute)
+
+# finstrument-functions
+
+該參數可以使程序在編譯時, 在所有 function 的 enter 和 exit 處生成 instrumentation 調用
+
+```
+void  __cyg_profile_func_enter(void *this_fn, void *call_site)
+{
+    return;
+}
+
+void  __cyg_profile_func_exit(void *this_fn, void *call_site)
+{
+    return;
+}
+
+this_fn   (callee): 是當前函數的起始地址 (可在符號表中找到)
+call_site (caller): 是調用處地址
+```
+
 
 # Linker
 
