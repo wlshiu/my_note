@@ -479,7 +479,7 @@ $ sudo apt-get install lubuntu-desktop
             a. shutdown
             a. In VirtualBox Network -> Adapter 2 -> Reflash MAC address (maybe don't need)
 
-        1. ubuntu 18.04
+        1. ubuntu 18.04 and ubuntu 20.04
 
             ```
             $ sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml_backup
@@ -507,8 +507,6 @@ $ sudo apt-get install lubuntu-desktop
             $ sudo bash -c 'grep -v -E "^#|^;" /etc/samba/smb.conf_backup | grep . > /etc/samba/smb.conf'
             ```
 
-        1. ubuntu 20.04
-
     - check connection
 
         1. in lubuntu
@@ -532,7 +530,9 @@ $ sudo apt-get install lubuntu-desktop
             ```
 
     - Create shared folder at lubuntu (Ex. ~/samba_share)
+
     - Set Samba
+
 
         ```
         # backup
@@ -540,25 +540,32 @@ $ sudo apt-get install lubuntu-desktop
 
         # Add setting, [User Name] is your Ubuntu account
         $ sudo gedit /etc/samba/smb.conf
+            [global]
+                ...
+
+                min protocol = SMB2     # 使用 SMBv2 以上(Win10 支援 SMBv3.1.1 協議, SMBv1 預設是關閉)
+
+            [printers]
+                ...
 
             [samba_share]
-            Comment = Shared Folder
-            Path = /home/[User Name]/samba_share
-            public = yes
-            writable = yes
-            read only = no
-            valid users = [User Name]
-            force directory mode = 777
-            force create mode = 777
-            force security mode = 777
-            force directory security mode = 777
-            hide dot file = no
-            create mask = 0644 ;0777
-            directory mask = 0775 ;0777
-            delete readonly = yes
-            guest ok = yes
-            available = yes
-            browseable = yes
+                Comment = Shared Folder
+                Path = /home/[User Name]/samba_share
+                public = yes
+                writable = yes
+                read only = no
+                valid users = [User Name]
+                force directory mode = 777
+                force create mode = 777
+                force security mode = 777
+                force directory security mode = 777
+                hide dot file = no
+                create mask = 0644 ;0777
+                directory mask = 0775 ;0777
+                delete readonly = yes
+                guest ok = yes
+                available = yes
+                browseable = yes
         ```
 
     - Set Samba account and password
@@ -584,7 +591,7 @@ $ sudo apt-get install lubuntu-desktop
         (you should get samba_share folder)
         ```
 
-    - Windows 10
+    - Windows 10 開啟 SMBv1 (lubuntu samba 使用 SMBv2 以上, 此項可省略)
         1. Open Control Panel.
         1. Click on Programs.
         1. Click on Turn Windows features on or off link.
