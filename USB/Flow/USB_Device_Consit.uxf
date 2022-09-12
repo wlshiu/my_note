@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>340</x>
+      <y>230</y>
+      <w>230</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>*USB Device*
+
+{innerclass
+*Interface 0 (Class)*
+{innerclass
+EP * n
+innerclass}
+innerclass}
+
+{innerclass
+*Interface 1 (Class)*
+{innerclass
+EP * m
+innerclass}
+innerclass}
+
+{innerclass
+*Interface 2 (Class)*
+{innerclass
+EP * k
+innerclass}
+innerclass}</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

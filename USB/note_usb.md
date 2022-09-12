@@ -212,7 +212,10 @@ USB 是一種 **Polled Bus**, 由 Host 啟動(Initiates)資料傳輸, 而 Device
 
 ## [Device](note_usb_device.md)
 
-由多個 Endpoints 構成一個 Interface; 多個 Interfaces 組合成 USB logic Device;
+由多個 Endpoints 構成一個 Interface (class); 多個 Interfaces (classes) 組合成 USB logic Device;
+
+![USB_Device_Consit](Flow/USB_Device_Consit.jpg)
+
 
 當 Device 接上 USB Bus 時, Host 會分配一個唯一的地址, 而 Device 會提供自己所有 Endpoints 的 attribute.
 > 每一個 Endpoint 都有唯一的 Endpoint Number(port number); 同時也包括支持的 Transfer types, Max packet length, data direction (IN or OUT).
@@ -272,12 +275,33 @@ USB OTG 與 USB2.0 相比, 多三種新的傳輸協定。
 
 ![STM32_USB_Lib](STM32_USB_Lib.png)
 
-## HUSB peripheral block diagram
+## H/w USB peripheral block diagram
 ![USB peripheral block diagram](Flow/STM32_USB_HWIP.jpg)
 
+## PMA (Packet Memory Area)
+
+![USB PMA layout](Flow/STM32_USB_PMA.jpg)
+
++ 藉由 `Buffer Description Table (BTable)` 來設定 EPx transceiving buffer
+
+    ```c
+    typedef struct buf_entry
+    {
+        uint16_t    addr_tx;
+        uint16_t    count_tx;
+        uint16_t    addr_rx;
+        uint16_t    count_rx;
+    } buf_entry_t;
+
+    /* STM32 suport 8 EndPointers */
+    typedef struct BTable
+    {
+        buf_entry_t     buf_entry[8];
+    } BTable_t;
+    ```
 
 # Reference
-
+---
 + [USB (Universal Serial Bus)-成大資工 WiKi](http://wiki.csie.ncku.edu.tw/embedded/USB)
 + [USB 枚舉過程介紹](https://www.wpgdadatong.com/tw/blog/detail?BID=B4561)
 + [OSI七層簡介](https://giboss.pixnet.net/blog/post/26798748-osi%E4%B8%83%E5%B1%A4%E7%B0%A1%E4%BB%8B)
