@@ -185,6 +185,22 @@ USB 是一種 **Polled Bus**, 由 Host 啟動(Initiates)資料傳輸, 而 Device
 
     > SOF (Start-of-Frame packet) 是一種特殊的封包, 他在每一個 frame 開始時發送
 
++ UTMI (USB2.0 Transceiver Macrocell Interface)
+    > 是一種用於 `USB controller` 和 `USB PHY` 通訊的協議
+
++ ULPI (UTMI+Low Pin Interface)
+    > 是 UTMI 的 **Low Pin** 版本
+
+    ![USB_ULPI](Flow/USB_ULPI_interface.jpg)
+
+    | SIGNAL    | DIRECTION | DESCRIPTION
+    |   :-      | :-        |
+    | CLK       | I/O       | 時鐘輸入, 60MHz
+    | DATA[7:0] | I/O       | 8-bits 雙向數據總線
+    | DIR       | OUT       | 控制數據總線方向, 0: LINK 到 PHY, 1: PHY 到 LINK
+    | STP       | IN        | Stop信號, 用於 Stop PHY 的輸出, 獲取總線控制權, 為 1 時有效
+    | NXT       | OUT       | 當 LINK 向 PHY 發送數據時, NXT 為 1 表示當前數據已經被 PHY 所接受. <br>當 PHY 向 LINK 發送數據時, NXT 為1 表示 PHY 有新的數據在總線上
+
 ## Host Controller
 
 在 USB Host端, 幾家大廠制定了 HCD (Host Controller Driver) 的規範
