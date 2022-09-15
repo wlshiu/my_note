@@ -560,7 +560,14 @@
             $ git add/rm <conflicted_files>
             $ git rebase --continue
             ```
++ 搬遷 Remote Git Repo
+    > clone 一個 bare git repo (只有 git 儲存庫), 再推到新位址去就好
 
+    ```shell
+    $ git clone --bare https://github.com/hbdoy/xxx
+    $ cd xxx.git
+    $ git push --mirror https://github.com/hbdoy/new_project
+    ```
 
 # tig
 
