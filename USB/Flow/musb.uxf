@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>350</x>
+      <y>570</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>USBDCDInit()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>450</x>
+      <y>90</y>
+      <w>140</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*TI-MSP432e4*
+fontsize=20</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>540</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*USBD Control-Driver*
+(usbdenum.c)
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>210</x>
+      <y>360</y>
+      <w>670</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>130</y>
+      <w>180</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*USB Device Configurtion*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>250</x>
+      <y>160</y>
+      <w>270</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>*tUSBDCDCDevice*
+--
++ VID/PID
++ pfnControlCallback
++ pfnRxCallback
++ pfnTxCallback
++ sPrivateData (tCDCSerInstance)
+    - sDevInfo
+*        &gt; psCallbacks (tCustomHandlers)*
+valign=center
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>550</x>
+      <y>160</y>
+      <w>270</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>*tUSBDMSCDevice*
+--
++ VID/PID
++ pfnEventCallback
++ sMediaFunctions
+    - pfnOpen/pfnClose
+    - pfnBlockRead/pfnBlockWrite
++ sPrivateData (tMSCInstance)
+    - sDevInfo
+*        &gt; psCallbacks (tCustomHandlers)*
+valign=center
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>210</x>
+      <y>130</y>
+      <w>670</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>330</x>
+      <y>420</y>
+      <w>140</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>USB Device X Init
+(register device)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>200</y>
+      <w>180</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0;160.0;240.0;40.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>330</y>
+      <w>30</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>650</x>
+      <y>670</y>
+      <w>40</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>IRQ
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>460</y>
+      <w>30</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>540</x>
+      <y>570</y>
+      <w>220</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>USBDeviceIntHandlerInternal()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>210</x>
+      <y>540</y>
+      <w>670</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>590</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+layer=0</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>360</y>
+      <w>170</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*Device Class X Handler*
+(usblib/device)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>630</y>
+      <w>200</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>USB0_IRQDeviceHandler()
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>650</y>
+      <w>30</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+layer=0</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>480</y>
+      <w>30</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+layer=0</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>650</x>
+      <y>510</y>
+      <w>220</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*psCallbacks (tCustomHandlers)*
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>300</y>
+      <w>260</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=green</panel_attributes>
+    <additional_attributes>10.0;10.0;240.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>230</y>
+      <w>170</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>370</y>
+      <w>170</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>Class X methods
+*(tCustomHandlers)*
+{innerclass
+*g_sCDCHand*
+innerclass}
+{innerclass
+*g_sMSCHandlers*
+innerclass}
+{innerclass
+*...*
+innerclass}</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>220</y>
+      <w>220</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0;150.0;200.0;200.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>250</y>
+      <w>170</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>220</y>
+      <w>180</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>300</y>
+      <w>70</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=green</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;140.0</additional_attributes>
+  </element>
+</diagram>
