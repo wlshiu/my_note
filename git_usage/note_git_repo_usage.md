@@ -105,17 +105,26 @@
 
 - git save password
 
-    + linux
+    + 儲存 ssh 帳密到 `~/.git-credentials`
 
         ```
-        $ git config --global credential.helper 'cache --timeout 86400'
+        # Enable save password
+        $ git config --global credential.helper store
         ```
 
-    + windows
+    + 暫時儲存 ssh 帳密
 
         ```
-        git config --global credential.helper wincred
+        # 設定自動暫存帳號與密碼（存在記憶體 15 分鐘）
+        $ git config --global credential.helper cache
         ```
+
+        1. 使用 `--timeout` 改變暫存時間
+
+            ```
+            # 帳號與密碼暫存一小時 (3600 seconds)
+            $ git config credential.helper 'cache --timeout=3600'
+            ```
 
 - 檢查目前 Git 的狀態
 
