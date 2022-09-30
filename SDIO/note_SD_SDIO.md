@@ -1,7 +1,9 @@
-SDIO interface (Secure Digital Input/Output interface)
+SD/SDIO interface (Secure Digital Input/Output interface)
 ---
 
-SDIO 就是 SD 的 I/O interface, 更具體的說 SD 本來是 memory card 的標準, 但也可以把 SD interface 拿來當作上某些週邊介面使用, 這樣的技術便是 SDIO.
+**SD Card(Secure Digital Memory Card)**, 中文翻譯為安全數位卡, 是一種記憶卡, 被廣泛應用於攜帶型裝置上.
+
+**SDIO** 就是 SD 的 I/O interface, 更具體的說 SD 本來是 memory card 的標準, 但也可以把 SD interface 拿來當作上某些週邊介面使用, 這樣的技術便是 SDIO.
 > SDIO 本身是一種相當單純的技術, 透過 SD I/O Pins 來連接外部週邊, 並透過 SD I/O Pins 與這些週邊傳輸資料, 而且 SD 協會會員也推出很完整的 SDIO stack driver,
 使得 SDIO 週邊(稱為 SDIO 卡)的開發與應用變得相當熱門.
 
@@ -44,18 +46,24 @@ SDIO 就是 SD 的 I/O interface, 更具體的說 SD 本來是 memory card 的�
 
 **Logo**
 
-| 傳統 SD            | SDHC (SD High Capacity, SD 2.0) | SDXC (SD eXtended Capacity, SD 3.0/4.0) |
-| :-                 | :-                              | :-                                      |
-| 容量 < 2GBytes     | 容量 < 32GBytes                 | 容量 < 2TBytes                          |
-| ![SD](SD-Logo.jpg) | ![SDHC](SDHC-Logo.jpg)          | ![SDXC](SDXC-Logo.jpg)                  |
+![SD_card_standard](SD_card_standard.jpg)
 
-## Card size
+> ![SD](SD-Logo.jpg)
+>> 傳統 SD (容量 < 2GBytes)
+
+
+## SD Card I/O Pinout
 
 Micro SD Card, 原名 `Trans-flash Card (TF)`. 2004 年正式更名為 Micro SD Card, 由 SanDisk 公司發明.
 
 ![Card size](MMC_SD_cade_size.jpg)
 
-## SD I/O Pinout
+### SD Card Pin Description
+
++ 傳輸模式
+    > + `SPI mode (Required)`
+    > + `1-bit mode`
+    > + `4-bits mode`
 
 | Pin# | `SD 4-bit`<br>(Pin Name) | `SD 4-bit`<br>(Pin Description) | `SD 1-bit`<br>(Pin Name) | `SD 1-bit`<br>(Pin Description) | `SPI Mode`<br>(Pin Name) | `SPI Mode`<br>(Pin Description) |
 | :-   | :-                  | :-                          | :-                  | :-                         | :-                  | :-                         |
@@ -69,6 +77,9 @@ Micro SD Card, 原名 `Trans-flash Card (TF)`. 2004 年正式更名為 Micro SD 
 | 8    | DAT[1]              | Data Line 1 / Interrupt     | IRQ                 | Interrupt                  | IRQ                 | Interrupt                  |
 | 9    | DAT[2]              | Data Line 2 /Read Wait      | RW                  | Read Wait                  | NC                  | Not Used                   |
 
+**SD Memory Card Architecture**
+
+![SD_Card_internal_arch](SD_Card_internal_arch.jpg)
 
 ### SD 卡的 PinOut 定義和 `Micro SD (TF)` 卡的 PinOut 定義是不相同
 
@@ -86,18 +97,31 @@ Micro SD Card, 原名 `Trans-flash Card (TF)`. 2004 年正式更名為 Micro SD 
 | 8     | DAT[1] | DAT[1]          | Rsv              |
 | 9     | DAT[2] | --              | --               |
 
-## 傳輸模式
+**MicroSD Memory Card Architecture**
+
+![MicroSD_Card_internal_arch](MicroSD_Card_internal_arch.jpg)
+
+### SD Card Basic Registers
+
+SD card 總共有 8 個 registers, 用於設定或表示 SD 卡資訊
+
+| Reg                                           | bit length | description                                          |
+| :-                                            | :-         | :-                                                   |
+| CID (Card identification number, 卡識別號)    | 128        | 用來識別的卡的個體號碼 (唯一的)                      |
+| RCA (Relative card address, 相對地址)         | 16         | 卡的本地系統地址, 初始化時, 動態地由卡建議, 主機核准 |
+| DSR (Driver Stage Register, 驅動級)           | 16         | 組態卡的輸出驅動                                     |
+| CSD (Card Specific Data, Card 的特定資料)     | 128        | 卡的操作條件資訊                                     |
+| SCR (SD Configuration Register, SD 組態)      | 64         | SD 卡特殊特性資訊                                    |
+| OCR (Operation conditions register, 操作條件) | 32         | 操作條件                                             |
+| SSR (SD Status, SD 狀態)                      | 512        | SD 卡專有特徵的資訊                                  |
+| CSR (Card Status,Card 狀態)                   | 32         | 卡狀態資訊                                           |
 
 
-
-+ SPI mode (MUST)
-
-+ 1-bit mode
-
-+ 4-bits mode
+## [SD-Bus-Protocol](note_SD_SDIO_bus_protocol.md)
 
 ## Reference
 
 + [SD卡](https://zh.m.wikipedia.org/zh-tw/SD%E5%8D%A1#SDIO_.E4.BB.8B.E7.BB.8D)
 + [SD Specifications](https://www.sdcard.org/downloads/pls/)
++ [【SDIO】SD2.0協議分析總結（一）](https://www.cxyzjd.com/article/ZHONGCAI0901/113190393)
 
