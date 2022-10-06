@@ -103,13 +103,13 @@ Micro SD Card, 原名 `Trans-flash Card (TF)`. 2004 年正式更名為 Micro SD 
 
 ### SD Card Basic Registers
 
-SD card 總共有 8 個 registers, 用於設定或表示 SD 卡資訊
+SD card 總共有 8 個 registers, 用於設定或表示 SD 卡資訊 (只有 DSR 是 Optional, 其他皆是 **Mandatory**)
 
 | Reg                                           | bit length | description                                          |
 | :-                                            | :-         | :-                                                   |
 | CID (Card identification number, 卡識別號)    | 128        | 用來識別的卡的個體號碼 (唯一的)                      |
 | RCA (Relative card address, 相對地址)         | 16         | 卡的本地系統地址, 初始化時, 動態地由卡建議, 主機核准 |
-| DSR (Driver Stage Register, 驅動級)           | 16         | 組態卡的輸出驅動                                     |
+| DSR (Driver Stage Register, 驅動級)           | 16         | 組態卡的輸出驅動 (Optional)                          |
 | CSD (Card Specific Data, Card 的特定資料)     | 128        | 卡的操作條件資訊                                     |
 | SCR (SD Configuration Register, SD 組態)      | 64         | SD 卡特殊特性資訊                                    |
 | OCR (Operation conditions register, 操作條件) | 32         | 操作條件                                             |
