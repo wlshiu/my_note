@@ -91,11 +91,32 @@ Embedded Flash is mapped to `0x0800_0000`
             > + latch WRP2 to FLASH_WRPR[23:16]
             > + latch WRP3 to FLASH_WRPR[31:24]
 
+    - Read Protection Level
+
+        1. Level-0 (無保護)
+            > STM32的默認保護等級, 它沒有任何讀保護, 可以讀取 Embedded Flash 及"備份SRAM"的內容都沒有任何限制
+
+        1. Level-1 (Enable Read protection)
+            > + Main Flash boot 可以訪問 Embedded Flash
+            > + 任何從外部訪問 Embedded Flash 的操作都被禁止,(e.g. ICE)
+            > + SRAM boot mode時, 禁止讀取 Embedded Flash
+
+        1. Level-2 (Disable Debug mode)
+            > 最高等級的 Read protection, 且**設定後無法再降級**, 會永久禁止 ICE 介面(相當於熔斷)
+            > + 僅支援 Main Flash boot, 並可訪問 Embedded Flash 及 SRAM
+            >> 由廠商自行提供的 IAP (In Application Program)
+            > + 具有 Level-1 的所有保護功能
+            > + 禁止 SRAM/SysMemory boot (即 ISP 下載功能失效)
+            > + 禁止 ICE 功能
+            > + 禁止修改 Option-Bytes area
+
+
+
 
 ### Reference
 
 + [STM32- PM0075 Programming manual](https://www.st.com/resource/en/programming_manual/pm0075-stm32f10xxx-flash-memory-microcontrollers-stmicroelectronics.pdf)
-
++ [第51章-設定FLASH的讀防寫保護及解除](https://www.cnblogs.com/firege/p/5806164.html)
 
 ## FSMC (Flexible static memory controller)
 
