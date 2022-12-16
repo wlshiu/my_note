@@ -143,7 +143,53 @@
     $ git add modify-file   # 修改過的檔案, 也要 add. (不然 commit 要加上 -a 的參數)
     $ git add -u            # 只加修改過的檔案, 新增的檔案不加入.
     $ git add -i            # 進入互動模式
+    $ git add -p            # 逐個 block 讓你選擇要不要加入 state
+                            # 最後一行: Stage this hunk [y,n,q,a,d,j,J,g,/,s,e,?] ?
+                            #   y：好
+                            #   n：不
+                            #   q：不，而且我要離開
+                            #   a：好，而且只要是這個檔案的更動我全都要
+                            #   d：不，而且只要是這個檔案的我全都不要
+                            #   j：跳到下一個未決定的區塊
+                            #   J：跳到下一個區塊
+                            #   k：跳到上一個未決定的區塊
+                            #   K：跳到上一個區塊
+                            #   g：列出所有區塊, goto 過去
+                            #   /：以 regex 搜尋符合的部分
+                            #   s：把當前區塊再切分(如果可以切的話)
+                            #   e：編輯，使用系統設定的文字編輯器(通常是 vim)
     ```
+
+    1. 編輯 hunk with vim `$ git add -p => press e`
+
+        ```
+        # Manual hunk edit mode -- see bottom for a quick guide.
+        @@ -26,7 +39,7 @@
+               <option name="SPACE_BEFORE_FOR_PARENTHESES" value="false" />
+               <option name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
+               <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
+        -      <option name="SOFT_MARGINS" value="160" />
+        +      <option name="SOFT_MARGINS" value="80" />
+               <indentOptions>
+                 <option name="INDENT_SIZE" value="2" />
+                 <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        # ---
+        # To remove '-' lines, make them ' ' lines (context).
+        # To remove '+' lines, delete them.
+        # Lines starting with # will be removed.
+        #
+        # If the patch applies cleanly, the edited hunk will immediately be
+        # marked for staging.
+        # If it does not apply cleanly, you will be given an opportunity to
+        # edit again.  If all lines of the hunk are removed, then the edit is
+        # aborted and the hunk is left unchanged.
+        ```
+
+        > + 回復刪除的行
+        >> 把該行最前面的 `-` 改成 ` ` (空白)
+        > + 回復新增的行
+        >> 直接將 `+ ....` 整行刪除
+
 
 - Git 刪除檔案
 
