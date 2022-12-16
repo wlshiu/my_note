@@ -5,8 +5,8 @@ Yellow='\e[1;33m'
 Light_Gray='\e[0;37m'
 NC='\e[0m' # No Color
 
-if [ $# != 2 ]; then
-    echo -e "usage: $0 <keil project path> <log directory path>"
+if [ $# != 3 ]; then
+    echo -e "usage: $0 <keil project path> <log directory path> <device name>"
     exit -1
 fi
 
@@ -22,6 +22,7 @@ rm -f $env_setup_file
 
 cur_dir=$(pwd)
 log_dir=$2
+dev_name=$3
 
 keil_proj=$1
 build_log=$(echo "$keil_proj" | sed -e 's/\//@/g')
@@ -29,6 +30,7 @@ build_log=$build_log.log
 
 echo -e "$Yellow build $1 ... $NC"
 
+UV4.exe $keil_proj -n $dev_name
 UV4.exe -j0 -cr $keil_proj -o $cur_dir/$build_log
 
 err_cnt=$(grep -e '- [0-9+] Error(s), [0-9+] Warning(s)[.]' $cur_dir/$build_log | awk -F" Error" '{print $1}' | awk -F"- " '{print $(NF)}')
