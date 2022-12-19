@@ -47,6 +47,7 @@ OpenCV
 
         1. `CMAKE_MAKE_PROGRAM is not set.`
             > + copy `.../mingw32/bin/mingw32-make` to `.../mingw32/bin/make`
+            >> `mingw32-make` 不支援 `-j n`, 誤用會造成 `make install fail`
             > + Select CheckBox `Advanced` of CMake-gui
             > + Set `CMAKE_MAKE_PROGRAM` item to `.../mingw32/bin/make`
 
