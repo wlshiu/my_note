@@ -143,7 +143,7 @@
     $ git add modify-file   # 修改過的檔案, 也要 add. (不然 commit 要加上 -a 的參數)
     $ git add -u            # 只加修改過的檔案, 新增的檔案不加入.
     $ git add -i            # 進入互動模式
-    $ git add -p            # 逐個 block 讓你選擇要不要加入 state
+    $ git add -p, --patch   # 逐個 block 讓你選擇要不要加入 state
                             # 最後一行: Stage this hunk [y,n,q,a,d,j,J,g,/,s,e,?] ?
                             #   y：好
                             #   n：不
@@ -190,6 +190,19 @@
         > + 回復新增的行
         >> 直接將 `+ ....` 整行刪除
 
+    1. 部分合併完成後, 確認整體是否符合預期
+
+        ```
+        $ git diff --cached
+            等同
+        $ git diff --staged
+        ```
+
+    1. 回復先前的 patch
+
+        ```
+        $ git checkout -p, --patch
+        ```
 
 - Git 刪除檔案
 

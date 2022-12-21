@@ -403,6 +403,98 @@ $ sudo apt-get install lubuntu-desktop
             $ sudo service sshd restart
             ```
 
++ 外部 user 用 SSH 連接本機 Virtual OS
+    > Port forwarding
+
+    - Host is Windows OS
+        > Use `netsh` cmd
+
+        1. Set port forwarding (windows side)
+
+            ```
+            λ netsh interface portproxy add v4tov4 listenport=[Forwarding-Port] listenaddress=[Host-IP] connectport=[Forwarding-Port] connectaddress=[Virtual OS IP]
+            ```
+
+        1. Cancel port forwarding
+
+            ```
+            λ netsh interface portproxy delete v4tov4 listenport=[Forwarding-Port] listenaddress=[Host-IP]
+            ```
+
+    - Virtual OS (Ubuntu)
+
+        1. 安裝ssh
+
+            ```
+            $ sudo apt-get install openssh-server
+                or
+            $ sudo apt-get install ssh
+            ```
+
+        1. 更改預設 SSH port
+
+            ```
+            $ sudo vim /etc/ssh/sshd_config
+                ...
+
+                #Port 22  ====> unmark and set target numbur 1024 ~ 65535 (0 ~ 1023 已規範特定用途)
+            ```
+
+        1. 設定防火牆 (允許使用新的 port)
+            > 使用 `ufw (Uncomplicated Firewall)` cmd
+
+            ```
+            $ sudo apt-get install ufw
+                - ufw enable            # 啟動防火牆, 執行後開機也會自動啟動
+                - ufw disable           # 關閉防火牆
+                - ufw status            # 查看防火牆狀態
+                - ufw status verbose    # 查看防火牆詳細狀態
+            ```
+
+            > + examples
+            ```
+            $ ufw default allow                                   # 預設全部允許
+            $ ufw default deny                                    # 預設全部阻擋
+            $ ufw allow[deny] ssh                                 # 允許[阻擋] SSH 服務連線
+            $ ufw allow[deny] 80                                  # 允許[阻擋] 通過 80 Port 使用 tcp 與 udp 連線
+            $ ufw allow[deny] 80/tcp                              # 允許[阻擋] 通過 80 Port 使用 tcp 連線
+            $ ufw allow[deny] from 192.168.0.1                    # 允許[阻擋] 來自 192.168.0.1 通過所有連線
+            $ ufw allow[deny] from 192.168.0.1 to any port 3306   # 允許[阻擋] 來自 192.168.0.1 通過 3306 Port
+            ```
+
+
+        1. Restart SSH server
+
+            ```
+            # /etc/init.d/ssh restart
+                or
+            # service ssh restart
+            ```
+
+        1. 測試新的 SSH port
+            > + `ss` cmd
+
+            ```
+            $ ss -tulpn | grep [NEW-PORT]
+                ...
+                tcp    LISTEN     0      128       *:[NEW-PORT]            *:*                   users:(("sshd",pid=2946,fd=3))
+                ...
+            ```
+
+            > + `netstat` cmd
+            ```
+            $ netstat -tulpn | grep [NEW-PORT]
+                ...
+                tcp        0      0 0.0.0.0:[NEW-PORT]          0.0.0.0:*               LISTEN      2946/sshd
+                ...
+            ```
+
+    - 使用 `ssh` cmd 登入
+
+        ```
+        $ ssh -p [port] [user-name]@[ip]    # e.g. ssh -p 1688 root@123.123.123.123
+        ```
+
 + Change graphic/text UI login
     - Text login
         > F1 ~ F6 is txet mode in Linux
