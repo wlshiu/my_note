@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+""" To recover the Python script to generate this SVG, delete the line above -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="-7700 -1400 12300 12300">
+ <title>Fourier series sawtooth wave circles animation</title>
+ <desc>SVG animation visualising the first four terms of the Fourier series of a sawtooth wave by CMG Lee.</desc>
+ <style type="text/css">
+.label     { font-size:400px; fill:#999999; stroke:none; }
+.theta,.pi { font-style:italic; }
+.stroke_0  { stroke:#cc9900; }
+.stroke_1  { stroke:#009900; }
+.stroke_2  { stroke:#0000ff; }
+.stroke_3  { stroke:#cc0000; }
+circle     { stroke-width:20; }
+@keyframes move_plot         { from { transform:         translate( 500px,0); }
+                               to   { transform:         translate(2500px,0); } }
+@-moz-keyframes move_plot    { from { -moz-transform:    translate( 500px,0); }
+                               to   { -moz-transform:    translate(2500px,0); } }
+@-webkit-keyframes move_plot { from { -webkit-transform: translate( 500px,0); }
+                               to   { -webkit-transform: translate(2500px,0); } }
+@keyframes rot_p          { from { transform:         rotate(360deg); }
+                            to   { transform:         rotate(0deg);   } }
+@-moz-keyframes rot_p     { from { -moz-transform:    rotate(360deg); }
+                            to   { -moz-transform:    rotate(0deg);   } }
+@-webkit-keyframes rot_p  { from { -webkit-transform: rotate(360deg); }
+                            to   { -webkit-transform: rotate(0deg);   } }
+@keyframes rot_n          { from { transform:         rotate(0deg);   }
+                            to   { transform:         rotate(360deg); } }
+@-moz-keyframes rot_n     { from { -moz-transform:    rotate(0deg);   }
+                            to   { -moz-transform:    rotate(360deg); } }
+@-webkit-keyframes rot_n  { from { -webkit-transform: rotate(0deg);   }
+                            to   { -webkit-transform: rotate(360deg); } }
+<!-- BEGIN_DYNAMIC_STYLES -->
+.move_plot { animation:         move_plot 21s linear infinite;
+             -moz-animation:    move_plot 21s linear infinite;
+             -webkit-animation: move_plot 21s linear infinite; }
+.rot_cu { animation:         rot_p 21s linear infinite;
+          -moz-animation:    rot_p 21s linear infinite;
+          -webkit-animation: rot_p 21s linear infinite; }
+.rot_p0 { animation:         rot_p 21s   linear infinite;
+          -moz-animation:    rot_p 21s   linear infinite;
+          -webkit-animation: rot_p 21s   linear infinite; }
+.rot_n0 { animation:         rot_n 21s   linear infinite;
+          -moz-animation:    rot_n 21s   linear infinite;
+          -webkit-animation: rot_n 21s   linear infinite; }
+.rot_p1 { animation:         rot_p 10.5s   linear infinite;
+          -moz-animation:    rot_p 10.5s   linear infinite;
+          -webkit-animation: rot_p 10.5s   linear infinite; }
+.rot_n1 { animation:         rot_n 10.5s   linear infinite;
+          -moz-animation:    rot_n 10.5s   linear infinite;
+          -webkit-animation: rot_n 10.5s   linear infinite; }
+.rot_p2 { animation:         rot_p 7s   linear infinite;
+          -moz-animation:    rot_p 7s   linear infinite;
+          -webkit-animation: rot_p 7s   linear infinite; }
+.rot_n2 { animation:         rot_n 7s   linear infinite;
+          -moz-animation:    rot_n 7s   linear infinite;
+          -webkit-animation: rot_n 7s   linear infinite; }
+.rot_p3 { animation:         rot_p 5.25s   linear infinite;
+          -moz-animation:    rot_p 5.25s   linear infinite;
+          -webkit-animation: rot_p 5.25s   linear infinite; }
+.rot_n3 { animation:         rot_n 5.25s   linear infinite;
+          -moz-animation:    rot_n 5.25s   linear infinite;
+          -webkit-animation: rot_n 5.25s   linear infinite; }
+<!--   END_DYNAMIC_STYLES -->
+ </style>
+ <defs>
+<!-- BEGIN_DYNAMIC_DEFS -->
+  <g id="plot_1_0">
+   <use xlink:href="#ideal"/>
+   <polyline points="0,0 20,-40 40,-80 60,-119 80,-158 100,-197 120,-234 140,-271 160,-307 180,-341 200,-374 220,-406 240,-436 260,-464 280,-491 300,-515 320,-538 340,-558 360,-576 380,-592 400,-605 420,-617 440,-625 460,-632 480,-635 500,-637 520,-635 540,-632 560,-625 580,-617 600,-605 620,-592 640,-576 660,-558 680,-538 700,-515 720,-491 740,-464 760,-436 780,-406 800,-374 820,-341 840,-307 860,-271 880,-234 900,-197 920,-158 940,-119 960,-80 980,-40 1000,-0 1020,40 1040,80 1060,119 1080,158 1100,197 1120,234 1140,271 1160,307 1180,341 1200,374 1220,406 1240,436 1260,464 1280,491 1300,515 1320,538 1340,558 1360,576 1380,592 1400,605 1420,617 1440,625 1460,632 1480,635 1500,637 1520,635 1540,632 1560,625 1580,617 1600,605 1620,592 1640,576 1660,558 1680,538 1700,515 1720,491 1740,464 1760,436 1780,406 1800,374 1820,341 1840,307 1860,271 1880,234 1900,197 1920,158 1940,119 1960,80 1980,40 2000,0"/>
+   <text class="label" transform="translate(2000,-400)" y="0.7ex" text-anchor="end">1&#5393;</text>
+  </g>
+  <g class="stroke_0" id="plot_2_0">
+   <use xlink:href="#plot_1_0"/>
+   <use xlink:href="#plot_1_0" transform="translate(2000,0)"/>
+  </g>
+  <g id="circle0" class="stroke_0">
+   <circle cx="0" cy="0" r="637"/>
+   <path d="M 0,0 H -637"/>
+  </g>
+  <g id="plot_1_1">
+   <use xlink:href="#ideal"/>
+   <polyline points="0,0 20,-0 40,-1 60,-2 80,-5 100,-10 120,-16 140,-26 160,-38 180,-53 200,-71 220,-93 240,-118 260,-146 280,-178 300,-212 320,-250 340,-289 360,-331 380,-374 400,-418 420,-463 440,-508 460,-552 480,-595 500,-637 520,-675 540,-711 560,-743 580,-770 600,-793 620,-810 640,-821 660,-827 680,-826 700,-818 720,-803 740,-782 760,-753 780,-718 800,-677 820,-629 840,-575 860,-516 880,-452 900,-384 920,-312 940,-236 960,-159 980,-80 1000,-0 1020,80 1040,159 1060,236 1080,312 1100,384 1120,452 1140,516 1160,575 1180,629 1200,677 1220,718 1240,753 1260,782 1280,803 1300,818 1320,826 1340,827 1360,821 1380,810 1400,793 1420,770 1440,743 1460,711 1480,675 1500,637 1520,595 1540,552 1560,508 1580,463 1600,418 1620,374 1640,331 1660,289 1680,250 1700,212 1720,178 1740,146 1760,118 1780,93 1800,71 1820,53 1840,38 1860,26 1880,16 1900,10 1920,5 1940,2 1960,1 1980,0 2000,0"/>
+   <text class="label" transform="translate(2000,-400)" y="0.7ex" text-anchor="end">2&#5393;</text>
+  </g>
+  <g class="stroke_1" id="plot_2_1">
+   <use xlink:href="#plot_1_1"/>
+   <use xlink:href="#plot_1_1" transform="translate(2000,0)"/>
+  </g>
+  <g id="circle1" class="stroke_1">
+   <circle cx="0" cy="0" r="318"/>
+   <path d="M 0,0 H 318"/>
+  </g>
+  <g id="plot_1_2">
+   <use xlink:href="#ideal"/>
+   <polyline points="0,0 20,-40 40,-79 60,-116 80,-150 100,-181 120,-208 140,-231 160,-250 180,-264 200,-273 220,-279 240,-282 260,-282 280,-280 300,-278 320,-276 340,-276 360,-278 380,-284 400,-294 420,-309 440,-329 460,-355 480,-387 500,-424 520,-467 540,-513 560,-563 580,-615 600,-668 620,-719 640,-769 660,-813 680,-852 700,-883 720,-905 740,-917 760,-917 780,-904 800,-879 820,-840 840,-787 860,-722 880,-644 900,-556 920,-457 940,-350 960,-237 980,-120 1000,-0 1020,120 1040,237 1060,350 1080,457 1100,556 1120,644 1140,722 1160,787 1180,840 1200,879 1220,904 1240,917 1260,917 1280,905 1300,883 1320,852 1340,813 1360,769 1380,719 1400,668 1420,615 1440,563 1460,513 1480,467 1500,424 1520,387 1540,355 1560,329 1580,309 1600,294 1620,284 1640,278 1660,276 1680,276 1700,278 1720,280 1740,282 1760,282 1780,279 1800,273 1820,264 1840,250 1860,231 1880,208 1900,181 1920,150 1940,116 1960,79 1980,40 2000,0"/>
+   <text class="label" transform="translate(2000,-400)" y="0.7ex" text-anchor="end">3&#5393;</text>
+  </g>
+  <g class="stroke_2" id="plot_2_2">
+   <use xlink:href="#plot_1_2"/>
+   <use xlink:href="#plot_1_2" transform="translate(2000,0)"/>
+  </g>
+  <g id="circle2" class="stroke_2">
+   <circle cx="0" cy="0" r="212"/>
+   <path d="M 0,0 H -212"/>
+  </g>
+  <g id="plot_1_3">
+   <use xlink:href="#ideal"/>
+   <polyline points="0,0 20,-0 40,-2 60,-7 80,-16 100,-30 120,-50 140,-75 160,-106 180,-141 200,-180 220,-220 240,-262 260,-302 280,-339 300,-371 320,-399 340,-420 360,-434 380,-443 400,-445 420,-443 440,-438 460,-432 480,-427 500,-424 520,-427 540,-437 560,-454 580,-481 600,-516 620,-561 640,-612 660,-669 680,-729 700,-790 720,-847 740,-897 760,-937 780,-963 800,-972 820,-962 840,-931 860,-878 880,-803 900,-707 920,-591 940,-459 960,-314 980,-159 1000,-0 1020,159 1040,314 1060,459 1080,591 1100,707 1120,803 1140,878 1160,931 1180,962 1200,972 1220,963 1240,937 1260,897 1280,847 1300,790 1320,729 1340,669 1360,612 1380,561 1400,516 1420,481 1440,454 1460,437 1480,427 1500,424 1520,427 1540,432 1560,438 1580,443 1600,445 1620,443 1640,434 1660,420 1680,399 1700,371 1720,339 1740,302 1760,262 1780,220 1800,180 1820,141 1840,106 1860,75 1880,50 1900,30 1920,16 1940,7 1960,2 1980,0 2000,-0"/>
+   <text class="label" transform="translate(2000,-400)" y="0.7ex" text-anchor="end">4&#5393;</text>
+  </g>
+  <g class="stroke_3" id="plot_2_3">
+   <use xlink:href="#plot_1_3"/>
+   <use xlink:href="#plot_1_3" transform="translate(2000,0)"/>
+  </g>
+  <g id="circle3" class="stroke_3">
+   <circle cx="0" cy="0" r="159"/>
+   <path d="M 0,0 H 159"/>
+  </g>
+<!--   END_DYNAMIC_DEFS -->
+  <path id="ideal" d="M 0,0 L 1000,-1000 V 1000 L 2000,0" stroke="#999999" stroke-dasharray="1,90"/>
+  <path id="pointer" d="M -40,0 a 40,40 0 1 1 0,1 H 6000" stroke-width="20"/>
+  <clipPath id="clip_pointer">
+   <rect x="-3000" y="-3000" width="5500" height="6000"/>
+  </clipPath>
+  <clipPath id="clip_plot">
+   <rect x="2520" y="-3000" width="2000" height="6000"/>
+  </clipPath>
+ </defs>
+ <circle cx="0" cy="0" r="99999" fill="#ffffff"/>
+ <g font-family="Helvetica,Arial,sans-serif" font-size="800" text-anchor="middle" fill="none" stroke="none" stroke-width="50" stroke-linecap="round" stroke-linejoin="round">
+  <g id="labels" transform="translate(-6600,0)" fill="#000000">
+   <text x="0" y="0"><tspan x="-1.5ex">_</tspan><tspan><tspan x="0">2</tspan><tspan x="0">_</tspan
+    ><tspan x="0" dy="1.7ex"><tspan class="pi">&#960;</tspan
+    ></tspan></tspan><tspan x="3ex" dy="-1ex"><tspan>sin&#8201;</tspan
+    ><tspan class="theta">&#952;</tspan></tspan></text>
+   <text x="0" y="3000"><tspan><tspan x="0">2</tspan><tspan x="0">__</tspan
+    ><tspan x="0" dy="2ex"><tspan>2</tspan><tspan class="pi">&#960;</tspan
+    ></tspan></tspan><tspan x="4ex" dy="-1.2ex"><tspan>sin&#8201;2</tspan
+    ><tspan class="theta">&#952;</tspan></tspan></text>
+   <text x="0" y="6000"><tspan x="-2ex">_</tspan><tspan><tspan x="0">2</tspan><tspan x="0">__</tspan
+    ><tspan x="0" dy="2ex"><tspan>3</tspan><tspan class="pi">&#960;</tspan
+    ></tspan></tspan><tspan x="4ex" dy="-1.2ex"><tspan>sin&#8201;3</tspan
+    ><tspan class="theta">&#952;</tspan></tspan></text>
+   <text x="0" y="9000"><tspan><tspan x="0">2</tspan><tspan x="0">__</tspan
+    ><tspan x="0" dy="2ex"><tspan>4</tspan><tspan dx="-0.1ex" class="pi">&#960;</tspan
+    ></tspan></tspan><tspan x="4ex" dy="-1.2ex"><tspan>sin&#8201;4</tspan
+    ><tspan class="theta" dx="-0.1ex">&#952;</tspan></tspan></text>
+  </g>
+<!-- BEGIN_DYNAMIC_MAIN -->
+  <g transform="translate(0,0)">
+   <g transform="translate(-2800,0)"><use class="rot_p0" xlink:href="#circle0"/></g>
+   <g clip-path="url(#clip_pointer)"><g class="rot_p0">
+    <use xlink:href="#circle0"/>
+    <g transform="translate(-637,0)"><use class="rot_n0 stroke_0" xlink:href="#pointer"/></g>
+
+   </g></g>
+   <g clip-path="url(#clip_plot)"><use class="move_plot" xlink:href="#plot_2_0" transform="translate(500,0)"/></g>
+  </g>
+  <g transform="translate(0,3050)">
+   <g transform="translate(-2800,0)"><use class="rot_p1" xlink:href="#circle1"/></g>
+   <g clip-path="url(#clip_pointer)"><g class="rot_p0">
+    <use xlink:href="#circle0"/>
+    <g transform="translate(-637,0)"><g class="rot_cu">
+     <use xlink:href="#circle1"/>
+     <g transform="translate(318,0)"><use class="rot_n1 stroke_1" xlink:href="#pointer"/></g>
+    </g></g>
+   </g></g>
+   <g clip-path="url(#clip_plot)"><use class="move_plot" xlink:href="#plot_2_1" transform="translate(500,0)"/></g>
+  </g>
+  <g transform="translate(0,6100)">
+   <g transform="translate(-2800,0)"><use class="rot_p2" xlink:href="#circle2"/></g>
+   <g clip-path="url(#clip_pointer)"><g class="rot_p0">
+    <use xlink:href="#circle0"/>
+    <g transform="translate(-637,0)"><g class="rot_cu">
+     <use xlink:href="#circle1"/>
+     <g transform="translate(318,0)"><g class="rot_cu">
+      <use xlink:href="#circle2"/>
+      <g transform="translate(-212,0)"><use class="rot_n2 stroke_2" xlink:href="#pointer"/></g>
+     </g></g>
+    </g></g>
+   </g></g>
+   <g clip-path="url(#clip_plot)"><use class="move_plot" xlink:href="#plot_2_2" transform="translate(500,0)"/></g>
+  </g>
+  <g transform="translate(0,9150)">
+   <g transform="translate(-2800,0)"><use class="rot_p3" xlink:href="#circle3"/></g>
+   <g clip-path="url(#clip_pointer)"><g class="rot_p0">
+    <use xlink:href="#circle0"/>
+    <g transform="translate(-637,0)"><g class="rot_cu">
+     <use xlink:href="#circle1"/>
+     <g transform="translate(318,0)"><g class="rot_cu">
+      <use xlink:href="#circle2"/>
+      <g transform="translate(-212,0)"><g class="rot_cu">
+       <use xlink:href="#circle3"/>
+       <g transform="translate(159,0)"><use class="rot_n3 stroke_3" xlink:href="#pointer"/></g>
+      </g></g>
+     </g></g>
+    </g></g>
+   </g></g>
+   <g clip-path="url(#clip_plot)"><use class="move_plot" xlink:href="#plot_2_3" transform="translate(500,0)"/></g>
+  </g>
+<!--   END_DYNAMIC_MAIN -->
+ </g>
+</svg>
+<!-- Please retain this and other comments, which contain Python code to generate this SVG. """
+import re, math
+def fmt(string): ## string.format(**vars()) using tags {expression!format} by CMG Lee
+ def f(tag): i_sep = tag.rfind('!'); return (re.sub('\.0+$', '', str(eval(tag[1:-1])))
+  if (i_sep < 0) else ('{:%s}' % tag[i_sep + 1:-1]).format(eval(tag[1:i_sep])))
+ return (re.sub(r'(?<!{){[^{}]+}', lambda m:f(m.group()), string)
+         .replace('{{', '{').replace('}}', '}'))
+def append(obj, string): return obj.append(fmt(string))
+def format_tab(*arg): return '\t'.join([str(el) for el in (arg if len(arg) > 1 else arg[0])])
+def tabbify(cellss, separator='|'):
+ cellpadss = [list(rows) + [''] * (len(max(cellss, key=len)) - len(rows)) for rows in cellss]
+ fmts = ['%%%ds' % (max([len(str(cell)) for cell in cols])) for cols in zip(*cellpadss)]
+ return '\n'.join([separator.join(fmts) % tuple(rows) for rows in cellpadss])
+def hex_rgb(colour): ## convert [#]RGB to #RRGGBB and [#]RRGGBB to #RRGGBB
+ return '#%s' % (colour if len(colour) > 4 else ''.join([c * 2 for c in colour])).lstrip('#')
+def roundm(x, multiple = 1): return int(math.floor(float(x) / multiple + 0.5)) * multiple
+def try_int_float(field):
+ try:     return int(field)
+ except:
+  try:    return float(field)
+  except: return field
+
+pi                = math.pi
+termss            = [(2/-pi,1), (2/(2*pi),2), (2/(-3*pi),3), (2/(4*pi),4)]
+period            = 21
+x_max             = 2000
+x_inc             = 20
+y_inc             = 3050
+amplitude_scale   = 1000
+amplitude_scaleds = []
+ys                = {}
+(out_styles, out_defs, out_mains) = ([], [], [])
+
+append(out_styles, '''\
+.move_plot { animation:         move_plot {period}s linear infinite;
+             -moz-animation:    move_plot {period}s linear infinite;
+             -webkit-animation: move_plot {period}s linear infinite; }
+.rot_cu { animation:         rot_p {period * (termss[1][1] - termss[0][1])}s linear infinite;
+          -moz-animation:    rot_p {period * (termss[1][1] - termss[0][1])}s linear infinite;
+          -webkit-animation: rot_p {period * (termss[1][1] - termss[0][1])}s linear infinite; }''')
+for (i_term, (amplitude, frequency)) in enumerate(termss):
+ amplitude_scaled = roundm(amplitude * amplitude_scale)
+ amplitude_scaleds.append(amplitude_scaled)
+ out_chains = []
+ out_closes = []
+ for i_chain in range(i_term + 1):
+  space = ' ' * i_chain
+  append(out_chains, '''\
+{space}    <use xlink:href="#circle{i_chain}"/>
+{space}    <g transform="translate({amplitude_scaleds[i_chain]},0)"><g class="rot_cu">''')
+  append(out_closes, '''\
+{space}    </g></g>''')
+ out_chain = '\n'.join(out_chains)
+ append(out_mains, '''\
+  <g transform="translate(0,{i_term * y_inc})">
+   <g transform="translate(-2800,0)"><use class="rot_p{i_term}" xlink:href="#circle{i_term}"/></g>
+   <g clip-path="url(#clip_pointer)"><g class="rot_p0">
+{out_chain[:out_chain.rfind('\\n')]}
+{' ' * i_term}    <g transform="translate({amplitude_scaleds[i_term]},0)"><use class="rot_n{i_term} stroke_{i_term}" xlink:href="#pointer"/></g>
+{'\\n'.join(out_closes[-2::-1])}
+   </g></g>
+   <g clip-path="url(#clip_plot)"><use class="move_plot" xlink:href="#plot_2_{i_term}" transform="translate(500,0)"/></g>
+  </g>''')
+ period_term = float(period) / frequency
+ append(out_styles, '''\
+.rot_p{i_term} { animation:         rot_p {period_term}s   linear infinite;
+          -moz-animation:    rot_p {period_term}s   linear infinite;
+          -webkit-animation: rot_p {period_term}s   linear infinite; }
+.rot_n{i_term} { animation:         rot_n {period_term}s   linear infinite;
+          -moz-animation:    rot_n {period_term}s   linear infinite;
+          -webkit-animation: rot_n {period_term}s   linear infinite; }''')
+ points = []
+ for x in range(0, x_max + 1, x_inc):
+  theta = 2 * math.pi * x / x_max
+  ys[x] = ys.get(x, 0) + amplitude_scale * amplitude * math.sin(frequency * theta)
+  points.append('%.0f,%.0f' % (x, ys[x]))
+ append(out_defs, '''\
+  <g id="plot_1_{i_term}">
+   <use xlink:href="#ideal"/>
+   <polyline points="{' '.join(points)}"/>
+   <text class="label" transform="translate(2000,-400)" y="0.7ex" text-anchor="end">{i_term + 1}&#5393;</text>
+  </g>
+  <g class="stroke_{i_term}" id="plot_2_{i_term}">
+   <use xlink:href="#plot_1_{i_term}"/>
+   <use xlink:href="#plot_1_{i_term}" transform="translate(2000,0)"/>
+  </g>
+  <g id="circle{i_term}" class="stroke_{i_term}">
+   <circle cx="0" cy="0" r="{abs(amplitude_scaled)}"/>
+   <path d="M 0,0 H {amplitude_scaled}"/>
+  </g>''')
+
+out_p = 'width="100%" height="100%" viewBox="-7700 -1400 12300 12300"'
+
+## Compile everything into an .svg file
+myself   = open(__file__, 'r').read() ## the contents of this very file
+file_out = open(__file__[:__file__.rfind('.')] + '.svg', 'w') ## *.* -> *.svg
+try: ## use try/finally so that file is closed even if write fails
+ file_out.write('''<?xml version="1.0" encoding="utf-8"?><!%s%s
+%s%s%s\n%s%s\n%s%s\n%s%s''' % ('-', '-', ## because SVG comments cannot have 2 consecutive '-'s
+  myself[:myself.find('width',myself.find('<svg'))], ## assume width specified before height/viewBox
+  out_p, ## replace SVG width/height/viewBox with {out_p} & dynamic SVG blocks with {out*s} contents
+  myself[myself.find ('>',myself.find('<svg')):
+         myself.find ('\n',myself.find('BEGIN_'+'DYNAMIC_STYLE'))], '\n'.join(out_styles),
+  myself[myself.rfind('\n',0,myself.find('END_'+'DYNAMIC_STYLE')):
+         myself.find ('\n',myself.find('BEGIN_'+'DYNAMIC_DEFS'))], '\n'.join(out_defs),
+  myself[myself.rfind('\n',0,myself.find('END_'+'DYNAMIC_DEFS')):
+         myself.find ('\n',myself.find('BEGIN_'+'DYNAMIC_MAIN'))], '\n'.join(out_mains),
+  myself[myself.rfind('\n',0,myself.find('END_'+'DYNAMIC_MAIN')):]))
+finally:
+ file_out.close()
+
+## SVG-Python near-polyglot framework version 3 by CMG Lee (March 2018) -->
