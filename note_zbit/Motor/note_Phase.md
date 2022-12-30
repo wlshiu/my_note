@@ -115,7 +115,15 @@ Y_red(t)   = A * sin(ωt – 90°)  -> Red waveform
 所謂三相交流電, 就是供電方式需要用到三個相位, 因此物理結構上需要三組線圈(或繞組), 目前三相發電最經濟, 因此世界各國普遍使用三相
 > 三相交流電, 每組線圈間隔 120°, 產生出來的電壓電流, 彼此也就相差 120°
 
++ 三相交流電發電機
+
 ![Generator](3phase_generator.gif)
+
++ 三相交流電 Motor
+
+藍色箭頭表示所形成的旋轉磁場
+
+![3phase_motor](3phase_motor.gif)
 
 + Phase sequence (相序)
     > 三相電有相序的分別, 任兩條接反了馬達會反轉(不像一般家裡的單相電, 正反插電風扇都轉同一邊), 所以相序很重要.
@@ -130,6 +138,7 @@ Y_red(t)   = A * sin(ωt – 90°)  -> Red waveform
 # Reference
 
 + [正弦曲線](https://zh.wikipedia.org/wiki/%E6%AD%A3%E5%BC%A6%E6%9B%B2%E7%B7%9A)
++ [一文學會傅里葉變換](https://blog.51cto.com/u_15819826/5738137)
 + [相位 領先-落後-單相-三相-原來是這樣](https://www.strongpilab.com/phase-lead-lag-single-phase-and-three-phase/)
 
 

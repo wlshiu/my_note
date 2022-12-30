@@ -174,7 +174,7 @@ Motor 的控制方法大致上可簡單分為
 
 ## Scalar Control
 
-傳統的永磁同步馬達為 Scalar Control, 也就是 V/F Control(Voltage/Frequency Control, 電壓頻率控制), 也稱為 VVVF(Variable Voltage Variable Frequency Control, 變壓變頻控制),
+傳統的永磁同步馬達(PMSM)為 Scalar Control, 也就是 V/F Control(Voltage/Frequency Control, 電壓頻率控制), 也稱為 VVVF(Variable Voltage Variable Frequency Control, 變壓變頻控制),
 > 根據轉速命令, 調整輸出頻率, 為獲得最高運轉效率(保持馬達磁通量), 也必需同時調整輸出電壓大小
 
 此控制方法雖然可以達到轉速與轉矩控制的目的, 但有啟動轉矩小, 響應速度慢, 精確度差, 容易受負載所影響等問題的產生
@@ -245,13 +245,13 @@ Brush (電刷) 多用石墨製成, 故也稱碳刷, 負責在旋轉部件與靜�
 
 ## Brush (有電刷) motor
 
-用機械換向, 磁極(磁鐵)為固定體不動, 轉動線圈繞組部件; 線圈電流方向的交替變化, 是隨 Motor 轉動的換相器和電刷來完成的, 而電源只需正負接線
+用機械換向, 磁極(磁鐵)為固定體不動, 轉動線圈繞組部件; 線圈電流方向的交替變化, 是隨 Motor 轉動的換相器和電刷來完成的, 而電源只需 DC 正負接線
 > 隨著 Motor 轉動, 不同時刻給不同線圈或同一個線圈的不同兩極通電, 使得線圈產生磁場的 N-S 極,
 與最靠近的 Stator (永久磁鐵)的 N-S 極, 有一個適合的角度差, 藉由相吸相斥特性, 產生動能推動 Motor 轉動
 
 ![Brush_Motor](Brush_Motor_Schematic.jpg)
 
-+ 使用變壓調速, 藉由調整後的電壓電流, 通過整流子及電刷轉換, 改變電極產生的磁場強弱, 達到改變轉速的目的
++ 使用變壓調速, 藉由調整後的電壓電流, 通過整流子及電刷轉換(機械式換向), 改變電極產生的磁場強弱, 達到改變轉速的目的
 
 + Brush motor 的優點
     - Motor 結構簡單, 且相關製程成熟
@@ -268,13 +268,13 @@ Brush (電刷) 多用石墨製成, 故也稱碳刷, 負責在旋轉部件與靜�
     - 只能連續工作約 5000 小時, 正常使用壽命為 2-3 年, 壽命低
 
 
-## [Brushless (無電刷) motor](note_BLDC.md)
+## [Brushless (無電刷) motor](note_Brushless.md)
 
 採取電子換向(由 MCU 中的控制電路完成), 線圈繞組部件固定不動, 轉動磁鐵, 而電源需要 U/V/W 三線接線
 > + 通過**霍爾元件**偵測永久磁鐵**磁極的位置**, 再適時切換線圈中電流的方向, 進而產生正確方向的磁力來驅動 Motor, 消除了 Brush Motor 的缺點
 >> 若裝有傳感器的無刷電機, 還需要一條五芯的霍爾感應線
 
-![Brushless_Motor](Brushless_Motor_Schematic.jpg)
+![Brushless_Motor](Brushless_Motor_Schematic.gif)
 
 + 使用變頻調速, 在電壓不變下, 通過 MCU 改變控制信號, 再改變大功率 MOS 管的開關速率, 來實現轉速的改變
 

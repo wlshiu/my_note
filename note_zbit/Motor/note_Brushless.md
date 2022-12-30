@@ -1,0 +1,176 @@
+Brushless Motor(無刷馬達) [[Back](note_Motor.md)]
+---
+
+Brushless Motor 可以分為無刷直流電機(BLDC)和永磁同步電機(PMSM), 結構大同小異,
+主要區別在於製造方式(e.g. 線圈繞組方式)不同, 導致的一些特性差異(比如反電動勢的波形)
+
+
+Brushless Motor 的常用控制策略, 可分為 120° 開/關控制和向量控制
+> + 120° 開/關控制方式
+>> Brushless Motor 的三個線圈中, 有兩個會通電, 並且會輪流切換六種通電模式, 以支援任一方向的旋轉
+>> ![Brushless_Control_Policy](Brushless_Control_Policy.jpg) <br>
+>> 在此模式下, 定子線圈會透過開/關電流(PWM)通電, 產生梯形加速曲線, 即馬達會逐漸加速或維持速度, 然後在線圈斷電時逐漸減速. 此作法的優勢在於非常簡便且操作直覺. <br>
+但容易因負載變化和其他變化, 而發生效能波動, 而且對某些應用來說, 精確度和效率也不夠高.
+此問題可透過調整 IGBT or MOSFET 的開/關時序, 以及使用`比例-積分-微分 (PID)` 或`比例-積分 (PI)` 控制, Motor Controller 中的精密演算法可在一定程度上克服
+
+> + 向量控制也稱為磁場導向控制(FOC)
+>> 此法將三個線圈, 都透過持續**控制磁場**而進行通電, 相較於 120° 控制, 運作更加順暢<br>
+在 FOC 中, 每個定子線圈的電流, 均由進階演算法測量和控制, 且需要進行複雜的數值處理. <br>
+此演算法也必須持續將三相 AC 值轉換成雙相 DC 值 (座標相位轉換), 以簡化控制所需的後續方程式和運算. <br>
+>> ![FOC_Axis_Convert](FOC_Axis_Convert.jpg) <br>
+若執行妥當, FOC 可達到非常準確且有效的控制
+
+從上述的無刷電機控制方式, 可以發現到, 轉子在磁場中只有 6 個穩定的狀態, 因此旋轉過程中其實是不平滑的, 存在扭矩的抖動
+> 可以用手轉一下無刷電機, 會感受到頓挫感
+
+
+因此為解決這個問題, 可從 H/w 或 S/w 出發, 這就衍生出了`BLDC`和`PMSM`的區別
+> + BLDC 由於反電動勢接近梯形波, 所以必定會有上面說的抖動問題的. 但如果增加極對數(也就是磁鐵對數, 增加穩定狀態數量), 就可降低頓挫感.
+BLDC 也可以結合抗齒槽演算法的FOC, 進行力矩補償實現平滑控制
+>> 實際上的BLDC 電機基本都是多極對, 都是使用三相輸入訊號,
+> + PMSM 設計的反電動勢為正弦波, 我們用 S/w 和演算法並結合 PWM,
+將方波轉變成等效的 SPWM 正弦波或者 SVPWM 馬鞍波, 再用來驅動電機, 其控制效果很理想
+
+當然為了產生更好的波形, 更好的旋轉磁場, Controller 及演算法, 就變得非常複雜, 這也是 FOC 的實現原理
+
+
+再者要控制 Brushless Motor, 首先要知道轉子角度位置 ([相位角](note_Phase.md)), Controller 利用相位角來協調與磁場相關的轉子線圈之供電,
+以確保 Motor 提供所需的回應
+> 回應包括如下, 具體取決於應用和操作條件
+> + 保持速度, 加速, 減速
+> + 改變方向
+> + 減小或增加扭矩
+> + 緊急停止
+> + 其他回應
+
+
+偵測轉子角度方式, 可以分為 sensor 及 sensorless
+
++ Sensor
+    > Sensor 類型豐富, 大致分為偵測相對和絕對位置兩種.
+    >> 通常有**線圈旋轉變壓器**, **霍爾感測器**, **光學或電容感測器**. 可根據解析度, 耐用程度, 或成本等要求來挑選
+
+    ![Brushless_Motor_Sensor](Brushless_Motor_Sensor.jpg)
+
++ Sensorless
+    > 透過測量每個轉子繞組中的反電動勢, 來計算轉子位置.
+    同時使用磁場導向控制(FOC), 將轉子電流分解為 D-軸 和 Q-軸分量, 因為 DC 變化緩慢, 可以簡化控制方式
+    >> 適合低成本, 精準度需求較低的應用
+
+    ![Brushless_Motor_Sensorless](Brushless_Motor_Sensorless.jpg)
+
+    >> 測量相電流的最常用方法是, 在逆變器(Invertor)級中, 使用分流電阻器(Shunt Resistor), 在每個低側 MOSFET 的源極和地之間進行**低側檢測**. <br>
+    由於分流器的共模電壓降低, 可使用低成本電流檢測放大器.
+
+## Hall Sensor
+
+Hall Sensor 大致上可分為兩種, 霍爾元件及霍爾 IC
++ Hall 元件, 會固定輸入一電流值後, 再依照外在磁場強弱與極性的變化, 輸出一 Hall Voltage
+    > 需要由 Analog 模組去偵測 Hall Voltage
+
++ Hall IC
+    > 整合 Hall 元件及 Analog 模組, 並輸出數位訊號, e.g. Hall Voltage 為正, 輸出 Vcc(High), Hall Voltage 為負值時, 則輸出 0V(Low)
+
+## IGBT(Insulated Gate Bipolar Transistor, 絕緣柵雙極晶體管)
+
+IGBT是一種半導體元件, 其特點為
+> + 驅動電流小
+> + 導通電阻也很低
+> + 高效率切換速度快
+> + 耐高壓 (10 VA ~ 100M VA)
+>> VA: Volt-Ampere
+
+由於可用大功率快速做切換, 因此常應用於馬達驅動器, 大瓦特輸出音響放大器的音源驅動元件, 一般都配合 PWM 與 Low-pass Filters
+
+
+## 反電動勢 (Back ElectroMotive Force, Back-EMF)
+
+馬達在送電的運轉過程中, 在啟動的當下, Motor 從靜態(靜平衡)進入到動態(動平衡)的過程, 電流會持續上升, 再隨著轉速上升而逐漸下降;
+當馬達達到穩速(達到動態平衡)運轉時, 電流值會下降到最低點
+
+![motor_rotating_current](motor_rotating_current.jpg)
+
+但依照電壓電流公式 `V = IR`, 馬達內部的電阻值 R 為恆定值.
+而馬達隨著轉速變化, 電流值會逐漸下降, 表示有一個**反電動勢**在降低電壓值.
+
++ 反電動勢發生的原因
+    > 馬達運作是送電給了線圈, 產生電磁場後與磁鐵作用, 最後轉化為動能旋轉輸出.
+    但**沒送電的線圈**也會感受到磁場的變化, 依照法拉第定律在線圈上生成**渦電流**, 這就是反電動勢的來源.
+    >> 事實上不僅是空的線圈會受到旋轉磁場變化的影響, 正在送電的線圈也會有反應
+
+    > 所以反電動勢是個一體兩面的存在
+    > + 當輸入電壓 12V, 馬達穩態轉速為 1200轉(RPM)
+    > + 若用外部力量(水力, 火力)帶動馬達旋轉達到 1200轉時, 就會產生 12V 的反電動勢
+
+
+反電動勢對馬達造成的影響
+> + 抑制工作電流
+> + 限制最高轉速(RPM)
+
+
+## 弗萊明左/右手定則
+
+弗萊明右手定則(Generator 定則)用於識別發電機的場域方向 (從磁生電)
+> `拇指`是導體**移動方向**, `食指`是**磁場方向**, `中指`為生成的**電流方向**
+
+弗萊明左手定則(Motor 定則), 為弗萊明右手定則的變形, 用於識別 Motor 的受力方向 (從電生磁)
+> `拇指`是導體**移動方向**, `食指`是**磁場方向**, `中指`為生成的**電流方向**
+>> 其中電流方向會與右手定則方向相反
+
+## 安培右手定則
+
++ 當磁生電時, 右手的拇指指向電流方向, 其它四根手指彎曲決定磁場的方向
+
++ 當電生磁時, 右手拇指指向 N 極, 其它四指彎向決定電流電流方向
+
+
+# BLDC (Brushless DC Motor, 無刷直流馬達)
+
+# PMSM (Permanent-Magnet Synchronous Motor, 永磁同步馬達)
+
+# FOC Control Principle
+
+![FOC_Motor_Components](FOC_Motor_Components.jpg)
+
+
++ Three-phase Invertor (三相逆變器)
+    > 三相AC/DC逆變器, 為永磁同步馬達(PMSM)及直流無刷馬達(BLDC)馬達, 提供三相電壓以進行驅動.
+    它從空間向量調變(Space Vector Modulation, SVM)模組中, 獲取 PWM訊號
+
++ QEP interface
+    > 正交編碼器脈衝(Quadrature Encoder Pulse, QEP)介面連接編碼器, 以取得轉子的機械位置, 並將其傳遞至其他模組
+
++ Speed/Position Estimation (速度/位置評估模組)
+    > 在此模組中執行計算, 以獲取轉子的位置和速度
+
++ PID (Proportional Integral Derivative, 比例-積分-微分) control
+    > PID是一種控制迴路, 它有賴於馬達以扭力形式的 feedback,
+    透過計算 `所需的扭力`, 以及從`派克變換(Park Transform)模組接收到的扭力`, 兩者間之差異, 從而進行校正
+
++ Clark Transform
+    > 克拉克變換(Clarke transform)模組使用 Clarke 變換公式, 將定子電流(ia, ib)轉換為磁通量和扭矩(d-q)座標系統.
+    >> 三相系統的靜止參考架構轉變為靜止參考架構中的二象限系統
+
++ Park Transform 和 Inverse Park Transform
+    > 該模組將靜止參考架構, 轉換為具有正交軸的雙相系統之旋轉參考架構.
+    正交份量是d-q, 分別是馬達直軸和正交軸. 當定子輸出電壓必須轉換回靜止參考架構(定子參考)時, Park 逆變換模組隨即出現
+
++ Space Vector Modulation (空間向量調變, SVM)
+    > SVM 技術用於確定適於馬達的 PWM 訊號. SVM 以定子電壓向量作為輸入, 並產生三相輸出電壓作為輸出
+
+
+
+# Reference
++ [*相位角、頻率](https://www.geogebra.org/m/wthz4bhr)
++ [【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
++ [ZhuYanzhen1/miniFOC](https://github.com/ZhuYanzhen1/miniFOC)
++ [FOC發展與原理概論](https://blog.udn.com/hal9678/6714149)
++ [FOC演算法穩定EV動力傳動性能](https://www.edntaiwan.com/20210825ta31-foc-algorithm-enhances-ev-powertrain-performance/)
++ [變頻器- Wiki](https://zh.m.wikipedia.org/zh-hant/%E5%8F%98%E9%A2%91%E5%99%A8)
++ [向量控制- Wiki](https://zh.m.wikipedia.org/zh-hant/%E5%90%91%E9%87%8F%E6%8E%A7%E5%88%B6)
++ [BLDC  with  Hall Sensor簡易控制說明手冊](https://lutron1980.pixnet.net/blog/post/23531227-bldc-with-hall-sensor%E7%B0%A1-%E6%98%93-%E6%8E%A7-%E5%88%B6-%E8%AA%AA-%E6%98%8E-%E6%89%8B-%E5%86%8A)
++ [如何使用高度整合的 IC 快速開始無刷直流馬達控制設計](https://www.digikey.tw/zh/articles/how-to-quickly-start-a-brushless-dc-motor-control-design-using-highly-integrated-ics)
++ [三相電機的磁場定向控制 (FOC)](https://www.onsemi.cn/company/news-media/blog/industrial-cloud-power/Field-Oriented-Control-FOC-for-3-Phase-Motors)
++ [無刷直流馬達的梯形控制](https://www.edntaiwan.com/20221031ta71-trapezoidal-control-of-bldc-motors/)
++ [什麼是過零檢測信號, 如何設計過零電路, 有哪幾種方法可實現](https://twgreatdaily.com/pnJMp2wBvvf6VcSZUWGL.html)
+
