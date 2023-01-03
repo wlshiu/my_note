@@ -1,12 +1,14 @@
 Phase (相位) [[Back](note_BLDC.md)]
 ---
 
+一個電氣訊號 (e.g. current or voltage) 在物理上含有波的特性, 因此可以用`Amplitude(A)`, `Frequency(ω)`, 及`Phase-Offset(θ)`來描述.
+
 相位(相位角)投影到時間座標平面(波形)時, 使用三角函數來表達波形, 過於抽象難以理解, 為了便於分析, 導入複數平面的相量圖(Phasor)的概念
 
 **三角函數**
 ```
-s1(t) = A * sin(ωt+0°)
-s2(t) = A * sin(ωt+θ)
+s1(t) = A * sin(ωt)
+s2(t) = A * sin(ωt + θ)
 ```
 
 **Phasor (是 Phase Vector 的混成詞)**

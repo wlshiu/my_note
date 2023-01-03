@@ -29,7 +29,10 @@ Brushless Motor 的常用控制策略, 可分為 120° 開/關控制和向量控
 BLDC 也可以結合抗齒槽演算法的FOC, 進行力矩補償實現平滑控制
 >> 實際上的BLDC 電機基本都是多極對, 都是使用三相輸入訊號,
 > + PMSM 設計的反電動勢為正弦波, 我們用 S/w 和演算法並結合 PWM,
-將方波轉變成等效的 SPWM 正弦波或者 SVPWM 馬鞍波, 再用來驅動電機, 其控制效果很理想
+將方波轉變成等效的 SPWM(Sinusoidal PWM) 正弦波或者 SVPWM (Space Vector PWM) 梯形波, 再用來驅動電機, 其控制效果很理想
+
+> ![SVPWM](SVPWM.jpg)
+>> 藍色: SPWM, 黃色: SVPWM (近似梯形波, 呈現馬鞍狀)
 
 當然為了產生更好的波形, 更好的旋轉磁場, Controller 及演算法, 就變得非常複雜, 這也是 FOC 的實現原理
 
@@ -123,6 +126,18 @@ IGBT是一種半導體元件, 其特點為
 
 + 當電生磁時, 右手拇指指向 N 極, 其它四指彎向決定電流電流方向
 
+## 3-Phase Inverter
+
+![3-Phase_Inverter](3-Phase_Inverter.jpg)
+
+每相 Inverter 會分為上橋臂(橙色)及下橋臂(藍色), 上圖電流從正極經上橋臂流至 U 相, 再分流到 V 相與 W 相, 最後經下橋臂到負極
+> 三相都導通, 會比只用兩相導通, 產生更大的扭矩
+> + `上橋開, 下橋關` 定義為狀態 1
+> + `上橋關, 下橋開` 定義為狀態 0
+
++ 3-Phase Inverter 依照上下橋臂的狀態, 總共可以有 8 (2^3) 種狀態, 扣除掉完全不導通的狀態 (000, 111), 可以在 α-β 平面(Clark Transform)區分出 6 個區域(如下)
+
+![SpaceVector](SVPWM_SpaceVector.jpg)
 
 # BLDC (Brushless DC Motor, 無刷直流馬達)
 
@@ -130,12 +145,15 @@ IGBT是一種半導體元件, 其特點為
 
 # FOC Control Principle
 
+FOC 驅動無刷電機的基本手段, 即通過`計算所需電壓向量`, 使用 `SVPWM 訊號(開關上下橋 MOS)來驅動三相逆變電路`, 合成出等效的三相正弦電壓驅動 Motor
+
+**FOC Motor Components**
 ![FOC_Motor_Components](FOC_Motor_Components.jpg)
 
 
 + Three-phase Invertor (三相逆變器)
     > 三相AC/DC逆變器, 為永磁同步馬達(PMSM)及直流無刷馬達(BLDC)馬達, 提供三相電壓以進行驅動.
-    它從空間向量調變(Space Vector Modulation, SVM)模組中, 獲取 PWM訊號
+    它從空間向量調變(Space Vector Modulation, SVM)模組中, 獲取 SVPWM 訊號
 
 + QEP interface
     > 正交編碼器脈衝(Quadrature Encoder Pulse, QEP)介面連接編碼器, 以取得轉子的機械位置, 並將其傳遞至其他模組
@@ -148,17 +166,69 @@ IGBT是一種半導體元件, 其特點為
     透過計算 `所需的扭力`, 以及從`派克變換(Park Transform)模組接收到的扭力`, 兩者間之差異, 從而進行校正
 
 + Clark Transform
-    > 克拉克變換(Clarke transform)模組使用 Clarke 變換公式, 將定子電流(ia, ib)轉換為磁通量和扭矩(d-q)座標系統.
-    >> 三相系統的靜止參考架構轉變為靜止參考架構中的二象限系統
+    > 克拉克變換(Clarke transform)模組使用 Clarke 變換公式, 將定子的三相電流(Ia, Ib, Ic) 降維度到二維 α-β 平面, 以降低複雜度
 
 + Park Transform 和 Inverse Park Transform
-    > 該模組將靜止參考架構, 轉換為具有正交軸的雙相系統之旋轉參考架構.
-    正交份量是d-q, 分別是馬達直軸和正交軸. 當定子輸出電壓必須轉換回靜止參考架構(定子參考)時, Park 逆變換模組隨即出現
+    > 該模組將定子角色所觀察到的資訊, 轉換到轉子角色的分量, 轉子的正交分量是直軸(d)和正交軸(q).
+    當轉子分量轉移到定子時, 就會使用 Park 逆變換
 
 + Space Vector Modulation (空間向量調變, SVM)
-    > SVM 技術用於確定適於馬達的 PWM 訊號. SVM 以定子電壓向量作為輸入, 並產生三相輸出電壓作為輸出
+    > SVM 技術用於確定適於馬達的 SVPWM 訊號. SVM 以定子電壓向量作為輸入, 並產生三相輸出電壓作為輸出
 
 
+## Sensorless flow chart
+
+![VectorSensorlesss](VectorSensorlesssBD.jpg)
+
+## IFOC v.s. DFOC
+
+FOC 可分為 IFOC (Indirect FOC)及 DFOC (Direct FOC)
+
++ DFOC
+    > 利用電壓型或電流型的磁通模型, 計算磁通大小及角度
+
++ IFOC
+    > 先量測定子電流及轉子速度, 再利用轉子速度及轉差率的計算值, 推導轉子角度, 進而得到磁通的角度
+
+    ![IFOC_flow_chart](IFOC_flow_chart.jpg)
+
+## Clark Transform
+
+Clark Transform 是將三相相位平面轉換到 α-β 正交平面(為了簡化控制複雜度), 反之, α-β 正交平面轉換回三相相位平面, 則稱為反轉換(Inverse Clark Transform)
+> ![3-Phase_SVPWM_wave](3-Phase_SVPWM_wave.gif) <br>
+> 左側為相位平面(Phase, Space Vector), 右側則為 Time domain 波形
+>> 相位平面有三軸 (U/V/W 軸), 可產生出 3 個 Phasors (紅/藍/綠), 因為各軸相差 120°, 可將 3 個 Phasors 合成為一個固定長度的 Phasos (黑).
+此 Phasos (黑) 可以轉換基底, 拆成 α-β 正交分量
+
+
++ Clark formula
+    > `m` 為幅值大小
+
+    ![Clark_formula](Clark_formula.jpg)
+
++ Inverse Clark formula
+    > `m'` 為幅值大小
+
+    ![Inverse_Clark_formula](Inverse_Clark_formula.jpg)
+
+## Park Transform
+
+Park Transform 將定子的電流, 投影到**隨著轉子旋轉**的直軸(Direct 軸)與正交軸(Quadrature 軸)平面上
+> 物理上來說, Park Transform 是從觀察定子的視野, 轉移到動態旋轉的轉子視野. <br>
+![Rotor_view](Rotor_view.jpg)
+>> dq 平面相對於定子來說是旋轉的坐標系, 其轉動的角速度和轉子的角速度相同, 因此相對於轉子來說，dq 平面坐標就是靜止的坐標.
+而 Id 及 Iq 分量為常量, 只需改變 θ 即可改變轉矩
+![DQ Coord System](DQ_Coord.gif)
+
++ 物理特性
+    > D 軸會與磁力線平行, Q 軸則會與磁力線正交, 也就是說, D 軸會對應到磁力最強的方向, Q 軸則是磁力最弱的方向
+
+    ![DQ plane](dq_plane.jpg)
+
++ 目的
+    > Park Transform 的目的是
+    > + 為了減少運算量
+    > + 為了方便描述最大與最小磁力的差別
 
 # Reference
 + [*相位角、頻率](https://www.geogebra.org/m/wthz4bhr)
@@ -172,5 +242,6 @@ IGBT是一種半導體元件, 其特點為
 + [如何使用高度整合的 IC 快速開始無刷直流馬達控制設計](https://www.digikey.tw/zh/articles/how-to-quickly-start-a-brushless-dc-motor-control-design-using-highly-integrated-ics)
 + [三相電機的磁場定向控制 (FOC)](https://www.onsemi.cn/company/news-media/blog/industrial-cloud-power/Field-Oriented-Control-FOC-for-3-Phase-Motors)
 + [無刷直流馬達的梯形控制](https://www.edntaiwan.com/20221031ta71-trapezoidal-control-of-bldc-motors/)
++ [如何深入理解SVPWM？](https://zhuanlan.zhihu.com/p/47766452)
 + [什麼是過零檢測信號, 如何設計過零電路, 有哪幾種方法可實現](https://twgreatdaily.com/pnJMp2wBvvf6VcSZUWGL.html)
 
