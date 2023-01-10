@@ -421,6 +421,19 @@ $ sudo apt-get install lubuntu-desktop
             λ netsh interface portproxy delete v4tov4 listenport=[Forwarding-Port] listenaddress=[Host-IP]
             ```
 
+    - Virtualbox
+
+        1. `Network` -> `Adapter 1` -> `Port Forwarding`
+            > Add new rule
+
+            ```
+            Protocol    : TCP
+            Host IP     : The physical IP of Host
+            Host Port   : The forwarding port number
+            Guest IP    : The Virtual OS IP (e.g. 192.168.56.2)
+            Guest Port  : The same with Host-Port
+            ```
+
     - Virtual OS (Ubuntu)
 
         1. 安裝ssh
@@ -492,7 +505,7 @@ $ sudo apt-get install lubuntu-desktop
     - 使用 `ssh` cmd 登入
 
         ```
-        $ ssh -p [port] [user-name]@[ip]    # e.g. ssh -p 1688 root@123.123.123.123
+        $ ssh -p [forwarding-port] [user-name]@[host-ip]    # e.g. ssh -p 1688 root@123.123.123.123
         ```
 
 + Change graphic/text UI login
