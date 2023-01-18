@@ -60,11 +60,14 @@ Vdc = Vun + Vng = Vun + (Vun / 2)
 以 Section-I 為例, Vδ 可用 V0/V4/V6/V7 來合成
 > Uα/Uβ 為 Vδ 在 α-β 正交平面的投影量, 由三角函數可獲得 Vδ 的分量 `Vα/Vβ`
 > ![Alpha_Beta_mapping_SV](Alpha_Beta_mapping_SV.jpg)
->> Ts 是每一個 PWM 的開關週期 <br>
+>> Ts 是每一個 section (I ~ VI), 執行一輪 PWM 開關的週期 <br>
 >> + T4 是在一個 PWM 開關週期 Ts 內, 電壓向量 V4 持續的時間. 同理,
 >> + T6 是在一個 PWM 開關週期 Ts 內, 電壓向量 V6 持續的時間 <br>
 
->> 當 Ts 足夠小時, Vout 和 Vδ 兩者的軌跡, 就可以無限趨近 (正無限多邊形趨近圓形)
+> 按照伏秒平衡原則來合成每個磁區內的任意電壓向量
+>> Volt-Second_balance (伏秒平衡)指處於穩定狀態的電感, 電感兩端的正伏秒積等於負伏秒積, 也就是電感兩端的伏秒積在一個開關週期內必須相等
+> ![Volt-Second_balance](Volt-Second_balance.jpg) <br>
+> 離散化後, 可等效為 `Ts * Vout = T4 * V4 + T6 * V6 + T0 * V0 + T7 * V7`
 
 ```
 Ts * Vout = T4 * V4 + T6 * V6 + T0 * V0 且 Ts = T4 + T6 + T0
@@ -119,10 +122,16 @@ T6 = (|Vβ| * Ts) / |V6|
    = (3 * (|Vout| * sin(θ)) * Ts) / (√3 * Vdc)
    = (√3 * Um * sin(θ) * Ts) / Vdc
 
+其中 '(√3 * Um) / Vdc', 可視為一個 modulation index (M), 可以當作是調整力矩的大小
+
 T0 = T7 = (Ts - T4 - T6) / 2
 ```
 
-+ 逆變器開關順序
+狀態切換的順序
+> 因位 Volt-Second_balance (伏秒平衡) 是做積分, 重要的是持續時間(面積)而不是順序, 一個週期內可以任意切換順序.<br>
+為了儘量減少 MOS 管的開關次數, 會以最大限度減少開關損耗為目的, 來安排狀態切換順序
+
++ 7 段式 SVPWM
     > 電壓向量對應著不同的逆變器開關狀態, 則在電壓向量間的切換, 就對應著不同的逆變器開關狀態間的切換.
     理想上, 在切換電壓向量的時候, 只更動逆變器一個相上的開關狀態, 其損耗會是最小,
     通過引入零向量 (V0/V7), 使產生的 PWM 對稱(有效地降低 PWM 的諧波份量), 就可以輕鬆實現這一目標
@@ -147,5 +156,5 @@ T0 = T7 = (Ts - T4 - T6) / 2
 # Reference
 
 + [*徹底吃透SVPWM如此簡單](https://zhuanlan.zhihu.com/p/414721065?utm_id=0)
-
++ [*【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
 

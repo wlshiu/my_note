@@ -180,6 +180,24 @@ FOC 驅動無刷電機的基本手段, 即通過`計算所需電壓向量`, 使�
     > SVM 技術用於確定適於馬達的 SVPWM 訊號. SVM 以定子電壓向量 (PWM) 作為輸入, 並產生三相輸出電壓作為輸出
     >> SVPWM 實際上計算的是, 三相逆變器六個開關, 在何時導通, 何時切斷
 
+## FOC 參數
+
+使用到 3 個 PI control 閉迴路 (電流的採樣率非常高, 因此不需要使用到微分項)
+> 主要參數 Position/Speed/Current
+> + 通過 response current (Iq/Id) 來控制扭矩 (Vu/Vv/Vw 三相力矩)
+> + 藉由控制扭矩來改變轉速(ω)
+> + 藉由控制轉速來改變轉子位置 (θ)
+
+![FOC_BlockDiagram](FOC_BlockDiagram.jpg)
+> `xxx_ref` 表示預期達到的值, user 經由 `PID` 調校
+
++ 當 `Position control`時, 轉速會變慢 (為了將轉子固定到某個位置), 因此會產生非常大的誤差.
+為了避免誤差, 去除 `Speed control`, 並將 `Position control`改用完整的 PID control
+    > Position 的微分就是速度, 可以減小`Position control`的震盪並加快收斂.
+    而積分項的作用則是為了消除靜態誤差
+
+    ![FOC_BlockDiagram_opti](FOC_BlockDiagram_opti.jpg)
+
 
 ## Sensorless flow chart
 
@@ -245,7 +263,7 @@ Park Transform 將定子的電流, 投影到**隨著轉子旋轉**的直軸(Dire
 # Reference
 + [*相位角、頻率](https://www.geogebra.org/m/wthz4bhr)
 + [*徹底吃透SVPWM如此簡單](https://zhuanlan.zhihu.com/p/414721065?utm_id=0)
-+ [【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
++ [*【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
 + [ZhuYanzhen1/miniFOC](https://github.com/ZhuYanzhen1/miniFOC)
 + [FOC發展與原理概論](https://blog.udn.com/hal9678/6714149)
 + [FOC演算法穩定EV動力傳動性能](https://www.edntaiwan.com/20210825ta31-foc-algorithm-enhances-ev-powertrain-performance/)
