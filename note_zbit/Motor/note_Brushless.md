@@ -199,9 +199,15 @@ FOC 驅動無刷電機的基本手段, 即通過`計算所需電壓向量`, 使�
     ![FOC_BlockDiagram_opti](FOC_BlockDiagram_opti.jpg)
 
 
-## Sensorless flow chart
+## Sensorless
 
-![VectorSensorlesss](VectorSensorlesssBD.jpg)
++ flow chart
+
+    ![VectorSensorlesss](VectorSensorlesssBD.jpg)
+
++ Arch
+
+    ![SensorlessBLDC_circuit](SensorlessBLDC_circuit.png)
 
 ## IFOC v.s. DFOC
 
