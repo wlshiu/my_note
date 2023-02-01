@@ -140,8 +140,12 @@ IGBT是一種半導體元件, 其特點為
     ![SpaceVector](SVPWM_SpaceVector.jpg)
 
     - 週期為相位平面一圈 `∠0° <= wt < ∠360°`
+        > 使用中間對稱三角波的形式來作為參考載波 (理想上的 Vδ 所產生的波形), 當使用響應後的電壓,
+        經計算後所得的實際值大於載波值時, 輸出 low, 否則輸出 high
+        > + 黑: 參考載波
+        > + 紅藍綠: 3 個繞組反饋的實際值
 
-    ![SpaceVectorMappsTo3PWMs](SpaceVectorMappsTo3PWMs.gif)
+        ![SpaceVectorMappsTo3PWMs](SpaceVectorMappsTo3PWMs.gif)
 
 # BLDC (Brushless DC Motor, 無刷直流馬達)
 
@@ -240,7 +244,18 @@ Clark Transform 是將三相相位平面轉換到 α-β 正交平面(為了簡�
 
     ![Inverse_Clark_formula](Inverse_Clark_formula.jpg)
 
++ Formula
 
+    ```
+    # Clark Transform
+    Iα = Iu - Iv * cos(π/3) - Iw * cos(π/3) = Iu - (Iv/2) - (Iw/2)
+    Iβ = Iv * sin(π/3) - Iw * sin(π/3)      = (Iv - Iw) * √3/2
+
+    # Inverse Clark Transform
+    Iu = Iα
+    Iv = Iα * cos(2π/3) + Iβ * sin(π/3) = (-1 * Iα/2) + (Iβ * √3/2)
+    Im = Iα * cos(2π/3) - Iβ * sin(π/3) = (-1 * Iα/2) - (Iβ * √3/2)
+    ```
 
 ## Park Transform
 
@@ -261,8 +276,83 @@ Park Transform 將定子的電流, 投影到**隨著轉子旋轉**的直軸(Dire
     > + 為了減少運算量
     > + 為了方便描述最大與最小磁力的差別
 
++ Formula
+
+    ![qd_coordinate_mapping](qd_coordinate_mapping.jpg)
+
+    ```
+    # Park Transform
+    Id = Iα * cos(θ) + Iβ * sin(θ)
+    Iq = -Iα * sin(θ) + Iβ * cos(θ)
+
+    # Inverse Park Transform
+    Iα = Id * cos(θ) - Iq * sin(θ)
+    Iβ = Id * sin(θ) + Iq * cos(θ)
+    ```
+
+    - C code
+
+        ```
+        /**
+         *  Use 48 samples
+         *  (2 * pi) / 48 =  0.130899
+         */
+        #define CONFIG_ANGULAR_VELOCITY     0.130899f   // ω
+        #define SQRT3_DIV2                  0.866025f   // √3/2
+
+        typedef struct foc_param
+        {
+            uint16_t    u;
+            uint16_t    v;
+            uint16_t    w;
+            uint16_t    d;
+            uint16_t    q;
+        } foc_param_t;
+
+        void phases_to_dq(foc_param_t *pFoc, uint16_t t)
+        {
+            float   x_alpha, x_beta, seta;
+
+            // Clark Transform
+            x_alpha = pFoc->u - (pFoc->v >> 1) - (pFoc->w >> 1);
+            x_beta  = SQRT3_DIV2 * (pFoc->v - pFoc->w);
+
+            // Park Transform
+            seta    = CONFIG_ANGULAR_VELOCITY * t; // θ
+            pFoc->d = x_alpha * cos(seta) + x_beta * sin(seta);
+            pFoc->q = -1 * (x_alpha * sin(seta)) + x_beta * cos(seta);
+        }
+
+        void dq_to_phases(foc_param_t *pFoc, uint16_t t)
+        {
+            float   x_alpha, x_beta, seta;
+
+            // Inverse Park Transform
+            seta    = CONFIG_ANGULAR_VELOCITY * t; // θ
+            x_alpha = pFoc->d * cos(seta) - pFoc->q * sin(seta);
+            x_beta  = pFoc->d * sin(seta) + pFoc->q * cos(seta);
+
+            // Inverse Clark Transform
+            pFoc->u = x_alpha;
+            pFoc->v = -0.5 * x_alpha + SQRT3_DIV2 * x_beta;
+            pFoc->w = -0.5 * x_alpha - SQRT3_DIV2 * x_beta;
+        }
+        ```
+
+
 ## [SVPWM](note_SVPWM.md)
 
+希望將複雜的控制, 簡化成**增減常量**的方式來控制
+> 藉由 Clark 及 Park 轉換來達到目的
+> + Clark Transform
+>> 降低維度, 為後續的 Park Transform 做前處理
+> + Park Transform
+>> 從 **Stator (定子) domain** 轉移到 **Rotor (轉子) domain**, 也就是 d-q domain. <br>
+改變 D-Q 常量值, 再逆轉換到 3-Phase domain, 即可知道要輸入到 Motor 的電壓值
+
+![Clark_Park_Transform](Clark_Park_Transform.jpg)
+
++ 閉迴路(Current close loop)可使 Motor 產生恆定的力矩 (電流量固定)
 
 
 

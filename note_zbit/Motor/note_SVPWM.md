@@ -1,4 +1,4 @@
-SVPWM [[Back](note_Brushless.md)]
+SVPWM (Space Vector PWM) [[Back](note_Brushless.md)]
 ---
 
 ## 3-Phase Inverter 相電壓
@@ -54,13 +54,68 @@ Vdc = Vun + Vng = Vun + (Vun / 2)
 
 ![3-Phase_sin_vector](3-Phase_sin_vector.gif)
 
-當**正弦相位平面**要對應到**三相逆變器電壓向量平面**時, 需使用相電壓向量(V0 ~ V7)來合成**參考電壓向量(Vδ)**
+當**正弦相位平面**要對應到**三相逆變器電壓向量平面**時, 需使用相電壓向量(V0 ~ V7), 並依照**參考電壓向量(Vδ)**, 來合成**輸出電壓相量(Vout)**
 > ![Phase_and_Space_Vector](Phase_and_Space_Vector.jpg)
+
+Vδ 是理想上的電壓相量, 其相量頂點軌跡會是一個圓形, Vout 則是 MCU 控制所生成的相量. 為了讓 Vout 逼近 Vδ, 可在圓周上取樣, 當取樣率越高, 兩者就越相似.
+
+```
+Ts 是取樣週期, 以 10KHz 取樣頻率
+    Ts = 1000ms/10k = 0.1 ms
+
+50 Hz 的 sin 參考訊號 (0 ~ 2π 為 50Hz)
+    samples = (1000ms/50) / Ts = 20ms / 0.1ms = 200
+
+因此可以將圓形等分切成 200 個扇形區域, 每個扇形區域週期即為 Ts
+多個 Ts 組成一個 Section, 並對應到 Section I ~ VI
+```
+
+### 基底轉換 (α-β axis to Space-Vector axis)
+
+![coordinate_conversion1](coordinate_conversion_1.jpg)
+
++ Vδ 從 α-β 轉換到 Vx/Vy, 其關係式
+    > Vx/Vy 分別為 V0 ~ V7 中任意 2 個基底
+
+    ![Formula_1](Formula_1.jpg)
+
++  Clark formula
+
+    ![Formula_3](Formula_3.jpg)
+
++ 從 UVW domain 轉換 Space-Vector domain
+
+    ![Formula_2](Formula_2.jpg)
+
+### 判定 Section
+
+為了標幺化, 將 V0 ~ V7 除以 `2Vdc / 3`(排除震幅的變動), 讓其範圍落在 0 ~ 1 之間, 進而以坐標的形式來表示
+> 標幺值 (Per-unit value) = 實際值 / 基準值
+
+![coordinate_conversion2](coordinate_conversion_2.jpg)
+
+```
+V2 boundary (粉紅線): Vx + Vy = 0 => 當 (Vx, Vy) = (-1, 1) 代入線性方程式
+```
+
+| Phase of Vout             | condition                |
+| :-                        | :-                       |
+| Section I   (0° ~ 60°)    |   Vx >= 0, Vy >= 0       |
+| Section II  (60° ~ 120°)  |   Vx + Vy >= 0, Vy >= 0  |
+| Section III (120° ~ 180°) |   Vx + Vy <= 0, Vy >= 0  |
+| Section IV  (180° ~ 240°) |   Vx <= 0, Vy <= 0       |
+| Section V   (240° ~ 300°) |   Vx + Vy <= 0, Vx >= 0  |
+| Section VI  (300° ~ 360°) |   Vx + Vy >= 0, Vx >= 0  |
+
+
+### 作用時間
+
+當 Vδ 位於 `Section II ~ VI` 時, 可將其轉換到 `Section I`, 以進一步簡化計算
 
 以 Section-I 為例, Vδ 可用 V0/V4/V6/V7 來合成
 > Uα/Uβ 為 Vδ 在 α-β 正交平面的投影量, 由三角函數可獲得 Vδ 的分量 `Vα/Vβ`
 > ![Alpha_Beta_mapping_SV](Alpha_Beta_mapping_SV.jpg)
->> Ts 是每一個 section (I ~ VI), 執行一輪 PWM 開關的週期 <br>
+>> 一個 Ts 中, 逆變器執行一次演算法(計算目前落在哪一個 Section, 以求得對應的 PWM 參數), 並更新一次 PWM 訊號
 >> + T4 是在一個 PWM 開關週期 Ts 內, 電壓向量 V4 持續的時間. 同理,
 >> + T6 是在一個 PWM 開關週期 Ts 內, 電壓向量 V6 持續的時間 <br>
 
@@ -127,11 +182,12 @@ T6 = (|Vβ| * Ts) / |V6|
 T0 = T7 = (Ts - T4 - T6) / 2
 ```
 
-狀態切換的順序
-> 因為 Volt-Second_balance (伏秒平衡) 是做積分, 重要的是持續時間(面積)而不是順序, 一個週期內可以任意切換順序.<br>
+### 狀態切換的順序
+
+因為 Volt-Second_balance (伏秒平衡) 是做積分, 重要的是持續時間(面積)而不是順序, 一個週期內可以任意切換順序.<br>
 為了儘量減少 MOS 管的開關次數, 會以最大限度減少開關損耗為目的, 來安排狀態切換順序
->> 角速度固定 ω, 只有時間 t 是變量, 因此只要維持當前三相繞組的磁場, 隨時間的改變, 就能產生推力. <br>
-V0 ~ V7 的切換, 是藉由改變三相繞組的電壓, 來維持磁場的穩定, 因此只要能保持磁場狀態, 改變三相繞組電壓的順序, 就可以有許多變化
+> 角速度 ω 固定, 只有時間 t 是變量, 因此只要維持當前三相繞組的磁場, 隨時間的改變, 就能產生推力. <br>
+V0 ~ V7 的切換, 是藉由改變 3 個繞組的電壓, 來維持磁場的穩定, 因此只要能保持磁場狀態, 改變 3 個繞組電壓的順序, 就可以有許多變化
 
 + 7 段式 SVPWM
     > 電壓向量對應著不同的逆變器開關狀態, 則在電壓向量間的切換, 就對應著不同的逆變器開關狀態間的切換.
@@ -153,6 +209,8 @@ V0 ~ V7 的切換, 是藉由改變三相繞組的電壓, 來維持磁場的穩�
     | Section V   (240° ~ 300°) | V0 -> V1 -> V5 -> V7 -> V7 -> V5 -> V1 -> V0  |
     | Section VI  (300° ~ 360°) | V0 -> V4 -> V5 -> V7 -> V7 -> V5 -> V4 -> V0  |
 
+    - 7 段式而言, 諧波含量較小, 每個開關週期(section), 有 6 次開關切換
+
     - **判斷 Vout(Vδ) 所處的磁區**
         > 藉由分量 `Vα/Vβ` 經反三角函數 `arctan()`, 可計算出所成的相位角 θ', 從 θ' 就可知道所處的 Section
 
@@ -173,6 +231,19 @@ V0 ~ V7 的切換, 是藉由改變三相繞組的電壓, 來維持磁場的穩�
             > + `tan(2π/3) = (β/α)`
 
             ![SVPWM_SectionDetect](SVPWM_SectionDetect.jpg)
+
++ 5 段式 SVPWM
+    > 為了進一步減少開關次數, 採用每相開關在每個扇區狀態維持不變的序列安排, 使得每個開關週期(section), 只有 3 次開關切換, 但是會增大諧波含量
+
+    | Phase of Vout             | Vector  order                                 |
+    | :-:                       | :-:                                           |
+    | Section I   (0° ~ 60°)    | V4 -> V6 -> V7 -> V7 -> V6 -> V4  |
+    | Section II  (60° ~ 120°)  | V2 -> V6 -> V7 -> V7 -> V6 -> V2  |
+    | Section III (120° ~ 180°) | V2 -> V3 -> V7 -> V7 -> V3 -> V2  |
+    | Section IV  (180° ~ 240°) | V1 -> V3 -> V7 -> V7 -> V3 -> V1  |
+    | Section V   (240° ~ 300°) | V1 -> V5 -> V7 -> V7 -> V5 -> V1  |
+    | Section VI  (300° ~ 360°) | V4 -> V5 -> V7 -> V7 -> V5 -> V4  |
+
 
 ## Volt-Ampere balance (伏安平衡)
 
@@ -220,5 +291,8 @@ V0 ~ V7 的切換, 是藉由改變三相繞組的電壓, 來維持磁場的穩�
 # Reference
 
 + [*徹底吃透SVPWM如此簡單](https://zhuanlan.zhihu.com/p/414721065?utm_id=0)
-+ [*【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
++ [*手撕系列（2）：Clark變換與Park變換](https://zhuanlan.zhihu.com/p/293470912)
++ [*手撕系列（4）：空間向量調製（SVPWM）](https://zhuanlan.zhihu.com/p/303998608)
++ [【自制FOC驅動器】深入淺出講解FOC演算法與SVPWM技術](https://zhuanlan.zhihu.com/p/147659820)
 + [【數字電源】數字電源核心理論-"伏妙平衡"與"安秒平衡"](https://blog.csdn.net/qq_33471732/article/details/109089209?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-109089209-blog-24369903.pc_relevant_multi_platform_whitelistv3&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
++ [FOC中的Clarke變換和Park變換詳解（動圖+推導+模擬+附件程式碼）](https://zhuanlan.zhihu.com/p/172484981)
