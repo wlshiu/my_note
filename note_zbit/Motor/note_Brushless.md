@@ -235,14 +235,17 @@ Clark Transform 是將三相相位平面轉換到 α-β 正交平面(為了簡�
 
 
 + Clark formula
-    > `m` 為幅值大小
+    > + `m = 2/3, m' = 1` 為幅值大小相等
+    > + `m = m' = √2/√3, m' = 1` 為功率大小相等
 
-    ![Clark_formula](Clark_formula.jpg)
+    - Clark Transform
+    
+        ![Clark_formula](Clark_formula.jpg)
 
-+ Inverse Clark formula
-    > `m'` 為幅值大小
+    - Inverse Clark Transform
+    
+        ![Inverse_Clark_formula](Inverse_Clark_formula.jpg)
 
-    ![Inverse_Clark_formula](Inverse_Clark_formula.jpg)
 
 + Formula
 

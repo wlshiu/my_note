@@ -147,9 +147,9 @@
                             # 最後一行: Stage this hunk [y,n,q,a,d,j,J,g,/,s,e,?] ?
                             #   y：好
                             #   n：不
-                            #   q：不，而且我要離開
-                            #   a：好，而且只要是這個檔案的更動我全都要
-                            #   d：不，而且只要是這個檔案的我全都不要
+                            #   q：不, 而且我要離開
+                            #   a：好, 而且只要是這個檔案的更動我全都要
+                            #   d：不, 而且只要是這個檔案的我全都不要
                             #   j：跳到下一個未決定的區塊
                             #   J：跳到下一個區塊
                             #   k：跳到上一個未決定的區塊
@@ -157,7 +157,7 @@
                             #   g：列出所有區塊, goto 過去
                             #   /：以 regex 搜尋符合的部分
                             #   s：把當前區塊再切分(如果可以切的話)
-                            #   e：編輯，使用系統設定的文字編輯器(通常是 vim)
+                            #   e：編輯, 使用系統設定的文字編輯器(通常是 vim)
     ```
 
     1. 編輯 hunk with vim `$ git add -p => press e`
@@ -278,6 +278,25 @@
 
     $ git stash drop stash@{0}　# 刪除暫存
     ```
+
+    1. 避免產生 `merge branch 'xxx' of ssh://gitlab.aaa.net/project/main  into yyyy`
+        > 因為 local 有領先 remote 的commit, 同時 remote 也有領先 local 的 commit
+        >> local 和 remote, 在同一個 base node 上, 各自長出不同的 commit nodes
+
+        > + `git pull --rebase`
+        >> 將 remote 更新拉取到 local, 而後將 local 的提交, **附加到 remote 更新之後**
+
+        > + git stash
+
+        ```
+        $ git stash                 # 這條命令會使本地的修改暫存, 就像是本地的修改消失了一樣, 可以理解成將本地的修改'藏起來'
+        $ git pull                  # 這條命令使本地獲取到遠端更新, 由於本地相對於遠端沒有新的commit, 不會產生額外的merge資訊
+        $ git stash pop             # 這條命令使本地的修改還原, 可以理解成將本地藏起來的修改重新'揪出來'
+        $ git add .                 # 這條命令表明重新將修改新增到暫存區
+        $ git commit -m [message]   # 重新將暫存區的修改提交到本地倉庫
+        $ git push                  # 推送到遠端
+        ```
+
 
 - Git blame
 
