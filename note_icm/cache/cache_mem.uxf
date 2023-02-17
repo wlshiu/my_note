@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>170</x>
+      <y>440</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>440</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>440</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>190</x>
+      <y>140</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>140</y>
+      <w>70</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Tag RAM
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>300</x>
+      <y>140</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>320</x>
+      <y>140</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Cache RAM
+group=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>440</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>380</x>
+      <y>440</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>450</x>
+      <y>440</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>480</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1
+bg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>480</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>480</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2
+bg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>380</x>
+      <y>480</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3
+bg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>450</x>
+      <y>480</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4
+bg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>170</x>
+      <y>480</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>250</x>
+      <y>350</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1
+bg=#3c7a00
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>220</x>
+      <y>350</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=3</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>350</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2
+bg=#3c7a00
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>350</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3
+bg=#3c7a00
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>460</x>
+      <y>350</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4
+bg=#3c7a00
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>180</x>
+      <y>350</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>250</x>
+      <y>320</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>220</x>
+      <y>320</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=3</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>320</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>320</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>460</x>
+      <y>320</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>180</x>
+      <y>320</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>230</x>
+      <y>410</y>
+      <w>300</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1
+fg=blue
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>230</x>
+      <y>410</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Cache Line*
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>110</x>
+      <y>390</y>
+      <w>440</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>110</x>
+      <y>390</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*2-Way*
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>120</x>
+      <y>290</y>
+      <w>440</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1
+fg=magenta
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>120</x>
+      <y>290</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*2-Way*
+fg=magenta
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>260</x>
+      <y>250</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1
+bg=#3c7a00
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>250</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=2</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>330</x>
+      <y>250</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2
+bg=#3c7a00
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>400</x>
+      <y>250</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3
+bg=#3c7a00
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>470</x>
+      <y>250</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4
+bg=#3c7a00
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>190</x>
+      <y>250</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>260</x>
+      <y>220</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data1
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>220</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=2</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>330</x>
+      <y>220</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data2
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>400</x>
+      <y>220</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data3
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>470</x>
+      <y>220</y>
+      <w>70</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>Data4
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>190</x>
+      <y>220</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>TAG
+bg=yellow
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>130</x>
+      <y>190</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*2-Way*
+fg=magenta
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>130</x>
+      <y>190</y>
+      <w>440</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.
+layer=-1
+fg=magenta
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>250</y>
+      <w>100</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>80.0;110.0;80.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>350</y>
+      <w>190</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>500</x>
+      <y>350</y>
+      <w>120</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>100.0;10.0;100.0;140.0;10.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>680</x>
+      <y>340</y>
+      <w>110</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*Set 1*
+(N * cacheline)
+fg=#3c7a00
+valign=center
+halign=left</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>110</x>
+      <y>440</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 0*
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>110</x>
+      <y>470</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 1*
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>130</x>
+      <y>220</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 0*
+fg=magenta
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>130</x>
+      <y>240</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 1*
+fg=magenta
+group=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>120</x>
+      <y>320</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 0*
+fg=magenta
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>120</x>
+      <y>340</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way 1*
+fg=magenta
+group=3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>220</y>
+      <w>130</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=blue</panel_attributes>
+    <additional_attributes>110.0;110.0;110.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>500</x>
+      <y>320</y>
+      <w>150</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=blue</panel_attributes>
+    <additional_attributes>130.0;10.0;130.0;130.0;10.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>320</y>
+      <w>170</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=blue</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>660</x>
+      <y>300</y>
+      <w>110</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*Set 0*
+(N * cacheline)
+valign=center
+halign=left
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

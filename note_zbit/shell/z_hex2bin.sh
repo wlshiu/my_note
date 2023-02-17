@@ -8,6 +8,7 @@ import string
 parser = argparse.ArgumentParser(description='Convert hex file to binary file')
 parser.add_argument("-o", "--Output", type=str, help="output bin file")
 parser.add_argument("-i", "--Input", type=str, help="input hex file")
+parser.add_argument("-e", "--LittleEndian", type=str, help="Endian type, le or be default: le(little-endian)")
 
 args = parser.parse_args()
 
@@ -34,11 +35,23 @@ Input file context:
 ...
 """
 
+
+Endian ='le'
+is_32le = False
+
+if args.LittleEndian == Endian:
+    is_32le = True
+
 fin = open(args.Input, 'r')
 for line in fin.readlines():
     value = int(line, 16)
     # print("%08x" % value)
-    a = struct.pack("I", value)
+
+    if is_32le:
+        a = struct.pack("<I", value) # little-endian
+    else:
+        a = struct.pack(">I", value) # big-endian
+
     fout.write(a)
 
 
