@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="14.3.0">
+<diagram program="umlet" version="15.0.0">
   <zoom_level>10</zoom_level>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>70</x>
-      <y>180</y>
+      <x>210</x>
+      <y>250</y>
       <w>450</w>
       <h>40</h>
     </coordinates>
@@ -15,30 +15,19 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>310</x>
+      <x>550</x>
       <y>280</y>
-      <w>70</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>450</x>
-      <y>210</y>
       <w>30</w>
-      <h>70</h>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>30</x>
-      <y>420</y>
+      <x>170</x>
+      <y>360</y>
       <w>130</w>
       <h>30</h>
     </coordinates>
@@ -48,21 +37,22 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>500</x>
-      <y>290</y>
-      <w>110</w>
-      <h>40</h>
+      <x>640</x>
+      <y>460</y>
+      <w>100</w>
+      <h>70</h>
     </coordinates>
-    <panel_attributes>128-bits AHB lite 
+    <panel_attributes>128-bits 
+AHB lite 
 *master*</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>480</x>
-      <y>440</y>
-      <w>110</w>
+      <x>640</x>
+      <y>550</y>
+      <w>100</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>Flash 
@@ -72,9 +62,9 @@ Controller</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>480</x>
-      <y>500</y>
-      <w>110</w>
+      <x>640</x>
+      <y>610</y>
+      <w>100</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>eFlash</panel_attributes>
@@ -83,64 +73,42 @@ Controller</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>470</y>
+      <x>680</x>
+      <y>580</y>
       <w>30</w>
       <h>50</h>
     </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
+    <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>380</y>
+      <x>440</x>
+      <y>350</y>
+      <w>80</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.&gt;</panel_attributes>
+    <additional_attributes>10.0;60.0;60.0;60.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>510</y>
       <w>30</w>
       <h>60</h>
     </coordinates>
-    <panel_attributes>lt=-</panel_attributes>
+    <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>400</x>
-      <y>380</y>
-      <w>50</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>lt=.</panel_attributes>
-    <additional_attributes>10.0;90.0;30.0;90.0;30.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>580</x>
-      <y>300</y>
-      <w>70</w>
-      <h>180</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;160.0;50.0;160.0;50.0;10.0;30.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>530</x>
-      <y>410</y>
-      <w>30</w>
-      <h>50</h>
-    </coordinates>
-    <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>360</x>
-      <y>260</y>
-      <w>250</w>
+      <x>520</x>
+      <y>400</y>
+      <w>230</w>
       <h>130</h>
     </coordinates>
     <panel_attributes>lt=-
@@ -151,111 +119,80 @@ layer=-1</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>220</x>
-      <y>280</y>
+      <x>780</x>
+      <y>420</y>
       <w>100</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>Tag SRAM
-group=1</panel_attributes>
+group=group-4</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>220</x>
-      <y>300</y>
+      <x>780</x>
+      <y>440</y>
       <w>100</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>Cache SRAM
-group=1</panel_attributes>
+group=group-4</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>220</x>
-      <y>330</y>
+      <x>780</x>
+      <y>470</y>
       <w>100</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>Tag SRAM
-group=2</panel_attributes>
+group=group-4</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>220</x>
-      <y>350</y>
+      <x>780</x>
+      <y>490</y>
       <w>100</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>Cache SRAM
-group=2</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>310</x>
-      <y>300</y>
-      <w>70</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>310</x>
-      <y>330</y>
-      <w>70</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>310</x>
-      <y>350</y>
-      <w>70</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>170</x>
-      <y>290</y>
-      <w>50</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>*Way0*</panel_attributes>
+group=group-4</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>170</x>
-      <y>340</y>
+      <x>880</x>
+      <y>430</y>
       <w>50</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>*Way1*</panel_attributes>
+    <panel_attributes>*Way0*
+group=group-4</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>880</x>
+      <y>480</y>
+      <w>50</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Way1*
+group=group-4</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>380</x>
-      <y>330</y>
+      <x>520</x>
+      <y>450</y>
       <w>110</w>
       <h>60</h>
     </coordinates>
@@ -267,8 +204,8 @@ slave
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>500</x>
-      <y>350</y>
+      <x>600</x>
+      <y>400</y>
       <w>110</w>
       <h>40</h>
     </coordinates>
@@ -279,8 +216,8 @@ slave
   <element>
     <id>Text</id>
     <coordinates>
-      <x>360</x>
-      <y>260</y>
+      <x>520</x>
+      <y>400</y>
       <w>60</w>
       <h>30</h>
     </coordinates>
@@ -290,8 +227,8 @@ slave
   <element>
     <id>Text</id>
     <coordinates>
-      <x>460</x>
-      <y>220</y>
+      <x>560</x>
+      <y>290</y>
       <w>60</w>
       <h>20</h>
     </coordinates>
@@ -301,10 +238,10 @@ slave
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>220</x>
-      <y>440</y>
+      <x>320</x>
+      <y>380</y>
       <w>100</w>
-      <h>40</h>
+      <h>60</h>
     </coordinates>
     <panel_attributes>master
 SRAM</panel_attributes>
@@ -313,8 +250,8 @@ SRAM</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>260</x>
-      <y>410</y>
+      <x>360</x>
+      <y>350</y>
       <w>30</w>
       <h>50</h>
     </coordinates>
@@ -324,19 +261,19 @@ SRAM</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>120</x>
-      <y>210</y>
+      <x>260</x>
+      <y>280</y>
       <w>30</w>
-      <h>230</h>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;210.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>130</x>
-      <y>230</y>
+      <x>270</x>
+      <y>300</y>
       <w>60</w>
       <h>20</h>
     </coordinates>
@@ -346,8 +283,8 @@ SRAM</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>30</x>
-      <y>230</y>
+      <x>170</x>
+      <y>300</y>
       <w>60</w>
       <h>20</h>
     </coordinates>
@@ -357,20 +294,20 @@ SRAM</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>80</x>
-      <y>210</y>
+      <x>220</x>
+      <y>280</y>
       <w>30</w>
-      <h>230</h>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;210.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLSyncBarHorizontal</id>
     <coordinates>
-      <x>30</x>
-      <y>410</y>
-      <w>550</w>
+      <x>170</x>
+      <y>350</y>
+      <w>590</w>
       <h>20</h>
     </coordinates>
     <panel_attributes>{joinSpec=
@@ -383,14 +320,14 @@ is passed}</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>80</x>
-      <y>490</y>
+      <x>190</x>
+      <y>510</y>
       <w>410</w>
       <h>110</h>
     </coordinates>
     <panel_attributes>CG092 
 + Only support prefech data from eFlash
-    - Manually set cache invalidate if eFlash be updated
+    - Manually set cache invalidate (all dirty) if eFlash be updated
 + Cache line is 16-Bytes  (4-words)
 + Support 1 ~ 2 way
     - 256B, 512B, 2048B, 4096B /Way (Not involve Tag-SRAM)</panel_attributes>
@@ -399,10 +336,10 @@ is passed}</panel_attributes>
   <element>
     <id>UMLSyncBarVertical</id>
     <coordinates>
-      <x>400</x>
-      <y>430</y>
+      <x>440</x>
+      <y>380</y>
       <w>20</w>
-      <h>70</h>
+      <h>110</h>
     </coordinates>
     <panel_attributes>template=txt
 title=titletext
@@ -412,12 +349,78 @@ bg=red</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>410</x>
-      <y>480</y>
+      <x>450</x>
+      <y>370</y>
       <w>50</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>*APB*</panel_attributes>
     <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>420</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>440</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>470</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>490</y>
+      <w>60</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>440</x>
+      <y>460</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.&gt;</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>640</x>
+      <y>350</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
   </element>
 </diagram>
