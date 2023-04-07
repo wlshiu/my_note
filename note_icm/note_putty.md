@@ -14,7 +14,7 @@ Putty
     - putty版本 > 0.6
 
         ```
-        putty -> Connection -> Data -> Terminal type string 從 xterm 改成 Linux
+        putty -> Connection -> Data -> Terminal type string 從 xterm 改成 putty or Linux
         ```
 
     - putty版本 <= 0.6
