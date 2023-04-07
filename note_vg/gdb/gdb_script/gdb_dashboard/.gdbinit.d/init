@@ -1,0 +1,45 @@
+set breakpoint pending on
+set confirm off
+set disassembly-flavor intel
+dashboard registers -style column-major True
+
+
+dashboard -layout !assembly breakpoints expressions !history !memory !registers source stack !threads variables
+
+define win-def
+	dashboard -layout !assembly breakpoints expressions !history !memory !registers source stack !threads variables
+	dashboard source -style height 30
+end
+
+define win-asm
+	dashboard -layout assembly !breakpoints !expressions !history !memory registers source !stack !threads !variables
+	dashboard assembly -style height 30
+	dashboard source -style height 10
+end
+
+define win-mem
+    if $argc != 2
+        help win-mem
+    else
+		dashboard -layout !assembly !breakpoints !expressions !history memory !registers !source !stack !threads !variables
+        dashboard memory watch $arg0 $arg1
+    end
+end
+document win-mem
+Usage: win_mem <addr> <length>
+end
+
+define win-redirect
+	if $argc != 2
+		help win-redirect
+	else
+		dashboard $arg0 -output $arg1
+	end
+end
+document win-redirect
+Usage: win-redirect <win_name> <tty_index>
+Redirect <win_name> to the other terminal with <tty_index>
+<win_name> : assembly, breakpoints, expressions, history,
+             memory, registers, source, stack, ,threads, variables
+<tty_index>: use '$ tty' to get the tty index of the target terminal.
+end
