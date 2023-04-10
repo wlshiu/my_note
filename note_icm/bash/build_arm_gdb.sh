@@ -10,13 +10,15 @@ export GDB=gdb-$VERSION
 rm -rf $GDB
 
 # Get archives
-wget http://ftp.gnu.org/gnu/gdb/$GDB.tar.gz
+if [ ! -f ${GDB}.tar.gz ]; then
+    wget http://ftp.gnu.org/gnu/gdb/$GDB.tar.gz
+fi
 
 # Extract archives
-tar xzvf $GDB.tar.gz
+tar xzf $GDB.tar.gz
 
 mkdir build-gdb
 cd build-gdb
 ../$GDB/configure --target=$TARGET --prefix=$PREFIX --enable-interwork --enable-multilib --with-python
 make
-make install
+# make install
