@@ -241,7 +241,7 @@ Qemu
 
                 src_path=$1
                 img_elf=$2
-                
+
                 arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf # -tui
                 # cgdb -d arm-none-eabi-gdb --directory=$src_path -ex "target remote:1234" $img_elf  <--- cgdb: 是 gdb 的前端, 可用來取代 -tui mode
 
@@ -288,6 +288,298 @@ Qemu
     $ make vexpress_ca9x4_defconfig
     $ make
     ```
+
+# Qemu features
+
+## options
+
++ `machine`
+
+    - check support list of machine
+
+        ```
+        $ qemu-system-arm -M ?
+            or
+        $ qemu-system-arm -machine ?
+        ```
+
+    - `virt`
+        > virt 是一個虛擬平台, 沒有對應到現實的任何平台, 專為在虛擬機器中使用而設計,
+        它支援 PCI, virtio, 最新的cpu, 和大量的RAM
+
+        1. virt 上運行 32-bits ARM Debian Linux 的資訊
+            > [Installing Debian on QEMU’s 32-bit ARM 'virt' board](https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemus-32-bit-arm-virt-board/)
+
+        1. 64-bits ARM 來說, virt 也是最好的選擇, 64-bits ARM Debian Linux 的資訊
+            > [Installing Debian on QEMU’s 64-bit ARM 'virt' board](https://translatedcode.wordpress.com/2017/07/24/installing-debian-on-qemus-64-bit-arm-virt-board/)
+
+
++ `cpu`
+
+    - check support list of cpu
+
+        ```
+        $ qemu-system-arm -cpu ?
+        ```
+
++ `device`
+
+    - check support list of device
+        > 外掛 device, e.g. display, sound, storage, USB, Network, PCIe, ...etc.
+
+        ```
+        $ qemu-system-arm -device ?
+        ```
+
+        1. virt graphic
+
+            ```
+            $ qemu-system-arm -device virtio-gpu-device
+            ```
+
+## Virt machine
+
++ Example u-boot with qemu
+
+    - [qemu-virt-hello](https://github.com/richardchien/qemu-virt-hello)
+        > kernel image for u-boot to bring-up
+
+        1. 產生 U-Boot 能夠識別的 image 檔案
+            > mkimage 命令 (Ubuntu 上需安裝 u-boot-tools)
+
+            ```
+            $ mkimage -A arm64 -C none -T kernel -a 0x40000000 -e 0x40000000 -n qemu-virt-hello -d build/kernel.bin uImage
+            ```
+
+    - run u-boot with qemu
+
+        ```
+        $ qemu-system-aarch64 -machine virt -cpu cortex-a57 -bios u-boot.bin -nographic
+        ```
+
+    - Device Tree Blob
+        > dump Device-Tree
+        >> 當前資料夾生成 virt.dtb 檔案
+
+        ```
+        # dumpdtb=virt.dtb
+        $ qemu-system-aarch64 -machine virt,dumpdtb=virt.dtb -cpu cortex-a57 -smp 1 -m 2G -nographic
+        ```
+
+    - Generator raw image of Flash
+        > QEMU virt 平台有兩個 flash 區域, 分別是 `0x0000_0000 ~ 0x0400_0000` 和 `0x0400_0000 ~ 0x0800_0000`,
+        U-Boot 本身被放在前一個 flash 區域, 可以通過 QEMU 參數, 傳入一個 raw binary image 來作為後一個 flash
+
+        ```
+        -drive if=pflash,format=raw,index=1,file=/path/to/flash.img
+        ```
+
+        1. 這裡為了方便, 使用 fallocate 和 cat,  簡單地把 uImage 和 virt.dtb 拼在一起
+
+            ```
+            # 把 uImage 和 virt.dtb 分別擴展到 32M
+            $ fallocate -l 32M uImage
+            $ fallocate -l 32M virt.dtb
+
+            # combine
+            $ cat uImage virt.dtb > flash.img
+            ```
+
+    - execute u-boot from flash wiht qemu
+
+        ```
+        $ qemu-system-aarch64 -nographic \
+            -machine virt -cpu cortex-a57 -smp 1 -m 2G \
+            -bios u-boot.bin \
+            -drive if=pflash,format=raw,index=1,file=flash.img
+        ```
+
+        1. 查看 flash 資訊 `flinfo ` cmd
+            > u-boot 中的 `flinfo` 可以查看 flash 資訊
+            >> 由於先前製作 flash.img 時, 拼接了 uImage 和 virt.dtb, 因此 `uImage` 在 0x0400_0000, `virt.dtb` 在 0x0600_0000
+
+        1. 顯示 kernel image 資訊
+            > `uImage` info
+
+            ```
+            => iminfo 0x04000000
+
+            ## Checking Image at 04000000 ...
+               Legacy image found
+               Image Name:   qemu-virt-hello
+               Created:      2021-02-22  15:54:06 UTC
+               Image Type:   AArch64 Linux Kernel Image (uncompressed)
+               Data Size:    12416 Bytes = 12.1 KiB
+               Load Address: 40000000
+               Entry Point:  40000000
+               Verifying Checksum ... OK
+            ```
+
+        1. 檢查 Device Tree 資訊
+            > `virt.dtb` info
+
+            ```
+            => fdt addr 0x06000000
+            => fdt print /
+            / {
+                interrupt-parent = <0x00008001>;
+                #size-cells = <0x00000002>;
+                ...
+            ```
+
+    - Bring-up kernel image from u-boot
+
+        ```
+        => bootm 0x04000000 - 0x06000000
+        ## Booting kernel from Legacy Image at 04000000 ...
+           Image Name:   qemu-virt-hello
+           Created:      2021-02-22  15:54:06 UTC
+           Image Type:   AArch64 Linux Kernel Image (uncompressed)
+           Data Size:    12416 Bytes = 12.1 KiB
+           Load Address: 40000000
+           Entry Point:  40000000
+           Verifying Checksum ... OK
+        ## Flattened Device Tree blob at 06000000
+           Booting using the fdt blob at 0x6000000
+           Loading Kernel Image
+           Loading Device Tree to 00000000bede5000, end 00000000bede9cdb ... OK
+
+        Starting kernel ...
+
+        Booting...
+        ...
+        ```
+
++ 由 flash 啟動 `virt` u-boot
+
+    - 先製作 flash image file, 將 `u-boot.bin` 複製到 flash image 的 offset 0x0,
+        > 使用 `-drive` 即可從 flash 啟動 u-boot
+
+        1. 製作 flash.bin 並將 u-boot.bin 複製到 offset 0x0
+
+            ```
+            $ dd if=/dev/zero of=flash.bin bs=4096 count=16384
+            $ dd if=output/images/u-boot.bin of=flash.bin conv=notrunc bs=4096
+            ```
+
+
+        2. 加`-drive`參數, 從 flash 啟動 u-boot
+
+            ```
+            $ qemu-system-aarch64 -machine virt -cpu cortex-a57 -m 1G -drive file=flash.bin,format=raw,if=pflash -nographic
+
+            U-Boot 2018.11 (Dec 17 2018 - 14:04:48 +0800)
+
+            DRAM: 1 GiB
+            In: pl011@9000000
+            Out: pl011@9000000
+            Err: pl011@9000000
+            Net: No ethernet found.
+            Hit any key to stop autoboot: 0
+            =>
+            ```
+
++ u-boot 支援網路
+    > virbr0 是 KVM 默認建立的一個 bridge, 其作用是為存在的 virtual netdev 提供 NAT 訪問外網的功能.
+
+    1. virbr0 默認分配了一個 IP `192.168.122.1`, 並為存在的其他虛擬網路卡提供 DHCP 服務.
+        > 利用這一機制, 讓 QEMU u-boot 可以訪問 host 網路, 進而可以從 tftp server 引導 linux kernel 了
+
+        ```
+        $ cat board/qemu/scripts/qemu-ifup_virbr0
+            #!/bin/sh
+            run_cmd()
+            {
+                echo $1
+                eval $1
+            }
+            run_cmd "sudo ifconfig $1 0.0.0.0 promisc up"
+            run_cmd "sudo brctl addif virbr0 $1"
+            run_cmd "brctl show"
+        ```
+
+
+    1. u-boot 啟動後, 設定 ipaddr 環境變數, 就可以 ping 通 `host ip: 192.168.122.1`
+
+        ```
+        $ sudo qemu-system-aarch64 -machine virt -cpu cortex-a57 -m 1G \
+            -drive file=flash.bin,format=raw,if=pflash \
+            -nographic \
+            -netdev type=tap,id=net0,script=board/qemu/scripts/qemu-ifup_virbr0 \
+            -device e1000,netdev=net0
+
+            sudo ifconfig tap0 0.0.0.0 promisc up
+            sudo brctl addif virbr0 tap0
+            brctl show
+            bridge name	bridge id	STP enabled	interfaces
+            virbr0	8000.5254005634be	yes	tap0
+                   virbr0-nic
+
+
+            U-Boot 2018.11 (Dec 17 2018 - 14:04:48 +0800)
+
+            DRAM: 1 GiB
+            In: pl011@9000000
+            Out: pl011@9000000
+            Err: pl011@9000000
+            Net: No ethernet found.
+            Hit any key to stop autoboot: 0
+        ```
+
+    1. u-boot 運行 bootcmd_dhcp, 使用 dhcp client 獲取 IP 地址和設定 server 地址
+        > 即 virbr0 的 IP: 192.168.122.1
+
+        ```
+        => run bootcmd_dhcp
+        starting USB...
+        No controllers found
+        e1000: 52:54:00:12:34:56
+
+        Warning: e1000#0 using MAC address from ROM
+        BOOTP broadcast 1
+        DHCP client bound to address 192.168.122.76 (7 ms)
+        Using e1000#0 device
+        TFTP from server 192.168.122.1; our IP address is 192.168.122.76
+        Filename 'boot.scr.uimg'.
+        Load address: 0x40200000
+        Loading: *
+        TFTP error: 'File not found' (1)
+        Not retrying...
+        BOOTP broadcast 1
+        DHCP client bound to address 192.168.122.76 (6 ms)
+        Using e1000#0 device
+        TFTP from server 192.168.122.1; our IP address is 192.168.122.76
+        Filename 'boot.scr.uimg'.
+        Load address: 0x40400000
+        Loading: *
+        TFTP error: 'File not found' (1)
+        Not retrying...
+        ```
+
+    1. u-boot ping server 地址
+
+        ```
+        => ping 192.168.122.1
+        Using e1000#0 device
+        host 192.168.122.1 is alive
+        ```
+
++ QEMU 運行 `virt` linux kernel
+    > 依 `buildroot/board/qemu/aarch64-virt/readme.txt` 的啟動命令, 就可以運行 linux 了
+
+    ```
+    $ sudo qemu-system-aarch64 -M virt \
+        -cpu cortex-a57 -nographic -smp 4 -m 512 \
+        -kernel output/images/Image \
+        -append "root=/dev/ram0 console=ttyAMA0 kmemleak=on loglevel=8" \
+        -netdev type=tap,ifname=tap0,id=eth0,script=board/qemu/scripts/qemu-ifup_virbr0,queues=2 \
+        -device virtio-net-pci,netdev=eth0,mac='00:00:00:01:00:01',vectors=6,mq=on \
+    ```
+
+## reference
++ [在 QEMU 上使用 U-Boot 啟動自制核心](https://stdrc.cc/post/2021/02/23/u-boot-qemu-virt/)
++ [QEMU模擬arm64 virt u-boot/linux](https://jgsun.github.io/2018/12/17/qemu-virt-arm64/)
+
 
 # My build-up flow (Ubuntu 18.04)
 
