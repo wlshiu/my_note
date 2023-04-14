@@ -33,3 +33,29 @@ Putty
     + Copy something from Vim into the Windows clipboard
         > hold `Shift + Select with Left Mouse`.
 
+
++ menuconfig 亂碼
+    > 兩種方法, 改 putty 或是 Linux OS 的設定
+
+    - Putty
+        > 兩種方法
+
+        > +  Terminal type
+
+        ```
+        Window -> Translation -> "Enable VT100 line drawing even in UTF-8 mode".
+        ```
+
+        > +  Terminal type
+
+        ```
+        putty -> Connection -> Data -> Terminal type string 從 xterm 改成 Linux
+        ```
+
+    -  `~/.bashrc` 中新增環境變數
+
+        ```
+        export NCURSES_NO_UTF8_ACS=1
+        ```
+
+

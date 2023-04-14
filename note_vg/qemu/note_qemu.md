@@ -825,31 +825,43 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
         ```
 
         1. simple rootfs
+            > + normal `rootfs.img.gz`
 
-        ```
-        $ mkdir rootfs
-        $ mkdir -pv {bin,sbin,etc,proc,sys,usr/{bin,sbin}}
+            ```
+            $ mkdir rootfs
+            $ mkdir -pv {bin,sbin,etc,proc,sys,usr/{bin,sbin}}
 
-        $ vim etc/inittab
-            ::sysinit:/etc/init.d/rcS
-            ::askfirst:/bin/ash
-            ::ctrlaltdel:/sbin/reboot
-            ::shutdown:/sbin/swapoff -a
-            ::shutdown:/bin/umount -a -r
-            ::restart:/sbin/init
+            $ vim etc/inittab
+                ::sysinit:/etc/init.d/rcS
+                ::askfirst:/bin/ash
+                ::ctrlaltdel:/sbin/reboot
+                ::shutdown:/sbin/swapoff -a
+                ::shutdown:/bin/umount -a -r
+                ::restart:/sbin/init
 
-        $ mkdir etc/init.d
-        $ vim etc/init.d/rcS
-            #!/bin/sh
-            mount -t proc none /proc
-            mount -t sys none /sys
-            /bin/mount -n -t sysfs none /sys
-            /bin/mount -t ramfs none /dev
-            /sbin/mdev -s
-        $ sudo chmod +x ./etc/init.d/rcS
-        $ find . | cpio -o --format=newc > ./rootfs.img
-        $ gzip -c rootfs.img > rootfs.img.gz
-        ```
+            $ mkdir etc/init.d
+            $ vim etc/init.d/rcS
+                #!/bin/sh
+                mount -t proc none /proc
+                mount -t sys none /sys
+                /bin/mount -n -t sysfs none /sys
+                /bin/mount -t ramfs none /dev
+                /sbin/mdev -s
+            $ sudo chmod +x ./etc/init.d/rcS
+            $ find . | cpio -o --format=newc > ./rootfs.img
+            $ gzip -c rootfs.img > rootfs.img.gz
+            ```
+
+            > + only init in rootfs `initramfs_data.cpio.gz`
+
+            ```
+            $ mkdir rootfs_tmp
+            $ cp <init sh files> rootfs_tmp/init
+            $ cd rootfs_tmp
+            $ find . | cpio -o -H newc | gzip > ../initramfs_data.cpio.gz
+            $ cd ..
+            $ rm -rf rootfs_tmp
+            ```
 
     - Debug on Qemu with GDB
 
