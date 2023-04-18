@@ -121,18 +121,44 @@ On ubuntu 20.04
     > kernel-module 通常使用 `*.ko` file externsion
 
     ```makefile
-    #
-    ## Makefile by appleboy
-    #
+    ARCH=x86_64
+    # ARCH=arm
 
-    obj-m       += hello.o
-    KVERSION := $(shell uname -r)
+    #
+    # KERNELDIR => kernel development include path
+    #
+    # x86_64: $(shell uname -r)
+    #	/lib/modules/5.4.0-124-generic/build
+    #    	or
+    #	/usr/src/linux-headers-5.4.0-124-generic
+    #
+    # ARM:
+    # 	$(HOME)/working/linux/linux/linux-4.19.279
+    ifeq ($(ARCH),x86_64)
+        CROSS_COMPILE :=
+        KERNELDIR := /lib/modules/5.4.0-124-generic/build
 
-    all:
-        $(MAKE) -C /lib/modules/$(KVERSION)/build M=$(PWD) modules
+    else ifeq ($(ARCH),arm)
+        CROSS_COMPILE := arm-none-eabi-
+        KERNELDIR := $(HOME)/working/linux/linux/linux-4.19.279
+
+    else
+    $(error No ARCH)
+    endif
+
+
+    PWD := $(shell pwd)
+
+    CC=$(CROSS_COMPILE)gcc
+    LD=$(CROSS_COMPILE)ld
+
+    obj-m := hello.o
+
+    modules:
+        $(MAKE) -C $(KERNELDIR) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) M=$(PWD) modules
 
     clean:
-        $(MAKE) -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
+        rm *.o *.ko *.mod.c *.markers *.order *.symvers
 
     ```
 
