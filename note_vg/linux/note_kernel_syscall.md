@@ -211,8 +211,59 @@ user_func()(e.g open) -> __libc_open() -> svc 0 -> vector_swi -> system_call -> 
         > + 執行完 syscall  後返回到 user mode 程序, 繼續執行
 
 
+## Vector Table
 
++ ARMv7-A
+    > `arch/arm/kernel/entry-armv.S`
 
+    ```asm
+        section .vectors, "ax", %progbits
+    .L__vectors_start:
+        W(b)    vector_rst                      /* reset */
+        W(b)    vector_und                      /* undefined */
+        W(ldr)  pc, .L__vectors_start + 0x1000  /* S/w interrupt */
+        W(b)    vector_pabt                     /* prefetch abort */
+        W(b)    vector_dabt                     /* data abort */
+        W(b)    vector_addrexcptn               /* not used */
+        W(b)    vector_irq                      /* normal irq */
+        W(b)    vector_fiq                      /* fast irq */
+    ```
+
++ ARMv7-M
+    > `arch/arm/kernel/entry-v7m.S`
+
+    ```asm
+    /*
+     * Vector table (Natural alignment need to be ensured)
+     */
+    ENTRY(vector_table)
+        long  0                 @ 0 - Reset stack pointer
+        long  __invalid_entry>  @ 1 - Reset
+        long  __invalid_entry>  @ 2 - NMI
+        long  __invalid_entry>  @ 3 - HardFault
+        long  __invalid_entry>  @ 4 - MemManage
+        long  __invalid_entry>  @ 5 - BusFault
+        long  __invalid_entry>  @ 6 - UsageFault
+        long  __invalid_entry>  @ 7 - Reserved
+        long  __invalid_entry>  @ 8 - Reserved
+        long  __invalid_entry>  @ 9 - Reserved
+        long  __invalid_entry>  @ 10 - Reserved
+        long  vector_swi        @ 11 - SVCall
+        long  __invalid_entry>  @ 12 - Debug Monitor
+        long  __invalid_entry>  @ 13 - Reserved
+        long  __pendsv_entry>   @ 14 - PendSV
+        long  __invalid_entry>  @ 15 - SysTick
+
+        rept  CONFIG_CPU_V7M_NUM_IRQ            <---- 針對 armv7-M 保留 External ISR
+        long  __irq_entry   @ External Interrupts
+        endr    /* end of rept */
+
+        align 2
+        globl exc_ret
+    exc_ret:
+        space 4
+
+    ```
 
 # Reference
 
@@ -220,6 +271,5 @@ user_func()(e.g open) -> __libc_open() -> svc 0 -> vector_swi -> system_call -> 
 + [System Call (系統呼叫)](https://hackmd.io/@combo-tw/Linux-%E8%AE%80%E6%9B%B8%E6%9C%83/%2F%40combo-tw%2FBJPoAcqQS)
 + [System Call & OS架構](https://ithelp.ithome.com.tw/m/articles/10275598)
 + [Linux系統呼叫(syscall)原理](http://gityuan.com/2016/05/21/syscall/)
-
-
++ [arm 中斷組態以及處理的原始碼分析](https://blog.csdn.net/weiwei_xiaoyu/article/details/47132327?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-5-47132327-blog-90135281.235^v29^pc_relevant_default_base3&spm=1001.2101.3001.4242.4&utm_relevant_index=8)
 

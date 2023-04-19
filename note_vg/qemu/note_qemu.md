@@ -880,6 +880,7 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
             -kernel arch/arm/boot/zImage \
             -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
             -nographic \
+            -initrd ../rootfs.img \
             -append "console=ttyAMA0" -s -S
         $ sudo chmod +x ./z_run_gdb_server.sh
         $ ./z_run_gdb_server.sh
@@ -909,6 +910,43 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
         Remote debugging using :1234
         (gdb)
 
+        ```
++ busybox
+
+    - dependency
+
+        ```
+        $ sudo apt-get install gcc-arm-linux-gnueabi
+        ```
+
+    - build
+
+        ```
+        $ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- menuconfig
+          Busybox Settings  --->
+            Build Options  --->
+              [*] Build BusyBox as a static binary (no shared libs)
+              ()  Cross Compiler prefix
+
+        $ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+        $ make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- install
+        $ cd _install
+        $ mkdir proc sys dev etc etc/init.d
+        $ touch etc/init.d/rcS
+        $ cat << EOF > etc/init.d/rcS
+            #!bin/sh
+
+            mount -t proc none /proc
+            mount -t sysfs none /sys
+            /sbin/mdev -s
+
+            EOF
+
+        $ chmod +x etc/init.d/rcS
+        $ sudo mkdir /rootfs
+        $ sudo pax -r -w -p e . /rootfs
+        $ sudo chmod 777 /rootfs -R
+        $ sudo chown -R nobody:nobody /rootfs
         ```
 
 + buildroot
@@ -1147,3 +1185,8 @@ $ source setting.env
         # 0x120000 是 kernel 的分區大小.
         ```
 
+
+# Reference
+
++ [QEMU/Options](https://wiki.gentoo.org/wiki/QEMU/Options)
++ [建構 ARM Linux 4.7.3 嵌入式開發環境 —— BusyBox 建構 RootFS](https://cloud.tencent.com/developer/article/1499163)
