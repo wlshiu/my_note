@@ -26,7 +26,7 @@ Qemu options
 ## `-s -S`
 
 `-s` 等同 `-gdb tcp::1234`
-`-S` 啟動 gdb server, 啟動後 qemu 不立即運行 image, 而是等待 gdb client 連接
+`-S` 啟動 gdb server, 啟動後 qemu 不立即運行 image, 而是等待 gdb client 連接並下達 continue command
 
 
 # Reference

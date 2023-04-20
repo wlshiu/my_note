@@ -14,53 +14,110 @@ export PATH
 
 help()
 {
-    echo -e "usage: $0 <kernel/uboot/busybox> [menu]"
-    echo -e "   e.g. $0 kernel menu"
+    echo -e "usage: $0 [options]\n"
+    echo -e "Options:"
+    echo -e "  -t |--target, Target devic kernel/uboot/busybox"
+    echo -e "  -m |--menu, Enable memuconfig"
+    echo -e "  -tr|--trace, Generate gtags/tags"
+
+    echo -e " e.g. $0 -t kernel -m"
     exit -1;
 }
 
-if [ $# -lt 1 ]; then
-    help
-fi
-
-target=$1
-menu_enable=$2
+target=''
+menu_enable=''
+gtag_enable=''
 
 CROSS_COMPILE=arm-none-eabi-
 export CROSS_COMPILE
 ARCH=arm
 export ARCH
 
+if [ -z "$1" ]; then
+    help
+fi
+
+while [ ! -z "$1" ]; do
+    case "$1" in
+        --target|-t)
+            shift
+            echo "Get: $1"
+            target=$1
+
+            ;;
+        --menu|-m)
+            menu_enable=1
+            ;;
+        --trace|-tr)
+            gtag_enable=1
+            ;;
+        *)
+            help
+            ;;
+    esac
+
+    shift
+done
+
 
 if [ "$target" = "kernel" ]; then
     echo -e "$Yellow Build kernel ... $NC"
 
-    make vexpress_defconfig
-
     if [ ! -z "$menu_enable" ]; then
+        echo -e "=== for Qemu Configuration\n"
+        echo -e "\nGeneral setup ---->"
+        echo -e "     [*] Initial RAM filesystem and RAM disk (initramfs/initrd) support"
+        echo -e "     (../build/fs.initrd/) Initramfs source file(s)\n"
+
+        echo -e "\nSystem Type  --->"
+        echo -e "    [ ] Enable the L2x0 outer cache controller\n"
+
+        echo -e "\nFloating point emulation  --->"
+        echo -e "   Disable FPU\n"
+
+        echo -e "\nKernel hacking—>"
+        echo -e "Compile-time checks and compiler options ->"
+        echo -e "    [*] compile the kernel with debug info\n"
+        echo -e "    [*]   Provide GDB scripts for kernel debugging\n"
+
         make menuconfig
+    else
+        make vexpress_defconfig
     fi
 
     make
+
+    if [ ! -z "$gtag_enable" ]; then
+        make ARCH=arm CROSS_COMPILE=arm-none-eabi- COMPILED_SOURCE=1 gtags tags
+    fi
+
 
 elif [ "$target" = "uboot" ]; then
     echo -e "$Yellow Build U-boot ... $NC"
 
-    make vexpress_ca9x4_defconfig
-
     if [ ! -z "$menu_enable" ]; then
         make menuconfig
+    else
+        make vexpress_ca9x4_defconfig
     fi
 
     make
+
+    if [ ! -z "$gtag_enable" ]; then
+        make ARCH=arm CROSS_COMPILE=arm-none-eabi- COMPILED_SOURCE=1 gtags tags
+    fi
 
 elif [ "$target" = "busybox" ]; then
 
     echo -e "$Yellow Build Busybox ... $NC"
 
+    initramfs_name='initramfs-busybox-arm.cpio.gz'
+
     make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- defconfig
 
-    if [[ ! -z "$menu_enable" ]]; then
+    if [ ! -z "$menu_enable" ]; then
+        echo -e "\nSettings  --->"
+        echo -e "    [*] Build static binary (no shared libs)\n"
         make ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabi- menuconfig # change to static link
     fi
 
@@ -89,9 +146,9 @@ elif [ "$target" = "busybox" ]; then
 EOF
 
     chmod +x init
-    find . -print0 | cpio --null -ov --format=newc | gzip -9 > ./initramfs-busybox-arm.cpio.gz
+    find . -print0 | cpio --null -ov --format=newc | gzip -9 > ${initramfs_name}
 
-    echo -e "$GREEN Gen $(pwd)/initramfs-busybox-arm.cpio.gz $NC"
+    echo -e "$GREEN Gen $(pwd)/${initramfs_name} $NC"
 
 else
 

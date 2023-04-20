@@ -908,8 +908,11 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
 
         (gdb) target remote:1234
         Remote debugging using :1234
+        (gdb) file ./output/build/linux-4.19.91/vmlinux
+        Reading symbols from ./output/build/linux-4.19.91/vmlinux...
+        0x60000000 in ?? ()
+        (gdb) b stext           <---- break at ASM code enter
         (gdb)
-
         ```
 + busybox
 
@@ -1033,7 +1036,8 @@ $ ../configure --prefix=$HOME/.local --python=/usr/bin/python3 --target-list=arm
         Reading symbols from ./output/build/linux-4.19.91/vmlinux...
         Remote debugging using :1234
         0x60000000 in ?? ()
-        (gdb) b start_kernel
+        (gdb) b stext               <---- break at ASM code enter
+        (gdb) b start_kernel        <---- break at C code enter
         Breakpoint 1 at 0x809009cc: file init/main.c, line 531.
         (gdb) c
         Continuing.
