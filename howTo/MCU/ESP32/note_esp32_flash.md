@@ -25,6 +25,30 @@ Flash 加密功能, 是用於加密外部 SPI Flash 中的內容
     - SPL (Secondary Program Loader)
         > F/w bootloader
 
+    - eFuse_Reg[RD_DIS/WR_DIS]
+        > disable read/write eFuse
+
+    - `eFuse[flash_encryption]` => 256-bits, default = 0
+        > Key of AES-256
+
+    - `eFuse[DISABLE_DL_ENCRYPT]`
+        > 在 UART burner 啟動模式下執行階段, 禁止 flash 加密操作
+
+    - `eFuse[DISABLE_DL_DECRYPT]` => 1-bit, default = 0
+        > 在 UART burner 模式下執行階段, 禁止透明 flash 解密
+        >> 即使 `eFuse[FLASH_CRYPT_CNT]` 已設定為, 在正常操作中啟用 flash 透明解密
+
+    - `eFuse[DISABLE_DL_CACHE]` => 1-bit, default = 0
+        > 在 UART burner 模式下, 執行階段禁止整個 MMU flash 快取
+
+    - `eFuse[FLASH_CRYPT_CNT]` => 7-bits, default = 0
+        > 在啟動時啟用/停用加密
+        > + 如果設定了**偶數個 bits**(e.g. 0, 2, 4, 6), 則在啟動時加密 flash
+        > + 如果設定了**奇數個 bits**(e.g. 1, 3, 5, 7), 則在啟動時不加密 flash
+
+    - `eFuse[FLASH_CRYPT_CONFIG]` => 4-bits, default = 0
+        > 決定 flash 加密 Key 中, 隨 block offset 的位數 (algorithm)
+
 # Flash Encryption Process
 
 + SPL 開啟支援 Flash-Encryption, 並使用`明文燒錄 img file`
@@ -34,8 +58,8 @@ Flash 加密功能, 是用於加密外部 SPI Flash 中的內容
 + SPL 將讀取 `eFuse[FLASH_CRYPT_CNT]` 值, 因為該值為 0(偶數個 bits 被設定), SPL 將 configure 並啟用 Flash-Encryption-Block, 同時將 `eFuse[FLASH_CRYPT_CONFIG]` 的值設為 0xF
     > 關於 Flash Encryption Block 的更多資訊, 請參考 ESP32 技術參考手冊 -> eFuse 控製器(eFuse) -> flash 加密塊
 
-+ SPL 使用 RNG 生成 AES-256 bits Key, 然後將其寫入 `flash_encryption` eFuse 中.
-    > 由於 `flash_encryption` eFuse 已設定 Read/Write protection bits, S/w 將無法訪問 Key
++ SPL 使用 RNG 生成 AES-256 bits Key, 然後將其寫入 `eFuse[flash_encryption]` 中.
+    > 由於 `eFuse[flash_encryption]` 已設定 Read/Write protection bits, S/w 將無法訪問 Key
     >> flash 加密操作完全在 H/w 中完成
 
 + Flash-Encryption-Block 將加密 flash 的內容
@@ -49,10 +73,10 @@ Flash 加密功能, 是用於加密外部 SPI Flash 中的內容
     > + Development mode 用於開發
     > + Release mode 用於生產
 
-    - 對於 [Development mode](#Development-mode), SPL 僅設定 `eFuse[DISABLE_DL_DECRYPT]` 和 `eFuse[DISABLE_DL_CACHE]` 為 1, 以便 UART burner 重新燒錄 Encrypted-BINs
+    - 對於 [Development mode](#Development-mode), SPL 僅設定 `eFuse[DISABLE_DL_DECRYPT]` 和 `eFuse[DISABLE_DL_CACHE]` 為 1, 以便 ROM-Code(with UART) 重新燒錄 Encrypted-BINs
         > 此時 `eFuse[FLASH_CRYPT_CNT]` 是 unlocked
 
-    - 對於 [Release mode](#Release-mode), SPL 設定 `eFuse[DISABLE_DL_ENCRYPT]`, `eFuse[DISABLE_DL_DECRYPT]` 和 `eFuse[DISABLE_DL_CACHE]` 為 1, 以防止 UART burner 解密 flash 內容
+    - 對於 [Release mode](#Release-mode), SPL 設定 `eFuse[DISABLE_DL_ENCRYPT]`, `eFuse[DISABLE_DL_DECRYPT]` 和 `eFuse[DISABLE_DL_CACHE]` 為 1, 以防止 ROM-Code(with UART) 解密 flash 內容
         > 此時 `eFuse[FLASH_CRYPT_CNT]` 是 locked (要修改此行為, 請參閱 `Enabling UART Bootloader Encryption/Decryption`)
 
 + 重新 reboot device 以開始執行加密 img data
@@ -73,7 +97,7 @@ Flash 加密功能, 是用於加密外部 SPI Flash 中的內容
 
 # Advanced Features
 
-## 加密分區 (Encrypted Partition)
+## Encrypted Partition
 
 ## Enabling UART Bootloader Encryption/Decryption
 
