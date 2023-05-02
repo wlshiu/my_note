@@ -45,25 +45,65 @@ MFCC [[Back](note_kws.md)]
 
 + Example
 
-    ```python
-    import numpy, scipy, sklearn, librosa
+    - use librosa
 
-    x, fs = librosa.load('example.wav')     # load target *.wav file
-    librosa.display.waveplot(x, sr=fs)      # draw the waveform
+        ```python
+        #!/usr/bin/env/ python
 
-    mfccs = librosa.feature.mfcc(x, sr=fs)  # extract MFCC
+        import librosa
+        import matplotlib.pyplot as plt
+        import scipy, sklearn
+        from sklearn import preprocessing
+        import numpy as np
 
-    print mfccs.shape   # log value
+        plt.rcParams['font.size'] = 8
 
-    # MFCC spectrum
-    librosa.display.specshow(mfccs, sr=fs, x_axis='time')
+        filename = "right.wav"
+        y, sr = librosa.load(filename)
+        mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
 
-    # log energy
-    mfccs = sklearn.preprocessing.scale(mfccs, axis=1)
+        # print(np.shape(mfccs))
+        # print(mfccs)
 
-    # draw MFCC features
-    librosa.display.specshow(mfccs, sr=fs, x_axis='time')
-    ```
+
+        fig, ax = plt.subplots(4, 1)
+
+        # 繪製波形圖
+        plt.subplot(4, 1, 1)
+        librosa.display.waveshow(y, sr=sr, ax=ax[0])
+        ax[0].set_title('nutcracker waveform')
+
+        # 繪製梅爾頻譜圖
+        plt.subplot(4, 1, 2)
+        S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=40, fmax=8000)
+        S_dB = librosa.power_to_db(S, ref=np.max)
+        librosa.display.specshow(S_dB, x_axis='time',
+                                 y_axis='mel', sr=sr,
+                                 fmax=8000, ax=ax[1])
+        ax[1].set_title('Mel-frequency spectrogram')
+
+
+        img = librosa.display.specshow(mfccs, x_axis='time', ax=ax[2])
+        fig.colorbar(img, ax=ax[2])
+        ax[2].set_title('MFCC')
+
+
+        mfccs = sklearn.preprocessing.scale(mfccs, axis=1)
+        img = librosa.display.specshow(mfccs, x_axis='time', ax=ax[3])
+        fig.colorbar(img, ax=ax[3])
+        ax[3].set_title('MFCC Log Energy')
+
+        plt.tight_layout()
+        plt.show()
+        ```
+
+    - MFCC flow of math
+
+        1. ref. `z_mfcc_procedure.py`
+
+    - Voice Activity Detection
+
+        1. ref. `z_VAD.py`
 
 # MFCC 對應的物理含義
 
@@ -358,5 +398,6 @@ MFCC [[Back](note_kws.md)]
 
 + [語音識別第4講：語音特徵參數MFCC](https://zhuanlan.zhihu.com/p/88625876)
 + [MFCC 梅爾倒頻譜係數](https://blog.maxkit.com.tw/2019/12/mfcc.html)
++ [Speech Processing for Machine Learning: Filter banks, Mel-Frequency Cepstral Coefficients (MFCCs) and What's In-Between](https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html)
 
 
