@@ -1,0 +1,1835 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>160</x>
+      <y>520</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-1
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>490</y>
+      <w>100</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+*X*</panel_attributes>
+    <additional_attributes>80.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>140</x>
+      <y>510</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>150</x>
+      <y>410</y>
+      <w>80</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+*Z*</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>130</x>
+      <y>530</y>
+      <w>20</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Y*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>260</x>
+      <y>70</y>
+      <w>230</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>+ X-axis: Depthwise
++ Z-axis: Pointwise (Channel cnt)
++ Y-axis: 2-D signal</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>200</x>
+      <y>520</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-2
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>520</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-3
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>280</x>
+      <y>520</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-4
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>520</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-5
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>560</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-10
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>280</x>
+      <y>560</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-9
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>560</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-8
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>200</x>
+      <y>560</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-7
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>160</x>
+      <y>560</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-6
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>230</x>
+      <y>330</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-1
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>270</x>
+      <y>330</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-2
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>330</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-3
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>350</x>
+      <y>330</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-4
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>330</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-5
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>370</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-10
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>350</x>
+      <y>370</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-9
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>370</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-8
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>270</x>
+      <y>370</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-7
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>230</x>
+      <y>370</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-6
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>160</x>
+      <y>600</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-11
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>200</x>
+      <y>600</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-12
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>600</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-13
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>280</x>
+      <y>600</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-14
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>600</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-15
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>280</x>
+      <y>640</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-19
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>240</x>
+      <y>640</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-18
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>200</x>
+      <y>640</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-17
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>160</x>
+      <y>640</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-16
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>320</x>
+      <y>640</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C1-20
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>230</x>
+      <y>410</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-11
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>270</x>
+      <y>410</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-12
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>350</x>
+      <y>410</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-14
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>410</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-15
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>390</x>
+      <y>450</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-20
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>350</x>
+      <y>450</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-19
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>450</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-18
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>270</x>
+      <y>450</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-17
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>230</x>
+      <y>450</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-16
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>310</x>
+      <y>410</y>
+      <w>40</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>C2-13
+group=group-10</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>470</x>
+      <y>490</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>type=flow_final</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-1-1
+bg=#008000</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-1-2
+bg=#008000</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-1-4
+bg=#008000</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-1-3
+bg=#008000</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-2-1
+group=group-8
+bg=#d3ff8f</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-2-2
+group=group-8
+bg=#d3ff8f</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>230</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-2-4
+group=group-8
+bg=#d3ff8f</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>230</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K1-2-3
+group=group-8
+bg=#d3ff8f</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>500</x>
+      <y>70</y>
+      <w>260</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>+ Kernel func (filter)
+    - Stride = 1
++ Tag meaning
+*    - Kernel_Idx-Ch_Idx-Pos_Idx*
+*    - Kernel_Out_Idx-Ch_Idx-Pos_Idx*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>240</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-1
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>240</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-2
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>240</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-3
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>240</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-4
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-8
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O-1-7
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-6
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>280</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-5
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-9
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-10
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-11
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>320</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-1-12
+bg=#008000
+group=group-14</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>700</x>
+      <y>480</y>
+      <w>30</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*=*
+fontsize=30
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>110</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-1
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>110</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-2
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>110</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-3
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>110</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-4
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>150</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-8
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>150</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-7
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>150</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-6
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>150</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-5
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-9
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-10
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-11
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>190</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O1-2-12
+bg=#d3ff8f
+group=group-15</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>490</x>
+      <y>10</y>
+      <w>230</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*Standard CNN*
+fontsize=30
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-1-1
+bg=YELLOW</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-1-2
+bg=YELLOW</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-1-4
+bg=YELLOW</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-1-3
+bg=YELLOW</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-2-2
+bg=#BBBB00
+group=group-16</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-2-4
+bg=#BBBB00
+group=group-16</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-2-3
+bg=#BBBB00
+group=group-16</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K2-2-1
+bg=#BBBB00
+group=group-16</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>750</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-1-1
+bg=ORANGE
+group=group-22</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>750</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-1-2
+bg=ORANGE
+group=group-22</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-1-4
+bg=ORANGE
+group=group-22</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>530</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-1-3
+bg=ORANGE
+group=group-22</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-2-2
+bg=#BB5500
+group=group-17</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>600</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-2-4
+bg=#BB5500
+group=group-17</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-2-3
+bg=#BB5500
+group=group-17</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>550</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>K3-2-1
+bg=#BB5500
+group=group-17</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-2
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-3
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-4
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-8
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-7
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-6
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>550</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-5
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>590</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-9
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>590</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-10
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>590</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-11
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>590</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-12
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>510</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-1-1
+bg=YELLOW
+group=group-18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>380</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-2
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>380</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-3
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>380</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-4
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-8
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-7
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-6
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>420</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-5
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-9
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-10
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-11
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>460</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-12
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>380</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O2-2-1
+bg=#BBBB00
+group=group-19</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-2
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-3
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-4
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>830</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-8
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>830</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-7
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>830</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-6
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>830</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-5
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>870</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-9
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>830</x>
+      <y>870</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-10
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>880</x>
+      <y>870</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-11
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>930</x>
+      <y>870</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-12
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>780</x>
+      <y>790</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-1-1
+group=group-20
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-2
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-3
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-4
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-8
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-7
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-6
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>700</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-5
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>740</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-9
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>860</x>
+      <y>740</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-10
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>910</x>
+      <y>740</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-11
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>960</x>
+      <y>740</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-12
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>810</x>
+      <y>660</y>
+      <w>50</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>O3-2-1
+bg=#BB5500
+group=group-21</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

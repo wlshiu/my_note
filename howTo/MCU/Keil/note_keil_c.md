@@ -330,15 +330,75 @@ Link external static libraries
         > SAVE memoutput.hex 0x20000000, 0x20020000, 0x4   /* Reads target memory using Word accesses */
         ```
 
-+ Dump memory to file (In Debug mode)
++ Dump memory to file (In Debug mode, HEX386 format)
     > `Start Debug Session` -> `View->Command Window`
 
     ```
     > save filepath StartAddr, EndAddr
 
     e.g.
-    > save C:\ExportData.hex 0x08000000, 0x08000000+0x2000
+    > save C:\ExportData.ihex 0x08000000,0x08002000
     ```
+
+    - Convert iHex and Bin
+        > [srecord-win32](https://sourceforge.net/projects/srecord/files/srecord-win32/)
+
+        1. iHex to Bin
+
+            ```bash
+            #!/bin/bash
+
+            #
+            # Intel Hex format to Bin
+            #
+
+            help()
+            {
+                echo -e "Intel Hex format to Bin"
+                echo -e "usage: $0 <ihex_path> [offset_addr]"
+                echo -e "  e.g. $0 ./test.hex 0x0"
+                exit -1
+            }
+
+            if [ $# -lt 1 ]; then
+                help
+            fi
+
+            ihex_path=$1
+            bin_path=${ihex_path}.bin
+
+            # STM32 offset 0x08000000
+            offset_addr=0x00000000
+
+            srec_cat.exe ${ihex_path} -intel -offset ${offset_addr} -o ${bin_path} -binary
+            ```
+
+        1. Bin to iHex
+
+            ```bash
+            #!/bin/bash
+
+            help()
+            {
+                echo -e "Bin to Intel Hex format"
+                echo -e "usage: $0 <bin_path> [offset_addr]"
+                echo -e "  e.g. $0 ./test.bin 0x0"
+                exit -1
+            }
+
+            if [ $# -lt 1 ]; then
+                help
+            fi
+
+            bin_path=$1
+            ihex_path=${bin_path}.ihex
+
+            # STM32 offset 0x08000000
+            offset_addr=0x00000000
+
+            srec_cat.exe ${bin_path} -binary -offset ${offset_addr} -o ${ihex_path} -intel
+            ```
+
 
 + Link GCC lib (*.a) in Keil-MDK
     > `Options for target` -> `Linker` -> `Misc controls`
