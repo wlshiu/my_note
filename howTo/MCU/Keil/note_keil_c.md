@@ -329,3 +329,41 @@ Link external static libraries
         > SAVE memoutput.hex  0x100,0x1FF                  /* Output memory between 0x100 and 0x1FF   */
         > SAVE memoutput.hex 0x20000000, 0x20020000, 0x4   /* Reads target memory using Word accesses */
         ```
+
++ Dump memory to file (In Debug mode)
+    > `Start Debug Session` -> `View->Command Window`
+
+    ```
+    > save filepath StartAddr, EndAddr
+
+    e.g.
+    > save C:\ExportData.hex 0x08000000, 0x08000000+0x2000
+    ```
+
++ Link GCC lib (*.a) in Keil-MDK
+    > `Options for target` -> `Linker` -> `Misc controls`
+
+    ```
+    path of *.a
+    ```
+
++ GCC with keil
+    > `File Extension, Books and environment...` -> `Folder/Extensions` -> `Use GCC Compiler (GNU) for ARM project`
+
+    ```
+    prefix: arm-none-eabi-
+    Folder: C:\gcc-arm-none-eabi-10-2020-q4-major\
+    ```
+
+    - Modify assembly file of GCC-ASM
+
+        ```
+        .syntax unified
+        .cpu cortex-m0
+
+        .eabi_attribute Tag_ABI_align_preserved, 1  <--- add for Keil IDE
+
+        .thumb
+        ```
+
+
