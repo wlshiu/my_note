@@ -138,6 +138,53 @@ Kaldi 是一個用`C ++` (Apache LICENSE) 編寫的語音識別工具包, 項目
 + [Speech_Commands_Dataset](https://dagshub.com/kingabzpro/Speech_Commands_Dataset/src/master)
 
 
+## Digital Audio Signal Data
+
+Audio raw data 一般會使用 PCM (Pulse-Code Modulation), 每個 sample 大小可以用 8-bits or 16-bits 來記錄
+
++ 有號或無號 PCM
+    > 使用 16-bits 紀錄時, 可分為`有號(s16)` 跟 `無號(u16)`
+
+    - s16 convert to u16
+        > 調整基準值 `offset = MAX_UINT16 / 2`
+
+        ```c
+        audio_sample_u16 = audio_sample_s16 + 0x8000
+        ```
+
++ 使用 ADC 取樣
+    > 一般 ADC 為 12-bits 精準度, 將 ADC 取樣值轉換為 u16
+
+    ```c
+    // LSB 補 0
+    PCM = ADC_value << 4;
+    ```
+
++ 分貝(Decibel) 標度
+    > 分貝是量度兩個相同單位之數量比例的單位, 主要用於度量聲音強度, 常用 `dB`表示
+    >> 聲學中, 聲音的強度定義為聲壓, 計算分貝值時, 採用 20 µPa 為參考值
+
+    - PCM 轉換為 分貝標度
+
+        ```c
+        int16_t     pcm[1024] = {...};
+        int32_t     val;
+        int         db = 48;
+        float       multiplier = pow(10, db/20);
+
+        for(int i = 0; i < 1024; i++)
+        {
+            val = pcm[i] * multiplier;
+
+            if( val < 32767 && val > -32768)
+                pcm[ctr] = val
+            else if( val > 32767 )
+                pcm[ctr] = 32767;
+            else if( val < -32768 )
+                pcm[ctr] = -32768;
+        }
+        ```
+
 # Benchmark
 ---
 
