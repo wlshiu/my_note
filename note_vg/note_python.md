@@ -61,6 +61,31 @@ $ vim ~/.bashrc
     $ python -m pip install pandas
     ```
 
++ virtualenv
+
+    - install
+
+        ```
+        $ pip install virtualenv
+            or
+        $ sudo apt-get install python3-venv
+        ```
+
+    - create virtual environment
+
+        ```
+        $ python -m venv test-env
+        (test-env) $
+        ```
+
+    - 指定 Python 版本
+        > 必須先安裝好不同版本的 python
+
+        ```
+        (test-env) $ virtualenv test-env --python=python3.8
+        ```
+
+
 # configure
 
 + Python 3.7
