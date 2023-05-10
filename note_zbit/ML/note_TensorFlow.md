@@ -29,6 +29,89 @@ TensorFlow 是目前神經網路中最好用的 lib 之一, 它擅長的任務�
 
 lib 版本問題需要 try and error
 
++ Python
+
+    - other versions
+
+        ```
+        $ sudo add-apt-repository ppa:deadsnakes/ppa
+        $ sudo apt install python3.8
+        ```
+
+        1. select target version
+
+            ```
+            # configure python version priority
+            $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
+            $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
+            $ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.7 3
+
+            # list versions in system
+            $ sudo update-alternatives --list python
+            $ sudo update-alternatives --config python
+            ```
+
+    - distutils
+
+        ```
+        $ sudo apt-get install pythonX.Y-distutils
+        ```
+
+    - matplotlib
+
+        ```
+        $ pip install matplotlib
+        ```
+
+    - virtualenv
+
+        1. install
+
+            ```
+            $ pip install virtualenv
+                or
+            $ sudo apt-get install python3-venv
+            ```
+
+        1. create virtual environment
+
+            ```
+            $ python -m venv test-env
+            (test-env) $
+            ```
+
+        1. 指定 Python 版本
+            > 必須先安裝好不同版本的 python
+
+            ```
+            (test-env) $ virtualenv test-env --python=python3.8
+            ```
+
+        1. enter virtual environment
+
+            ```
+            $ cd .../test-env/bin
+            $ source activate
+            (test-env)
+            ```
+
+        1. exit virtual environment
+
+            ```bash
+            $
+            (test-env)
+            $ deactivate
+            $
+            ```
+
+    - protobuf
+
+        1. tensorflow v1.15 use protobuf v3.20
+
+            ```
+            $ pip install protobuf==3.20
+            ```
+
 + [Python 3.9-amd64](https://www.python.org/downloads/windows/)
     > ubuntu 下,使用 `sudo pip install ...` 就將 lib 加入到 `/usr` 下給所有人使用
 
@@ -84,6 +167,13 @@ lib 版本問題需要 try and error
         >>> print(tf.add(1, 2))
         ```
 
+        ```bash
+        $ python
+
+        >>> import tensorflow as tf
+        >>> print(tf.__version__)
+        ```
+
     - TensorFlow v1.x 移植到 2.x
         > 修改使用的模組
 
@@ -112,7 +202,9 @@ lib 版本問題需要 try and error
 + [statsmodels](https://www.lfd.uci.edu/~gohlke/pythonlibs/#statsmodels)
 
 
-## Reference
+# Training
+
+
 
 
 # Reference
@@ -121,3 +213,13 @@ lib 版本問題需要 try and error
 + [Tensorflow 指南](https://www.tensorflow.org/guide/basic_training_loops?hl=zh-cn)
 + [簡單粗暴 TensorFlow 2](https://tf.wiki/zh_hant/)
 + [【Python】TensorFlow學習筆記(一)：TensorBoard 的浪漫](https://dotblogs.com.tw/shaynling/2017/11/14/173025)
++ [簡單語音指令辨識(training wiht TensorFlow)](https://newtoypia.blogspot.com/2019/08/speech-recognition.html)
++ [Simple Audio Recognition（簡單的音訊識別）](https://cloud.tencent.com/developer/section/1475685)
+
++ [*從零.4開始我的深度學習之旅](https://ithelp.ithome.com.tw/users/20125152/ironman/3400?page=1)
+
++ [DataSet]
+    - [mini_speech_commands](http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip)
+    - [speech_commands_v0.01](http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz)
+    - [speech_commands_v0.02](https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz)
+

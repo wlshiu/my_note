@@ -143,6 +143,10 @@ Sphinx 除了是 open source 之外, 還可以自己定製聲音模型, 語言�
 
 ## [MFCC, Mel-scaleFrequency Cepstral Coefficients](note_MFCC.md)
 
+# ML-KWS-for-MCU
+
+
+
 # Reference
 
 + [MFCC 梅爾倒頻譜係數](https://blog.maxkit.com.tw/2019/12/mfcc.html)

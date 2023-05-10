@@ -85,6 +85,11 @@ $ vim ~/.bashrc
         (test-env) $ virtualenv test-env --python=python3.8
         ```
 
++ distutils
+
+    ```
+    $ sudo apt-get install pythonX.Y-distutils
+    ```
 
 # configure
 

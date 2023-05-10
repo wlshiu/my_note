@@ -59,3 +59,14 @@ Putty
         ```
 
 
++ link with X-server
+    > intstall [Xming](https://sourceforge.net/projects/xming/files/Xming/)
+
+    - Putty enable x11 feature to link X-server
+
+        ![putty_x11](putty_x11.jpg)
+
+    - Reference
+
+        1. [[Linux]-安裝Xming以讓X Windows透過Putty帶出](https://dotblogs.com.tw/colinlin/2017/07/06/120046)
+
