@@ -17,13 +17,21 @@ Tensor 從圖中流過的直觀圖就是這個工具取名為 Tensorflow 的原�
 
 ![tensors_flowing](tensors_flowing.gif)
 
-
-
 TensorFlow 讓我們可以先繪製計算結構圖, 也可以稱是一系列可人機互動的計算操作,
 然後把編輯好的 Python 檔案轉換成更高效的 C++, 並在後端進行計算
 
 TensorFlow 是目前神經網路中最好用的 lib 之一, 它擅長的任務就是**訓練深度神經網路**.
 通過使用 TensorFlow 我們就可以快速的入門神經網路, 大大降低了深度學習的開發成本和開發難度
+
++ TensorFlow-Lite
+    > 因為 TensorFlow 複雜度較高, Google 推出 TensorFlow-Lite (TensorFlow optimization version)
+
+
++ TensorFlow-Lite for Microcontroller (TFLite-Micro)
+    > 專門為了 MCIU, 從 TensorFlow-Lite 再進一步精簡
+
+**TensorFlow 訓練完的 model, 可轉換為 TensorFlow-Lite model, 再轉換為 TFLite-Micro model**
+> 依序降低 model size
 
 # Environment Setup
 
@@ -206,6 +214,7 @@ lib 版本問題需要 try and error
 
 
 
+# [TFLite-Micro](./note_TFLite-Micro.md)
 
 # Reference
 

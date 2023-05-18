@@ -33,31 +33,31 @@ LSTM(長短期記憶網路)是基於 RNN 的一種時間循環神經網路, LSTM
 ![LSTM_Math](LSTM_Math.jpg)<br>
 Fig. LSTM 數學式
 
-> + $\{z_i\}$ : 控制 input gate 的 signal
-> + $\{z_o\}$ : 控制 output gate 的 signal
-> + $\{z_f\}$ : 控制 forget gate 的 signal
+> + $z_i$ : 控制 input gate 的 signal
+> + $z_o$ : 控制 output gate 的 signal
+> + $z_f$ : 控制 forget gate 的 signal
 > + $z$ : 要被存進 cell 的 input value
 > + $a$ : output
 > + $h()$ : hidden state (隱藏狀態)
 
 $z$ 通過一個 activation function 得到 $g(z)$
-> + $\{z_i\}$ 通過一個 activation function 得到 f($\{z_i\}$),
-> + $\{z_o\}$ 通過一個 activation function 得到 f($\{z_o\}$)
-> + $\{z_f\}$ 通過一個 activation function 得到 f($\{z_f\}$)
+> + $z_i$ 通過一個 activation function 得到 f($z_i$),
+> + $z_o$ 通過一個 activation function 得到 f($z_o$)
+> + $z_f$ 通過一個 activation function 得到 f($z_f$)
 
 > $f()$ 通常用 sigmoid function, 因為 sigmoid function 值介在 0 ~ 1 之間, 代表 gate 被打開的程度,
 >> 如果 f()$ 的 output 是 1 代表 gate 打開, 反之 output 是 0 代表 gate 被關閉
 
-$c’$ 為新的存在 memory 裡面的值
-> $c’$ = f($\{z_i\}$) * g(z) + c*f($\{z_f\}$)
->> 由上式可知, f($\{z_i\}$) 控制 input g(z) 是否可以進來,
->> + 當 f($\{z_i\}$) = 0 時，前面那一項就是 0
->> + 若 f($\{z_f\}$) = 1 時, 代表之前的 c 會被記得, 跟這回合的 input 值相加
->> + 若 f($\{z_f\}$) = 0 時, 代表之前的 c 會被遺忘, 後面那一項會是 0
+$c'$ 為新的存在 memory 裡面的值
+> $c'$ = f($z_i$) * g(z) + c*f($z_f$)
+>> 由上式可知, f($z_i$) 控制 input g(z) 是否可以進來,
+>> + 當 f($z_i$) = 0 時，前面那一項就是 0
+>> + 若 f($z_f$) = 1 時, 代表之前的 c 會被記得, 跟這回合的 input 值相加
+>> + 若 f($z_f$) = 0 時, 代表之前的 c 會被遺忘, 後面那一項會是 0
 
 所以 forget gate 的特性跟字面上的直覺剛好相反
-> + 當 forget gate 打開時 f($\{z_f\}$) = 1, 之前的值會 **記得**
-> + 當 forget gate 關閉時 f($\{z_f\}$) = 0, 之前的值會 **遺忘**
+> + 當 forget gate 打開時 f($z_f$) = 1, 之前的值會 **記得**
+> + 當 forget gate 關閉時 f($z_f$) = 0, 之前的值會 **遺忘**
 
 
 # Reference
