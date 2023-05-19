@@ -170,21 +170,7 @@ $$
     > + 標準差(Standard Deviation)
     > + 決定係數(R2)
 
-    - 標準差(Standard Deviation)
-        > 用於表示資料之離散程度 (與平均值的差異)
-
-        假設取 $m$ 個樣本
-        $$
-        \sigma = \sqrt{\frac{1}{m - 1}\sum_{i=1}^{m}(RealValue_i - Mean)^2}
-        $$
-
-    - 均方根誤差(Root Mean Squared Error, RMSE)
-        > 用來衡量預測值與實際值之間的偏差, 對一組測量中的特大或特小誤差(異常值)反應非常敏感
-
-        假設取 $m$ 個樣本
-        $$
-        RMSE = \sqrt{\frac{1}{m}\sum_{i=1}^{m}(PredictionValue_i - RealValue_i)^2}
-        $$
+    - [Numerical Analysis](note_Num_Aanalysis.md)
 
 
 

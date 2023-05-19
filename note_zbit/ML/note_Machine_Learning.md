@@ -85,26 +85,26 @@ Machine Learning
 
         - 非線性 data set, 使用某 kernel method 將 data set轉換到高維度空間或是 `eigen space`
             > kernel method (Kernel trick): Be served as a bridge from linearity to non-linearity.
-                commonly use Gaussian radial basis function (RBF), it approximates the eigendecomposition
+            commonly use Gaussian radial basis function (RBF), it approximates the eigendecomposition
 
             > gamma value (in RBF): 資料轉換到 eigen space 的分散程度(呈反比)
-                - large gamma => small variance of Gaussian RBF
-                >> 越集中,影響越小,越不易分類
+            > - large gamma => small variance of Gaussian RBF
+            >> 越集中,影響越小,越不易分類
 
-                - small gamma => large variance of Gaussian RBF
-                >> 越分散,影響越大,越容易誤判
+            > - small gamma => large variance of Gaussian RBF
+            >> 越分散,影響越大,越容易誤判
 
             > 用內積(dot product)形式去描述轉換, 使kernel method 可簡化轉換難度
 
         - 為提高彈性(handle unlabeled or extremely un-usual),使用 `soft margin`來獲得較好的效果,同時因容忍誤差而加入 `C` (cost wight)參數
 
             > soft margin: allows some samples to be `ignored` or placed on the wrong side of the margin
-                - 適度模糊 one sample 到 hyperplane的距離(容忍誤差值, 超過就 ignore)
+                > - 適度模糊 one sample 到 hyperplane的距離(容忍誤差值, 超過就 ignore)
 
             > `C` is the parameter (cost weight) for the soft margin cost function, which controls the cost of misclassification on the training data.
 
-                - 越大的 C(權重越大), 對誤差的反應劇烈,也越容易造成 overfitting
-                - 較佳的 C,適度反映誤差,可獲得較大彈性的預測
+                > - 越大的 C(權重越大), 對誤差的反應劇烈,也越容易造成 overfitting
+                > - 較佳的 C,適度反映誤差,可獲得較大彈性的預測
 
         - The goal is to find the balance between **not too strict** and **not too loose**.
             Cross-validation and resampling, along with `grid search`, are good ways to finding the best C and gamma.
@@ -254,17 +254,17 @@ Machine Learning
 
                 > 相當於 noise與 denoise的過程,多次變換後,保留下來能識別到 original input的就是顯著的 feature。
 
-                c1. Sparse AutoEncoder(稀疏自動編碼器)
-                    > input -> encode -> sparsity penalty -> decode -> output
+                > + Sparse AutoEncoder(稀疏自動編碼器)
+                >> input -> encode -> sparsity penalty -> decode -> output
 
-                    > sparsity penalty: 做較極端的特徵強化(大部分節點都要為 0,只有少數不為 0)
+                >> sparsity penalty: 做較極端的特徵強化(大部分節點都要為 0,只有少數不為 0)
 
-                    - 稀疏的表達往往比其他的表達要有效(人腦也是這樣的,某個輸入只是刺激某些神經元,其他的大部分的神經元是受到抑制的)。
+                >> - 稀疏的表達往往比其他的表達要有效(人腦也是這樣的,某個輸入只是刺激某些神經元,其他的大部分的神經元是受到抑制的)。
 
-                c2. Denoising AutoEncoder(降噪自動編碼器)
-                    > input with noise -> encode -> add noise -> decode -> output
+                > + Denoising AutoEncoder(降噪自動編碼器)
+                >> input with noise -> encode -> add noise -> decode -> output
 
-                    > encoder必須學習去除 noise而獲得真正 pure input,因此較 robustness,通用性也較佳
+                >> encoder必須學習去除 noise而獲得真正 pure input,因此較 robustness,通用性也較佳
 
         2. optimal (supervised) - Backward Phase
             a. 使用已標註的資料(labeled training data)
