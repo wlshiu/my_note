@@ -137,6 +137,8 @@ $
     \end{array}
     $
 
+### 實例計算
+
 $O1$ 神經元, 期望輸出是 0, 但實際輸出是 0.679
 
 $
@@ -162,17 +164,75 @@ $
 
 ![Backpropagation_backward_0_ex](Backpropagation_backward_0_ex.jpg)
 
-有 $\delta_{O1}$ 及 $\delta_{O2}$ , 就可以回推 $\delta_{a1}$ 及 $\delta_{a2}$
+有 $\delta_{O1}$ 及 $\delta_{O2}$ , 就可以回推 $\delta_{a1}$ 及 $\delta_{a2}$.
+
+其中
+
+$
+\begin{array}{l}
+\delta_{a1} &= g'(Z) × \sum(W_{O} × \delta_{O})\\
+            &= O_{a1} × (1 - O_{a1}) × (W_{a1-O1} × \delta_{O1} + W_{a1-O2} × \delta_{O2})\\
+            &= 0.71 × (1 - 0.71) × (0.1 × 0.1479 + 0.2 × -0.044)\\
+            &= 0.001233
+\end{array}
+$
 
 ![Backpropagation_backward_1_ex](Backpropagation_backward_1_ex.jpg)
+
+$
+\begin{array}{l}
+\delta_{a2} &= g'(Z) × \sum(W_{O} × \delta_{O})\\
+            &= O_{a2} × (1 - O_{a2}) × (W_{a2-O1} × \delta_{O1} + W_{a2-O2} × \delta_{O2})\\
+            &= 0.726 × (1 - 0.726) × (0.25 × 0.1479 + 0.7 × -0.044)\\
+            &= 0.0012228
+\end{array}
+$
 ![Backpropagation_backward_2_ex](Backpropagation_backward_2_ex.jpg)
 
 ## 更新權重
 
+假設 $\alpha$ 為梯度下降的 learning rate, 則權重更新方式
+
+$
+\begin{array}{l}
+w_{i,new} &= w_{i,org} - \alpha × \delta_{L+1} × Input_{L}\\
+
+w_{bias,new} &= w_{bias,org} - \alpha × \delta
+\end{array}
+$
+
+### 實例計算
+
+假設 $\alpha$=0.5
+
+$
+\begin{array}{l}
+w_{7,new} &= w_{7,org} - \alpha × \delta_{O1} × Input_{L}\\
+          &= 0.1 - (0.5 × 0.1479 × 0.71)\\
+          &= 0.47495
+\end{array}
+$
+
+![Backpropagation_backward_3_ex](Backpropagation_backward_3_ex.jpg)
+
+# Python code
+
+一些 Python code 例子在 `nn_back_propagation` 中
++ `Ex_BackPropagation.py` 簡單的 BackPropagation 數學推導
++ `neuralnetwork.py` 簡易實作 NN Class
++ `Ex_Basic_NN.py` 上述例子的實作
++ `Ex_XOR_Classification.py` XOR 分類器
++ `Ex_Multiclass_Classification.py` 簡易的多元分類器
+
+
 # Reference
 
 + [類神經網路跟Backpropagation一點筆記](http://terrence.logdown.com/posts/1132631-neural-networks-with-backpropagation-one-notes)
+    - [一文弄懂神經網路中的反向傳播法-BackPropagation](https://zhuanlan.zhihu.com/p/33668471?from_voters_page=true)
 + [A Step by Step Backpropagation Example](https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/)
 + [李宏毅 ML Lecture 7: Backpropagation](https://hackmd.io/@shaoeChen/B1CoXxvmm/https%3A%2F%2Fhackmd.io%2Fs%2Fr1cqatmI7#%E6%9D%8E%E5%AE%8F%E6%AF%85_ML_Lecture_7)
++ [【布客】AI Learning](https://ailearning.apachecn.org/)
+    - [AI learning-Github](https://github.com/apachecn/ailearning)
+    - [1030933569/AiLearning/docs/dl - Github](https://github.com/1030933569/AiLearning/tree/master/docs/dl)
 
 

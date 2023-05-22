@@ -71,6 +71,7 @@ Learning-Rate 為控制模型中, 梯度下降(Gradient Descent)的速度, 也�
 
     ![3-D_Gradient_Descent](3-D_Gradient_Descent.gif)
 
+
 # Normalization
 
 不同的類型的資料, 彼此會有一個級距的差異, 進而影響數據分析結果.
@@ -244,4 +245,3 @@ $$
 + [CNN 模型所需的計算力flops是什麼？怎麼計算？](https://zhuanlan.zhihu.com/p/137719986)
 + [[Day 26] 交叉驗證 K-Fold Cross-Validation](https://ithelp.ithome.com.tw/articles/10279240)
 + [機器學習\統計方法: 模型評估-驗證指標(validation index)](https://chih-sheng-huang821.medium.com/%E6%A9%9F%E5%99%A8%E5%AD%B8%E7%BF%92-%E7%B5%B1%E8%A8%88%E6%96%B9%E6%B3%95-%E6%A8%A1%E5%9E%8B%E8%A9%95%E4%BC%B0-%E9%A9%97%E8%AD%89%E6%8C%87%E6%A8%99-b03825ff0814)
-

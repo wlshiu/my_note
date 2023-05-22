@@ -33,7 +33,7 @@ Fig. NerualNet_Base_Arch
 + 隱藏層(hidden layer)
     > 可以有多個隱藏層, 每層可以包含一個或多個 Neuron. 而上一層 Neurons 的輸出, 會是下一層 Neurons 的輸入
     >> `Fig. NerualNet_Base_Arch` 中, hidden layer 代表**上一層的特徵乘上權重後的結果**
-    
+
     ![Neuron](Neuron.jpg)<br>
     Fig. One_Neuron_Arch
 
@@ -62,6 +62,37 @@ Fig. NerualNet_Base_Arch
         > + 反向傳播
         > + 權重更新
 
++ 簡易描述 NN 規模
+
+    - `<input nodes>-<hidden 1 nodes>-<hidden 2-nodes>-...-<output nodes>` NN
+        > + `2-2-2 NN` 代表 input/hidden/output 都各有 2 nodes, hidden 只有 1 層
+        > + `2-5-5-2 NN` 代表 input/output 各有兩個 nodes, hidden 有 2 層都各自有 5 個 nodes
+
+# Activation Function (啟動函數, 激勵函數)
+
+在神經網路中, 每一層輸出都是上層輸入的線性函數, 無論神經網路有多少層, 輸出都是輸入的線性組合
+當使用 Activation Function 時, 給神經元引入了非線性因素, 使得神經網路**可以任意逼近任何非線性函數**,
+這樣神經網路就可以應用到眾多的非線性模型中
+
+常見的啟動函數
++ `sigmoid()`
+    > 也叫 Logistic 函數, 取值範圍為(0, 1), 在特徵相差比較複雜, 或是相差不是特別大時, 效果比較好
+    >> 啟動函數計算量大, 反向傳播求誤差梯度時, 很容易就會出現梯度消失的情況(求導數涉及除法), 從而無法完成深層網路的訓練
+
+求導涉及除法
+
++ `Tanh()`
+    > 也稱為雙切正切函數, 取值範圍為 [-1,1], 在特徵相差明顯時, 效果會很好, 在循環過程中會不斷擴大特徵效果
+    >> `tanh` 平均值是 0, 因此實際應用中 tanh 會比 sigmoid 更好
+
++ `ReLU()`
+    > ReLU (Rectified Linear Unit) 得到的 SGD 的收斂速度, 會比 sigmoid/tanh 快很多
+    >> 訓練的時候很**脆弱**, 當遇到一個非常大的梯度時, 更新過參數之後, 這個神經元很容易就再也不會對任何資料有啟動現象
+
++ `softmax()`
+    > 用於多分類神經網路輸出
+    >> clases 之間是互斥的, 即一個輸入只能被歸為一類, e.g. Apple 只能是`水果` 或是`科技公司`擇一
+
 ## Fully-Connected Layer(全連接層)
 
 FC Layer 原則上就是最後的分類器, 將上一層所擷取出來的所有特徵,
@@ -69,8 +100,11 @@ FC Layer 原則上就是最後的分類器, 將上一層所擷取出來的所有
 
 ## [Back-Propagation(反向傳播演算法)](note_BackPropagation.md)
 
+## [RNN(循環神經網路)](note_rnn.md)
+
 # Reference
 
++ [常用啟動函數比較](https://www.cnblogs.com/codehome/p/9729349.html)
 
 
 

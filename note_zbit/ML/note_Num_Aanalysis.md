@@ -103,6 +103,5 @@ $$
 # Reference
 + [共變異數及相關係數](https://www.stat.nuk.edu.tw/cbme/math/statistic/sta2/s3_5/node1.html)
 + [相關係數與共變異數(Correlation Coefficient and Covariance)](https://chih-sheng-huang821.medium.com/%E7%9B%B8%E9%97%9C%E4%BF%82%E6%95%B8%E8%88%87%E5%85%B1%E8%AE%8A%E7%95%B0%E6%95%B8-correlation-coefficient-and-covariance-c9324c5cf679)
-+ []
 
 
