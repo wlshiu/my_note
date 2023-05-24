@@ -106,6 +106,7 @@ $
 ## 向後傳遞運算
 
 計算真實 output 跟期望 output 的誤差 $\delta$, 以及每個神經元對於誤差的影響.
+> 每一個 layer 所產生的誤差, 是由前一層的 Neurons 經過權重比例後, Propagate 到目前 layer
 
 ### 各層誤差影響的演算法
 

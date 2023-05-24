@@ -39,6 +39,7 @@ Fig. The-Standard-RNN
 
 $$
 \begin{array}{l}
+h(t) &= V × X(t) + U × S(t-1) + bias\\
 S(t) &= f_1(h(t))\\
      &= tanh(V × X(t) + U × S(t-1) + bias)\\
 O(t) &= f_2(Z_t)\\
@@ -105,101 +106,160 @@ Fig. RNN_Advance_Arch
 ![BPTT](BPTT.jpg)<br>
 Fig. BPTT
 
-BP 利用找梯度 (偏微分)逼近參數, 同樣的 BPTT 也是找向對應的梯度.
-由於 BPTT 比 BP 多了一個時軸上的輸入, 因此多了一個 $U$ 權重矩陣要逼近
+由於誤差是從前一層的 Neurons 經過權重比例後, Propagate 到目前 layer.
+BP 則利用 Error Propagation 的方程式, 經由梯度下降 (偏微分) 來逼近最小誤差, 再將誤差跟新到權重.
+同樣的 BPTT 也是使用相同的方式, 由於 BPTT 比 BP 多了一個時軸上的輸入, 因此多了一個 $U$ 權重矩陣要逼近
 
 定義 $E(t)$ 為 Loss-Function, 也就是誤差函數
 > Loss-Function 可選擇
-> + Cross-entropy loss
+> + Cross-entropy loss (交叉熵)
 > + MSE (Mean-Square Error)
 
-Cross-entropy loss
+在 RNN 結構中, 時軸上 $t$ 會有 error propagation 的情況發生, 因此需將每個 cell 所產生的誤差累加起來
 
-$
-\begin{array}{l}
-E(\hat{O}(t), O(t)) &= L(\hat{O}(t), O(t))\\
-                    &= \frac{-1}{M} \sum_{j=1}^M (\hat{O_j}(t)log(O(t)))\\
-\end{array}
-$
+![BPTT_Err_Propagation](BPTT_Err_Propagation.jpg)<br>
+Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
 
++ Cross-entropy loss
 
-$
-\begin{array}{l}
-\Delta_W &= \frac{\partial E(t)}{\partial W}\\
-\Delta_V &= \frac{\partial E(t)}{\partial V}\\
-\Delta_U &= \frac{\partial E(t)}{\partial U} => t 和 (t-1) 的權重
-\end{array}
-$
+    $
+    \begin{array}{l}
+    E(\hat{O}, O)       &= \sum_{t=0}^{T'} E\left(\hat{O}(t), O(t)\right)\\
+    E(\hat{O}(t), O(t)) &= \sum_{j=0}^M L\left(\hat{O_j}(t), O_j(t)\right)\\
+                        &= \frac{-1}{M} \sum_{j=0}^M \left(\overbrace{O_j(t) \cdot log\left(\hat{O_j}(t)\right)}^{Positive\ term} + \overbrace{(1 - O_j(t)) \cdot log\left(1 - \hat{O}_j(t)\right)}^{(Negative\ term)}\right)\\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+    \hat{O}_t &: RNN\ prediction\ output\\
+    O_t &: Target\ output (The\ truly\ correct)\\
+    Positive\ term &: 當結果是1時, 有反應\\
+    Negative\ term &: 當結果是0時, 有反應
+    \end{array}
+    $
 
 
+### 梯度推導 $(\nabla_U, \nabla_V, \nabla_W)$
 
++ $\nabla_V$
 
+    $
+    \begin{array}{l}
+    \nabla_V(i,k) &= \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
+                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot
+                     \frac{\partial Z_j(t)}{\partial h_k(t))} \cdot
+                     \frac{\partial h_k(t)}{\partial V(i,k))}\\
+                  &= \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
+                        \otimes
+                     \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
+    \\
+    \\
+    \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
+                                            &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
+                                            &= W(k,j) \cdot f_1^{'}(h_k(t))
+    \\
+    \\
+    \frac{\partial h_k(t)}{\partial V(i,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}\\
+                                            &= X_i(t)
+    \\
+    \\
+    \delta_V(i,k) &= \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
+                  &= \sum_{i=0}^{T'} \left(
+                        \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
+                            \otimes
+                        \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
+                     \right)
+    \\
+    f_1^{'}() : f_1()的導數\\
+    f_2^{'}() : f_2()的導數\\
+    \otimes   : 外積
+    \end{array}
+    $
 
++ $\nabla_W$
 
+    $
+    \begin{array}{l}
+    \nabla_W(k,j) &= \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
+                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
+                     \frac{\partial Z_j(t)}{\partial W(k,j)}\\
+                  &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+                        f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
+                        S_k(t)
+    \\
+    \\
+    \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+                                                        f_2^{'} \left(Z_j^{(i)}(t) \right)
+    \\
+    \\
+    \frac{\partial Z_j(t)}{\partial W(k,j)} &= \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
+                                            &= S_k(t)
+    \\
+    \\
+    \delta_W(k,j) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
+                  &= \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+                        f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
+                        S_k(t)
+    \end{array}
+    $
 
++ $\nabla_U$
 
+    $
+    \begin{array}{l}
+    \nabla_U(q,k) &= \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
+                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
+                     \frac{\partial Z_j(t)}{\partial h_k(t)} \cdot
+                     \frac{\partial h_k(t)}{\partial U(q,k)}\\
+                  &= \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right]
+                        \otimes
+                     \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]
 
+    \\
+    \\
+    \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
+                                            &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
+                                            &= W(k,j) \cdot f_1^{'}(h_k(t))
+    \\
+    \\
+    \frac{\partial h_k(t)}{\partial U(q,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
+                                            &= S_k(t-1)
+    \\
+    \\
+    \delta_U(q,k) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
+                  &= \sum_{i=1}^{T'}
+                     \left(
+                        \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right]
+                            \otimes
+                        \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right]
+                     \right)
 
+    \end{array}
+    $
 
-
-
-## RNN 訓練
-
-希望藉由 training 來找到 (U, V, W) 參數值, 這過程中需要幾個步驟
-> + BPTT (BackPropagation Through Time, 時序反向傳播) 來獲得模型變數和參數之間的依賴關係
->> 是 BackPropagation 演算法的一個特定應用
-> + SGD(Stochastic Gradient Descent, 梯度下降) 來逼近最佳值
-> + 梯度截斷機制
->> 加速計算並且避免發生梯度爆炸
-
-RNN 是循環計算, 誤差也會一級一級的傳播下去, 因此需要把**所有時刻**造成的損失都加起來.
-定義 Loss-function
-> 分類問題, 常用`交叉熵(cross-entropy)`作為損失函數,
-
-$
-\begin{array}{l}
-L &= \sum_{t=1}^T l(\hat{O}_t, O_t)\\
-  &= \frac{-1}{T}\sum_{t=1}^T (O_t × log(\hat{O}_t) + (1 - O_t) × log(1 - \hat{O}_t)) \\
-
-\hat{O}_t &: RNN\ prediction\ output\\
-O_t &: Target\ output
-\end{array}
-$
-
-$
-\begin{array}{l}
-Positive\ term (當結果是1時, 有反應): O_t × log(\hat{O}_t)\\
-Negative\ term (當結果是0時, 有反應): (1 - O_t) × log(1 - \hat{O}_t)
-\end{array}
-$
-
-![BPTT_Concept](BPTT_Concept.jpg) <br>
-Fig. BPTT_Concept
 
 # RNN 結構改進
 
-然而 RNN 並不完美, 它存在`長依賴`的問題.
-> 比方說, 假設想讓 RNN 根據一段不完整的句子來預測缺失的單詞,
-> e.g. `I grew up in France... I speak fluent ________. (缺失的單詞為 French)`, 有用的資訊主要集中在前半句.
-然而要預測的單詞, 卻和前面有用的資訊距離較遠, 這會導致 RNN 很難學習到有用的資訊
+根據 RNN 模型會有些不同, 自然前向/反向傳播的公式會有些不一樣, 但是原理基本類似.
+需要特別指出的是, 理論上 RNN 可以支援任意長度的序列, 然而在實際訓練過程中, 如果序列過長
+> + 可能會導致最佳化時, 出現`梯度消散`和`梯度爆炸`的問題
+> + 同時展開後的前饋神經網路, 會`佔用過大的記憶體`
 
-可以從廣度及深度兩方向改進
-> + Bidirectional RNN (廣度)
->> 依前後文來判定, 因此需要後面的時間的資料
-> + Deep-Bidirectional RNN (深度)
->> 使用多個 hidden layers, 同時加入前後文 (很多資訊無法一次記下來, 就需要多次記憶)
-
+所以實際中一般會規定一個最大長度, 當序列長度超過規定長度之後會對序列進行截斷
 
 ## [LSTM(Long Short-Term Memory networks)](note_LSTM.md)
 
-時序反向傳播演算法(BPTT)會按照時間的逆序, 將錯誤資訊一步步地往前傳遞的過程, 容易發生梯度消失或梯度爆;
+時序反向傳播演算法(BPTT)會按照時間的逆序, 將錯誤資訊一步步地往前傳遞的過程, 容易發生梯度消失或梯度爆炸;
 為了解決 RNN 層內梯度消失的問題, 使用 LSTM 結構, 它導入了
 > + 有選擇地保存和遺忘記憶資訊
 > + 可以學習長的依賴關係
->> 因為線性相加，不單單取決於啟動函數
+>> 因為線性相加, 不單單取決於啟動函數
 
-GRU (Gated Recurrent Units, 門控單元) 是一個 LSTM 稍微簡化的變體, 通常能夠提供同等的效果, 並且計算的速度更快
+## GRU (Gated Recurrent Units, 門控單元)
+
+GRU 是一個 LSTM 稍微簡化的變體, 通常能夠提供同等的效果, 並且計算的速度更快
 
 
 ## Examples

@@ -1,7 +1,9 @@
 LSTM (Long Short-Term Memory networks) [[Back](note_RNN.md#LSTM)]
 ---
 
-
+LSTM 和 GRU 都是 RNN 中常見的模型, 都可以用於處理序列資料.
+> + LSTM 相對 GRU 有更長的記憶能力, 可以更好的處理長序列資料, 但計算量比較大訓練時間長.
+> + GRU 計算量小訓練速度快, 但記憶相對較弱, 可能出項梯度消失的問題.
 
 
 
@@ -50,3 +52,6 @@ $c'$ 為新的存在 memory 裡面的值
 
 + [CS224d筆記4續——RNN隱藏層計算之GRU和LSTM](https://wugh.github.io/posts/2016/03/cs224d-notes4-recurrent-neural-networks-continue/)
 + [*Evolution: from vanilla RNN to GRU & LSTMs](https://docs.google.com/presentation/d/1UHXrKL1oTdgMLoAHHPfMM_srDO0BCyJXPmhe4DNh_G8/pub?start=false&loop=false&delayms=3000&slide=id.g24de73a70b_0_0)
+
++ [RNN學習筆記（六）-GRU，LSTM 程式碼實現](https://blog.csdn.net/rtygbwwwerr/article/details/51056140)
++ [LSTM/GRU詳細程式碼解析+完整程式碼實現](https://blog.csdn.net/m0_53961910/article/details/127965475)
