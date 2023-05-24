@@ -233,7 +233,6 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
     $
     \begin{array}{l}
-
     \frac{\partial Z_j(t)}{\partial W(k,j)} &= \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
                                             &= S_k(t)
     \end{array}
@@ -241,7 +240,6 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
     $
     \begin{array}{l}
-
     \delta_W(k,j) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
                   &= \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                         f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
@@ -260,13 +258,11 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
                   &= \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right]
                         \otimes
                      \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]
-
     \end{array}
     $
 
     $
     \begin{array}{l}
-
     \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
                                             &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
                                             &= W(k,j) \cdot f_1^{'}(h_k(t))
@@ -275,7 +271,6 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
     $
     \begin{array}{l}
-
     \frac{\partial h_k(t)}{\partial U(q,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
                                             &= S_k(t-1)
     \end{array}
@@ -283,7 +278,6 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
     $
     \begin{array}{l}
-
     \delta_U(q,k) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
                   &= \sum_{i=1}^{T'}
                      \left(
@@ -291,7 +285,6 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
                             \otimes
                         \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right]
                      \right)
-
     \end{array}
     $
 
