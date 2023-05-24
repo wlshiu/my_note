@@ -37,22 +37,32 @@ Fig. The-Standard-RNN
 > 每個 cell 都共享了一組參數矩陣(U, V, W), 這樣就能極大的降低計算量
 >> $O(t)$ 在很多情況下都是不需要的, 因為大部分的情況, 都只關注最後的結果的, 因此使用 softmax()
 
-$$
+$
 \begin{array}{l}
 h(t) &= V × X(t) + U × S(t-1) + bias\\
+\end{array}
+$
+
+$
+\begin{array}{l}
 S(t) &= f_1(h(t))\\
      &= tanh(V × X(t) + U × S(t-1) + bias)\\
+\end{array}
+$
+
+$
+\begin{array}{l}
 O(t) &= f_2(Z_t)\\
      &= softmax(Z_t)\\
      &= softmax(W × S(t) + bias)
 \end{array}
-$$
+$
 
-$$
+$
 \begin{array}{l}
 f_1()\ and\ f_2(): Activation\ function\\
 \end{array}
-$$
+$
 
 
 RNN 基本上, 就是 (U, V, W) 三個權重和對應的 activation 來進行運算
@@ -72,6 +82,11 @@ Fig. RNN_Advance_Arch
     $
     \begin{array}{l}
     S_k(t) &= f_1(h_k(t))\\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     h_k(t) &=\sum_{i=1}^{D}V(i, k) × X_i(t) + \sum_{q=1}^{P} U(q, k) × S_q(t-1)
     \end{array}
     $
@@ -89,6 +104,11 @@ Fig. RNN_Advance_Arch
     $
     \begin{array}{l}
     O_j(t) &= f_2(Z_j(t))\\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     Z_j(t) &=\sum_{k=1}^{P}W(k, j) × S_k(t)
     \end{array}
     $
@@ -154,24 +174,37 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
                   &= \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
                         \otimes
                      \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
                                             &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
                                             &= W(k,j) \cdot f_1^{'}(h_k(t))
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     \frac{\partial h_k(t)}{\partial V(i,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}\\
                                             &= X_i(t)
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     \delta_V(i,k) &= \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
                   &= \sum_{i=0}^{T'} \left(
                         \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
                             \otimes
                         \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
                      \right)
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     f_1^{'}() : f_1()的導數\\
     f_2^{'}() : f_2()的導數\\
     \otimes   : 外積
@@ -188,16 +221,27 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
                   &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                         f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
                         S_k(t)
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
     \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                                                         f_2^{'} \left(Z_j^{(i)}(t) \right)
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+
     \frac{\partial Z_j(t)}{\partial W(k,j)} &= \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
                                             &= S_k(t)
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+
     \delta_W(k,j) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
                   &= \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                         f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
@@ -217,17 +261,29 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
                         \otimes
                      \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]
 
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+
     \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
                                             &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
                                             &= W(k,j) \cdot f_1^{'}(h_k(t))
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+
     \frac{\partial h_k(t)}{\partial U(q,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
                                             &= S_k(t-1)
-    \\
-    \\
+    \end{array}
+    $
+
+    $
+    \begin{array}{l}
+
     \delta_U(q,k) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
                   &= \sum_{i=1}^{T'}
                      \left(
