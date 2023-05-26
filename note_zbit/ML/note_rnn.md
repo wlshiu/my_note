@@ -1,4 +1,4 @@
-RNN (Recurrent Neural Network)
+RNN (Recurrent Neural Network) [[Back](note_DeepLearning.md#RNN)]
 ----
 
 CNN 可以有效地處理空間資訊, 因此對於圖像上的 pixels 位置, 可以有很優秀的處理效果, 但在**序列資料**中, CNN 就不盡人意.
@@ -293,12 +293,28 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
 根據 RNN 模型會有些不同, 自然前向/反向傳播的公式會有些不一樣, 但是原理基本類似.
 需要特別指出的是, 理論上 RNN 可以支援任意長度的序列, 然而在實際訓練過程中, 如果序列過長
-> + 可能會導致最佳化時, 出現`梯度消散`和`梯度爆炸`的問題
+> + 可能會導致最佳化時, 出現`梯度消失(Vanishing Gradients)`和`梯度爆炸(Exploding Gradients)`的問題
 > + 同時展開後的前饋神經網路, 會`佔用過大的記憶體`
 
-所以實際中一般會規定一個最大長度, 當序列長度超過規定長度之後會對序列進行截斷
+## 梯度消失或梯度爆炸
 
-## [LSTM(Long Short-Term Memory networks)](note_LSTM.md)
+主要是 RNN 在不同時間步, 使用共享參數 $W$, 當 BPTT 計算時,
+會導致 $t+n$ 時刻(當序列的距離太大)的 Loss, 在 $t$ 時刻參數的偏導數, 存在 $W$ 的指數形式,
+一旦在指數的兩側時(很小或很大), 就會導致梯度消失或梯度爆炸的問題
+
++ 梯度爆炸(Exploding Gradients)
+    > 根據梯度下降的更新公式, 參數會一瞬間更新非常大, 導致網路震盪 (造成出現前後文不匹配的情況).
+    >> 比較好的解決方法是梯度裁剪, 即如果發現梯度的範數(Norm)大於某個 thresholde, 則以一定的比例縮小梯度的範數(Norm), 但不改變其方向.
+    所以實際中一般會規定一個最大長度, 當序列長度超過規定長度之後, 會對序列進行截斷
+
++ 梯度消失(Vanishing Gradients)
+    > 遠距離序列的影響變極小
+    >> 舉例來說, 要預測 `The writer of the books __` 中的 `__` 是 `is` 還是 `are` 時,
+    當梯度消失時, `books`(近距離序列) 的權重會大於 `writer` (遠距離序列), 進而造成預測錯誤,
+    導致無法建模長距離依賴關係
+
+
+## [LSTM (Long Short-Term Memory networks)](note_LSTM.md)
 
 時序反向傳播演算法(BPTT)會按照時間的逆序, 將錯誤資訊一步步地往前傳遞的過程, 容易發生梯度消失或梯度爆炸;
 為了解決 RNN 層內梯度消失的問題, 使用 LSTM 結構, 它導入了
@@ -306,7 +322,7 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 > + 可以學習長的依賴關係
 >> 因為線性相加, 不單單取決於啟動函數
 
-## GRU (Gated Recurrent Units, 門控單元)
+## [GRU (Gated Recurrent Units, 門控單元)](note_GRU.md)
 
 GRU 是一個 LSTM 稍微簡化的變體, 通常能夠提供同等的效果, 並且計算的速度更快
 

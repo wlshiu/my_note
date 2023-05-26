@@ -68,6 +68,22 @@ Fig. NerualNet_Base_Arch
         > + `2-2-2 NN` 代表 input/hidden/output 都各有 2 nodes, hidden 只有 1 層
         > + `2-5-5-2 NN` 代表 input/output 各有兩個 nodes, hidden 有 2 層都各自有 5 個 nodes
 
++ 為何 NN 模型被稱為黑箱的原因之一
+
+    -  影響 NN 表現能力的主要因素有
+        > + 神經網路的 layers
+        > + 神經元的個數
+        > + 神經元之間的連接方式
+        > + 神經元採用的 Activation Function
+
+    - 神經元之間以不同的連接方式(全連接, 部分連接)組合, 可以構成不同神經網路, 對於不同的訊號處理效果也不一樣
+        > **但目前依舊沒有一種通用的方法, 可以根據訊號輸入的特徵, 來決定神經網路的結構**
+
++ NN 優點
+    > 大可不用顧及模型本身是如何作用的, 只需要按照規則建構網路 (e.g. 隱藏層個數, 每層的 Neuron 個數, 前後層 Neuron 連接方式, 選擇啟動函數),
+    然後使用訓練資料集不斷調整參數, 在許多問題上都能得到一個**相對能接受**的結果
+    >> 然而我們對其中發生了什麼, 是未可知的
+
 # Activation Function (啟動函數, 激勵函數)
 
 在神經網路中, 每一層輸出都是上層輸入的線性函數, 無論神經網路有多少層, 輸出都是輸入的線性組合
@@ -100,7 +116,12 @@ FC Layer 原則上就是最後的分類器, 將上一層所擷取出來的所有
 
 ## [Back-Propagation(反向傳播演算法)](note_BackPropagation.md)
 
-## [RNN(循環神經網路)](note_rnn.md)
+## [RNN(循環神經網路)](note_RNN.md)
+
+## [DS-CNN (Depthwise Separable CNN)](note_DS_CNN.md)
+
+## Attention Model (注意力模型)
+
 
 # Reference
 

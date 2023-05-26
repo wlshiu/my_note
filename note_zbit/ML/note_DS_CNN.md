@@ -1,4 +1,4 @@
-DS-CNN (Depthwise Separable CNN)
+DS-CNN (Depthwise Separable CNN) [[Back](note_DeepLearning.md#DS-CNN)]
 ---
 
 ## Definitions
