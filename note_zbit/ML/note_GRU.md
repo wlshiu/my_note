@@ -27,11 +27,7 @@ Fig. GRU_Core_Arch
 reset gate $R(t)$ 允許我們控制, 長期記憶中, `可能還想記住`的資訊
 > $R(t)$ 的值越小, 說明長期記憶忽略得越多
 
-$
-\begin{array}{l}
-R(t) = \sigma \left(W_{xr}X(t) + W_{hr}h(t-1) +  Bais\right)
-\end{array}
-$
+$R(t) = \sigma \left(W_{xr}X(t) + W_{hr}h(t-1) +  Bais\right)$
 
 
 ## update gate (更新門)
@@ -39,39 +35,19 @@ $
 update gate $Z(t)$ 將允許我們控制, 長期記憶中有多少資訊需要被更新
 > $Z(t)$ 的值越大, 說明前一時刻的 $h(t-1)$ 對 $h(t)$ 的影響越大
 
-$
-\begin{array}{l}
-Z(t) = \sigma \left(W_{xz}X(t) + W_{hz}h(t-1) +  Bais\right)
-\end{array}
-$
+$Z(t) = \sigma \left(W_{xz}X(t) + W_{hz}h(t-1) +  Bais\right)$
 
 
 ## Candidate Hidden state
-$
-\begin{array}{l}
-\hat{h}(t) = tanh \left(W_{xh}X(t) + R(t) \cdot h(t-1) +  Bais\right)
-\end{array}
-$
+$\hat{h}(t) = tanh \left(W_{xh}X(t) + R(t) \cdot h(t-1) +  Bais\right)$
 
 ## Output
 
-$
-\begin{array}{l}
-h(t) = (1-Z(t)) \cdot h(t-1) + Z(t) \cdot \hat{h}(t) +  Bais
-\end{array}
-$
+$h(t) = (1-Z(t)) \cdot h(t-1) + Z(t) \cdot \hat{h}(t) +  Bais$
 
-$
-\begin{array}{l}
-h(t) = (1-Z(t)) \cdot h(t-1) + Z(t) \cdot tanh \left(W_{xh}X(t) + R(t) \cdot h(t-1) \right) +  Bais
-\end{array}
-$
+$h(t) = (1-Z(t)) \cdot h(t-1) + Z(t) \cdot tanh \left(W_{xh}X(t) + R(t) \cdot h(t-1) \right) +  Bais$
 
-$
-\begin{array}{l}
-\hat{O}(t) = W_o h(t) +  Bais
-\end{array}
-$
+$\hat{O}(t) = W_o h(t) +  Bais$
 
 # BPTT of GRU
 
@@ -87,180 +63,67 @@ Fig. GRU_Forward
 ![GRU_Backward](GRU_Backward.jpg) <br>
 Fig. GRU_Backward
 
-$
-\begin{array}{l}
-\delta3 = \delta1 + \delta2
-\end{array}
-$
+$\delta3 = \delta 1 + \delta 2$
 
-$
-\begin{array}{l}
-\delta4 = (1- Z(t)) + \delta3
-\end{array}
-$
+$\delta4 = (1- Z(t)) + \delta3$
 
-$
-\begin{array}{l}
-\delta5 = \delta3 \cdot h(t-1)
-\end{array}
-$
+$\delta5 = \delta3 \cdot h(t-1)$
 
-$
-\begin{array}{l}
-\delta6 = 1 - \delta5
-\end{array}
-$
+$\delta6 = 1 - \delta5$
 
-$
-\begin{array}{l}
-\delta7 = \delta3 \cdot \hat{h}(t)
-\end{array}
-$
+$\delta7 = \delta3 \cdot \hat{h}(t)$
 
-$
-\begin{array}{l}
-\delta8 = \delta3 \cdot Z(t)
-\end{array}
-$
+$\delta8 = \delta3 \cdot Z(t)$
 
-$
-\begin{array}{l}
-\delta9 = \delta7 + \delta8
-\end{array}
-$
+$\delta9 = \delta7 + \delta8$
 
-$
-\begin{array}{l}
-\delta10 = \delta8 \cdot tanh^{'}(\hat{h}(t))
-\end{array}
-$
+$\delta10 = \delta8 \cdot tanh^{'}(\hat{h}(t))$
 
-$
-\begin{array}{l}
-\delta11 = \delta9 \cdot sigmoid^{'}(Z(t))
-\end{array}
-$
+$\delta11 = \delta9 \cdot sigmoid^{'}(Z(t))$
 
-$
-\begin{array}{l}
-\delta12 = \delta10 \otimes W_{xh}^{T}
-\end{array}
-$
+$\delta12 = \delta10 \otimes W_{xh}^{T}$
 
-$
-\begin{array}{l}
-\delta13 = \delta10 \otimes W_{hh}^{T}
-\end{array}
-$
+$\delta13 = \delta10 \otimes W_{hh}^{T}$
 
-$
-\begin{array}{l}
-\delta14 = \delta11 \otimes W_{xz}^{T}
-\end{array}
-$
+$\delta14 = \delta11 \otimes W_{xz}^{T}$
 
-$
-\begin{array}{l}
-\delta15 = \delta11 \otimes W_{hz}^{T}
-\end{array}
-$
+$\delta15 = \delta11 \otimes W_{hz}^{T}$
 
-$
-\begin{array}{l}
-\delta16 = \delta13 \cdot h(t-1)
-\end{array}
-$
+$\delta16 = \delta13 \cdot h(t-1)$
 
-$
-\begin{array}{l}
-\delta17 = \delta13 \cdot R(t)
-\end{array}
-$
+$\delta17 = \delta13 \cdot R(t)$
 
-$
-\begin{array}{l}
-\delta18 = \delta17 \cdot sigmoid^{'}(R(t))
-\end{array}
-$
+$\delta18 = \delta17 \cdot sigmoid^{'}(R(t))$
 
-$
-\begin{array}{l}
-\delta19 = \delta17 + \delta4
-\end{array}
-$
+$\delta19 = \delta17 + \delta4$
 
-$
-\begin{array}{l}
-\delta20 = \delta18 \otimes W_{xr}^{T}
-\end{array}
-$
+$\delta20 = \delta18 \otimes W_{xr}^{T}$
 
-$
-\begin{array}{l}
-\delta21 = \delta18 \otimes W_{hr}^{T}
-\end{array}
-$
+$\delta21 = \delta18 \otimes W_{hr}^{T}$
 
-$
-\begin{array}{l}
-\delta22 = \delta21 + \delta15
-\end{array}
-$
+$\delta22 = \delta21 + \delta15$
 
-$
-\begin{array}{l}
-\delta23 &= \delta19 + \delta22\\
-         &= \delta17 + \delta4 + \delta21 + \delta15
-\end{array}
-$
+$\delta23 =\delta19 + \delta22 = \delta17 + \delta4 + \delta21 + \delta15$
 
-$
-\begin{array}{l}
-\delta24 = \delta12 + \delta14 + \delta20
-\end{array}
-$
+$\delta24 = \delta12 + \delta14 + \delta20$
 
 + Weights of reset_gate
 
-    $
-    \begin{array}{l}
-    \delta W_{xr} = X^{T}(t) \cdot \delta18
-    \end{array}
-    $
+    $\delta W_{xr} = X^{T}(t) \cdot \delta18$
 
-    $
-    \begin{array}{l}
-    \delta W_{hr} = h^{T}(t-1) \cdot \delta18
-    \end{array}
-    $
+    $\delta W_{hr} = h^{T}(t-1) \cdot \delta18$
 
 + Weights of update_gate
 
-    $
-    \begin{array}{l}
-    \delta W_{xz} = X^{T}(t) \cdot \delta11
-    \end{array}
-    $
+    $\delta W_{xz} = X^{T}(t) \cdot \delta11$
 
-    $
-    \begin{array}{l}
-    \delta W_{hz} = h^{T}(t-1) \cdot \delta11
-    \end{array}
-    $
+    $\delta W_{hz} = h^{T}(t-1) \cdot \delta11$
 
 + Weights of Candidate Hidden state
 
-    $
-    \begin{array}{l}
-    \delta W_{xh} = X^{T}(t) \cdot \delta10
-    \end{array}
-    $
+    $\delta W_{xh} = X^{T}(t) \cdot \delta10$
 
-    $
-    \begin{array}{l}
-    \delta W_{hh} = h^{T}(t-1) \cdot \delta10
-    \end{array}
-    $
+    $\delta W_{hh} = h^{T}(t-1) \cdot \delta10$
 
 
 
