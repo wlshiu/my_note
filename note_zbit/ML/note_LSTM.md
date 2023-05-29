@@ -25,12 +25,7 @@ Fig. LSTM_Core_Arch
 決定了上一時刻的 $C(t-1)$ (單元狀態), 保留多少到當前時刻 $C(t)$, 也就是會對 input 進行選擇性忘記
 > 因為使用 sigmoid function, 則越遠的資料權重越大, 保留較多長期記憶
 
-$
-\begin{array}{l}
-f(t) &= \sigma(W_f \cdot \left[h(t-1), X(t) \right] + Bais)\\
-    &= sigmoid(W_f \cdot \left[h(t-1), X(t) \right] + Bais)
-\end{array}
-$
+$f(t) = \sigma(W_f \cdot \left[h(t-1), X(t) \right] + Bais) = sigmoid(W_f \cdot \left[h(t-1), X(t) \right] + Bais)$
 
 其中權重矩陣 $W_f$ 由兩個矩陣 $W_fh$ 和 $W_fx$ 拼接而成, 分別對應 $h(t-1)$ 及 $X(t)$
 
@@ -61,25 +56,13 @@ $
 > sigmoid layer 決定要更新哪些資訊, 而 tanh layer 則創造了一個新的候選值, 來更新資訊到 $C(t)$
 >> 避免當前無關緊要的內容進入長期記憶 $C(t)$
 
-$
-\begin{array}{l}
-i(t) = \sigma \left(W_i \cdot [h(t-1), X(t)] + Bais\right)
-\end{array}
-$
+$i(t) = \sigma \left(W_i \cdot [h(t-1), X(t)] + Bais\right)$
 
-$
-\begin{array}{l}
-\hat{C(t)} = tanh(W_c \cdot [h(t-1), X(t)] + Bais)
-\end{array}
-$
+$\hat{C(t)} = tanh(W_c \cdot [h(t-1), X(t)] + Bais)$
 
 則經過 input gate 後的 $C(t)$
 
-$
-\begin{array}{l}
-C(t) = f(t) \cdot C(t-1) + i(t) \cdot \hat{C(t)})
-\end{array}
-$
+$C(t) = f(t) \cdot C(t-1) + i(t) \cdot \hat{C(t)})$
 
 
 ## output gate (輸出門)
@@ -87,17 +70,9 @@ $
 用來控制當前的 $C(t)$ 有多少被過濾掉, 並輸出到當前的輸出值 $h(t)$
 
 
-$
-\begin{array}{l}
-O(t) = \sigma \left(W_o \cdot [h(t-1), X(t)] + Bais\right)
-\end{array}
-$
+$O(t) = \sigma \left(W_o \cdot [h(t-1), X(t)] + Bais\right)$
 
-$
-\begin{array}{l}
-h(t) = O(t) \cdot tanh(C(t))
-\end{array}
-$
+$h(t) = O(t) \cdot tanh(C(t))$
 
 # LSTM 的缺點分析
 
