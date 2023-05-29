@@ -11,7 +11,7 @@ Fig. LSTM_Core_Arch
 > + 黃色  ：表示一個 `全連接` 的 Neural Network Layer (並非啟動函數, 只是剛好使用相同的數學式)
 >> $\sigma$ 為 sigmoid function, 用來將 input 轉換為 `0 ~ 1` 之間的數值, 進而描述有多少量的 input 可以通過
 > + 粉色  ：表示按位操作或逐點操作(pointwise operation),
->> e.g. 向量相加 (Vector Addition), 向量乘積 (Vector dot production), ...etc.
+>> e.g. 向量相加 (Vector Addition), 向量乘積 (Hadamard production), ...etc.
 > + 粗黑點：表示兩個訊號的連接(向量拼接)
 >> $[h(t-1), X(t)]$ 表示將向量 $h(t-1)$ 和 $X(t)$ 拼接起來
 > + $W_f$: forget_gate 的輸入權重
