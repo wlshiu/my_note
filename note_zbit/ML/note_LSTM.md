@@ -6,7 +6,7 @@ LSTM 為了解決 RNN 無法建立長期記憶的依賴關係(梯度消失或爆
 > > + LSTM 相對 GRU 有更長的記憶能力, 可以更好的處理長序列資料, 但計算量比較大訓練時間長.
 > > + GRU 計算量小訓練速度快, 但記憶相對較弱, 可能出項梯度消失的問題.
 
-![LSTM_Core_Arch](LSTM_core_arch.jpg) <br>
+![LSTM_Core_Arch](LSTM_Core_Arch.jpg) <br>
 Fig. LSTM_Core_Arch
 > + 黃色  ：表示一個 `全連接` 的 Neural Network Layer (並非啟動函數, 只是剛好使用相同的數學式)
 >> $\sigma$ 為 sigmoid function, 用來將 input 轉換為 `0 ~ 1` 之間的數值, 進而描述有多少量的 input 可以通過

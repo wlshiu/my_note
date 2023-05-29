@@ -37,32 +37,16 @@ Fig. The-Standard-RNN
 > 每個 cell 都共享了一組參數矩陣(U, V, W), 這樣就能極大的降低計算量
 >> $O(t)$ 在很多情況下都是不需要的, 因為大部分的情況, 都只關注最後的結果的, 因此使用 softmax()
 
-$
-\begin{array}{l}
-h(t) &= V × X(t) + U × S(t-1) + bias\\
-\end{array}
-$
+$h(t) = V × X(t) + U × S(t-1) + bias$
 
-$
-\begin{array}{l}
-S(t) &= f_1(h(t))\\
-     &= tanh(V × X(t) + U × S(t-1) + bias)\\
-\end{array}
-$
+$S(t) = f_1(h(t)) = tanh(V × X(t) + U × S(t-1) + bias)$
 
-$
-\begin{array}{l}
-O(t) &= f_2(Z_t)\\
-     &= softmax(Z_t)\\
-     &= softmax(W × S(t) + bias)
-\end{array}
-$
+$$O(t) = f_2(Z_t)$<br>
+$\     = softmax(Z_t)$<br>
+$\     = softmax(W × S(t) + bias)$<br>
 
-$
-\begin{array}{l}
-f_1()\ and\ f_2(): Activation\ function\\
-\end{array}
-$
+
+$f_1()\ and\ f_2(): Activation\ function$
 
 
 RNN 基本上, 就是 (U, V, W) 三個權重和對應的 activation 來進行運算
@@ -79,45 +63,21 @@ Fig. RNN_Advance_Arch
 
     假設有 $N$ 個 data, 每次使用 $D$ 個 Input 到 RNN, 單一層 hidden layer 共有 $P$ 個 nodes, 則第 $k$ 個 node
 
-    $
-    \begin{array}{l}
-    S_k(t) &= f_1(h_k(t))\\
-    \end{array}
-    $
+    $S_k(t) = f_1(h_k(t))$
 
-    $
-    \begin{array}{l}
-    h_k(t) &=\sum_{i=1}^{D}V(i, k) × X_i(t) + \sum_{q=1}^{P} U(q, k) × S_q(t-1)
-    \end{array}
-    $
+    $h_k(t) = \sum_{i=1}^{D}V(i, k) × X_i(t) + \sum_{q=1}^{P} U(q, k) × S_q(t-1)$
 
-    $
-    \begin{array}{l}
-    f_1(): Activation\ function
-    \end{array}
-    $
+    $f_1(): Activation\ function$
 
 + Hidden layer to Output
 
     假設 Output layer 共有 $M$ 個 nodes, 則第 $j$ 個 node
 
-    $
-    \begin{array}{l}
-    O_j(t) &= f_2(Z_j(t))\\
-    \end{array}
-    $
+    $O_j(t) = f_2(Z_j(t))$
 
-    $
-    \begin{array}{l}
-    Z_j(t) &=\sum_{k=1}^{P}W(k, j) × S_k(t)
-    \end{array}
-    $
+    $Z_j(t) =\sum_{k=1}^{P}W(k, j) × S_k(t)$
 
-    $
-    \begin{array}{l}
-    f_2(): Activation\ function
-    \end{array}
-    $
+    $f_2(): Activation\ function$
 
 
 
@@ -143,150 +103,115 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
 + Cross-entropy loss
 
-    $
-    \begin{array}{l}
-    E(\hat{O}, O)       &= \sum_{t=0}^{T'} E\left(\hat{O}(t), O(t)\right)\\
-    E(\hat{O}(t), O(t)) &= \sum_{j=0}^M L\left(\hat{O_j}(t), O_j(t)\right)\\
-                        &= \frac{-1}{M} \sum_{j=0}^M \left(\overbrace{O_j(t) \cdot log\left(\hat{O_j}(t)\right)}^{Positive\ term} + \overbrace{(1 - O_j(t)) \cdot log\left(1 - \hat{O}_j(t)\right)}^{(Negative\ term)}\right)\\
-    \end{array}
-    $
+    $E(\hat{O}, O)       = \sum_{t=0}^{T'} E\left(\hat{O}(t), O(t)\right)$<br>
+    $E(\hat{O}(t), O(t)) = \sum_{j=0}^M L\left(\hat{O_j}(t), O_j(t)\right)$<br>
+    $\                   = \frac{-1}{M} \sum_{j=0}^M \left(\overbrace{O_j(t) \cdot log\left(\hat{O_j}(t)\right)}^{Positive\ term} + \overbrace{(1 - O_j(t)) \cdot log\left(1 - \hat{O}_j(t)\right)}^{(Negative\ term)}\right)$<br>
 
-    $
-    \begin{array}{l}
-    \hat{O}_t &: RNN\ prediction\ output\\
-    O_t &: Target\ output (The\ truly\ correct)\\
-    Positive\ term &: 當結果是1時, 有反應\\
-    Negative\ term &: 當結果是0時, 有反應
-    \end{array}
-    $
+    $\hat{O}_t &: RNN\ prediction\ output$<br>
+    $O_t &: Target\ output (The\ truly\ correct)$<br>
+    $Positive\ term &: 當結果是1時, 有反應$<br>
+    $Negative\ term &: 當結果是0時, 有反應$<br>
 
 
 ### 梯度推導 $(\nabla_U, \nabla_V, \nabla_W)$
 
 + $\nabla_V$
 
-    $
-    \begin{array}{l}
-    \nabla_V(i,k) &= \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
-                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot
+    ```math
+    \nabla_V(i,k) = \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
+                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot
                      \frac{\partial Z_j(t)}{\partial h_k(t))} \cdot
                      \frac{\partial h_k(t)}{\partial V(i,k))}\\
-                  &= \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
+                  = \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
                         \otimes
                      \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
-    \end{array}
-    $
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
-                                            &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
-                                            &= W(k,j) \cdot f_1^{'}(h_k(t))
-    \end{array}
-    $
+    ```math
+    \frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
+                                            = \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
+                                            = W(k,j) \cdot f_1^{'}(h_k(t))
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial h_k(t)}{\partial V(i,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}\\
-                                            &= X_i(t)
-    \end{array}
-    $
+    ```math
+    \frac{\partial h_k(t)}{\partial V(i,k)} = \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}\\
+                                            = X_i(t)
+    ```
 
-    $
-    \begin{array}{l}
-    \delta_V(i,k) &= \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
-                  &= \sum_{i=0}^{T'} \left(
+    ```math
+    \delta_V(i,k) = \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
+                  = \sum_{i=0}^{T'} \left(
                         \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
                             \otimes
                         \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
                      \right)
-    \end{array}
-    $
+    ```
 
-    $
-    \begin{array}{l}
-    f_1^{'}() : f_1()的導數\\
-    f_2^{'}() : f_2()的導數\\
-    \otimes   : 外積
-    \end{array}
-    $
+    $f_1^{'}() : f_1()的導數$<br>
+    $f_2^{'}() : f_2()的導數$<br>
+    $\otimes   : 外積$<br>
+
 
 + $\nabla_W$
 
-    $
-    \begin{array}{l}
-    \nabla_W(k,j) &= \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
-                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
-                     \frac{\partial Z_j(t)}{\partial W(k,j)}\\
-                  &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+    ```math
+    \nabla_W(k,j) = \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
+                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
+                    \frac{\partial Z_j(t)}{\partial W(k,j)}\\
+                  = \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                         f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
                         S_k(t)
-    \end{array}
-    $
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} &= \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+    ```math
+    \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} = \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                                                         f_2^{'} \left(Z_j^{(i)}(t) \right)
-    \end{array}
-    $
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial Z_j(t)}{\partial W(k,j)} &= \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
-                                            &= S_k(t)
-    \end{array}
-    $
+    ```math
+    \frac{\partial Z_j(t)}{\partial W(k,j)} = \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
+                                            = S_k(t)
+    ```
 
-    $
-    \begin{array}{l}
-    \delta_W(k,j) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
-                  &= \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
+    ```math
+    \delta_W(k,j) = \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
+                  = \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
                         f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
                         S_k(t)
-    \end{array}
-    $
+    ```
 
 + $\nabla_U$
 
-    $
-    \begin{array}{l}
-    \nabla_U(q,k) &= \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
-                  &= \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
+    ```math
+    \nabla_U(q,k) = \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
+                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
                      \frac{\partial Z_j(t)}{\partial h_k(t)} \cdot
                      \frac{\partial h_k(t)}{\partial U(q,k)}\\
-                  &= \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right]
+                  = \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right]
                         \otimes
                      \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]
-    \end{array}
-    $
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial Z_j(t)}{\partial h_k(t)} &= \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
-                                            &= \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
-                                            &= W(k,j) \cdot f_1^{'}(h_k(t))
-    \end{array}
-    $
+    ```math
+    \frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
+                                            = \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
+                                            = W(k,j) \cdot f_1^{'}(h_k(t))
+    ```
 
-    $
-    \begin{array}{l}
-    \frac{\partial h_k(t)}{\partial U(q,k)} &= \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
-                                            &= S_k(t-1)
-    \end{array}
-    $
+    ```math
+    \frac{\partial h_k(t)}{\partial U(q,k)} = \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
+                                            = S_k(t-1)
+    ```
 
-    $
-    \begin{array}{l}
-    \delta_U(q,k) &= \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
-                  &= \sum_{i=1}^{T'}
+    ```math
+    \delta_U(q,k) = \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
+                  = \sum_{i=1}^{T'}
                      \left(
                         \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right]
                             \otimes
                         \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right]
                      \right)
-    \end{array}
-    $
+    ```
 
 
 # RNN 結構改進
@@ -341,11 +266,7 @@ GRU 是一個 LSTM 稍微簡化的變體, 通常能夠提供同等的效果, 並
     > 將圖像特徵輸入到 RNN 中 ($X$ 為圖像特徵)
     >> $X$ 應該為一個 `n * 1` 的向量
 
-    $
-    \begin{array}{l}
-    h_t = tanh(U × X_t + W × H_{t-1} + V × X)
-    \end{array}
-    $
+    $h_t = tanh(U × X_t + W × H_{t-1} + V × X)$
 
 
 # Reference
