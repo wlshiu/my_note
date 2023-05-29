@@ -121,25 +121,20 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
     $\             = \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot \frac{\partial Z_j(t)}{\partial h_k(t))} \cdot \frac{\partial h_k(t)}{\partial V(i,k))}$<br>
     $\             = \left[\displaystyle \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right] \otimes \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]$<br>
 
-    ```math
-    \frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
-                                            = \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
-                                            = W(k,j) \cdot f_1^{'}(h_k(t))
-    ```
 
-    ```math
-    \frac{\partial h_k(t)}{\partial V(i,k)} = \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}\\
-                                            = X_i(t)
-    ```
+    $\frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{ \displaystyle \partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}$<br>
+    $\                                        = \frac{\displaystyle \partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}$<br>
+    $\                                        = W(k,j) \cdot f_1^{'}(h_k(t))$<br>
 
-    ```math
-    \delta_V(i,k) = \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
-                  = \sum_{i=0}^{T'} \left(
-                        \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
-                            \otimes
-                        \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
-                     \right)
-    ```
+
+
+    $\frac{\partial h_k(t)}{\partial V(i,k)} = \displaystyle \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial V(i,k)}$<br>
+    $\                                       = X_i(t)$<br>
+
+
+    $\delta_V(i,k) = \displaystyle \sum_{i=0}^{T'} \frac{\partial E^{(i)}(t)}{\partial V(i,k)}$<br>
+    $\             = \displaystyle \sum_{i=0}^{T'} \left(\left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right] \otimes \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right] \right)$<br>
+
 
     $f_1^{'}() : f_1()的導數$<br>
     $f_2^{'}() : f_2()的導數$<br>
@@ -148,64 +143,37 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
 + $\nabla_W$
 
-    ```math
-    \nabla_W(k,j) = \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
-                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
-                    \frac{\partial Z_j(t)}{\partial W(k,j)}\\
-                  = \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
-                        f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
-                        S_k(t)
-    ```
+    $\nabla_W(k,j) = \frac{\partial E^{(i)}(t)}{\partial W(k,j)}$<br>
+    $\             = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot \frac{\partial Z_j(t)}{\partial W(k,j)}$<br>
+    $\             = \displaystyle \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot S_k(t)$<br>
 
-    ```math
-    \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} = \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
-                                                        f_2^{'} \left(Z_j^{(i)}(t) \right)
-    ```
+    $\frac{\partial E^{(i)}(t)}{\partial Z_j(t)} = \displaystyle \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)$<br>
 
-    ```math
-    \frac{\partial Z_j(t)}{\partial W(k,j)} = \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}\\
-                                            = S_k(t)
-    ```
 
-    ```math
-    \delta_W(k,j) = \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}\\
-                  = \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot
-                        f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot
-                        S_k(t)
-    ```
+    $\frac{\partial Z_j(t)}{\partial W(k,j)} = \displaystyle \frac{\partial \sum_{k=1}^{p} W(k,j)S_k(t)}{\partial W(k,j)}$<br>
+    $\                                       = S_k(t)$<br>
+
+    $\delta_W(k,j) = \displaystyle \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial W(k,j)}$<br>
+    $\             = \displaystyle \sum_{i=1}^{T'} \sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right) \cdot S_k(t)$<br>
 
 + $\nabla_U$
 
-    ```math
-    \nabla_U(q,k) = \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
-                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot
-                     \frac{\partial Z_j(t)}{\partial h_k(t)} \cdot
-                     \frac{\partial h_k(t)}{\partial U(q,k)}\\
-                  = \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right]
-                        \otimes
-                     \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]
-    ```
+    $\nabla_U(q,k) = \frac{\partial E^{(i)}(t)}{\partial U(q,k)}$<br>
+    $\             = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot \frac{\partial Z_j(t)}{\partial h_k(t)} \cdot \frac{\partial h_k(t)}{\partial U(q,k)}$<br>
+    $\             = \displaystyl \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]$<br>
 
-    ```math
-    \frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
-                                            = \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}\\
-                                            = W(k,j) \cdot f_1^{'}(h_k(t))
-    ```
 
-    ```math
-    \frac{\partial h_k(t)}{\partial U(q,k)} = \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}\\
-                                            = S_k(t-1)
-    ```
 
-    ```math
-    \delta_U(q,k) = \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}\\
-                  = \sum_{i=1}^{T'}
-                     \left(
-                        \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right]
-                            \otimes
-                        \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right]
-                     \right)
-    ```
+    $\frac{\partial Z_j(t)}{\partial h_k(t)} = \displaystyl \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}$<br>
+    $\                                       = \displaystyl \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}$<br>
+    $\                                       = W(k,j) \cdot f_1^{'}(h_k(t))$<br>
+
+
+    $\frac{\partial h_k(t)}{\partial U(q,k)} = \displaystyl \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}$<br>
+    $\                                       = S_k(t-1)$<br>
+
+    $\delta_U(q,k) = \displaystyl \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}$<br>
+    $\              = \displaystyl \sum_{i=1}^{T'} \left( \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right] \right)$<br>
 
 
 # RNN 結構改進
