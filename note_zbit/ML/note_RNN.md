@@ -41,7 +41,7 @@ $h(t) = V × X(t) + U × S(t-1) + bias$
 
 $S(t) = f_1(h(t)) = tanh(V × X(t) + U × S(t-1) + bias)$
 
-$$O(t) = f_2(Z_t)$<br>
+$O(t) = f_2(Z_t)$<br>
 $\     = softmax(Z_t)$<br>
 $\     = softmax(W × S(t) + bias)$<br>
 
@@ -65,7 +65,7 @@ Fig. RNN_Advance_Arch
 
     $S_k(t) = f_1(h_k(t))$
 
-    $h_k(t) = \sum_{i=1}^{D}V(i, k) × X_i(t) + \sum_{q=1}^{P} U(q, k) × S_q(t-1)$
+    $h_k(t) = \displaystyle \sum_{i=1}^D V(i, k) × X_i(t) + \sum_{q=1}^P U(q, k) × S_q(t-1)$
 
     $f_1(): Activation\ function$
 
@@ -75,7 +75,7 @@ Fig. RNN_Advance_Arch
 
     $O_j(t) = f_2(Z_j(t))$
 
-    $Z_j(t) =\sum_{k=1}^{P}W(k, j) × S_k(t)$
+    $Z_j(t) = \displaystyle \sum_{k=1}^{P}W(k, j) × S_k(t)$
 
     $f_2(): Activation\ function$
 
@@ -103,29 +103,23 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
 + Cross-entropy loss
 
-    $E(\hat{O}, O)       = \sum_{t=0}^{T'} E\left(\hat{O}(t), O(t)\right)$<br>
-    $E(\hat{O}(t), O(t)) = \sum_{j=0}^M L\left(\hat{O_j}(t), O_j(t)\right)$<br>
-    $\                   = \frac{-1}{M} \sum_{j=0}^M \left(\overbrace{O_j(t) \cdot log\left(\hat{O_j}(t)\right)}^{Positive\ term} + \overbrace{(1 - O_j(t)) \cdot log\left(1 - \hat{O}_j(t)\right)}^{(Negative\ term)}\right)$<br>
+    $E(\hat{O}, O)       = \displaystyle \sum_{t=0}^{T'} E\left(\hat{O}(t), O(t)\right)$<br>
+    $E(\hat{O}(t), O(t)) = \displaystyle \sum_{j=0}^M L\left(\hat{O_j}(t), O_j(t)\right)$<br>
+    $\                   = \displaystyle \frac{-1}{M} \sum_{j=0}^M \left(\overbrace{O_j(t) \cdot log\left(\hat{O_j}(t)\right)}^{Positive\ term} + \overbrace{(1 - O_j(t)) \cdot log\left(1 - \hat{O}_j(t)\right)}^{(Negative\ term)}\right)$<br>
 
-    $\hat{O}_t &: RNN\ prediction\ output$<br>
-    $O_t &: Target\ output (The\ truly\ correct)$<br>
-    $Positive\ term &: 當結果是1時, 有反應$<br>
-    $Negative\ term &: 當結果是0時, 有反應$<br>
+    $\hat{O}_t : RNN\ prediction\ output$<br>
+    $O_t : Target\ output (The\ truly\ correct)$<br>
+    $Positive\ term : 當結果是1時, 有反應$<br>
+    $Negative\ term : 當結果是0時, 有反應$<br>
 
 
 ### 梯度推導 $(\nabla_U, \nabla_V, \nabla_W)$
 
 + $\nabla_V$
 
-    ```math
-    \nabla_V(i,k) = \frac{\partial E^{(i)}(t)}{\partial V(i,k)}\\
-                  = \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot
-                     \frac{\partial Z_j(t)}{\partial h_k(t))} \cdot
-                     \frac{\partial h_k(t)}{\partial V(i,k))}\\
-                  = \left[ \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right]
-                        \otimes
-                     \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]
-    ```
+    $\nabla_V(i,k) = \frac{\partial E^{(i)}(t)}{\partial V(i,k)}$<br>
+    $\             = \frac{\partial E^{(i)}(t)}{\partial Z_j(t))} \cdot \frac{\partial Z_j(t)}{\partial h_k(t))} \cdot \frac{\partial h_k(t)}{\partial V(i,k))}$<br>
+    $\             = \left[\displaystyle \sum_{j=0}^M \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'} \left(Z_j^{(i)}(t) \right)  \right] \otimes \left[ W(i,k) \cdot f_1^{'}(S_k(t)) \cdot X_i(t)\right]$<br>
 
     ```math
     \frac{\partial Z_j(t)}{\partial h_k(t)} = \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}\\
