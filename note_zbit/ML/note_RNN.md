@@ -160,20 +160,20 @@ Fig. BPTT_Err_Propagation, e.g. $T'=3$
 
     $\nabla_U(q,k) = \frac{\partial E^{(i)}(t)}{\partial U(q,k)}$<br>
     $\             = \frac{\partial E^{(i)}(t)}{\partial Z_j(t)} \cdot \frac{\partial Z_j(t)}{\partial h_k(t)} \cdot \frac{\partial h_k(t)}{\partial U(q,k)}$<br>
-    $\             = \displaystyl \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]$<br>
+    $\             = \displaystyle \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_j^{(i)}(t) \right) \cdot f_2^{'}\left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'}(h_k(t)) \cdot S_k(t-1) \right]$<br>
 
 
 
-    $\frac{\partial Z_j(t)}{\partial h_k(t)} = \displaystyl \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}$<br>
-    $\                                       = \displaystyl \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}$<br>
+    $\frac{\partial Z_j(t)}{\partial h_k(t)} = \displaystyle \frac{\partial \sum_{k=1}^{p} W(k,j) \cdot S_k(t)}{\partial h_k(t)}$<br>
+    $\                                       = \displaystyle \frac{\partial \sum_{k=1}^{p} W_(k,j) \cdot f_1(h_k(t))}{\partial h_k(t)}$<br>
     $\                                       = W(k,j) \cdot f_1^{'}(h_k(t))$<br>
 
 
-    $\frac{\partial h_k(t)}{\partial U(q,k)} = \displaystyl \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}$<br>
+    $\frac{\partial h_k(t)}{\partial U(q,k)} = \displaystyle \frac{\partial \left(\sum_{i=1}^{d} V(i,k)X_i(t) + \sum_{q=1}^{p} U(q,k)S_k(t-1)\right)}{\partial U(q,k)}$<br>
     $\                                       = S_k(t-1)$<br>
 
-    $\delta_U(q,k) = \displaystyl \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}$<br>
-    $\              = \displaystyl \sum_{i=1}^{T'} \left( \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right] \right)$<br>
+    $\delta_U(q,k) = \displaystyle \sum_{i=1}^{T'} \frac{\partial E^{(i)}(t)}{\partial U(q,k)}$<br>
+    $\              = \displaystyle \sum_{i=1}^{T'} \left( \left[\sum_{j=0}^{m} \left(\hat{O_j}^{(i)}(t) - O_t^{(i)}(t) \right) \cdot f_2^{(i)} \left(Z_j^{(i)}(t) \right) \right] \otimes \left[W(k,j) \cdot f_1^{'} \left(h_k(t) \right) \cdot S_k(t-1) \right] \right)$<br>
 
 
 # RNN 結構改進
