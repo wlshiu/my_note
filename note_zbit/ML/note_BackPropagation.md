@@ -52,7 +52,9 @@ Fig. Backpropagation_Example
 
 + $a1$ 神經元
 
-  $Z = w_1 × x_1 + w_2 × x_2 + w_3 × bias = 0.5 × 0.3 + 0.3 × 0.5 + 0.6 × 1 = 0.9$
+  $Z = w_1 × x_1 + w_2 × x_2 + w_3 × bias$ <br> 
+  $\  = 0.5 × 0.3 + 0.3 × 0.5 + 0.6 × 1$<br>
+  $\  = 0.9$
 
   $O = 1 / (1 + exp^{-0.9}) = 0.71$
 
@@ -60,13 +62,17 @@ Fig. Backpropagation_Example
 
 + $a2$ 神經元
 
-    $Z = w_4 × x_1 + w_5 × x_2 + w_6 × bias = 0.25 × 0.3 + 0.6 × 0.5 + 0.6 × 1 = 0.975$
+    $Z = w_4 × x_1 + w_5 × x_2 + w_6 × bias$<br>
+    $\ = 0.25 × 0.3 + 0.6 × 0.5 + 0.6 × 1$<br>
+    $\ = 0.975$
 
     $O = 1 / (1 + exp^{-0.975}) = 0.726$
 
 + $O1$ 神經元
 
-    $Z = w_7 × a1_{out} + w_8 × a2_{out} + w_9 × bias = 0.1 × 0.71 + 0.25 × 0.726 + 0.5 × 1 = 0.7525$
+    $Z = w_7 × a1_{out} + w_8 × a2_{out} + w_9 × bias$<br>
+    $\ = 0.1 × 0.71 + 0.25 × 0.726 + 0.5 × 1$<br>
+    $\ = 0.7525$
 
     $O = 1 / (1 + exp^{-0.7525}) = 0.679$
 
@@ -108,22 +114,20 @@ Fig. Backpropagation_Example
 
 $O1$ 神經元, 期望輸出是 0, 但實際輸出是 0.679
 
-```math
-\delta_{O1} = (Real_{output} − Expect_{output}) × g'(Z) \\
-         = (Real_{output} − Expect_{output}) × O_1 × (1 - O_1) \\
-         = (0.679 - 0) × 0.679 × (1 - 0.679) \\
-         = 0.1479
-```
+$\delta_{O1} = (Real_{output} − Expect_{output}) × g'(Z)$<br>
+$\         = (Real_{output} − Expect_{output}) × O_1 × (1 - O_1)$<br>
+$\         = (0.679 - 0) × 0.679 × (1 - 0.679)$<br>
+$\         = 0.1479$
+
 
 
 $O2$ 神經元, 期望輸出是 1, 但實際輸出是 0.759
 
-```math
-\delta_{O2} = (Real_{output} − Expect_{output}) × g'(Z) \\
-         = (Real_{output} − Expect_{output}) × O_2 × (1 - O_2) \\
-         = (0.759 - 1) × 0.759 × (1 - 0.759) \\
-         = -0.044
-```
+$\delta_{O2} = (Real_{output} − Expect_{output}) × g'(Z)$<br>
+$\         = (Real_{output} − Expect_{output}) × O_2 × (1 - O_2)$<br>
+$\         = (0.759 - 1) × 0.759 × (1 - 0.759)$<br>
+$\         = -0.044$
+
 
 ![Backpropagation_backward_0_ex](Backpropagation_backward_0_ex.jpg)
 
@@ -131,21 +135,18 @@ $O2$ 神經元, 期望輸出是 1, 但實際輸出是 0.759
 
 其中
 
-```math
-\delta_{a1} = g'(Z) × \sum(W_{O} × \delta_{O})\\
-            = O_{a1} × (1 - O_{a1}) × (W_{a1-O1} × \delta_{O1} + W_{a1-O2} × \delta_{O2})\\
-            = 0.71 × (1 - 0.71) × (0.1 × 0.1479 + 0.2 × -0.044)\\
-            = 0.001233
-```
+$\delta_{a1} = g'(Z) × \sum(W_{O} × \delta_{O})$<br>
+$\            = O_{a1} × (1 - O_{a1}) × (W_{a1-O1} × \delta_{O1} + W_{a1-O2} × \delta_{O2})$<br>
+$\            = 0.71 × (1 - 0.71) × (0.1 × 0.1479 + 0.2 × -0.044)$<br>
+$\            = 0.001233$
 
 ![Backpropagation_backward_1_ex](Backpropagation_backward_1_ex.jpg)
 
-```math
-\delta_{a2} = g'(Z) × \sum(W_{O} × \delta_{O})\\
-            = O_{a2} × (1 - O_{a2}) × (W_{a2-O1} × \delta_{O1} + W_{a2-O2} × \delta_{O2})\\
-            = 0.726 × (1 - 0.726) × (0.25 × 0.1479 + 0.7 × -0.044)\\
-            = 0.0012228
-```
+$\delta_{a2} = g'(Z) × \sum(W_{O} × \delta_{O})$<br>
+$\            = O_{a2} × (1 - O_{a2}) × (W_{a2-O1} × \delta_{O1} + W_{a2-O2} × \delta_{O2})$<br>
+$\            = 0.726 × (1 - 0.726) × (0.25 × 0.1479 + 0.7 × -0.044)$<br>
+$\            = 0.0012228$<br>
+
 
 ![Backpropagation_backward_2_ex](Backpropagation_backward_2_ex.jpg)
 
@@ -161,11 +162,10 @@ $w_{bias,new} = w_{bias,org} - \alpha × \delta$
 
 假設 $\alpha$=0.5
 
-```math
-w_{7,new} = w_{7,org} - \alpha × \delta_{O1} × Input_{L}\\
-          = 0.1 - (0.5 × 0.1479 × 0.71) \\
-          = 0.47495
-```
+$w_{7,new} = w_{7,org} - \alpha × \delta_{O1} × Input_{L}$<br>
+$\          = 0.1 - (0.5 × 0.1479 × 0.71)$<br>
+$\          = 0.47495$<br>
+
 
 ![Backpropagation_backward_3_ex](Backpropagation_backward_3_ex.jpg)
 
