@@ -84,6 +84,96 @@ Fig. NerualNet_Base_Arch
     然後使用訓練資料集不斷調整參數, 在許多問題上都能得到一個**相對能接受**的結果
     >> 然而我們對其中發生了什麼, 是未可知的
 
+# Input data format
+
+不同平台為了提高效能, 會遷就 H/w 特性(e.g. GPU, TPU, Multi-Cores, ...etc), 或是演算法特性, 對於讀資料會有特定格式
+> 資料在 memory 中是連續位置存放, 格式會以簡稱來表示
+
+| N              | C                      | H          | W          |
+| :-:            | :-:                    | :-:        | :-:        |
+| batch 批次大小 | channels, 特徵圖通道數 | 特徵圖的高 | 特徵圖的寬 |
+
+
+![ml_data_format](ml_data_format.jpg) <br>
+Fig. ml_data_format
+
+![ml_data_order](ml_data_order.jpg) <br>
+Fig. ml_data_order, RGB data with plane mode and packed(interleaved) mode
+
+
++ NCHW
+    > NCHW 是先取 W 方向資料, 然後 H 方向, 再 C 方向, 最後 N 方向
+    >> 取 data 的順序, 是名稱的倒敘
+
+    ```
+    1D data from Fig. ml_data_format:
+
+    W 方向           H 方向           C 方向           N 方向
+    000 001 002 003, 004 005 ... 019, 020 ... 318 319, 320 321 ...
+    ```
+
++ NHWC
+    > NHWC 是先取 C 方向資料, 然後 W 方向, 再 H 方向, 最後 N 方向
+    >> 取 data 的順序, 是名稱的倒敘
+
+    ```
+    1D data from Fig. ml_data_format:
+
+    C 方向           W 方向           H 方向       N 方向
+    000 020 ... 300, 001 021 ... 303, 004 ... 319, 320 340 ...
+    ```
+
+一般來說, NHWC 更適合多核 CPU 運算,
+> CPU 的 memory 頻寬相對較小, 每個像素計算的時延較低, 臨時空間也很小,
+有時電腦採取非同步的方式, 邊讀邊算來減小訪存時間, 計算控制靈活且複雜
+
+NCHW 適合 GPU 運算
+> GPU 的 memory 頻寬較大, 並且平行處理強, 在計算時會使用較大的儲存空間
+
+## Format Convertor
+
+```c
+// Convert HWC to CHW and Normalize
+void Convert_HWC_2_CHW(int height, int width, int channels, uint8_t *fileData, float *nnDataBuf)
+{
+    for(int c = 0; c < channels; ++c)       // C
+    {
+        for(int h = 0; h < height; ++h)     // H
+        {
+            for(int w = 0; w < width; ++w)  // W
+            {
+                int     dstIdx = c * height * width + h * width + w;
+                int     srcIdx = h * width * channels + w * channels + c;
+
+                nnDataBuf[dstIdx] =  fileData[srcIdx];
+            }
+        }
+    }
+    return;
+}
+```
+
+```c
+// Convert CHW to HWC and Normalize
+void Convert_CHW_2_HWC(int height, int width, int channels, uint8_t *fileData, float *nnDataBuf)
+{
+    for(int h = 0; h < height; ++h)             // H
+    {
+        for(int w = 0; w < width; ++w)          // W
+        {
+            for(int c = 0; c < channels; ++c)   // C
+            {
+                int     dstIdx = h * width * channels + w * channels + c;
+                int     srcIdx = c * height * width + h * width + w;
+
+                nnDataBuf[dstIdx] =  fileData[srcIdx];
+            }
+        }
+    }
+    return;
+}
+```
+
 # Activation Function (啟動函數, 激勵函數)
 
 在神經網路中, 每一層輸出都是上層輸入的線性函數, 無論神經網路有多少層, 輸出都是輸入的線性組合
@@ -109,18 +199,19 @@ Fig. NerualNet_Base_Arch
     > 用於多分類神經網路輸出
     >> clases 之間是互斥的, 即一個輸入只能被歸為一類, e.g. Apple 只能是`水果` 或是`科技公司`擇一
 
-## Fully-Connected Layer(全連接層)
+# Fully-Connected Layer(全連接層)
 
 FC Layer 原則上就是最後的分類器, 將上一層所擷取出來的所有特徵,
 經過權重的計算後, 來辨識出這個所輸入的圖像到底屬於哪一個分類
+> 也叫 `Densely-connected`
 
-## [Back-Propagation(反向傳播演算法)](note_BackPropagation.md)
+# [Back-Propagation(反向傳播演算法)](note_BackPropagation.md)
 
-## [RNN(循環神經網路)](note_RNN.md)
+# [RNN(循環神經網路)](note_RNN.md)
 
-## [DS-CNN (Depthwise Separable CNN)](note_DS_CNN.md)
+# [DS-CNN (Depthwise Separable CNN)](note_DS_CNN.md)
 
-## Attention Model (注意力模型)
+# Attention Model (注意力模型)
 
 
 # Reference

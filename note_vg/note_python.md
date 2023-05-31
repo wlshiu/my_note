@@ -78,11 +78,17 @@ $ vim ~/.bashrc
         (test-env) $
         ```
 
-    - 指定 Python 版本
+    - 建立虛擬環境並指定 Python 版本
         > 必須先安裝好不同版本的 python
 
         ```
-        (test-env) $ virtualenv test-env --python=python3.8
+        $ virtualenv test-env --python=python3.8
+        ```
+
+    - 啟動虛擬環境
+
+        ```
+        $ source  test-env/bin/activate
         ```
 
 + distutils

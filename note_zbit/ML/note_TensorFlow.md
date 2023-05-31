@@ -117,7 +117,7 @@ lib 版本問題需要 try and error
         1. tensorflow v1.15 use protobuf v3.20
 
             ```
-            $ pip install protobuf==3.20
+            $ pip install protobuf==3.20.*
             ```
 
 + [Python 3.9-amd64](https://www.python.org/downloads/windows/)
@@ -201,6 +201,101 @@ lib 版本問題需要 try and error
         #  from tensorflow.contrib import slim as slim
         import tf_slim as slim
         ```
+
++ TensorFlow v1.15 (with Python 3.7)
+    > [tensorflow-1.15.5-cp37-cp37m-manylinux2010_x86_64](https://files.pythonhosted.org/packages/9a/51/99abd43185d94adaaaddf8f44a80c418a91977924a7bc39b8dacd0c495b0/tensorflow-1.15.5-cp37-cp37m-manylinux2010_x86_64.whl)
+
++ TensorFlow v2.6 (with Python 3.9)
+    > [tensorflow_cpu-windows_2.6.0](https://storage.googleapis.com/tensorflow/windows/cpu/tensorflow_cpu-2.6.0-cp39-cp39-win_amd64.whl)
+
+    ```bash
+    $ python -m venv tensorflow_2_6
+    (tensorflow_2_6) virtualenv py39 --python=python3.9
+    (tensorflow_2_6) pip install tensorflow_cpu-2.6.0-cp39-cp39-win_amd64.whl
+    (tensorflow_2_6) pip install protobuf==3.20.*
+    (tensorflow_2_6) pip install keras==2.6         <----- fix no 'dtensor'
+    (tensorflow_2_6) pip install scikit-learn scipy
+    (tensorflow_2_6) pip install matplotlib==3.4.3
+    (tensorflow_2_6) pip install numpy==1.19.5
+    (tensorflow_2_6)
+    ```
+
+    - `nnom/examples/keyword_spotting`
+
+        1. `speech_commands_v0.01.tar.gz` 解壓縮到 `nnom/examples/keyword_spotting/dat`
+
+            ```
+            ~/nnom/examples/keyword_spotting/dat
+            ├── README.md
+            ├── _background_noise_
+            ├── down
+            ├── go
+            ├── left
+            ├── list.log
+            ├── no
+            ├── right
+            ├── stop
+            ├── testing_list.txt
+            ├── up
+            ├── validation_list.txt
+            ├── yes
+            └── z_classify_dataset.py
+            ```
+
+        1. 分類 dataset
+            > `z_classify_dataset.py`
+
+            ```python
+            #!/usr/bin/env python
+
+            import sys
+            import argparse
+
+            parser = argparse.ArgumentParser(description='Classify training dataset')
+            parser.add_argument("-i", "--Input", type=str, help="input file list (wav)")
+
+            args = parser.parse_args()
+
+            if not args.Input:
+                print('Wrong parameter ...')
+                sys.exit(1)
+
+            i = 0
+
+            fout_test = open('testing_list.txt', 'w')
+            fout_valid = open('validation_list.txt', 'w')
+
+            with open(args.Input, 'r') as fin:
+                with open(args.Input, 'r') as fin:
+                    for line in fin.readlines():
+                        if i & 0x1:
+                            fout_test.write(line)
+                        else:
+                            fout_valid.write(line)
+
+                        i = i + 1
+
+            fout_test.close()
+            fout_valid.close()
+            ```
+
+        1. modify `kws.py`
+            > mark GPU case
+
+            ```
+            def main():
+                # fix cudnn gpu memory error
+                if 0:
+                    physical_devices = tf.config.experimental.list_physical_devices("GPU")
+                    if(physical_devices is not None):
+                        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+            ```
+
+            > modify training lables to fit dataset
+
+            ```
+            selected_lable = ['yes', 'no', 'up', 'down', 'left', 'right', 'stop', 'go']
+            ```
 
 ## Other machine learning lib
 

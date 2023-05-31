@@ -94,7 +94,7 @@ $ sudo apt-get install lubuntu-desktop
 
 + Environment
     ```
-    $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake autoconf libtool pkg-config \
+    $ sudo apt-get -y install build-essential make gcc gdb tig dos2unix automake autoconf libtool pkg-config ripgrep \
             vim git exuberant-ctags id-utils texinfo global libncurses5-dev libreadline5 libreadline-dev doxygen graphviz tree icdiff silversearcher-ag tmux bison flex
 
     $ sudo apt -y install ssh openssh-server
@@ -425,12 +425,13 @@ $ sudo apt-get install lubuntu-desktop
 
         1. `Network` -> `Adapter 1` -> `Port Forwarding`
             > Add new rule
+            >> 如果由 Virtualbox 做 Port Forwarding, Windows 就不需要設定 `netsh`
 
             ```
             Protocol    : TCP
             Host IP     : The physical IP of Host
             Host Port   : The forwarding port number
-            Guest IP    : The Virtual OS IP (e.g. 192.168.56.2)
+            Guest IP    : The Virtual OS IP (e.g. '10.0.2.15', '192.168.56.2')
             Guest Port  : The same with Host-Port
             ```
 
@@ -899,4 +900,49 @@ $ sudo apt-get install lubuntu-desktop
             fi
 
             ```
+
+## Create user and group
+
+
+```bash
+$ sudo groupadd <group-name>
+$ sudo usermod -a -G <group-name> <user-name>
+
+# list members of a group
+$ getent group <groupname>
+
+# change group permission
+$ chgrp -R <groupname> <path directory or file>
+
+# change owner
+$ sudo chown <user-name> <path to directory or files>
+
+# 權限 u: user, g: group, o: others
+$ chmod u=rwx,g=rwx,o=rwx,o=x <path to directory or files>
+
+# add user
+$ sudo useradd -m <user-name> -p PASSWORD
+$ sudo usermod -s /bin/bash <user-name>
+
+# reset a user password
+$ sudo passwd <user_name>
+
+# Deleting a user password
+$ sudo passwd -d <user-name>
+```
+
+## Fix Issues
+
++ `virtualbox [drm:vmw_host_log [vmwgfx]] *ERROR* Failed to send host log message` 解決方法
+    > `設定` -> `顯示` -> `顯示卡控製器` -> `VBoxVGA`
+    >> 最底下會提示`發現無效設定`, 可以直接無視, 點 OK 即可
+
+
++ `/usr/bin/xauth: file /home/user/.Xauthority does not exist`
+
+    ```
+    $ sudo useradd username -m <user-name>
+    $ sudo usermod -s /bin/bash <user-name> (指定 shell, 否則會非常不便於終端操作)
+    ```
+
 
