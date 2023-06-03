@@ -84,6 +84,13 @@
             $ git wdiff HEAD^   # 比對前一版
             ```
 
+- symlinks on Winbdows
+    > 在 clone 時, 加上 option `-c core.symlinks=true`
+
+    ```
+    git clone --recurse-submodules https://github.com/python-mode/python-mode -c core.symlinks=true
+    ```
+
 - clone 時把 submodule 一起抓下來
 
     ```
