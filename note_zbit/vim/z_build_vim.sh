@@ -1,5 +1,22 @@
 #!/bin/bash
 
+
+#
+#   dependency:
+#   + python3-dev
+#
+# sudo apt install -y \
+#       libatk1.0-dev \
+#       libcairo2-dev \
+#       libgtk2.0-dev \
+#       liblua5.1-0-dev \
+#       libncurses5-dev \
+#       libperl-dev \
+#       libx11-dev \
+#       libxpm-dev \
+#       libxt-dev
+#
+
 #
 #   dependency:
 #   + python-devel
@@ -46,8 +63,11 @@
     # --enable-fail-if-missing \
     # --prefix=$(echo -e $HOME)/.local/
 
-# ${CHOST}
-
+#
+# In linux:
+#   skip:
+#   + option: --build ${CHOST}
+#
 ./configure \
     --build=${CHOST/-msys/-cygwin} \
     --with-features=huge \
@@ -57,6 +77,7 @@
     --enable-perlinterp=dynamic \
     --enable-pythoninterp=no \
     --enable-python3interp=yes \
+    --with-python3-config-dir=$(python3-config --configdir) \
     --enable-rubyinterp=dynamic \
     --disable-netbeans \
     --disable-canberra \
