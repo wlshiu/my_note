@@ -31,6 +31,68 @@ extern uint32_t foo[2];
 printf("%08x %d\n", foo[0], foo[1]);
 ```
 
+## Inline Assembly Language in C Code
+
+可自行最佳化 critical 部份的code, 有些想做的事很難用 C 語言來寫, 用 assembly language 卻事半功倍(e.g. delay 幾個 machine cycle)
+
+ASM statement 基本分成4部分, 用冒號`:`來區分
+> + The assembler `instruction`
+> + `Output operands`
+> + `Input operands`
+> + `Clobbered` register (類似宣告成 volatile 的效果)
+>> 描述哪些 GPRs 或是 memory 會被這段 assembly code 修改, 請 compiler 要特別處理後面的 code
+
+```
+__ASM volatile("instruction..." : Output_operands : Input_operands : Clobbered);
+```
+
++ examples
+
+    - one line expression
+
+        ```
+        __ASM volatile("mov %0, %1, ror #1" : "=r" (result) : "r" (value));
+        ```
+
+        1. `"=r" (result)` 是output operands
+            > `"=r"` 代表放到 GPRs 裡, 在將 GPRs 裡的值放到變數 resule
+
+        1. `"r" (value)` 是input operands
+            > `"r"` 代表變數 value, 使用 GPRs 來操作
+
+        1. `%0, %1, %2, ..., %n`
+            > 流水號對應後面的 Output_operands and Input_operands
+
+        1. 將 `變數 value` 向右 rotate 1 bit, 然後存到 `變數 result`
+
+    - inline function expression
+
+        ```
+        __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_LR(void)
+        {
+            register uint32_t   result;
+
+            __ASM volatile ("MOV %0, LR\n" : "=r" (result) );
+            return(result);
+        }
+
+        __STATIC_INLINE uint32_t __get_PSP(void)
+        {
+            register uint32_t __regProcessStackPointer      __ASM("psp");
+            return(__regProcessStackPointer);
+        }
+
+
+        __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
+        {
+            register uint32_t __regProcessStackPointer      __ASM("psp");
+            __regProcessStackPointer = topOfProcStack;
+        }
+        ```
+
++ Reference
+    - [ARM GCC Inline Assembler Cookboo](http://www.ethernut.de/en/documents/arm-inline-asm.html)
+
 ## Get a section address/length
 
 ```
