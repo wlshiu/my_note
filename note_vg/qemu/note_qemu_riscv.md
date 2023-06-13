@@ -11,7 +11,7 @@ Qemu RISC-V
     + install lib
 
         ```bash
-        $ sudo apt-get install ninja-build libglib2.0-dev libpixman-1-dev libegl-mesa0 meson libsdl2-2.0 libsdl2-dev
+        $ sudo apt-get install ninja-build libpixman-1-dev # libglib2.0-dev libegl-mesa0 meson libsdl2-2.0 libsdl2-dev
         ```
 
 + Build Qemu
