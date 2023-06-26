@@ -35,6 +35,27 @@ USB 的設計為非對稱式的, 它由一個 Host controller 和若干通過集
 
     - Hub
         > 用來連接更多裝置
+        >> 一般 Host controller 會掛 n 組 Root-Hub, 每個 Root-Hub 再分 Port 來連接 Device
+
+        ```
+                Host side
+        +---------------------------+
+        | Host Controller           |
+        |     ├── Root-Hub 1        |
+        |     │       ├──  Port 0   |
+        |     │       ├──  ...      |
+        |     │       └──  Port x   |
+        |     │                     |
+        |     ├── Root-Hub 2        |
+        |     │       ├──  Port 0   |
+        |     │       ├──  ...      |
+        |     │       └──  Port y   |
+        |     │                     |
+        |     └── Root-Hub n        |
+        |                           |
+        +---------------------------+
+        ```
+
     - Function
         > 提供特殊功能給系統, e.g. 人機裝置, 影像裝置, 儲存裝置等等.
     - Compound Device

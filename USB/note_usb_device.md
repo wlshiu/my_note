@@ -32,7 +32,7 @@ USB Device [[Back]](note_usb.md#Device)
     >> 在 Suspended 狀態, USB Device 保持其內部的狀態不變, 包括地址和配置
 
 
-## [Bus-Enumeration](note_usb_enumeration.md) (列舉)
+## [Bus-Enumeration](note_usb_enumeration.md) (列舉, Ch 9.1.2 Bus Enumeration)
 
 當 USB Device 接入 USB Host 時, Host 從 Device 中獲取 Device 的相關信息, 包括 USB Device 的 Device type, 通信速率, Device Vendor 等信息;
 然後 Host 根據這些信息加載對應的 USB Driver 來實現跟 Device 的通信
@@ -59,7 +59,7 @@ Host 會經由 Endpoint0 的 Control Pipe 與 Device 溝通, 依 `Standard Devic
 
 ## Requests type (Ref. 9.4 Standard Device Requests in USB 2.0 Spec)
 
-+ GET_DESCRIPTOR (Ref. 9.4.3 Get Descriptor in USB 2.0 Spec)
++ GET_DESCRIPTOR (Ref. Ch 9.4.3 Get Descriptor in USB 2.0 Spec)
     > 要求 Device 返回存在的 Descriptor.
 
     ```

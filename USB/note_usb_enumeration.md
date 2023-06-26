@@ -1,7 +1,7 @@
 USB Enumeration [[Back]](note_usb_device.md#Bus-Enumeration)
 ---
 
-列舉就是從 Device 讀取一些資訊, 知道 Device 是什麼樣的 Device , 如何進行通訊, 這樣 Host 就可以根據這些資訊來載入合適的驅動程式.
+列舉 (Ch 9.1.2 Bus Enumeration)就是從 Device 讀取一些資訊, 知道 Device 是什麼樣的 Device , 如何進行通訊, 這樣 Host 就可以根據這些資訊來載入合適的驅動程式.
 > Debug USB Device, 很重要的一點就是 USB 的列舉過程, 只要列舉成功了, 那麼就已經成功大半了
 
 USB 架構中, hub 負責檢測 Device 的連線和斷開, 利用其中斷 `IN Endpoint` 來向 Host 報告.
@@ -65,7 +65,7 @@ Hub 偵測到`D+`和`D-`中的一根資料線是高電平, 就認為是有 Devic
 
 每個 Hub 利用它自己的中斷 endpoint, 向 Host 報告它的各個 Port 的狀態(對於這個過程, Device 是看不到的, 也不必關心),
 報告的內容只是 Hub Ports 的 Device Connection/Disconnection 的 event.
-> 如果有 Connection/Disconnection 事件發生, 那麼 Host 會發送一個 `Get_Port_Status` Request 給 Hub, 以瞭解此次狀態改變的確切含義
+> 如果有 Connection/Disconnection 事件發生, 那麼 Host 會發送一個 `Get_Port_Status` Request (Ch 11.24.2.7 Get Port Status) 給 Hub, 以瞭解此次狀態改變的確切含義
 >> `Get_Port_Status`等 Request, 屬於所有 Hub 都要求支援 Standard Hub-class requests
 
 ## Hub 檢測所插入的 Device 是高速還是低速 Device
@@ -119,7 +119,7 @@ Device Descriptor 的 `8-th Bytes` 代表 Device Endpoint0 的最大 packet size
 
 ##  Host 給 Device 分配一個唯一的地址
 
-Host 控制器通過`Set_Address` Request, 向 Device 分配一個唯一的地址. <br>
+Host 控制器通過`Set_Address` Request (Table 9-4. Standard Request Codes), 向 Device 分配一個唯一的地址. <br>
 在完成這次傳輸之後, Device 進入 Address state, 之後就啟用新地址繼續與 Host 通訊.
 > 這個地址對於 Device 來說是終生制的, 只要 Device 存在, 地址就不會回收 <br>
 當 Device 消失(被拔出, 復位, 系統重啟..), 地址就會被收回
