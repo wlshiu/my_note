@@ -44,6 +44,8 @@ USB 協議定義了 Device 的6種狀態, 僅在列舉過程中, Device 就經�
 > + 配置狀態(Configured)
 >> 其他兩種是連線狀態(Attached)和掛起狀態(Suspended)
 
+![USB_Enumeration](./Flow/USB_Enumeration.jpg)
+
 以下是依過程順序說明
 
 ## 使用者把 USB Device 插入 USB Port 或系統啟動時給 Device 上電
@@ -179,5 +181,5 @@ Device Driver 根據前面 Device 回覆的資訊 (之後的事情, 都由 Devic
 # Reference
 + [USB 列舉教學，詳解](https://wwssllabcd.github.io/2012/11/28/usb-emulation/)
 + [USB列舉過程](https://www.796t.com/p/123921.html)
-
++ [LPC5528 EVK USB列舉解析](https://www.wpgdadatong.com/blog/detail/44351)
 
