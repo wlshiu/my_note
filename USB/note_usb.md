@@ -342,4 +342,4 @@ USB OTG 與 USB2.0 相比, 多三種新的傳輸協定。
 + [USB (Universal Serial Bus)-成大資工 WiKi](http://wiki.csie.ncku.edu.tw/embedded/USB)
 + [USB 枚舉過程介紹](https://www.wpgdadatong.com/tw/blog/detail?BID=B4561)
 + [OSI七層簡介](https://giboss.pixnet.net/blog/post/26798748-osi%E4%B8%83%E5%B1%A4%E7%B0%A1%E4%BB%8B)
-
++ [USB：從零入門到放棄](https://tw511.com/a/01/18824.html)
