@@ -146,7 +146,7 @@ elif [ "$target" = "busybox" ]; then
 EOF
 
     chmod +x init
-    find . -print0 | cpio --null -ov --format=newc | gzip -9 > ${initramfs_name}
+    find -L . -print0 | cpio --null -ov --format=newc | gzip -9 > ${initramfs_name}
 
     echo -e "$GREEN Gen $(pwd)/${initramfs_name} $NC"
 

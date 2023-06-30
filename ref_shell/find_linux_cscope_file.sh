@@ -5,7 +5,7 @@ MINGW=F:/_portable/MinGW
 LNX=$MINGW/msys/1.0/home/redegg/linux-3.18.14
 
 cd /
-find  $LNX                            \
+find -L $LNX                            \
 -path "$LNX/arch/arm*" -o             \
 -path "$LNX/include/asm-*" -o         \
 -path "$LNX/tmp*" -prune -o           \

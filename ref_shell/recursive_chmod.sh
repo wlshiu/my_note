@@ -61,9 +61,9 @@ fi
 
 # Recursively set directory/file permissions based on the permission variables
 if [ -n "$DIRPERMS" ] ; then
-  find $ROOT -type d -print0 | xargs -0 chmod -v $DIRPERMS
+  find -L $ROOT -type d -print0 | xargs -0 chmod -v $DIRPERMS
 fi
 
 if [ -n "$FILEPERMS" ] ; then
-  find $ROOT -path ".git" -prune -o -name "*.o" -prune -o -type f -print0 | xargs -0 chmod -v $FILEPERMS
+  find -L $ROOT -path ".git" -prune -o -name "*.o" -prune -o -type f -print0 | xargs -0 chmod -v $FILEPERMS
 fi

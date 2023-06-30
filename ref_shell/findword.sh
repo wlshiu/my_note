@@ -31,6 +31,6 @@ fi
 
 echo -e "find "${magenta}"$1"${NCOL}", grep "${RED}"$2"${NCOL}
 
-find $WORKDIR -type f -iname $1 -exec grep --color -E -niH "$2" {} \;
+find -L $WORKDIR -type f -iname $1 -exec grep --color -E -niH "$2" {} \;
 
 echo -e ${green}"seach done !"${NCOL}
