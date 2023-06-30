@@ -28,17 +28,17 @@ Bus idle    | sync patt  | Data Area | EOP |   Bus idle
     |            | 0100                   | `0010` 1101                     | PING    | Check if endpoint can accept data (USB 2.0)                   |
     | Special    | 1100                   | `0011` 1100                     | PRE     | Low-bandwidth USB preamble                                    |
     | Handshake  | 1100                   | `0011` 1100                     | ERR     | Split transaction error (USB 2.0)                             |
-    |            | 0010                   | `0100` 1011                     | ACK     | Data packet accepted                                          |
-    |            | 1010                   | `0101` 1010                     | NAK     | Data packet not accepted; please retransmit                   |
+    |            | 0010                   | `0100` 1011 (0x4B)              | ACK     | Data packet accepted                                          |
+    |            | 1010                   | `0101` 1010 (0x5A)              | NAK     | Data packet not accepted; please retransmit                   |
     |            | 0110                   | `0110` 1001                     | NYET    | Data not ready yet (USB 2.0)                                  |
-    |            | 1110                   | `0111` 1000                     | STALL   | Transfer impossible; do error recovery                        |
-    | Token      | 0001                   | `1000` 0111                     | OUT     | Address for host-to-device transfer                           |
-    |            | 1001                   | `1001` 0110                     | IN      | Address for device-to-host transfer                           |
-    |            | 0101                   | `1010` 0101                     | SOF     | Start of frame marker (sent each ms)                          |
-    |            | 1101                   | `1011` 0100                     | SETUP   | Address for host-to-device control transfer                   |
-    | Data       | 0011                   | `1100` 0011                     | DATA0   | Even-numbered data packet                                     |
-    |            | 1011                   | `1101` 0010                     | DATA1   | Odd-numbered data packet                                      |
-    |            | 0111                   | `1110` 0001                     | DATA2   | Data packet for high-bandwidth isochronous transfer (USB 2.0) |
+    |            | 1110                   | `0111` 1000 (0x78)              | STALL   | Transfer impossible; do error recovery                        |
+    | Token      | 0001                   | `1000` 0111 (0x87)              | OUT     | Address for host-to-device transfer                           |
+    |            | 1001                   | `1001` 0110 (0x96)              | IN      | Address for device-to-host transfer                           |
+    |            | 0101                   | `1010` 0101 (0xA5)              | SOF     | Start of frame marker (sent each ms)                          |
+    |            | 1101                   | `1011` 0100 (0xB4)              | SETUP   | Address for host-to-device control transfer                   |
+    | Data       | 0011                   | `1100` 0011 (0xC3)              | DATA0   | Even-numbered data packet                                     |
+    |            | 1011                   | `1101` 0010 (0xD2)              | DATA1   | Odd-numbered data packet                                      |
+    |            | 0111                   | `1110` 0001 (0xE1)              | DATA2   | Data packet for high-bandwidth isochronous transfer (USB 2.0) |
     |            | 1111                   | `1111` 0000                     | MDATA   | Data packet for high-bandwidth isochronous transfer (USB 2.0) |
 
 
@@ -54,13 +54,19 @@ Bus idle    | sync patt  | Data Area | EOP |   Bus idle
 > + 對於`IN`處理, ADDR 與 ENDP 欄位用來選擇傳送資料的 Endpoint
 
 ```
-Token Format
+        Token Packet
 
-LSB                                                            MSB
-+--------------+---------------+---------------+---------------+
-| PID (8-bits) | ADDR (7-bits) | ENDP (4-bits) | CRC5 (5-bits) |
-+--------------+---------------+---------------+---------------+
++-----+------+--------------------------------------------------------------+-----+
+| SOF | Sync |                       Packet Content                         | EOP |
++-----+------+--------------------------------------------------------------+-----+
+
+             LSB                                                            MSB
+             +--------------+---------------+---------------+---------------+
+             | PID (8-bits) | ADDR (7-bits) | ENDP (4-bits) | CRC5 (5-bits) |
+             +--------------+---------------+---------------+---------------+
 ```
+
+![USB_Tocken_Packet](USB_Tocken_Packet.jpg)
 
 + SOF(Start-of-Frame)
     > 為一個特別的 Token 封包類型, 包含目前的 Frame Number, Host 每隔一段很小的間隔就會 broadcast 一次 SOF packet, 所有 Devices 以及 Hub 都會收到 SOF packet. <br>
@@ -69,23 +75,26 @@ LSB                                                            MSB
     ```
     SOF format
 
-    LSB                                                 MSB
-    +--------------+---------------------+---------------+
-    | PID (8-bits) | Frame Num (11-bits) | CRC5 (5-bits) |
-    +--------------+---------------------+---------------+
+           LSB                                               MSB
+    +------+--------------+---------------------+---------------+-----+
+    | Sync | PID (8-bits) | Frame Num (11-bits) | CRC5 (5-bits) | EOP |
+    +------+--------------+---------------------+---------------+-----+
     ```
 
+    ![USB_SOF_Packet](USB_SOF_Packet.jpg)
 
 # Data Packet
 
 ```
 Data format
 
-LSB                                                 MSB
-+--------------+----------------------+-----------------+
-| PID (8-bits) | Data (0 ~ 1023 bits) | CRC16 (16-bits) |
-+--------------+----------------------+-----------------+
+        LSB                                                 MSB
++------+--------------+----------------------+-----------------+-----+
+| Sync | PID (8-bits) | Data (0 ~ 1023 bits) | CRC16 (16-bits) | EOP |
++------+--------------+----------------------+-----------------+-----+
 ```
+
+![USB_Data_Packet](USB_Data_Packet.jpg)
 
 + Data packet size
 
@@ -105,19 +114,23 @@ LSB                                                 MSB
 ```
 Handshake format
 
-LSB           MSB
-+--------------+
-| PID (8-bits) |
-+--------------+
+       LSB         MSB
++------+--------------+-----+
+| Sync | PID (8-bits) | EOP |
++------+--------------+-----+
 ```
+
+![USB_Status_Packet](USB_Status_Packet.jpg)
 
 除了即時型傳輸(Isochronous)外, 所有的傳輸都保證資料的傳遞正確, 如 Handshake Packet 回應資料是否正確的被收到, **若執行處理動作中發生錯誤, 處理動作將重新執行**
 
 Handshake Packet 由一個 PID 所組成, 用來表示資料傳輸的狀態, 部分 Handshake Packet 說明如下
 > + `ACK` 表示 Data packet 沒有 bit stuff 或是 CRC 錯誤 (也就是 PID 欄位以及 Data 欄位沒有出現錯誤)
-> + `NAK` 表示裝置無法從主機接收資料, 或是無資料可以傳輸到主機
->> `NAK` 也被當作流量控制的用途來使用, 表示裝置暫時無資料傳送或無法接收資料
-> + `STALL` 表示裝置無法傳送或接收資料, 需要 Host 介入來清除延遲狀況
+> + `NAK` 表示 Device 無法從 Host 接收資料, 或是無資料可以傳輸到 Host
+>> `NAK` 也被當作流量控制的用途來使用, 表示 Device 暫時無資料傳送或無法接收資料
+> + `STALL` 表示 Device 不支援請求, 或暫時無法傳收資料 (Host 絕不會發送 STALL)
+>> Host 在接收到一個 STALL 後, Host 停止所有與 Device 的請求,
+直到 Device 發送一個成功的請求, 來通知 Host 解除對 Device 暫停特性
 
 # 封包傳遞說明
 ![usb_eumeration_stage_0](usb_eumeration_0.png)

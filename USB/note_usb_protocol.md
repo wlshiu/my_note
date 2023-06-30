@@ -25,6 +25,15 @@ USB Protocol [[Back]](note_usb.md#Protocol)
     > + Full/High Speed `D+` 上拉
     > + Low-Speed `D-` 上拉
 
+# USB Stream Architecture
+
+由多個 packets 組成一個 Transaction (事務), 多個 Transactions 組成 Transfer (傳輸), 多個 Transfers 組成 Pipe
+
+![USB_Transaction_Pkg](Flow/USB_Transaction_Pkg.jpg)
+
++ USB Analyzer tool
+
+![USB_Stream_Arch](USB_Stream_Arch.jpg)
 
 # Transfer types
 
@@ -96,16 +105,19 @@ Interrupt Transfer 也是 Host 發起的傳輸, 採用 Polling(輪詢)的方式,
 
 Transaction (事務) 指 USB 資料的傳輸, 大部分的傳輸包含了三種封包
 > + Token packet
+>> 通知 device, 現在 Host 想做什麼事, e.g. SOF, OUT, IN, SETUP
 > + Data packet
+>> 如果 tocken 為 IN, device 傳出資料; 如果 tocken 為 OUT, host 傳出資料
 > + Status packet or Handshake
+>> 接收方要傳 ACK, 讓資料傳送方確認已接收到
 
 Transaction 可能是從 Host 傳向 Device, 或是從 Device 傳向 Host. 傳送方向是在 Token packet 中指定
 > 一般來說, 目標端利用 Handshake (Status packet) 來判斷本次傳輸是否成功
 
-![USB_Transaction_Pkg](Flow/USB_Transaction_Pkg.jpg)
 
 
-## [Packets](note_usb_packets.md)
+
+# [Packets](note_usb_packets.md)
 
 Packet 被視為每次傳輸的最小單位, 傳送時 LSB 先傳.
 
@@ -162,6 +174,9 @@ Bus idle    | SOP | sync patt  | Data Area | EOP |   Bus idle
         對於高速 SOF, 傳輸的 EOP 分隔符需要 5 個 NRZ 字節, 而不需要填充 bit, 由 `01111111 11111111 11111111 11111111 11111111`組成.
         因此, 如果 EOP 字段之前的最後一位是 J, 這將導致線路上有 40 個 K 狀態, 線路必須返回到高速空閒狀態.
         額外的 EOP 長度對接收器沒有意義, 它用於斷開檢測.
+
+# LeCroy USB Advisor
+
 
 # Reference
 

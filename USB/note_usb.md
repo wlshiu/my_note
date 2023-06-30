@@ -294,6 +294,9 @@ USB 是一種 **Polled Bus**, 由 Host 啟動(Initiates)資料傳輸, 而 Device
 
 # [Protocol](note_usb_protocol.md)
 
+# [USB-Descriptors](note_usb_descriptors.md)
+
+# [USB-Class](note_usb_classes.md)
 
 # USB-OTG
 
@@ -343,3 +346,4 @@ USB OTG 與 USB2.0 相比, 多三種新的傳輸協定。
 + [USB 枚舉過程介紹](https://www.wpgdadatong.com/tw/blog/detail?BID=B4561)
 + [OSI七層簡介](https://giboss.pixnet.net/blog/post/26798748-osi%E4%B8%83%E5%B1%A4%E7%B0%A1%E4%BB%8B)
 + [USB：從零入門到放棄](https://tw511.com/a/01/18824.html)
++ [USB協議詳解](https://blog.csdn.net/weiaipan1314/category_10697813.html)
