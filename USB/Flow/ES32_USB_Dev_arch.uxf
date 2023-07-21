@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>90</x>
+      <y>830</y>
+      <w>780</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>usbd_core
+fontsize=18
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>860</y>
+      <w>630</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>610.0;10.0;10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>230</x>
+      <y>910</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*IRQ*
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>450</x>
+      <y>200</y>
+      <w>190</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>*usbd_bulk*
+(base_handler_t)
+{innerclass
+get_desc
+innerclass}
+{innerclass
+request_handler
+innerclass}
+{innerclass
+interface_change
+innerclass}
+{innerclass
+config_change
+innerclass}
+{innerclass
+reset_handler
+innerclass}
+{innerclass
+suspend_handler
+innerclass}
+{innerclass
+resume_handler
+innerclass}
+{innerclass
+disconnect_handler
+innerclass}
+{innerclass
+device_handler
+innerclass}
+{innerclass
+*ep_handler*
+innerclass}
+{innerclass
+data_recv
+innerclass}
+{innerclass
+data_send
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>240</x>
+      <y>200</y>
+      <w>190</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>*usbd_cdc*
+(base_handler_t)
+{innerclass
+get_desc
+innerclass}
+{innerclass
+request_handler
+innerclass}
+{innerclass
+interface_change
+innerclass}
+{innerclass
+config_change
+innerclass}
+{innerclass
+reset_handler
+innerclass}
+{innerclass
+suspend_handler
+innerclass}
+{innerclass
+resume_handler
+innerclass}
+{innerclass
+disconnect_handler
+innerclass}
+{innerclass
+device_handler
+innerclass}
+{innerclass
+*ep_handler*
+innerclass}
+{innerclass
+data_recv
+innerclass}
+{innerclass
+data_send
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>660</x>
+      <y>200</y>
+      <w>190</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>*usbd_audio*
+(base_handler_t)
+{innerclass
+get_desc
+innerclass}
+{innerclass
+request_handler
+innerclass}
+{innerclass
+interface_change
+innerclass}
+{innerclass
+config_change
+innerclass}
+{innerclass
+reset_handler
+innerclass}
+{innerclass
+suspend_handler
+innerclass}
+{innerclass
+resume_handler
+innerclass}
+{innerclass
+disconnect_handler
+innerclass}
+{innerclass
+device_handler
+innerclass}
+{innerclass
+*ep_handler*
+innerclass}
+{innerclass
+data_recv
+innerclass}
+{innerclass
+data_send
+innerclass}
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>90</x>
+      <y>570</y>
+      <w>170</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>
+halign=center
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>90</x>
+      <y>570</y>
+      <w>170</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>*usbd_comp*
+*(base_handler_t * N)*
+halign=center
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>100</x>
+      <y>620</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*usbd_cdc*
+(base_handler_t)
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>100</x>
+      <y>670</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*usbd_bulk*
+(base_handler_t)
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>100</x>
+      <y>720</y>
+      <w>150</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>*usbd_audio*
+(base_handler_t)
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>160</x>
+      <y>760</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*...*
+fontsize=20
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>50</y>
+      <w>180</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>*usbd_xxx_dev*
+{innerclass
+rx_cbk
+innerclass}
+{innerclass
+tx_cbk
+innerclass}</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>470</x>
+      <y>600</y>
+      <w>180</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>*virtual composite*
+(usbd_xxx_init_comp)
+{innerclass
+usbd_cdc_init_comp
+innerclass}
+{innerclass
+usbd_bulk_init_comp
+innerclass}
+{innerclass
+usbd_audio_init_comp
+innerclass}
+group=group-3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>700</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*...*
+fontsize=20
+group=group-3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>110</y>
+      <w>260</w>
+      <h>560</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>20.0;540.0;240.0;540.0;240.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>520</y>
+      <w>450</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>430.0;10.0;430.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>550</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>520</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>730</y>
+      <w>30</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>160</y>
+      <w>440</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0;420.0;10.0;420.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>120</y>
+      <w>30</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>160</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>550</x>
+      <y>140</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Single class</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>710</x>
+      <y>100</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Multi-Classes*
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>630</y>
+      <w>270</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;10.0;250.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>660</y>
+      <w>270</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;30.0;250.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>690</y>
+      <w>270</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;50.0;250.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>450</y>
+      <w>100</w>
+      <h>440</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;420.0;50.0;420.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>410</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>380</y>
+      <w>100</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>360</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>330</y>
+      <w>100</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>430</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>310</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>280</y>
+      <w>100</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>260</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA
+group=group-7</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>620</x>
+      <y>100</y>
+      <w>100</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0;60.0;360.0;80.0;360.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>620</x>
+      <y>80</y>
+      <w>80</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0;60.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>640</x>
+      <y>90</y>
+      <w>30</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*IN*
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>640</x>
+      <y>70</y>
+      <w>40</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*OUT*
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>810</x>
+      <y>760</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Single class
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>60</x>
+      <y>730</y>
+      <w>180</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+group=group-8
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;10.0;130.0;160.0;130.0;160.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>60</x>
+      <y>680</y>
+      <w>70</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+group=group-8
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>60</x>
+      <y>630</y>
+      <w>70</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+group=group-8
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>100</x>
+      <y>840</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Multi-Classes*
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>450</y>
+      <w>170</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>100</x>
+      <y>450</y>
+      <w>390</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>370.0;10.0;10.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>100</x>
+      <y>450</y>
+      <w>590</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>570.0;10.0;10.0;280.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>260</x>
+      <y>100</y>
+      <w>220</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>200.0;10.0;10.0;360.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>470</x>
+      <y>110</y>
+      <w>30</w>
+      <h>370</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>620</x>
+      <y>110</y>
+      <w>70</w>
+      <h>370</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;..
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>360</x>
+      <y>620</y>
+      <w>80</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>composite
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>360</x>
+      <y>690</y>
+      <w>80</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>composite
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>360</x>
+      <y>650</y>
+      <w>80</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>composite
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>170</x>
+      <y>790</y>
+      <w>30</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

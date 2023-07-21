@@ -111,3 +111,14 @@ CodeBlocks
     menu bar Project -> build options -> Pre/Post build steps -> Post-build steps
     Add 'size ${TARGET_OUTPUT_FILE}'
     ```
+
+# Tips
+
++ 設定條件斷點
+
+    - 設定斷點位置
+    - Open breakpointer window
+        > `Debug` -> `Debugging windows` -> `Breakpoints`
+    - 選擇斷點並右鍵選單 `Edit`
+
+    ![codblock_condition_break](codblock_condition_break.jpg)

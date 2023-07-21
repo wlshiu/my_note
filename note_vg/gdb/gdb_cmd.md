@@ -5,6 +5,8 @@ GDB_CMD
 
 [gdb 除錯技術](https://cntofu.com/book/46/gdb/187.md)
 
+[GDB條件斷點(condition命令)詳解](http://c.biancheng.net/view/8255.html)
+
 + help (h)
     > 顯示指令簡短說明.例:help breakpoint
 
@@ -133,13 +135,16 @@ GDB_CMD
         (gdb) b main.c:10 if var > 10
         ```
 
-        ```shell
-        (gdb) info break
-        1   xxxx
-        2   yyyy
-        (gdb) condition 2 (var > 3) # 設置中斷條件, 條件成立時 2 號中斷
-        (gdb) condition 2           #　取消 2 號中斷條件
-        ```
+        1. condition
+            > `condition [brackpoint_idx] [expression]`
+
+            ```shell
+            (gdb) info break
+            1   xxxx
+            2   yyyy
+            (gdb) condition 2 (var > 3) # 設置中斷條件, 條件成立時 2 號中斷
+            (gdb) condition 2           #　取消 2 號中斷條件
+            ```
 
 + H/w break pointer
     > 如果遇到`b start_kernel`停不下來, 可以使用硬體斷點
