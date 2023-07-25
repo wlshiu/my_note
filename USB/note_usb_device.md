@@ -295,3 +295,8 @@ MSC 是大容量存儲裝置 Class, 也是一種 PC 和 Mobile 之間的傳輸�
 
 MSC的通用性和操作簡單, 使它成為行動裝置上最常見的檔案系統,
 > USB MSC 並不需要任何特定的 File System, 它提供了一個簡單的介面來讀寫插入的硬碟裝置
+
+## [UAC (USB Audio Class)](note_usb_audio_class.md)
+
+`UAC`(USB Audio Class) 有時也叫 `UAD`(USB Audio Device)
+
