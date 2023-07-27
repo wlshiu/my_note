@@ -123,16 +123,16 @@ USB 定義了 Standard Descriptors, 包含了4 個層次
 
 + Descriptor type (**bDescriptorType**)
 
-    | Type                  | Descriptor                | Value
-    | :-                    | :-                        |
-    | Standard Descriptor   | Device Descriptor         | 0x01
-    | Standard Descriptor   | Configuration Descriptor  | 0x02
-    | Standard Descriptor   | String Descriptor         | 0x03
-    | Standard Descriptor   | Interface Descriptor      | 0x04
-    | Standard Descriptor   | EndPont Descriptor        | 0x05
-    | Class Descriptor      | Hub Descriptor            | 0x29
-    | Class Descriptor      | HID Descriptor            | 0x21
-    | Vendor Descriptor     |                           | 0xFF
+    | Type                  | Descriptor                | Value |
+    | :-                    | :-                        | :-    |
+    | Standard Descriptor   | Device Descriptor         | 0x01  |
+    | Standard Descriptor   | Configuration Descriptor  | 0x02  |
+    | Standard Descriptor   | String Descriptor         | 0x03  |
+    | Standard Descriptor   | Interface Descriptor      | 0x04  |
+    | Standard Descriptor   | EndPont Descriptor        | 0x05  |
+    | Class Descriptor      | Hub Descriptor            | 0x29  |
+    | Class Descriptor      | HID Descriptor            | 0x21  |
+    | Vendor Descriptor     |                           | 0xFF  |
 
 + Class Codes (**bDeviceClass**, **bInterfaceClass**)
     > 當 `bDeviceClass == 0x00`, 則 `bDeviceSubClass = bDeviceProtocol = 0`
