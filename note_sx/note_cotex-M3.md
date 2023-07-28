@@ -169,9 +169,9 @@ ps. `crti.o` and `crtbegin.o` are for initializing.
 
 # Hard Faul Handle
 
-    To detect problems as early as possible, all Cortex-M processors have a fault exception mechanism included.
-    If a fault is detected, the corresponding fault exception is triggered
-    and one of the fault exception handlers is executed.
+> To detect problems as early as possible, all Cortex-M processors have a fault exception mechanism included.
+If a fault is detected, the corresponding fault exception is triggered
+and one of the fault exception handlers is executed.
 
 You can reference [Using Cortex-M3/M4/M7 Fault Exceptions](http://www.keil.com/appnotes/docs/apnt_209.asp)
 
@@ -203,10 +203,27 @@ Each exception has an associated `Exception Number` (IRQ numbers) and an associa
 
 | Exception       | Exception Number  |  Priority      | IRQ Number  |  Activation
 |-----------------|-------------------|----------------|-------------|----------------------
-| HardFault       |     3             |      -1        |   -13       |  -
+| NMI             |     2             |      -2        |   -14       |  Asynchronous
+| HardFault       |     3             |      -1        |   -13       |  Synchronous
 | MemManage fault |     4             |  Configurable  |   -12       |  Synchronous
 | BusFault        |     5             |  Configurable  |   -11       |  Synchronous when precise, asynchronous when imprecise.
 | UsageFault      |     6             |  Configurable  |   -10       |  Synchronous
+
++ NMI (Non-Maskable Interrupt)
+    > 是一種不能藉由 mask 機制來關閉的硬體中斷.
+
+    - NMI 可用來通報一個不可恢復的 H/w 錯誤(e.g. system hung), 以作即時的反應處理.
+        > 在某些系統, NMI 可由外部 H/w 拉 NMI pin (e.g. 按特定 hot key), 或者是由其他 processor 來觸發產生
+        >> SoC 系統內, 某一 processor 無法 handle 一般 interrupt 時, 由其它 processor 觸發 NMI
+
+        1. 無法恢復的錯誤
+            > + Chipset 系統內部錯誤
+            > + Memory 有損壞 (Check-Sum/ECC 錯誤)
+            > + Bus 偵測到資料損壞
+
+    - 當 NMI 收到並進入到 NMI_Handler 時, 就可在 handler 作一些debug機制
+        > + Cache flush 以利開發者之後分析 memory dump,
+        > + 用 ICE 去 break 在此 handler, 並即時分析系統 Status, Registers, ...etc.
 
 + The HardFault exception is always enabled and has a fixed priority.
     > it is higher than other interrupts and exceptions, but lower than NMI (Non-Maskable Interrupt).

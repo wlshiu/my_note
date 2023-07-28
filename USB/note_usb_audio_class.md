@@ -95,7 +95,7 @@ UAC 定義在 Interface layer, 而 UAC 又分為不同的 SubClass, 以便於進
 >> 傳輸 Audio streaming 資料. 一個 UAC 裝置可以有多個 Audio Stream 介面, 每個 Audio Stream 介面可以傳輸不同的音訊資料格式
 > + MIDIStreaming Interface Subclass (MIDI流介面子類)
 
-## Audio Function Topology
+## Audio Function Topology (USB Audio Device)
 
 Audio data 處理是以 Pipline 的方式 (like DirectShow), 由 Terminals (Input/Output) 及 Units (Filters) 來達成 pipline 的目的.
 > Pipline 在 UAC 中稱為 `Audio-Function Topology` (Terminals 及 Units 的組成結構)
@@ -145,7 +145,7 @@ UAC 定義特定目的的 Terminals 及 Units, 來囊括絕大部分的 audio �
         >> 相逆變器
 
     - Sampling Rate Converter Unit (RU, UAC2.0)
-        > 改變 sample rate, 指示在 `Audio-Function` 中 改變 Sample Rate 的確切位置
+        > 改變 sample rate, 指示在 `Audio-Function` 中, 改變 Sample Rate 的確切位置
     - Effect Unit (EU, UAC2.0 從 PU 獨立出來)
         > 改變訊號特性的高級功能 (一進一出)
         > + Parametric Equalizer Section
@@ -201,14 +201,6 @@ UAC 定義特定目的的 Terminals 及 Units, 來囊括絕大部分的 audio �
     | PROCESSING_UNIT           | 0x07  |
     | EXTENSION_UNIT            | 0x08  |
 
-+ AS Interface Descriptor Subtypes (bDescriptorSubtype)
-
-    | Descriptor Subtype        | Value |
-    | :-                        | :-    |
-    |AS_DESCRIPTOR_UNDEFINED    | 0x00  |
-    |AS_GENERAL                 | 0x01  |
-    |FORMAT_TYPE                | 0x02  |
-    |FORMAT_SPECIFIC            | 0x03  |
 
 + Audio Class-Specific Descriptor Types (bDescriptorType, Class layer)
 
@@ -221,23 +213,15 @@ UAC 定義特定目的的 Terminals 及 Units, 來囊括絕大部分的 audio �
     | CS_INTERFACE       | 0x24   |
     | CS_ENDPOINT        | 0x25   |
 
++ AS Interface Descriptor Subtypes (bDescriptorSubtype)
 
-+ Audio Class-Specific Request Codes
-
-    | Audio Class Request Code  | Value |
+    | Descriptor Subtype        | Value |
     | :-                        | :-    |
-    | REQUEST_CODE_UNDEFINED    | 0x00  |
-    | SET_CUR                   | 0x01  |
-    | GET_CUR                   | 0x81  |
-    | SET_MIN                   | 0x02  |
-    | GET_MIN                   | 0x82  |
-    | SET_MAX                   | 0x03  |
-    | GET_MAX                   | 0x83  |
-    | SET_RES                   | 0x04  |
-    | GET_RES                   | 0x84  |
-    | SET_MEM                   | 0x05  |
-    | GET_MEM                   | 0x85  |
-    | GET_STAT                  | 0xFF  |
+    |AS_DESCRIPTOR_UNDEFINED    | 0x00  |
+    |AS_GENERAL                 | 0x01  |
+    |FORMAT_TYPE                | 0x02  |
+    |FORMAT_SPECIFIC            | 0x03  |
+
 
 + Format Type Codes (bFormatType)
 
@@ -266,6 +250,75 @@ UAC 定義特定目的的 Terminals 及 Units, 來囊括絕大部分的 audio �
     | DESCRIPTOR_UNDEFINED   | 0x00   |
     | EP_GENERAL             | 0x01   |
 
+
+## UAC Requests
+
++ UAC Request Type (bmRequestType)
+
+    | bmRequestType  | Recipient  | value  |
+    | :-             | :-         | :-     |
+    | Set Request    | Interface  | 0x21   |
+    | Set Request    | Endpoint   | 0x22   |
+    | Get Request    | Interface  | 0xA1   |
+    | Get Request    | Endpoint   | 0xA2   |
+
++ Standard Request Codes (bRequest)
+
+    | bRequest           | Value  |
+    | :-                 | :-     |
+    | GET_STATUS         | 0x0    |
+    | CLEAR_FEATURE      | 0x1    |
+    | Reserved           | 0x2    |
+    | SET_FEATURE        | 0x3    |
+    | Reserved           | 0x4    |
+    | SET_ADDRESS        | 0x5    |
+    | GET_DESCRIPTOR     | 0x6    |
+    | SET_DESCRIPTOR     | 0x7    |
+    | GET_CONFIGURATION  | 0x8    |
+    | SET_CONFIGURATION  | 0x9    |
+    | GET_INTERFACE      | 0xA    |
+    | SET_INTERFACE      | 0xB    |
+    | SYNCH_FRAME        | 0xC    |
+
++ Audio Class-Specific Request Codes (bRequest)
+
+    | Class-Specific Request Code   | Value |
+    | :-                            | :-    |
+    | REQUEST_CODE_UNDEFINED        | 0x00  |
+    | SET_CUR                       | 0x01  |
+    | GET_CUR                       | 0x81  |
+    | SET_MIN                       | 0x02  |
+    | GET_MIN                       | 0x82  |
+    | SET_MAX                       | 0x03  |
+    | GET_MAX                       | 0x83  |
+    | SET_RES                       | 0x04  |
+    | GET_RES                       | 0x84  |
+    | SET_MEM                       | 0x05  |
+    | GET_MEM                       | 0x85  |
+    | GET_STAT                      | 0xFF  |
+
+    | HID Class-Specific Request Code   | Value |
+    | :-                                | :-    |
+    | SET_REPORT                        | 0x09  |
+    | SET_IDLE                          | 0x0A  |
+    | SET_PROTOCOL                      | 0x0B  |
+
+
++ Feature Unit Control Selectors (wValue, CS at high-byte)
+
+    | Control Selector           | Value |
+    | :-                         | :-    |
+    | FU_CONTROL_UNDEFINED       | 0x00  |
+    | MUTE_CONTROL               | 0x01  |
+    | VOLUME_CONTROL             | 0x02  |
+    | BASS_CONTROL               | 0x03  |
+    | MID_CONTROL                | 0x04  |
+    | TREBLE_CONTROL             | 0x05  |
+    | GRAPHIC_EQUALIZER_CONTROL  | 0x06  |
+    | AUTOMATIC_GAIN_CONTROL     | 0x07  |
+    | DELAY_CONTROL              | 0x08  |
+    | BASS_BOOST_CONTROL         | 0x09  |
+    | LOUDNESS_CONTROL           | 0x0A  |
 
 ### Examples
 
@@ -467,8 +520,18 @@ ref. UVC1.0 -> Appendix B. Example 1: USB Microphone -> B.3 Descriptors
             AUDIO_STREAMING_ENDPOINT_DESC_SIZE,   /* bLength = 7 */
             AUDIO_ENDPOINT_DESCRIPTOR_TYPE,       /* bDescriptorType = CS_ENDPOINT, Class layer */
             AUDIO_ENDPOINT_GENERAL,               /* bDescriptorSubtype = EP_GENERAL */
-            0x01,                                 /* bmAttributes */
-            0x00,                                 /* bLockDelayUnits */
+            0x01,                                 /* bmAttributes
+                                                        Bits[0]  : Sampling Frequency
+                                                        Bits[1]  : Pitch
+                                                        Bits[6:2]: Reserved
+                                                        Bits[7]  : Indicates a requirement for 'wMaxPacketSize' packets.
+                                                   */
+            0x00,                                 /* bLockDelayUnits
+                                                        0= Undefined
+                                                        1= Milliseconds
+                                                        2= Decoded PCM samples
+                                                        3~255= Reserved
+                                                   */
             0x00,                                 /* wLockDelay */
             0x00,
             ```
