@@ -31,6 +31,25 @@ extern uint32_t foo[2];
 printf("%08x %d\n", foo[0], foo[1]);
 ```
 
+## Keep variables data on SRAM
+
+Keep data of `0x20007000 ~ 0x20007FFF` of SRAM
+
+![Keil_NoInit](Keil_NoInit.jpg)
+
+```c
+uint32_t   *pAddr = (uint32_t*)0x20007010;
+uint32_t    val = 0;
+
+val = *pAddr;
+printf("0x%08X\n", val);
+val++;
+*pAddr = val;
+*pAddr = val;   <---- flush to SRAM ?
+
+NVIC_SystemReset();
+```
+
 ## Inline Assembly Language in C Code
 
 可自行最佳化 critical 部份的code, 有些想做的事很難用 C 語言來寫, 用 assembly language 卻事半功倍(e.g. delay 幾個 machine cycle)
@@ -346,7 +365,6 @@ Link external static libraries
         假設 project file 為 'D:\app_sdk\meterAPP\app.uvprojx'
         '@P' 內容為 'app'
         ```
-
 
 # Customize Tools Menu
 

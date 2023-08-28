@@ -71,6 +71,78 @@ ps. `crti.o` and `crtbegin.o` are for initializing.
                         -> _fini
         ```
 
+# Reset
+
++ Core Reset
+    >CM3 允許由 S/w trigger reset, 用於特殊的調試或維護目的.
+    >> set `SCB->AIRCR.VECTRESET`
+
+    > 這種 reset 的作用範圍, 覆蓋了整個 CM3 CPU 中, 除了調試邏輯之外的所有角落, 但是它**不會影響到 CM3 CPU 外部的任何電路**,
+    >> SoC 上的 peripheral 和其它電路都不受影響
+
+
+    - examples
+
+        ```c
+        void NVIC_CoreReset(void)
+        {
+            __DSB();
+
+            // set VECTRESET
+            SCB->AIRCR = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+                          (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
+                          SCB_AIRCR_VECTRESET_Msk);
+            __DSB();
+            while(1);
+        }
+        ```
+
+        ```asm
+        __asm void NVIC_CoreReset_a(void)
+        {
+            LDR R0, =0xE000ED0C
+            LDR R1, =0x05FA0001  // set VECTRESET
+            STR R1, [R0]
+
+            B   .
+        }
+        ```
+
++ System Reset
+    >  System Reset 是會波及整個 SoC 上的電路 (它會使 CM3 CPU 把送往 System Reset 發生器的請求線置為有效)
+    >> set `SCB->AIRCR.SYSRESETREQ`
+
+    > 但是 **System Reset 發生器是由 IC Vendor 實現**, 因此不同的 IC 對 System Reset 的 response 也不同.
+
+    - 大多數情況下, Reset 發生器在響應 SYSRESETREQ 時, 同時它也會把 CM3 CPU 的系統復位信號(SYSRESETn)設為有效, 通常 SYSRESETREQ 不應 reset 調試邏輯.
+        > 這裡有一個要注意的地方, 從 SYSRESETREQ 被設為有效, 到 Reset 發生器執行 Reset 指令, 會有一個 delay time, 在此 delay time 間, CPU 仍可以響應中斷請求;
+        因此最好在發出 reset request 前, 先排除中斷訊號 `__set_FAULTMASK(1);` (set FAULTMASK)
+
+    - example
+
+        ```c
+        void NVIC_SysReset(void)
+        {
+            __DSB();
+
+            SCB->AIRCR = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+                          (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
+                          SCB_AIRCR_SYSRESETREQ_Msk);
+            __DSB();
+            while(1);
+        }
+        ```
+
+        ```asm
+        __asm void NVIC_SysReset_a(void)
+        {
+            LDR R0, =0xE000ED0C
+            LDR R1, =0x05FA0004
+            STR R1, [R0]
+
+            B   .
+        }
+        ```
 
 # Dual Core sample
 
