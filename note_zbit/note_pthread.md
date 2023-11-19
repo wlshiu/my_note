@@ -133,6 +133,101 @@ note_pthread
 >> 比如說 `thread 1` 準備等待, 而另一個`thread 2`可能會在`thread 1`實際開始等待前, 便先 **signal** 了條件變量,
 這將導致死結的發生 (互相等待，永不開始), 因為`thread 1`會一直等待不會被送來的 signal
 
+```c
+#include <pthread.h>
+
+#include
+
+#include
+
+#define COUNT_DONE    10
+#define COUNT_HALT1    3
+#define COUNT_HALT2    6
+
+
+pthread_mutex_t    count_mutex     = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t    condition_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t    condition_cond = PTHREAD_COND_INITIALIZER;
+
+int count = 0;
+
+void* thread_1(void *param)
+{
+    for (;;)
+    {
+        pthread_mutex_lock(&condition_mutex);
+
+        while (count >= COUNT_HALT1 && count <= COUNT_HALT2)
+        {
+            pthread_cond_wait(&condition_cond, &condition_mutex);
+
+            /* ToDo: ... */
+        }
+
+        pthread_mutex_unlock(&condition_mutex);
+
+        pthread_mutex_lock(&count_mutex);
+
+        count++;
+        printf("Counter value thread_1: %d\n", count);
+
+        pthread_mutex_unlock(&count_mutex);
+
+        if(count >= COUNT_DONE)
+            return 0;
+    }
+
+    pthread_exit(0);
+}
+
+void* thread_2(void *param)
+{
+    for (;;)
+    {
+        pthread_mutex_lock(&condition_mutex);
+
+        if (count < COUNT_HALT1 || count > COUNT_HALT2)
+        {
+            pthread_cond_signal(&condition_cond);
+        }
+
+        pthread_mutex_unlock(&condition_mutex);
+
+
+        pthread_mutex_lock(&count_mutex);
+
+        count++;
+        printf("Counter value thread_2: %d\n", count);
+
+        pthread_mutex_unlock(&count_mutex);
+
+        if(count >= COUNT_DONE)
+            return 0;
+    }
+    pthread_exit(0);
+}
+
+
+int main()
+{
+    pthread_t th_1, th_2;
+
+    pthread_create(&th_1, 0, thread_1, 0);
+    pthread_create(&th_2, 0, thread_2, 0);
+
+    pthread_join(th_1, 0);
+    pthread_join(th_2);
+
+    return 0;
+}
+```
+
+> `pthread_cond_signal()`和`pthread_cond_wait()`的用法.
+>> `pthread_cond_signal`使用 `if` 來判斷, 而 `pthread_cond_wait`則使用的則是 `while`.
+這是由於在進入`pthread_cond_wait()`時, 開始會先解鎖 (unlock mutex), 離開時再次加鎖 (lock mutex),
+中間會有空隙, 必須要再次判斷. 所以如果 `/* ToDo: ... */` 的地方有程式碼的話, 是不能保證同步正確性的.
+
+
 + pthread_cond_init
     > 按參數 attr 指定的屬性, 建立一個條件變數
 
