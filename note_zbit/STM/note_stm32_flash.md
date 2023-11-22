@@ -7,7 +7,7 @@ Embedded Flash is mapped to `0x0800_0000`
 
 ### Flash Organization
 
-![Mem_Remap](flow/F103_Mem_Remap.jpg)
+![Mem_Remap](../flow/F103_Mem_Remap.jpg)
 
 + Main memory
     > STM32 Embedded flash 通常都是指 Main memory, 它是儲存App img 的區域
