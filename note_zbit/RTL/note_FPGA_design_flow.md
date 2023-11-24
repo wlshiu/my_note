@@ -62,5 +62,5 @@ Overall flow
 # Reference
 
 + [[Day25]淺談FPGA design flow - iT 邦幫忙::一起幫忙解決難題, 拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10195959)
-
++ [用python實現一個verilog網表Parser-騰訊雲開發者社區-騰訊雲](https://cloud.tencent.com/developer/article/1665670)
 
