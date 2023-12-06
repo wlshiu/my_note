@@ -32,10 +32,23 @@
                 > + `C:\Qt\5.12.6\mingw73_32\lib`
                 > + `C:\Qt\Tools\mingw730_32\lib`
 
-        * tab [Linker Setting]
+        * Tab [Linker Setting]
 
-            1. add libs `C:\Qt\5.12.6\mingw73_32\lib\libxxx.a`
+            1. add libs `C:\Qt\...\lib\libxxx.a`
 
+                ```
+                Qt/QT_5.14.2_static/plugins/platforms/libqwindows.a
+                Qt/QT_5.14.2_static/lib/libqtlibpng.a
+                Qt/QT_5.14.2_static/lib/libqtharfbuzz.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libversion.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libws2_32.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libwsock32.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libole32.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuserenv.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libwinmm.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuuid.a
+                Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libnetapi32.a
+                ```
 
     - Set global environment variables
         > [Setting]->[Environment]->[Environment variables]
