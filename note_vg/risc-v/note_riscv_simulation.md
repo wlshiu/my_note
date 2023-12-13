@@ -111,6 +111,8 @@ opensbi 生成的 F/w 有三種類型:
 
 運行`start-qemu.sh`啟動 RISC-V Linux
 
+### [OpenSBI Practice](note_riscv_opensbi.md)
+
 ## buildroot
 
 buildroot 已經可以幫我們搭建一套完整環境, 包括 toolchain, opensbi, linux, file-syztem, qemu 等等
@@ -127,5 +129,6 @@ $ make -j
 # Reference
 
 + [想要嘗試riscv開發, 如何搭建qemu環境？](https://www.zhihu.com/question/421757389/answer/2937412514)
-
++ [基於qemu-riscv從0開始建構嵌入式linux系統_Quard_D的部落格](https://blog.csdn.net/weixin_39871788/category_11180842.html)
+    - [基於qemu-riscv從0開始建構嵌入式linux系統ch2. 新增qemu模擬板——Quard-Star板](https://quard.blog.csdn.net/article/details/118469138?ydreferer=aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zOTg3MTc4OC9jYXRlZ29yeV8xMTE4MDg0Mi5odG1s)
 

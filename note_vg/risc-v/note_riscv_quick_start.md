@@ -320,6 +320,8 @@ RISC-V 基本整數指令子集(字母 I 表示 )規定的**指令長度均為�
 
 # [RISC-V Simulation](note_riscv_simulation.md)
 
+# [RISC-V BootFlow](note_riscv_bootflow.md)
+
 # 子程序調用 (call function)
 
 一般 RISC 架構中程序調用子函數的過程予以介紹, 其過程如下:

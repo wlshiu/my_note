@@ -68,6 +68,33 @@ Qemu RISC-V [[Back]](note_riscv_simulation.md#Qemu-with-RISC-V)
             -drive file=ubuntu-20.04.02-20g.img,format=raw,if=virtio
         ```
 
++ MISC reference
+
+    - riscv-probe
+        > Simple machine mode program to probe RISC-V control and status registers
+
+        ```
+        $ git clond https://github.com/michaeljclark/riscv-probe.git
+        $ make [CROSS_COMPILE=riscv64-unknown-elf-]   # [] 表示 optional
+        ```
+
+        1. run spike
+
+            ```
+            $ spike --isa=RV32IMAFDC build/bin/rv32imac/spike/probe
+            $ spike --isa=RV32IMAFDC build/bin/rv32imac/spike/probe
+            ```
+
+        1. run qemu
+
+            ```
+            $ qemu-system-riscv32 -nographic -machine spike_v1.10 -kernel build/bin/rv32imac/spike/probe
+            $ qemu-system-riscv64 -nographic -machine spike_v1.10 -kernel build/bin/rv64imac/spike/probe
+            $ qemu-system-riscv32 -nographic -machine virt -kernel build/bin/rv32imac/virt/probe
+            $ qemu-system-riscv32 -nographic -machine sifive_e -kernel build/bin/rv32imac/qemu-sifive_e/probe
+            $ qemu-system-riscv32 -nographic -machine sifive_u -kernel build/bin/rv32imac/qemu-sifive_u/probe
+            ```
+
 # Reference
 
 + [基於qemu-riscv從0開始建構嵌入式linux系統](https://blog.csdn.net/weixin_39871788/category_11180842.html)
