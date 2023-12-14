@@ -28,7 +28,10 @@ Fig 3. RISC-V Boot Flow
 
 ### OpenSBI Boot Flow analysis
 
+[fw_base.S](fw_base.S)
+
 OpenSBI 在一開始的 Assembly 階段做了這些事: 首先主core 會去做重定位, 此時其他core會陷入循環等待主core 重定位結束, 主core 重定位結束之後會通過寫一個全域變數通知其他core此時已經完成了重定位了。完成重定位後主core 會去為每個core分配一段棧以及scratch空間, 並將一些scratch結構體參數放入scratch空間（包括： 下一階段的跳轉地址、下一階段的Mode等）。主core在完成棧空間分配後會清除bss 段。然後進行fdt的重新導向, fdt的源地址保存在a1暫存器中（這個a1暫存器的值從進入opensbi至今 都還保持著原先得值）fdt的目的地地址時通過宏定義決定。在搬運fdt的過程中, 首先會判斷a1暫存器的值是否符號要求（是否存在fdt需要搬運）如果a1 == 0 直接跳過這一部分, 搬運完fdt後, 主core又會寫一個全域變數通知其他core該做的初始化已經完成, 接下來準備啟動c呼叫了。其他core接收到這個通知後會跳出一個循環開始下一階段。opensbi 彙編的最後就是每個core 去找到自己的棧空間, 然後把棧頂設定到sp暫存器中, 再設定好異常入口地址, 緊接著就是跳轉如c 程式碼執行sbi_init.
+
 
 ## Misc
 
