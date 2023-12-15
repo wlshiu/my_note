@@ -584,7 +584,7 @@ _scratch_init:
      * The following registers hold values that are computed before
      * entering this block, and should remain unchanged.
      *
-     * t3 -> the firmware end address
+     * t3 -> the firmware end address (F/w size + stack + heap)
      * s7 -> HART count
      * s8 -> HART stack size
      * s9 -> Heap Size
@@ -597,12 +597,64 @@ _scratch_init:
     li  a5, SBI_SCRATCH_SIZE
     sub tp, tp, a5
 
+	/**
+	 *
+     *  0x0 +---------
+     *      |
+	 *      | _fw_start
+	 *      |
+	 *      |
+	 *      | _fw_end
+	 *      |   ...
+	 *      |
+     *      |  Stack End (hart 1)
+     *      |    ...
+     *      |  Stack Top (hart 1)
+	 *      |    scratch start(hart 1)    <--- tp HART 1 (scratch_t *pHART_1_scratch)
+	 *      |      ^
+	 *      |      | SBI_SCRATCH_SIZE
+	 *      |      v
+	 *      |    scratch end
+     *      |  Stack End (hart 0)
+     *      |    ...
+     *      |  Stack Top (hart 0)
+	 *      |    scratch start(hart 0)    <--- tp HART 0 (scratch_t *pHART_0_scratch)
+	 *      |      ^
+	 *      |      | SBI_SCRATCH_SIZE
+	 *      |      v
+	 *      |    scratch end
+     *      | HARTs Stack Top       <---- tp
+     *      | Heap
+     *      |   ^
+     *      |   | Heap Size (s9)
+     *      |   v
+     *      +-----------    <---- t3
+     *
+	 */
+
     /* Initialize scratch space */
+    /**
+     *  scratch space arguments:
+     *
+     *  typedef struct _scratch {
+     *     unsigned long fw_start;           // 起始地址: Firmware linked to OpenSBI library
+     *     unsigned long fw_size;            // 地址長度: Firmware linked to OpenSBI library
+     *     unsigned long next_arg1;          // a1暫存器: 下一啟動階段 a1 暫存器
+     *     unsigned long next_addr;          // 地址：下一啟動階段
+     *     unsigned long next_mode;          // 優先順序模式: 下一啟動階段
+     *     unsigned long warmboot_addr;      // 地址: warm boot
+     *     unsigned long platform_addr;      // 地址: 啟動平台地址
+     *     unsigned long hartid_to_scratch;  // 地址: HART id到sbi scratch 的轉換函數
+     *     unsigned long trap_exit;          // 地址: 陷入退出函數
+     *     unsigned long tmp0;               // 臨時儲存
+     *     unsigned long options;            // OpenSBI 庫選項
+     *  } scratch_t;
+     */
     /* Store fw_start and fw_size in scratch space */
     lla a4, _fw_start
     sub a5, t3, a4
-    REG_S   a4, SBI_SCRATCH_FW_START_OFFSET(tp)
-    REG_S   a5, SBI_SCRATCH_FW_SIZE_OFFSET(tp)
+    REG_S   a4, SBI_SCRATCH_FW_START_OFFSET(tp) /* sw   a4, 0(tp)*/
+    REG_S   a5, SBI_SCRATCH_FW_SIZE_OFFSET(tp)  /* sw   a5, 4(tp)*/
 
     /* Store R/W section's offset in scratch space */
     lla a4, __fw_rw_offset
@@ -785,6 +837,9 @@ _start_warm:
     /* Setup stack */
     add sp, tp, zero
 
+    /**
+     *  設定真正的 trap vector table
+     */
     /* Setup trap handler */
     lla a4, _trap_handler
 #if __riscv_xlen == 32
@@ -811,6 +866,10 @@ _skip_trap_exit_rv32_hyp:
 
     /* Initialize SBI runtime */
     csrr    a0, CSR_MSCRATCH
+
+    /**
+     *  系統前期設置完成, 進入 SBI 核心程序
+     */
     call    sbi_init
 
     /* We don't expect to reach here hence just hang */
