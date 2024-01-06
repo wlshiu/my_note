@@ -40,6 +40,16 @@ $ git rm qemu       # 移除 qemu submodule, 降低資料量
 $ git submodule update --init --recursive
 ```
 
+> msys2 dependency
+> ```
+> # msys2
+> $ pacman -S zlib1g-dev -y
+> $ pacman -S libmpc-dev
+> $ pacman -S libmpfr-dev
+> $ pacman -S libgmp-dev
+> $ pacman -S build-essential
+> ```
+
 + `riscv-gnu-toolchain`
     > 包含多個 submodules
     > + [riscv-gcc](https://github.com/riscv/riscv-gcc)
@@ -83,6 +93,7 @@ $ git submodule update --init --recursive
         ```
 
         1. `--with-abi`
+            > ref [`-march and -mabi`](https://xpack.github.io/dev-tools/riscv-none-elf-gcc/#-march-and--mabi)
             > + ilp32
             > + ilp32f
             > + ilp32d
