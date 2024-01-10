@@ -288,7 +288,7 @@ Fault Status Register (SCB->CFSR and SCB->HFSR) 和 Fault Address Register(SCB->
         | [7:4]     | -                     | 保留
         | [3]       | NOCP                  | 無 Co-processor UsageFault, 處理器不支援 co-processor 指令<br>0: 試圖訪問一個 Co-processor 未引起 UsageFault <br>1: CPU 已試圖訪問一個  Co-processor
         | [2]       | INVPC (Invalid $PC)   | EXC_RETURN 的無效 `$PC`載入, 引起的 UsageFault: <br>0: 沒有發生無效 `$PC`載入 UsageFault<br>1: CPU 已試圖將 EXC_RETURN 非法載入`$PC`, 作為一個無效的上下文或一個無效的 EXC_RETURN 值 <br>當該 bit 被設為 1 時, 異常返回 Push stack 的 `$PC`,  指向嘗試執行非法 `$PC` 載入的 Instruction
-        | [1]       | INVSTATE (Invalid State) | 無效狀態 UsageFault<br>0: 未發生無效狀態 UsageFault<br>1: CPU 已試圖執行一個非法使用 EPSR 的 Instruction<br>當該 bit 設為 1 時, 異常返回 Push stacfk 的 `$PC` 指向一個嘗試非法使用 EPSR 的 Instruction.<br>如果一個未定義的 Instruction 使用了 EPSR, 則該 bit 不被設為 1
+        | [1]       | INVSTATE (Invalid State) | 無效狀態 UsageFault<br>0: 未發生無效狀態 UsageFault<br>1: CPU 已試圖執行一個非法使用 EPSR 的 Instruction<br>當該 bit 設為 1 時, 異常返回 Push stack 的 `$PC` 指向一個嘗試非法使用 EPSR 的 Instruction.<br>如果一個未定義的 Instruction 使用了 EPSR, 則該 bit 不被設為 1
         | [0]       | UNDEFINSTR            | 未定義的 Instruction UsageFault<br>0: 無未定義的 Instruction UsageFault <br>1: CPU 已試圖執行一個未定義的 Instruction.<br>當該 bit 設為 1 時, 異常返回 Push stack 的 `$PC` 指向未定義的 Instruction.<br>未定義的 Instruction, 是一條不能被處理器譯碼的 Instruction
 
 ## SCB->HSFR Register
@@ -310,7 +310,7 @@ Fault Status Register (SCB->CFSR and SCB->HFSR) 和 Fault Address Register(SCB->
 
 + 如果`SCB->CFSR` 的 `bit[BFARVALID]` 有效(為 1), 則`SCB->BFAR`的值, 表示引起 BusFault 的 Memory Address.
 
-+ 如果`SCB->CFSR` 的 bit[MMFARVALID] 有效(為 1), 則`SCB->MMFAR`的值, 表示引起 MemManageFault 的 Memory Address.
++ 如果`SCB->CFSR` 的 `bit[MMFARVALID]` 有效(為 1), 則`SCB->MMFAR`的值, 表示引起 MemManageFault 的 Memory Address.
 
 
 # Reference
