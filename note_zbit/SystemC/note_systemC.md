@@ -155,5 +155,5 @@ platform: ubuntu 20.4
 + [SystemC 學習之 Linux 安裝 SystemC(一)_systemc教學-CSDN部落格](https://blog.csdn.net/yp18792574062/article/details/133747670?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2~default~YuanLiJiHua~Position-2-133747670-blog-78672320.235%5Ev40%5Epc_relevant_anti_t3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~YuanLiJiHua~Position-2-133747670-blog-78672320.235%5Ev40%5Epc_relevant_anti_t3&utm_relevant_index=5)
 + [accellera-official/systemc: SystemC Reference Implementation](https://github.com/accellera-official/systemc/tree/master)
 + [dcblack/ModernSystemC: Example code for Modern SystemC using Modern C++](https://github.com/dcblack/ModernSystemC)
-
++ [AleksandarKostovic/SystemC-tutorial: Brief SystemC getting started tutorial](https://github.com/AleksandarKostovic/SystemC-tutorial/tree/master)
 
