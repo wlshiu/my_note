@@ -149,6 +149,94 @@ platform: ubuntu 20.4
         Hello World SystemC
         ```
 
++ Build example with Makefile
+    > build all cpp files in 1-depth folder
+
+    ```
+    $ vi ./Makefile
+        RED="\033[0;31m"
+        GREEN="\033[0;32m"
+        LIGHT_GREEN="\033[1;32m"
+        YELLOW="\033[0;33m"
+        LIGHT_YELLOW="\033[1;33m"
+        GREY="\033[0;37m"
+        BWHITE="\033[1;37m"
+        MAGENTA="\033[1;35m"
+        CYAN="\033[1;36m"
+        NC="\033[0m"
+
+        V ?= $(VERBOSE)
+        ifeq ("$(V)","1")
+            Q =
+        else
+            Q = @
+        endif
+
+        # GTKWAVE:= $(shell which gtkwave)
+
+        rootdir := $(shell pwd)
+        TARGET := $(shell basename $(rootdir))
+        ODIR := out
+
+        CXX := g++
+        LD := $(CXX)
+
+        CXXFLAGS := -I. -I$(SYSTEMC_HOME)/include -O0 -g3 -Wall -c -std=c++11
+        LDFLAGS = -L$(SYSTEMC_HOME)/lib
+
+        LIBS := -lsystemc -lm
+
+        SRC = $(wildcard ./*.cpp)
+        OBJS = $(SRC:./%.cpp=$(ODIR)/%.o)
+
+        # $(warning $(SRC))
+        # $(warning $(OBJS))
+        # $(warning target=$(TARGET))
+
+        .PHONY: run wave clean help
+
+        all: $(ODIR)/$(TARGET) $(ODIR)
+
+        $(ODIR)/$(TARGET): $(OBJS) | $(ODIR)
+            $(Q)$(CXX) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+
+        $(ODIR)/%.o: $(SRC) | $(ODIR)
+            @echo "CC   $@"
+            $(Q)$(CXX) $(CXXFLAGS) $(CFLAGS) -c $< -o $@
+
+        $(ODIR):
+            @mkdir $@
+
+        run: $(ODIR)/$(TARGET)
+            $(ODIR)/$(TARGET)
+            @echo -e "\nlist vcd file:"
+            @ls *.vcd -al
+
+        wave:
+            @echo -e "wave $(VCD)"
+
+        # @if [ -f $(GTKWAVE) ]; then $(GTKWAVE) $(VCD); fi
+
+        clean:
+            @echo -e "rm $(ODIR) and *.vcd\n"
+            @$(RM) -fr $(ODIR)
+            @$(RM) *.vcd
+
+
+        help:
+            @echo "----------------------------------------------------------------------"
+            @echo "Useful make targets:"
+            @echo ""
+            @echo "  make all                   - Build all"
+            @echo "  make clean                 - Remove most generated files"
+            @echo ""
+            @echo "  make run                   - Execute Target BIN file"
+            @echo "  make wave VCD=xxx.vcd      - Display Waveform"
+            @echo ""
+            @echo "  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build"
+            @echo "  make O=dir [targets] Locate all output files in 'dir'"
+            @echo "----------------------------------------------------------------------"
+    ```
 
 # Reference
 + [學長認真: 各種搞懂SystemC](https://sianghuang.blogspot.com/2017/11/systemc.html)
