@@ -36,24 +36,28 @@ new_name=$2
 
 # check_file ${in_path}
 
-filename=${in_path##*/}
-
-dir_path=${in_path%/*}
-
-dir_name="${dir_path##*/}"
-dirsub_path="${dir_path%/*}"
 
 if [ -f "${in_path}" ]; then
     # file path
-    echo -e "from ${in_path} to ${dir_path}/${new_name}"
+    filename=${in_path##*/}
 
-    # mv ${in_path} ${dir_path}/${new_name}
+    dir_path=${in_path%/*}
+
+    dir_name="${dir_path##*/}"
+    dirsub_path="${dir_path%/*}"
+
+    # echo -e "from ${in_path} to ${dir_path}/${new_name}"
+
+    mv ${in_path} ${dir_path}/${new_name}
 
 elif [ -d "${in_path}" ]; then
     # dir path
-    echo -e "from ${in_path} to ${dirsub_path}/${new_name}"
+    dir_name="${in_path##*/}"
+    dirsub_path="${in_path%/*}"
 
-    # mv ${in_path} ${dirsub_path}/${new_name}
+    # echo -e "from ${in_path} to ${dirsub_path}/${new_name}"
+
+    mv ${in_path} ${dirsub_path}/${new_name}
 
 else
     echo "Not Exist"
