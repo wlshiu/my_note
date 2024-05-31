@@ -116,6 +116,9 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
     ```
 
 + Run Qemu
+    > exit Qemu
+    > + ubuntu: `C-a + x`
+    > + msys2: `C-c`
 
     - E902
 
@@ -123,8 +126,6 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
         $ qemu-system-riscv32 -M smartl -cpu e902 -nographic -m 128M -kernel out/smartl_e902_evb.elf
         Hello World!
         Hello_World runs successfully!
-
-        # C+A x to exit qemu
         ```
 
     - E902M
@@ -155,8 +156,6 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
 
             $ chmod +x z_qemu_e902m.sh
             $ ./z_qemu_e902m.sh out/smartl_e902_evb.elf
-
-            # C+A x to exit qemu
             ```
 
         1. GDB client side
@@ -177,7 +176,11 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
 
                 elf_file=$1
 
-                riscv64-unknown-elf-gdb -ex 'target remote localhost:23333' -tui ${elf_file}
+                if [[ $OSTYPE == 'linux-gnu' ]]; then
+                    optflags=' -tui '
+                fi
+
+                riscv64-unknown-elf-gdb -ex 'target remote localhost:23333' ${optflags} ${elf_file}
 
             $ chmod +x z_gdb_e902m.sh
             $ ./z_gdb_e902m.sh out/smartl_e902_evb.elf
