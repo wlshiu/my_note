@@ -45,7 +45,12 @@ T-Head RISC-V Intro
 # Resource
 
 + [XuanTie玄铁官网](https://www.xrvm.cn/?spm=a2cl5.14300690.0.0.6efd7a32QKvAHX)
+    - [玄鐵 QEMU 使用者手冊XuanTie玄鐵官網](https://www.xrvm.cn/document?temp=xuantie-qemu-user-mode&slug=xuantie-qemu-userguide)
+    - [文件中心](https://www.xrvm.cn/document-index?spm=a2cl5.14290816.0.0.f894ZS0JZS0Jtz)
+    - [開放原始碼專案](https://www.xrvm.cn/overview/openSource?spm=a2cl5.27297580.0.0.33ac7a32WGgcAs)
+    - [AOS API · GitBook](https://yoc.docs.t-head.cn/yocbook/Chapter3-AliOS/)
 + [T-Head Github](https://github.com/T-head-Semi)
++ [模擬器運行介紹 · GitBook](https://yoc.docs.t-head.cn/linuxbook/Chapter2/qemu.html)
 
 # Development IDE
 
