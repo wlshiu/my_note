@@ -1,5 +1,14 @@
 # Git usage
 ---
+
+- github token
+
+  ```
+  $ git remote set-url origin https://<githubtoken>@github.com/<username>/<repositoryname>.git
+      or
+  $ git clone https://<githubtoken>@github.com/<username>/<repositoryname>.git
+  ```
+
 - Upgrade Git version on Ubuntu
 
     ```
@@ -7,6 +16,7 @@
     $ sudo apt-get update
     $ sudo apt-get install git
     ```
+
 - 換行符號
 
     1. `AutoCRLF`
