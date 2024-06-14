@@ -43,26 +43,26 @@ $ vim ~/.tmux.conf
 
     ### rebind hotkey
 
-    # prefix setting (screen-like)
+    #// prefix setting (screen-like)
     # set -g prefix C-a
     # unbind C-b
     # bind C-a send-prefix
 
-    # reload config without killing server
+    #// reload config without killing server
     bind R source-file ~/.tmux.conf \; display-message "Config reloaded..."
 
-    # "|" splits the current window vertically, and "-" splits it horizontally
+    #// "|" splits the current window vertically, and "-" splits it horizontally
     unbind %
     bind | split-window -h
     bind - split-window -v
 
-    # Pane navigation (vim-like)
+    #// Pane navigation (vim-like)
     bind h select-pane -L
     bind j select-pane -D
     bind k select-pane -U
     bind l select-pane -R
 
-    # Pane resizing
+    #// Pane resizing
     bind -r Left  resize-pane -L 4
     bind -r Down  resize-pane -D 4
     bind -r Up    resize-pane -U 4
@@ -75,49 +75,67 @@ $ vim ~/.tmux.conf
     # set -g default-command /bin/zsh
     # set -g default-shell /bin/zsh
 
-    # use UTF8
+    #// use UTF8
     # set -g utf8
     # set-window-option -g utf8 on
 
-    # display things in 256 colors
+    #// display things in 256 colors
     set -g default-terminal "screen-256color"
 
-    # mouse is great!
+    #// mouse is great!
     set-option -g mouse on
 
-    # history size
+    #// history size
     set -g history-limit 10000
 
-    # fix delay
+    #// fix delay
     set -g escape-time 0
 
-    # 0 is too far
+    #// 0 is too far
     set -g base-index 1
     setw -g pane-base-index 1
 
-    # stop auto renaming
+    #// stop auto renaming
     setw -g automatic-rename off
     set-option -g allow-rename off
 
-    # renumber windows sequentially after closing
+    #// renumber windows sequentially after closing
     set -g renumber-windows on
 
-    # window notifications; display activity on other window
+    #// window notifications; display activity on other window
     setw -g monitor-activity on
     set -g visual-activity on
+
+    #// copy mode
+    set-window-option -g mode-keys vi
+    set-option -g mouse on    #// 自動複製滑鼠選取的文字
 ```
 
 + Hot key
     > the default prefix key is C+b
 
-    - 複製滑鼠選擇到剪貼簿
+    - 複製滑鼠選擇到主機端的剪貼簿
 
-        ```
-        ## enable mouse mode
-        # set-option -g mouse on
+        1. method-1
+            > ```
+            > ## enable mouse mode
+            > # set-option -g mouse on
+            > ```
+            > + 左鍵滑鼠選範圍
+            > + `<C+b> + ]`  貼上
 
-        <Shift> + 滑鼠選範圍
-        ```
+        1. method-2
+            > + `<C+b> + [`    => 進入 copy-mode
+            > + Press `space`  => Start select and copy context mode
+            >> 移動游標選取
+            > + Press `enter`  => End select mode
+            > + `<C+b> + ]`    => 貼上
+
+    - Copy to local clipboard with SSH
+        > + `<shfit> + 左鍵滑鼠選範圍`
+        >> 切換到 local 端
+        > + `<alt> + c`
+        >> 複製到 local clipboard 中
 
     - 系統操作
 
