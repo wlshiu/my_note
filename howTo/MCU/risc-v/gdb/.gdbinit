@@ -117,16 +117,16 @@ define color_reset
 end
 
 define color_bold
-	echo \033[1m
+    echo \033[1m
    #echo \[\e[1m\]
 end
 
 define color_underline
-	echo \033[4m
+    echo \033[4m
 end
 
 
-define regrv32
+define reg_rv32
     printf "\n"
     # ra
     color $COLOR_REGNAME
@@ -306,7 +306,7 @@ define regrv32
     end
     printf "  0x%08X\n", $a7
 
-	#----
+    #----
     # t3
     color $COLOR_REGNAME
     printf "t3 (x28):"
@@ -348,7 +348,7 @@ define regrv32
     printf "  0x%08X\n", $t6
 
     #----
-	# s2
+    # s2
     color $COLOR_REGNAME
     printf "s2 (x18):"
     if ($s2 != $oldr_s2)
@@ -358,7 +358,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s2
 
-	# s3
+    # s3
     color $COLOR_REGNAME
     printf "s3 (x19):"
     if ($s3 != $oldr_s3)
@@ -368,7 +368,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s3
 
-	# s4
+    # s4
     color $COLOR_REGNAME
     printf "s4 (x20):"
     if ($s4 != $oldr_s4)
@@ -378,7 +378,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s4
 
-	# s5
+    # s5
     color $COLOR_REGNAME
     printf "s5 (x21):"
     if ($s5 != $oldr_s5)
@@ -389,7 +389,7 @@ define regrv32
     printf "  0x%08X\n", $s5
 
     #----
-	# s6
+    # s6
     color $COLOR_REGNAME
     printf "s6 (x22):"
     if ($s6 != $oldr_s6)
@@ -399,7 +399,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s6
 
-	# s7
+    # s7
     color $COLOR_REGNAME
     printf "s7 (x23):"
     if ($s7 != $oldr_s7)
@@ -409,7 +409,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s7
 
-	# s8
+    # s8
     color $COLOR_REGNAME
     printf "s8 (x24):"
     if ($s8 != $oldr_s8)
@@ -419,7 +419,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s8
 
-	# s9
+    # s9
     color $COLOR_REGNAME
     printf "s9 (x25):"
     if ($s9 != $oldr_s9)
@@ -430,7 +430,7 @@ define regrv32
     printf "  0x%08X\n", $s9
 
     #----
-	# s10
+    # s10
     color $COLOR_REGNAME
     printf "s10(x26):"
     if ($s10 != $oldr_s10)
@@ -440,7 +440,7 @@ define regrv32
     end
     printf "  0x%08X  ", $s10
 
-	# s11
+    # s11
     color $COLOR_REGNAME
     printf "s11(x27):"
     if ($s11 != $oldr_s11)
@@ -459,13 +459,13 @@ define regrv32
     color_reset
     printf "\n"
 end
-document regrv32
-Syntax: regrv32
+document reg_rv32
+Syntax: reg_rv32
 | Auxiliary function to display RISC-v 32-bits registers.
 end
 
-define gprs
-    regrv32
+define reg_rv32gprs
+    reg_rv32
 
     #------RV32E-----
     set $oldr_ra  = $x1
@@ -508,10 +508,30 @@ define gprs
     set $oldr_s11 = $s11
 
 end
-document gprs
-Syntax: gprs
+document reg_rv32gprs
+Syntax: reg_rv32gprs
 | Print CPU registers.
 end
+
+
+define reg_rv32csr
+    printf "mtvec   = 0x%08X\n", $mtvec
+    printf "mstatus = 0x%08X\n", $mstatus
+    printf "mepc    = 0x%08X\n", $mepc
+
+    printf "sstatus = "
+	p/x $sstatus
+
+    printf "sepc    = "
+	p/x $sepc
+
+end
+document reg_rv32csr
+Syntax: reg_rv32csr
+| Print CSR registerss value.
+end
+
+
 
 # __________hex/ascii dump an address_________
 define ascii_char
@@ -591,7 +611,7 @@ Syntax: hexdump_aux ADDR
 end
 
 define hexdump
-	printf "\n"
+    printf "\n"
 
     if $argc == 1
         hexdump_aux $arg0
@@ -604,29 +624,29 @@ define hexdump
                 set $_count++
             end
         else
-			if $argc == 3
-				set $_count = 0
-				while ($_count < $arg1)
-					set $_i = ($_count * 0x10)
+            if $argc == 3
+                set $_count = 0
+                while ($_count < $arg1)
+                    set $_i = ($_count * 0x10)
 
-					color_bold
-					printf "0x%08X: ", $arg0+$_i
-					color_reset
+                    color_bold
+                    printf "0x%08X: ", $arg0+$_i
+                    color_reset
 
-					printf "%08X %08X %08X %08X\n", \
-							*(unsigned int*)($arg0+$_i+0x0), \
-							*(unsigned int*)($arg0+$_i+0x4), \
-							*(unsigned int*)($arg0+$_i+0x8), \
-							*(unsigned int*)($arg0+$_i+0xC)
-					set $_count++
-				end
-			else
-				help hexdump
-			end
+                    printf "%08X %08X %08X %08X\n", \
+                            *(unsigned int*)($arg0+$_i+0x0), \
+                            *(unsigned int*)($arg0+$_i+0x4), \
+                            *(unsigned int*)($arg0+$_i+0x8), \
+                            *(unsigned int*)($arg0+$_i+0xC)
+                    set $_count++
+                end
+            else
+                help hexdump
+            end
         end
     end
 
-	printf "\n"
+    printf "\n"
 end
 document hexdump
 Syntax: hexdump ADDR <NR_LINES> <Is_Byte_Layout>
@@ -639,13 +659,13 @@ define memdump
         hexdump $arg0
     else
         if $argc == 2
-			hexdump $arg0 $arg1
+            hexdump $arg0 $arg1
         else
-			if $argc == 3
-				hexdump $arg0 $arg1 $arg2
-			else
-				help memdump
-			end
+            if $argc == 3
+                hexdump $arg0 $arg1 $arg2
+            else
+                help memdump
+            end
         end
     end
 end
