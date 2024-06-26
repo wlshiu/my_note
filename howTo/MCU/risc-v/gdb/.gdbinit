@@ -61,6 +61,13 @@ set disassemble-next-line auto
 set style address background white
 set style address intensity bold
 
+# set style sources on
+# set style tui-current-position on
+
+# show style sources
+# show style tui-current-position
+
+
 ## configure some print formats
 set print pretty on
 set print array on
@@ -515,20 +522,44 @@ end
 
 
 define reg_rv32csr
-    printf "mtvec   = 0x%08X\n", $mtvec
-    printf "mstatus = 0x%08X\n", $mstatus
-    printf "mepc    = 0x%08X\n", $mepc
 
-    printf "sstatus = "
-	p/x $sstatus
+    printf "======= M-Mode ======\n"
+    printf "info:\n"
+    printf "mvendorid= 0x%08X, marchid= 0x%08X, mimpid= 0x%08X, mhartid= 0x%08X\n\n", \
+            $mvendorid, $marchid, $mimpid, $mhartid
 
-    printf "sepc    = "
-	p/x $sepc
+    printf "exception cfg:\n"
+    printf "mstatus   = 0x%08X, misa      = 0x%08X\n", $mstatus, $misa
+    # printf "mie       = 0x%08X, mcounteren= 0x%08X\n", $mie, $mcounteren
+    printf "mie       = 0x%08X \n", $mie
+    # printf "mtvec     = 0x%08X, mtvt      = 0x%08X\n\n", $mtvec, $mtvt
+    printf "mtvec     = 0x%08X\n\n", $mtvec
+
+    printf "mepc      = 0x%08X, mcause    = 0x%08X, mtval    = 0x%08X\n", $mepc, $mcause, $mtval
+    # printf "mintstatus= 0x%08X\n", $mintstatus
+    # printf "mip       = 0x%08X, mnxti     = 0x%08X, mclicbase= 0x%08X\n", $mip, $mnxti, $mclicbase
+    printf "mip       = 0x%08X\n", $mip
+    # printf "mscratch  = 0x%08X, mscratchcsw= 0x%08X, mscratchcswl= 0x%08X\n\n", $mscratch, $mscratchcsw, $mscratchcswl
+    printf "mscratch  = 0x%08X\n\n", $mscratch
+
+    printf "conter:\n"
+    printf "mcycleh   = 0x%08X, mcycle    = 0x%08X\n", $mcycleh, $mcycle
+    printf "minstreth = 0x%08X, minstret  = 0x%08X\n", $minstreth, $minstret
+
+    if $argc == 1
+        printf "mem protection:\n"
+        printf "pmpcfg0  = 0x%08X, pmpcfg1  = 0x%08X, pmpcfg2  = 0x%08X, pmpcfg3  = 0x%08X\n", $pmpcfg0, $pmpcfg1, $pmpcfg2, $pmpcfg3
+        printf "pmpaddr0 = 0x%08X, pmpaddr1 = 0x%08X, pmpaddr2 = 0x%08X, pmpaddr3 = 0x%08X\n", $pmpaddr0, $pmpaddr1, $pmpaddr2, $pmpaddr3
+        printf "pmpaddr4 = 0x%08X, pmpaddr5 = 0x%08X, pmpaddr6 = 0x%08X, pmpaddr7 = 0x%08X\n", $pmpaddr4, $pmpaddr5, $pmpaddr6, $pmpaddr7
+        printf "pmpaddr8 = 0x%08X, pmpaddr9 = 0x%08X, pmpaddr10= 0x%08X, pmpaddr11= 0x%08X\n", $pmpaddr8, $pmpaddr9, $pmpaddr10, $pmpaddr11
+        printf "pmpaddr12= 0x%08X, pmpaddr13= 0x%08X, pmpaddr14= 0x%08X, pmpaddr15= 0x%08X\n", $pmpaddr12, $pmpaddr13, $pmpaddr14, $pmpaddr15
+    end
 
 end
 document reg_rv32csr
-Syntax: reg_rv32csr
-| Print CSR registerss value.
+Syntax: reg_rv32csr [all]
+| Print CSR registers value.
+| [all] Optional, Log mem protection registers
 end
 
 
