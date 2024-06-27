@@ -64,7 +64,7 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
     - Hart 保存 PC 到 `mepc` 中
     - Hart 將 `mcause.Exception_Code`, 更新為當前發生的 code number 且 `mcause.Interrupt_Flag` 設為 0
     - Hart 將 `mstatus.MIE`, 保存到 `mstatus.MPIE`
-    - Hart 將 `mstatus.MIE` 設為 0, 已停止中斷觸發
+    - Hart 將 `mstatus.MIE` 設為 0, 停止 Exception 觸發
     - Hart 將 `mxstatus.PM` 保存到 `mstatus.MPP`, 並將 `mxstatus.PM` 設為 0x3 (M-mode)
         > Exception 發生後, Hart 應切換為 M-mode 來處理
 
@@ -105,6 +105,10 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
     - Modify CSRs if necessary
         > e.g. 避免重複觸發 Exception
 
+    - Handle Exception event if necessary
+    - Pop GPRs back
+    - 執行 `mret`
+
 + Exception leave
     > 返回時, S/w 須執行 Instr. `mret`, 此指令會讓 Hart 執行以下步驟
     >> 進入 Trap 前, Hart 自動處理, 但返回則需要 S/w 來觸發 re-store
@@ -115,18 +119,85 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
         > 如果 Hart 只支援 M-mode, 則 `mstatus.MPP`設為 0x3 (M-mode)
 
 
++ Hart lock mechanism
+    > 當在 Exception Trap 中, 又觸發 Exception 的情況
+    >> `ecall/ebreak` 所觸發的 Exception, 則不會觸發 Hart lock 機制
+
+    - 使用 T-Head Exception `mexstatus.EXPT_VLD`
+        > E902 在進入 Exception 前, Hart 將 `mexstatus.EXPT_VLD` 設為 1,
+        並在 `mret` 時, 將 `mexstatus.EXPT_VLD` 設為 0
+        >> 當 Hart 鎖死時, 會將 `mexstatus.LOCKUP` 設為 1
+
+    - 在 debog mode (ebreak) 下, 當離開 debug mode 時, S/w 將 PC 設為 `0xeffffffc`, 則會維持 Hart-Lock
+    - 在 debog mode (ebreak) 下, 當離開 debug mode 時, S/w 將 PC 設為有效的程序 address, 則會解除 Hart-Lock
+
+
 ## Interrupt flow
 
+E902 支援 CLIC
+> CLIC 可兼容 `CLINT * 16` + `External Interrupt * 240`
+>> 由 S/w 設定每個 external interrupts 的優先權
 
+| Reg-Addr            | Reg-Name       | type      | default         | description
+| :-:                 | :-:            | :-        | :-              | :-
+| 0xE0800000          | cliccfg        |   RW      | 0x1             | CLIC Configuration Register
+| 0xE0800004          | clicinfo       |   RO      | 详见计时器中断  | CLIC Info Register
+| 0xE0800008          | mintthresh     |   RW      | 0x0             | M-mode Interrupt-Level Threshold
+| 0xE0801000 + 4 x i  | clicintip[i]   |   R or RW | 0x0             | CLIC i-th Interrupt Pending
+| 0xE0801001 + 4 x i  | clicintie[i]   |   RW      | 0x0             | CLIC i-th Interrupt Enable
+| 0xE0801002 + 4 x i  | clicintattr[i] |   RW      | 0x0             | CLIC i-th Interrupt Attribute
+| 0xE0801003 + 4 x i  | clicintctrl[i] |   RW      | 0x0             | CLIC i-th Interrupt control
 
+> 啟用 Interrupt 步驟
+> - set `mstatus.MIE = 1`
+>> Hart 總開關
+> - set `clicintie.IE = 1`
+>> CLIC module 開關
 
++ Interrupt enter
+    > 當進入 interrupt routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
+    >> E902 `mtvec.MODE == 3` 時, Interrupt Vectored Table Base 是參考 `mtvt`
 
+    - Hart 保存 PC 到 `mepc` 中
+        > 如果觸發 Interrupt 的 Instr. 同時也觸發 Exception, 則記錄在 `mepc` 的值會是觸發中斷的 Instr. 本身
+        >> 在 Interrupt/Exception 之間存在優先順序,
+        >> + Interrupt 先觸發, 因此 `mepc` 紀錄觸發中斷的下一條 Instr.
+        >> + Exception 接著觸發, `mepc` 的紀錄則被覆蓋為之前 Interrupt 的 Instr.
 
+    - Hart 將 `mcause.Exception_Code` 更新為當前發生的 code number, 且 `mcause.Interrupt_Flag` 設為 1
+    - Hart 將 `mstatus.MIE` 保存到 `mstatus.MPIE` 中
+    - Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發
 
+    - Hart 將 `mxstatus.PM` 保存到 `mstatus.MPP`, 並將 `mxstatus.PM` 設為 0x3 (M-mode)
+        > 中斷觸發後, Hart 立即進入 M-mode
 
+    - Hart 將 `mcause.MPIL` 更新為 `mintstatus.MIL`, `mintstatus.MIL`則被更新為,當前觸發中斷的 priority level
 
+    - 對於 Pulse Interrupt (GPIO)而言, Hart 會自動清除其對應的 `clicintip.pending`, Level-Triggered (電平觸發)則不會清除
 
++ Interrupt handle
+    > `此階段之後全由 S/w 接手`
 
+    - Push GPRs to stack
+    - `mstatus.MIE` 設為 1, 開啟中斷 (Nested Interrupt)
+        > 當 Nested Interrupt 時, Hart 會比較 `mintstatus.MIL` (目前的中斷優先級)
+        和 `clicintctrl.int_ctl` (最新產生的中斷優先級), 以決定是否要再觸發中斷
+        >> 當 Nested Interrupt 發生時, 必須將 `mstatus`, `mcause` 一併 push to stack
+
+    - Handle Interrupt event if necessary
+    - Pop GPRs back
+        > 當 Nested Interrupt 發生時, 必須先將 `mstatus`, `mcause` pop from stack
+
+    - 執行 `mret`
+
++ Interrupt leave
+    > 返回時, S/w 須執行 Instr. `mret`, 此指令會讓 Hart 執行以下步驟
+
+    - Hart 將 `mepc` 覆蓋 PC, 以保證可以從 interrupt trap, 返回到原程序執行位址
+    - Hart 將 `mxstatus.PM` 恢復為 `mstatus.MPP` 內的值, `mstatus.MPP`設為 0x0 (U-mode)
+        > 如果 Hart 只支援 M-mode, 則 `mstatus.MPP`設為 0x3 (M-mode)
+    - Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值
+    - Hard 將 `mintstatus.MIL` 恢復為 `mcause.MPIL` 內的值
 
 
 # CSRs of T-Head E902
