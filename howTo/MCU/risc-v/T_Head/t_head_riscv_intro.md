@@ -338,5 +338,26 @@ $ make
             YoC SDK Done
         ```
 
+# Concepts
 
+T-Head E902 只支援 privilege level: Machine (M-mode) and User (U-mode)
+> CSR `mxstatus` (T-Head Externsion)
+> + PM, bit[31:30]
+>> - `0x3`: M-mode
+>> - `0x0`: U-mode
+
++ U-mode permission
+    > 使用 `ecall` Instr. 來進入 M-mode
+
+    - GPRs `x0 ~ x15, pc`
+    - 可使用大部分 Instr.
+        > 不能使用 `wfi`, `mret`, `csr`, `cache`(T-Head Externsion)
+
++ M-mode permission
+    > 權限全開, 無限制
+    >> Default M-mode after reset
+
+    - GPRs `x0 ~ x31, pc` (if Hart supports x16 ~ x31)
+
+### [Interrupt](./t_head_riscv_interrupt.md)
 
