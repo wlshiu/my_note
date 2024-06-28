@@ -39,6 +39,15 @@ T-Head RISCV Interrupt [[Back](t_head_riscv_intro.md#Interrupt)]
 + CLIC (Core-Local Interrupt Controller)
     > 可當作是 `CLINT` + `PLIC`, 可以支援一定數目外部中斷
 
++ Tail-chaining (中斷咬尾)
+    > 在低優先級中斷 ISR 中, 被高優先級的中斷打斷.
+    為提高效率, 只做一次 Push/Pop Stack 的動作
+    >> 有些似乎稱為 `interrupt preemptible` ?
+
+    ```
+    Push-Stack -> ISR_low_priority_FrontHalf -> ISR_high_priority -> ISR_low_priority_BackHalf -> Pop-Stack
+    ```
+
 # Exception/Interrupt 響應
 
 RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基礎的規範, 不同 vendor 會有實作上的差異
@@ -60,6 +69,7 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
 
 + Exception enter
     > 當進入 exception routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
+    >> E902 `mtvec.MODE == 3` 時, Exception Vectored Table Base 是參考 `mtvec.BASE`
 
     - Hart 保存 PC 到 `mepc` 中
     - Hart 將 `mcause.Exception_Code`, 更新為當前發生的 code number 且 `mcause.Interrupt_Flag` 設為 0
@@ -138,25 +148,36 @@ E902 支援 CLIC
 > CLIC 可兼容 `CLINT * 16` + `External Interrupt * 240`
 >> 由 S/w 設定每個 external interrupts 的優先權
 
-| Reg-Addr            | Reg-Name       | type      | default         | description
-| :-:                 | :-:            | :-        | :-              | :-
-| 0xE0800000          | cliccfg        |   RW      | 0x1             | CLIC Configuration Register
-| 0xE0800004          | clicinfo       |   RO      | 详见计时器中断  | CLIC Info Register
-| 0xE0800008          | mintthresh     |   RW      | 0x0             | M-mode Interrupt-Level Threshold
-| 0xE0801000 + 4 x i  | clicintip[i]   |   R or RW | 0x0             | CLIC i-th Interrupt Pending
-| 0xE0801001 + 4 x i  | clicintie[i]   |   RW      | 0x0             | CLIC i-th Interrupt Enable
-| 0xE0801002 + 4 x i  | clicintattr[i] |   RW      | 0x0             | CLIC i-th Interrupt Attribute
-| 0xE0801003 + 4 x i  | clicintctrl[i] |   RW      | 0x0             | CLIC i-th Interrupt control
++ CLIC registers
+    >
+    > | Reg-Addr            | Reg-Name       | type      | default         | description
+    > | :-:                 | :-:            | :-        | :-              | :-
+    > | 0xE0800000          | cliccfg        |   RW      | 0x1             | CLIC Configuration Register
+    > | 0xE0800004          | clicinfo       |   RO      | 详见计时器中断  | CLIC Info Register
+    > | 0xE0800008          | mintthresh     |   RW      | 0x0             | M-mode Interrupt-Level Threshold
+    > | 0xE0801000 + 4 x i  | clicintip[i]   |   R or RW | 0x0             | CLIC i-th Interrupt Pending
+    > | 0xE0801001 + 4 x i  | clicintie[i]   |   RW      | 0x0             | CLIC i-th Interrupt Enable
+    > | 0xE0801002 + 4 x i  | clicintattr[i] |   RW      | 0x0             | CLIC i-th Interrupt Attribute
+    > | 0xE0801003 + 4 x i  | clicintctrl[i] |   RW      | 0x0             | CLIC i-th Interrupt control
 
-> 啟用 Interrupt 步驟
-> - set `mstatus.MIE = 1`
->> Hart 總開關
-> - set `clicintie.IE = 1`
->> CLIC module 開關
++ 啟用 Interrupt 步驟
+    > - set `mstatus.MIE = 1`
+    >> Hart 總開關
+    > - set `clicintie.IE = 1`
+    >> CLIC module 開關
+
++ Vectored/Direct mode
+    > 在 CLIC 中, 所有 Interrupts 只能全用同一種 mode (? 似乎可以同時使用)
+    >> 所有 `clicintattr[i].shv` 都設定相同
+
+### Use Interrupt Vectored table (矢量中斷)
+
+可經由 CLIC 個別設定 Interrupt 為 Vectored mode
+> `clicintattr[i].shv = 1`
 
 + Interrupt enter
     > 當進入 interrupt routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-    >> E902 `mtvec.MODE == 3` 時, Interrupt Vectored Table Base 是參考 `mtvt`
+    >> E902 `mtvec.MODE == 3` 時, Interrupt Vectored Table Base 是參考 `mtvt.BASE`
 
     - Hart 保存 PC 到 `mepc` 中
         > 如果觸發 Interrupt 的 Instr. 同時也觸發 Exception, 則記錄在 `mepc` 的值會是觸發中斷的 Instr. 本身
@@ -174,6 +195,7 @@ E902 支援 CLIC
     - Hart 將 `mcause.MPIL` 更新為 `mintstatus.MIL`, `mintstatus.MIL`則被更新為,當前觸發中斷的 priority level
 
     - 對於 Pulse Interrupt (GPIO)而言, Hart 會自動清除其對應的 `clicintip.pending`, Level-Triggered (電平觸發)則不會清除
+        > 在 **Interrupt Direct mode**, Hart 則會跳過 `clicintip.pending` 的存取, 改由 S/w 處理 (?)
 
 + Interrupt handle
     > `此階段之後全由 S/w 接手`
@@ -181,7 +203,7 @@ E902 支援 CLIC
     - Push GPRs to stack
     - `mstatus.MIE` 設為 1, 開啟中斷 (Nested Interrupt)
         > 當 Nested Interrupt 時, Hart 會比較 `mintstatus.MIL` (目前的中斷優先級)
-        和 `clicintctrl.int_ctl` (最新產生的中斷優先級), 以決定是否要再觸發中斷
+        和 `clicintctrl[i].int_ctl` (最新產生的中斷優先級), 以決定是否要再觸發中斷
         >> 當 Nested Interrupt 發生時, 必須將 `mstatus`, `mcause` 一併 push to stack
 
     - Handle Interrupt event if necessary
@@ -198,6 +220,107 @@ E902 支援 CLIC
         > 如果 Hart 只支援 M-mode, 則 `mstatus.MPP`設為 0x3 (M-mode)
     - Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值
     - Hard 將 `mintstatus.MIL` 恢復為 `mcause.MPIL` 內的值
+
+### Use Interrupt Direct (非矢量中斷)
+
+可經由 CLIC 個別設定 Interrupt 為 Direct mode
+> `clicintattr[i].shv = 0`
+
+在 Interrupt Direct mode 下, ISR address 是統一由 `mtvec` 指定, 同時在 CLIC 中也定義了 `Interrupt Tail-chaining` 的支援
+
++ Interrupt enter
+    > 當進入 interrupt routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
+
+    - Hart 保存 PC 到 `mepc` 中
+        > 如果觸發 Interrupt 的 Instr. 同時也觸發 Exception, 則記錄在 `mepc` 的值會是觸發中斷的 Instr. 本身
+        >> 在 Interrupt/Exception 之間存在優先順序,
+        >> + Interrupt 先觸發, 因此 `mepc` 紀錄觸發中斷的下一條 Instr.
+        >> + Exception 接著觸發, `mepc` 的紀錄則被覆蓋為之前 Interrupt 的 Instr.
+
+    - Hart 將 `mcause.Exception_Code` 更新為當前發生的 code number, 且 `mcause.Interrupt_Flag` 設為 1
+    - Hart 將 `mstatus.MIE` 保存到 `mstatus.MPIE` 中
+    - Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發
+
+    - Hart 將 `mxstatus.PM` 保存到 `mstatus.MPP`, 並將 `mxstatus.PM` 設為 0x3 (M-mode)
+        > 中斷觸發後, Hart 立即進入 M-mode
+
+    - Hart 將 `mcause.MPIL` 更新為 `mintstatus.MIL`, `mintstatus.MIL`則被更新為, 當前觸發中斷的 priority level
+
++ Interrupt handle
+    > `此階段之後全由 S/w 接手`
+
+    - 處理方式與 Interrupt Vectored mode 相同,
+    但為提高即時性, Interrupt Direct mode 多支援 `Interrupt Tail-chaining` 的情況
+
+    - **Interrupt Tail-chaining**
+        > 在 Interrupt Direct mode 中, ISR address 統一由 `mtvec` 指定, 因此可以在 ISR 入口統一做 Push-Stack
+
+        1. Push GPRs to stack
+        1. 如果 `mnxti != 0`, 則表示有比目前優先級更高的 Interrupt 需要處理
+            > + 當 S/w read `mnxti` (read type), 則返回有效的 ISR address, 其中 `ISR_Addr = (mtvt[31:6] << 6) + 4 * IRQ_num`
+            > + 同時, Hart 會將 `mintstatus.MIL` 更新為 higher-priority Interrupt 的優先級
+            > + Hart 也會將 `mcause.Exception_Code` 更新為 higher-priority Interrupt 的 ID
+            > + S/w 設定 `mnxti.bit[3] = 1` (write type), Hart 將會 set `mstatus.MIE = 1` 來開啟中斷
+            > + S/w 跳轉到 ISP_higher_priority_Addr
+
+        1. 如果 `mnxti == 0` 時, Hart 則不會更新 `mintstatus.MIL` 及 `mcause.Exception_Code`
+        1. Pop GPRs back
+            > 當 Nested Interrupt 發生時, 必須先將 `mstatus`, `mcause` pop from stack
+
+        1. 執行 `mret`
+
++ Interrupt leave
+    > 與 Interrupt Vectored table 相同
+
+## Non-Maskable Interrupt (NMI) flow
+
+NMI 優先級是最高且 NMI 不受全局中斷位 `mstatus.MIE` 的控制
+> 為了使得任何時候觸發 NMI 並在返回後, Hart 都可以恢覆正常運行程序流,
+E902 externsion 實作了 `mnmicause` 和 `mnmipc`, 用於保存觸發 NMI 時, Hart 的狀態
+
+
++ NMI enter
+
+    - Hart 保存 `mepc` 到 `mnmipc` 中
+    - Hart 保存 PC 到 `mepc` 中
+        > 為了可以返回原位址
+
+    - Hart 將 `mcause.Exception_Code` 更新為 24, 且 `mcause.Interrupt_Flag` 設為 0
+
+
+    - Hart 將 `mstatus.MPP`及 `mstatus.MPIE` 保存到 `mnmicause`
+    - Hart 將 `mxstatus.PM` 保存到 `mstatus.MPP`
+    - Hart 將 `mstatus.MIE` 保存到 `mstatus.MPIE`
+    - 跳轉到 NMI handle (base on `mtvec`)
+
++ NMI handle
+    > `此階段之後全由 S/w 接手`
+
+    - 在 NMI 中必須停止 Exception 觸發, 否則會觸發 Hart-Lock
+        > S/wt 將 `mstatus.MIE` 設為 0 (?)
+    - Hart 會確認 `mcause.Exception_Code` 是否為 24, 因此在 leave NMI handle 前, `mcause.Exception_Code` 不能被改動
+
+    - 執行 `mret`
+
++ NMI leave
+    > 返回時, S/w 須執行 Instr. `mret`, 此指令會讓 Hart 執行以下步驟
+
+    - Hart 將 `mepc` 覆蓋到 PC 再將 `mnmipc` 覆蓋到 `mepc`
+    - Hart 將 `mcause.Exception_Code` 及 `mcause.Interrupt_Flag` 恢復為 `mnmicause` 內的值
+    - Hart 將 `mxstatus.PM` 恢復為 `mstatus.MPP` 內的值
+    - Hart 將 `mstatus.MPIE` 及 `mstatus.MPP` 恢復為 `mnmicause` 內的值
+
+    - Hart 將 `mnmicause.NMI_MPP `設為 0x0 (U-mode)
+        > 如果 Hart 只支援 M-mode, 則 `mnmicause.NMI_MPP`設為 0x3 (M-mode)
+
+
++ NMI lock mechanism
+    > 當在 NMI Trap 中, 又觸發 NMI 的情況
+
+    - Hart 會設定 `mexstatus.LOCKUP = 1`
+        > Hard 直接停止 (不 fetch 也不執行)
+
+    - 只有在 Hart reset (重新啟動) 才能 unlock
 
 
 # CSRs of T-Head E902
@@ -248,13 +371,13 @@ E902 支援 CLIC
     | 0                      |    10                    |  Reserved
     | 0                      |    11                    |  Environment call from M-mode
     | 0                      |    12-23                 |  Reserved
-    | 0                      |    24                    |  Non-Marsk Interrupt (NMI)
+    | 0                      |    24                    |  Non-Maskable Interrupt (NMI)
 
 + Priority
 
     | Priority | Interrupt-Flag bit[31] | Exception-Code bit[11:0] | Description
     | :-:      | :-:                    | :-:                      | :-
-    | Highest  | 0                      |    24                    |  Non-Marsk Interrupt (NMI)
+    | Highest  | 0                      |    24                    |  Non-Maskable Interrupt (NMI)
     |          | ...                    |    ...                   |  ...
     |  High    | 0                      |    1                     |  Instruction access fault
     |          | 0                      |    2                     |  Illegal instruction
@@ -264,6 +387,19 @@ E902 支援 CLIC
     |          | 0                      |    4                     |  Load address misaligned
     |          | 0                      |    7                     |  Store access fault
     |  Low     | 0                      |    5                     |  Load access fault
+
+
+## `mtvt` (Machine Trap-handler Vector Table base Register)
+
+由 CLIC 定義的 CSR register, 用來加強對中斷向量的支持
+
+## `mnxti` (Interrupt handler address and enable modifier)
+
+由 CLIC 定義的 CSR register (全名 `M-mode Next Interrupt` 更符合).
+
+在 `Tail-chaining` 下, S/w 使用 `mnxti` 來加速中斷響應.
+在 M-mode 下, 當最新 Interrupt 的優先級高於目前正在處理的中斷優先級 `mcause.MPIL` 時,
+S/w 通過 `mnxti` 可以獲取下一中斷入口位址
 
 
 # Reference
