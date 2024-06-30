@@ -167,8 +167,12 @@ E902 支援 CLIC
     >> CLIC module 開關
 
 + Vectored/Direct mode
-    > 在 CLIC 中, 所有 Interrupts 只能全用同一種 mode (? 似乎可以同時使用)
-    >> 所有 `clicintattr[i].shv` 都設定相同
+    > 在 CLIC E902 `mtvec.MODE == 3` 中, 可以同時使用兩種 mode
+    > + Exception trigger with Direct mode
+    >> S/w set a handle address to `mtvec`
+    > + Interrupt trigger with Vectored mode
+    >> S/w set a Vector Table base address to `mtvt`
+
 
 ### Use Interrupt Vectored table (矢量中斷)
 
@@ -400,6 +404,12 @@ E902 externsion 實作了 `mnmicause` 和 `mnmipc`, 用於保存觸發 NMI 時, 
 在 `Tail-chaining` 下, S/w 使用 `mnxti` 來加速中斷響應.
 在 M-mode 下, 當最新 Interrupt 的優先級高於目前正在處理的中斷優先級 `mcause.MPIL` 時,
 S/w 通過 `mnxti` 可以獲取下一中斷入口位址
+
+
+## `mscratch` (Machine Scratch Register)
+
+此 CSR register 一般被用來設定 Stack top of Exception/Interrupt
+> E902 使用 32-bits
 
 
 # Reference
