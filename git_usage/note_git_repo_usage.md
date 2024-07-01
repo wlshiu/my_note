@@ -938,6 +938,10 @@ manifests of projects
     $ repo sync
     $ repo start local --all
     ```
+# Gitlab push rules (付費帳號)
+
++ Require expression in commit messages
+  > `^(fix|feat|perf|refactor|chore|style|docs|test|build|revert): (\s|\S){5,72}$|^Merge`
 
 # windows download code
 
