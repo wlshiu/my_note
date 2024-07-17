@@ -654,6 +654,13 @@ $ sudo apt-get install lubuntu-desktop
             [printers]
                 ...
 
+           # keep file attributes
+           map archive = no
+           map hidden = no
+           map read only = no
+           map system = no
+           store dos attributes = yes
+
             [samba_share]
                 Comment = Shared Folder
                 Path = /home/[User Name]/samba_share
@@ -661,13 +668,13 @@ $ sudo apt-get install lubuntu-desktop
                 writable = yes
                 read only = no
                 valid users = [User Name]
-                force directory mode = 777
-                force create mode = 777
+                force directory mode = 0775 #0777
+                force create mode = 0644 #0777
                 force security mode = 777
                 force directory security mode = 777
                 hide dot file = no
-                create mask = 0644 ;0777
-                directory mask = 0775 ;0777
+                create mask = 0644 #0777
+                directory mask = 0775 #0777
                 delete readonly = yes
                 guest ok = yes
                 available = yes
