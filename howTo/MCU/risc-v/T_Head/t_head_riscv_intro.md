@@ -101,7 +101,7 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
     - dependency
 
         ```
-        $ sudo apt-get install -y libsnappy-dev libpixman-1-dev libjpeg-dev \
+        $ sudo apt-get install -y libsnappy-dev libpixman-1-dev libjpeg-dev libfdt-dev \
             libdaxctl-dev libvdeplug-dev libpmem-dev libgbm-dev libepoxy-dev libaio1 libslirp-dev \
             libgtk-3-0
 
