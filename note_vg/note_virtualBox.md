@@ -63,7 +63,7 @@ $ sudo apt-get install lubuntu-desktop
         ```
 
 + update atp-get
-    1. edit sources.list
+    - edit sources.list
 
         ```
         $ sudo gedit /etc/apt/sources.list
@@ -76,16 +76,19 @@ $ sudo apt-get install lubuntu-desktop
         deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe
 
         ```
-        a. [NCHC, Taiwan, 20 Gbps](http://free.nchc.org.tw/ubuntu/)
-        a. [TaiChung County Education Network Center, 1 Gbps](http://ftp.tcc.edu.tw/Linux/ubuntu/)
-        a. http://ubuntu.stu.edu.tw/ubuntu/
+        1. [NCHC, Taiwan, 20 Gbps](http://free.nchc.org.tw/ubuntu/)
+        1. [TaiChung County Education Network Center, 1 Gbps](http://ftp.tcc.edu.tw/Linux/ubuntu/)
+        1. http://ubuntu.stu.edu.tw/ubuntu/
+        1. https://mirrors.wikimedia.org/ubuntu/ (https)
+           > dependency (https): `$ sudo apt install apt-transport-https`
+           >> [deb packages](https://pkgs.org/)
 
-    1. update list
+    - update list
         ```
         $ sudo apt-get update
         ```
 
-    1. upgrade
+    - upgrade
         ```
         $ sudo apt-get upgrade
         ```
