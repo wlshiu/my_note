@@ -108,6 +108,10 @@ CDS包含了 T-Head 的全部系列的CPU, 支援從裸板程序到嵌入式Linu
         $ sudo apt-get install -y libcapstone-dev libspice-server-dev \
             libsdl2-2.0-0 libsdl2-image-2.0-0 libvirglrenderer-dev \
             libcacard-dev libusbredirparser1 libfuse3-3 libiscsi7 librbd1
+        $ sudo apt-get install -y libbrlapi-dev
+
+        # libcapstone3 only ubuntu-22.04
+        $ sudo dpkg -i /media/sf_VMShare/libcapstone3_4.0.1+really+3.0.5-1build1_amd64.deb
         ```
 
 ## Practice
