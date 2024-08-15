@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <help_text/>
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>385</x>
+      <y>341</y>
+      <w>275</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>*T0*
+IEEE 1149.1 compliance with 
+multiple on-chip TAPs</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>363</x>
+      <y>275</y>
+      <w>319</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>*T1*
+Basic IEEE 1149.7 control 
+and function extensions, power</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>341</x>
+      <y>220</y>
+      <w>363</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>*T2*
+Chip bypass in a Series Scan Topology</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>319</x>
+      <y>165</y>
+      <w>407</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>*T3*
+Parallel (Star-4) Scan Topologies</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>297</x>
+      <y>110</y>
+      <w>451</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>*T4*
+2-Pins  Parallel (Star-2) Topologies</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>275</x>
+      <y>55</y>
+      <w>495</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>*T5*
+BDX Data Channels with 2-Pins, Custom pin support (CDX)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>154</x>
+      <y>44</y>
+      <w>132</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>154</x>
+      <y>154</y>
+      <w>99</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>143</x>
+      <y>385</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>165</x>
+      <y>330</y>
+      <w>33</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>143</x>
+      <y>330</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>198</x>
+      <y>154</y>
+      <w>33</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;220.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>242</x>
+      <y>44</y>
+      <w>33</w>
+      <h>374</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;</panel_attributes>
+    <additional_attributes>10.0;320.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>44</x>
+      <y>341</y>
+      <w>121</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>JTAg Compliant 
+Features
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>44</x>
+      <y>220</y>
+      <w>121</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>JTAg Extended 
+Features
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>44</x>
+      <y>66</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>Advanced Debug
+Features
+valign=center
+halign=center</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

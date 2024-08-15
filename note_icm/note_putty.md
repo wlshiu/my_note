@@ -10,6 +10,9 @@ Putty
 
 
 + 無法使用 home end 鍵
+    > 直接在 putty 使用組合 key
+    > + home: `ctrl + a`
+    > + end: `ctrl + e`
 
     - putty版本 > 0.6
 
