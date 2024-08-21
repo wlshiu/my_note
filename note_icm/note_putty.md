@@ -10,7 +10,7 @@ Putty
 
 
 + 無法使用 home end 鍵
-    > 直接在 putty 使用組合 key
+    > 直接在 putty 使用組合 key 也可以達到同樣效果
     > + home: `ctrl + a`
     > + end: `ctrl + e`
 
@@ -34,7 +34,8 @@ Putty
         > Use `Shift + Insert`.
 
     + Copy something from Vim into the Windows clipboard
-        > hold `Shift + Select with Left Mouse`.
+        > + hold `Shift + 滑鼠左鍵選擇`.
+        > + `alt + C`
 
 
 + menuconfig 亂碼
@@ -71,5 +72,5 @@ Putty
 
     - Reference
 
-        1. [[Linux]-安裝Xming以讓X Windows透過Putty帶出](https://dotblogs.com.tw/colinlin/2017/07/06/120046)
+        1. [[Linux]- 安裝 Xming 以讓 X Windows透過Putty帶出](https://dotblogs.com.tw/colinlin/2017/07/06/120046)
 
