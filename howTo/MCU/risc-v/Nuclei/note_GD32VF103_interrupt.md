@@ -13,7 +13,7 @@ GD32VF103 interrupt analysis
 
 當然 RISC-V 也可以支援這種 Vector Interrupt, 這樣每個地址處會安排一個特定的 ISR, 當中斷發生後, 跳轉到特定的 ISR 去執行即可.
 
-### 向量中斷
+### Non-Vectored 中斷
 
 對於非向量中斷, 則表示中斷發生後, **只有一個入口**, 需要在這一個 ISR 中, 去判斷具體 IRQ
 > 這種行為, 可以在常見的 mips, sparc 中看到
