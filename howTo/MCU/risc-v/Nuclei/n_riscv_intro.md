@@ -186,6 +186,16 @@ toolchain: `nuclei_riscv_newlibc_prebuilt_linux64_2024.06.tar.bz2`
             $ ./z_gdb_n200.sh ./software/hello_world/hello_world
             ```
 
+# Concepts
+
+Nuclei N200 遵循 ISA Spec **riscv-specv2.2** 及 Interrupt Spec **riscv-privileged-v1.10**
+
+### [Interrupt_n200](./n_riscv_interrupt.md)
+### [Interrupt_gd32vf103](./note_GD32VF103_interrupt.md)
+
+# [Nuclei_SDK](./n_riscv_sdk.md)
+
+
 # Reference
 
 + [RISC-V CPU IP 芯來科技 - 產品中心](https://www.nucleisys.com/product.php)
