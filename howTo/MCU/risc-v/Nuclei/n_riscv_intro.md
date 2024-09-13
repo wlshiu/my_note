@@ -190,7 +190,10 @@ toolchain: `nuclei_riscv_newlibc_prebuilt_linux64_2024.06.tar.bz2`
 
 Nuclei N200 遵循 ISA Spec **riscv-specv2.2** 及 Interrupt Spec **riscv-privileged-v1.10**
 
-### [Interrupt_n200](./n_riscv_interrupt.md)
+### [Interrupt_n200](./n_riscv_interrupt_n200.md)
+
+### [Interrupt_n100](./n_riscv_interrupt_n100.md)
+
 ### [Interrupt_gd32vf103](./note_GD32VF103_interrupt.md)
 
 # [Nuclei_SDK](./n_riscv_sdk.md)
