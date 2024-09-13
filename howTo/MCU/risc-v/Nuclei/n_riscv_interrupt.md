@@ -228,7 +228,7 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
         > `ECLIC->CTRL[irq_id].INTATTR_b.SHV == 1`
 
         1. Hart 會依照 interrupt source id, 去計算以 `mtvt` 為 base 的中斷向量 offset, 並跳轉到對應的 ISR (花費至少 6T)
-            > H/w 直接響應, 因此在 ISR 中需自行實作 `Save/Restor Context` 流程 (需自行處理 push/pop 行為)
+            > H/w 直接響應, 因此在 ISR 中需自行實作 `Save/Restore Context` 流程 (需自行處理 push/pop 行為)
 
             I. **ISR 必須使用 `__attribute__((interrupt))` 宣告**
                 > Compiler 會對 `__attribute__((interrupt))` 屬性的 ISR 進行分析,
@@ -286,7 +286,7 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 + Interrupt Vectored mode (向量中斷)
     > + 在此模式下, 從中段觸發到跳轉至 ISR, **花費至少 6T**
     > + **每個 ISR 都需自行處理 Push/Pop 行為**
-    > + 有 `__attribute__((interrupt))` 屬性的 function, 視情況 Compiler 會強制加入 `Save/Restor GPRs` 行為
+    > + 有 `__attribute__((interrupt))` 屬性的 function, 視情況 Compiler 會強制加入 `Save/Restore GPRs` 行為
     > + 此模式不支援 Tail-chaining (中斷咬尾)
 
     - 此模式下進入 ISR 時, Hart 會關閉全域中斷 `mstatus.MIE = 0`,
@@ -361,8 +361,168 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 
 ## Non-Maskable Interrupt (NMI) flow
 
+### NMI Enter
+
+> 當進入 ISR 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
+> + 跳轉到 `mnvec` 紀錄的 entry address
+> + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`, `mintstatus`)
+> + Hart 更新 Privilege mode to M-mode (Machine mode)
+> + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
+
++ Hart 將 Interrupt 發生時, 尚未執行的下一條 instruction address (PC+4 or PC+2) 保存到 `mepc` 中
+    > `mepc` 可以被 S/w 修改, 因此 S/w 可以強制修改跳轉的 address
+
+    - 跳轉到 `mnvec` entry address
+        1. `mmisc_ctl.NMI_CAUSE_FFF == 1`
+            > `mnvec == mtvec`
+
+        1. `mmisc_ctl.NMI_CAUSE_FFF == 0`
+            > `mnvec == reset_vector`
+            >> reset_vector 為 Cool Reset 的程式執行起點 (?)
+
++ Hart 將 `mcause.EXCCODE` 更新為 NMI_Trap_ID
+    - `mmisc_ctl.NMI_CAUSE_FFF == 1`: `mcause.EXCCODE = 0xFFF`
+    - `mmisc_ctl.NMI_CAUSE_FFF == 0`: `mcause.EXCCODE = 0x1`
 
 
++ Hart 將發生 NMI 前的 `mstatus.MIE`, 保存到 `mstatus.MPIE`
+    > `mstatus.MPIE` 是為了能在離開 NMI 時, 利用 `mstatus.MPIE` 來恢復進入 NMI 前的 `mstatus.MIE`
++ **Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發**
+
++ Hart 將 `mstatus.MPP` 用來記錄進入 NMI 前的 Privilege Mode
+    > `mstatus.MPP` 是為了能在離開 NMI 時, 利用 `mstatus.MPP` 來恢復進入 NMI 前的 Privilege Mode
++ Hart 強制將 Privilege Mode 切換到 M-Mode (**NMI 都會在 M-Mode 處理**)
+
+
++ Hart 將原本的 `msubm.TYP` 保存到 `msubm.PTYP`
+    > `mstatus.PTYP` 是為了能在離開 NMI 時, 利用 `mstatus.PTYP` 來恢復進入 NMI 前的 Machine Sub-Mode
+
++ Hart 將 `msubm.TYP` 設為 3 (NMI)
+
+### NMI Handle
+
+> `此階段之後, 基本由 S/w 接手`
+
+需自行處理 `Save/Restore context`
+
+
+### NMI Leave
+
+> 返回時, S/w 須執行 `mret` instruction, 此指令會讓 **Hart 自動在 1T(sysclk) 內執行以下步驟**
+> + 跳轉到 `mepc` 紀錄的 address
+> + Hart 更新 CSRs (`mstatus`)
+> + Hart 恢復原本的 Privilege mode
+> + Hart 恢復原本的 Machine Sub-Mode
+
+
++ Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值, `mstatus.MPIE` 設為 1
++ Hart 將 Privilege Mode 恢復為 `mstatus.MPP` 內的值
+    > + 0x0: User Mode
+    > + 0x3: Machine Mode
+
++ Hart 將 Machine Sub-Mode `msubm.TYP` 恢復為 `msubm.PTYP` 內的值
+
+
+### Nested of NMI and Exception
+
+**Nuclei-Nxxx** 支援 `2-Level NMI/Exception Nested state stack`
+> Hart 有 2 級 Stack, 加上 real-time registers, 總共 `3-Level of Nested Exception`
+
+在 NMI handler 中, Hart masks 觸發 NMI exception (在 NMI 中無法觸發 NMI)
+> **Nuclei-Nxxx** 只支援 3 種 Nested Exception
+> + NMI to Exception
+> + Exception to Exception
+> + Exception to NMI
+
++ Trigger Exception on App level
+
+    - Program runing
+
+        1. App PC
+        1. App Privilege Mode
+        1. App Interrupt Enable Flag (IE)
+
+        1. Issue Exception (start exception flow)
+            > goto `0-level Exception pre-handle`
+        1. Back from Exception handler (end exception flow)
+            > return from `0-level Exception pre-handle`
+
++ `0-level Exception pre-handle`
+
+    - Before Entry Handler (Hart auto handle)
+        1. App Exception cause          => `mcause` and `mdcause`
+        1. GPR_PC                       => `mepc`
+        1. App IE Flag `mstatus.MIE`    => `mstatus.MPIE`
+        1. App Privilege Mode           => `mstatus.MPP`
+        1. App Machine Sub-Mode         => `msubm.PTYP`
+        1. **Jump to Exception Handler**
+
+    - Leave Handler (`mret` triggers Hart handle)
+
+        1. `mepc`           => GPR_PC
+            > Exception 需 S/w `mepc += 4`
+
+        1. `mstatus.MPIE`   => App IE Flag
+        1. `mstatus.MPP`    => App Privilege Mode
+        1. `msubm.PTYP`     => App Machine Sub-Mode
+        1. **Back to App program**
+
+
++ `1-level Exception pre-handle`
+
+    - Entry (Hart auto handle)
+
+        1. GPR_PC                                       => `msaveepc1`
+        1. `mstatus.MIE`                                => `msavestatus.MPIE1`
+        1. `0-level Exception handler` Privilege Mode   => `msavestatus.MPP1`
+        1. `msubm.TYP`                                  => `msavestatus.PTYP1`
+        1. `0-level Exception handle` Machine Sub-Mode  => `msubm.TYP`
+        1. `0-level Exception handler` Exception cause  => `msavecause1` and `msavedcause1`
+        1. **Jump to Exception Handler**
+
+
+    - Leave (`mret` triggers Hart handle)
+
+        //1. `msaveepc1`              => `mepc`
+        1. `msavestatus.MPIE1`      => `mstatus.MPIE`
+        1. `msavestatus.MPP1`       => `mstatus.MPP`
+        1. `msavestatus.PTYP1`      => `msubm.TYP`
+        1. `msavecause1`            => `mcause`
+        1. `msavedcause1`           => `mdcause`
+
+        1. `mstatus.MPIE`   => `0-level Exception handle` IE Flag (`mstatus.MIE`)
+        1. `mstatus.MPP`    => `0-level Exception handle` Privilege Mode
+        1. `msubm.PTYP`     => `0-level Exception handle` Machine Sub-Mode (`msubm.TYP`)
+        1. `msaveepc1`      => GPR_PC
+            > Exception 需 S/w `msaveepc1 += 4`
+
++ `2-level Exception pre-handle`
+
+    - Entry (Hart auto handle)
+
+        1. GPR_PC                                       => `msaveepc2`
+        1. `mstatus.MIE`                                => `msavestatus.MPIE2`
+        1. `1-level Exception handle` Privilege Mode    => `msavestatus.MPP2`
+        1. `msubm.TYP`                                  => `msavestatus.PTYP2`
+        1. `1-level Exception handle` Machine Sub-Mode  => `msubm.TYP`
+        1. `1-level Exception handle` Exception cause   => `msavecause2` and `msavedcause2`
+        1. **Jump to Exception Handler**
+
+
+    - Leave (`mret` triggers Hart handle)
+
+        
+
+
+
+        1. `msavestatus.MPIE2`      => `1-level Exception handle` IE Flag (`mstatus.MIE`)
+        1. `msavestatus.MPP2`       => `1-level Exception handle` Privilege Mode
+        1. `msavestatus.PTYP2`      => `msubm.TYP`
+        1. `msavecause2`            => `1-level Exception handle` Exception cause
+        1. `msavedcause2`           => `1-level Exception handle` Exception dcause
+        1. `msaveepc2`              => GPR_PC
+            > Exception 需 S/w `msaveepc2 += 4`
+        1. **Back to 1-level Exception handler**
 
 
 
@@ -679,6 +839,34 @@ mscratch暫存器可以提供一種 Save/Restore 機制, e.g. 在進入中斷或
         > + 2:　Exception
         > + 3:　NMI
 
+## `mnvec` (Machine NMI-Vector Base-Address Register)
+
+**Nuclei-Nxxx** 自定義 `CSR mnvec`, 用來設定 NMI handler entry address
+
+## `mmisc_ctl`
+
+**Nuclei-Nxxx** 自定義 `CSR mmisc_ctl`, 用來控制 NMI, Misaligned Access 和 BPU 的相關功能
+
++ Member fields
+    - `mmisc_ctl.NMI_CAUSE_FFF`, bit[9]
+        > 控制 `mnvec` 及 NMI 的 `mcause.EXCCODE`
+        > + 0: `mnvec` 的值等於 Hart reset 後的 PC, **NMI 的`mcause.EXCCODE == 0x1`**, 此為預設值
+        >> Reset 不一定要從頭執行
+        > + 1: `mnvec` 的值與 `mtvec`相同, **NMI 的 `mcause.EXCCODE == 0xFFF`**
+
+    - `mmisc_ctl.ZCMT_ZCMP_EN`, bit[7]
+        > Control the Zc Extension uses the cfdsp of D Ext's encoding or not
+
+    - `mmisc_ctl.UNALGN_ENA_BLE`, bit[6]
+        > 控制 Hart 是否支援 Address Misaligned Access 功能
+        >> 此 field 只有 H/w 開啟 non-align address access 功能才有效, 否則為 0
+        > + 0: Misaligned Access 功能關閉，Misaligned Access 操作會產生 Exception
+        > + 1: Misaligned Access 功能開啟, 此為預設值
+
+    - `mmisc_ctl.BPU_ENABLE`, bit[3] (Branch Prediction Unit)
+        > 設定分支預測器是否開啟
+        > + 0: 分支預測器 Disable
+        > + 1: 分支預測器 Enable, 此為預設值
 
 ## `mcycle` (Machine Cycle counter) and `mcycleh` (Upper 32-bits of mcycle, RV32 only)
 
@@ -686,7 +874,141 @@ RISC-V 定義了一個 64-bits 的 Clock Counter, 用於反映 Hart 執行了多
 > 只要 Hart 處於執行狀態時, 此計數器便會不斷計數
 
 ```
-Clock Counter = (`mcycleh` << 32 | `mcycle`)
+Clock Counter = (mcycleh << 32 | mcycle)
+```
+
+
+## `msavestatus`
+
+**Nuclei-Nxxx** 自定義 `CSR msavestatus`, 用來實現 Nested Exception feature,
+主要儲存 `mstatus` 和 `msubm` 的值
+
++ Member fields
+    - `msavestatus.PTYP2`, bit[15:14]
+        > 第二級 Nested NMI/Exception 發生前的 Trap type
+    - `msavestatus.MPP2`, bit[10:9]
+        > 第二級 Nested NMI/Exception 發生前的 Privilege mode
+    - `msavestatus.MPIE2`, bit[8]
+        > 第二級 Nested NMI/Exception 發生前的 MIE (Interrupt Enable) 狀態
+
+
+    - `msavestatus.PTYP1`, bit[7:6]
+        > 第一級 Nested NMI/Exception 發生前的 Trap type
+    - `msavestatus.MPP1`, bit[2:1]
+        > 第一級 Nested NMI/Exception 發生前的 Privilege mode
+    - `msavestatus.MPIE1`, bit[0]
+        > 第一級 Nested NMI/Exception 發生前的 MIE (Interrupt Enable) 狀態
+
+
+## `msaveepc1` and `msaveepc2`
+
+**Nuclei-Nxxx** 自定義 `CSR msaveepc1` and `CSR msaveepc2`, 用來實現 Nested Exception feature,
+主要為 `mepc` 的 Nested Exception Stack
+
++ push flow
+
+    ```
+                    +-----------+
+                    |   APP     | <- Exception be triggered
+                    +-----------+
+                    |   mepc    | <- 0-level Exception
+                    +-----------+
+    PC push1 ===>   | msaveepc1 | <- 1-level Exception
+                    +-----------+
+    PC push2 ===>   | msaveepc2 | <- 2-level Exception
+                    +-----------+
+    ```
+
++ pop flow
+
+    ```
+                    +-----------+
+                    |   APP     | <- Exception be triggered
+                    +-----------+
+                    |   mepc    | <- 0-level Exception
+                    +-----------+
+    PC pop1 <===    | msaveepc1 | <- 1-level Exception
+                    +-----------+
+    PC pop2 <===    | msaveepc2 | <- 2-level Exception
+                    +-----------+
+    ```
+
+## `msavecause1` and `msavecause2`
+
+**Nuclei-Nxxx** 自定義 `CSR msavecause1` and `CSR msavecause2`, 用來實現 Nested Exception feature,
+主要為 `mcause` 的 Nested Exception Stack
+
++ push flow
+
+    ```
+                        +-------------+
+                        |   APP       | <- Exception be triggered
+                        +-------------+
+                        |   mcause    | <- 0-level Exception
+                        +-------------+
+    cause1 push ===>    | msavecause1 | <- 1-level Exception
+                        +-------------+
+    cause2 push ===>    | msavecause2 | <- 2-level Exception
+                        +-------------+
+    ```
+
++ pop flow
+
+    ```
+                        +-------------+
+                        |   APP       | <- Exception be triggered
+                        +-------------+
+                        |   mcause    | <- 0-level Exception
+                        +-------------+
+    mcause pop1 <===    | msavecause1 | <- 1-level Exception
+                        +-------------+
+    mcause pop2 <===    | msavecause2 | <- 2-level Exception
+                        +-------------+
+    ```
+
+## `msavedcause1` and `msavedcause2`
+
+**Nuclei-Nxxx** 自定義 `CSR msavedcause1` and `CSR msavedcause2`, 用來實現 Nested Exception feature,
+主要為 `mdcause` 的 Nested Exception Stack
+
++ push flow
+
+    ```
+                        +--------------+
+                        |    APP       | <- Exception be triggered
+                        +--------------+
+                        |   mdcause    | <- 0-level Exception
+                        +--------------+
+    dcause push 1 ==>   | msavedcause1 | <- 1-level Exception
+                        +--------------+
+    dcause push 2 ==>   | msavedcause2 | <- 2-level Exception
+                        +--------------+
+    ```
+
++ pop flow
+
+    ```
+                        +--------------+
+                        |    APP       | <- Exception be triggered
+                        +--------------+
+                        |   mdcause    | <- 0-level Exception
+                        +--------------+
+    mdcause pop1 <==    | msavedcause1 | <- 1-level Exception
+                        +--------------+
+    mdcause pop2 <==    | msavedcause2 | <- 2-level Exception
+                        +--------------+
+    ```
+
+
+## `pushmsubm`, `pushmcause` and `pushmepc`
+
+**Nuclei-Nxxx** 自定義 `CSR pushmsubm`, `CSR pushmcause` and `CSR pushmepc`,
+用來 push `CSR pushmsubm`, `CSR pushmcause` and `CSR pushmepc` 值到 Stack 中
+> 一筆 instruction 做多件事 (e.g. 取值, 累加計算, 寫入)
+
+```
+/* 將 'msubm' 的值存到 MemAddress[SP + 13 * 4] */
+csrrwi x0, PUSHMSUBM, 13
 ```
 
 
