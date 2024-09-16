@@ -1,6 +1,9 @@
 Nuclei RISCV Interrupt [[Back](n_riscv_intro.md#Interrupt_n100)]
 ---
 
+**Nuclei-N1xx** 對比 **8051**, 因此沒有嚴格遵循標準 `riscv-privileged-v1.10.pdf`, 而是對其進行了簡化和刪減, 從而達到最小化面積和功耗的效果.
+> + Privilege Modes: **Nuclei-N1xx** 只支援 Machine Mode (M-Mode)
+
 
 # Definitions
 
@@ -52,54 +55,42 @@ Nuclei RISCV Interrupt [[Back](n_riscv_intro.md#Interrupt_n100)]
     Push-Stack -> ISR_low_priority_FrontHalf -> ISR_high_priority -> ISR_low_priority_BackHalf -> Pop-Stack
     ```
 
++ Interrupt Response Latency (中斷響應延遲)
+    > 從外部中斷源觸發, 到執行 ISR 內的第一條 instructioin, 所花費的時間.
+    >> 中間會經過幾個步驟
+    >> - 查表尋找對應的 ISR 的時間
+    >> - Save Context 的時間
+    >> - Hart 跳轉到 ISR 的時間
+
 # Exception/Interrupt 響應
 
-RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基礎的規範, 不同 vendor 會有實作上的差異
+RISC-V spec (riscv-privileged-v1.10) 裡只對 `mtvec` 和 `mcause` 做了最基礎的規範, 不同 vendor 會有實作上的差異
 
 ## Exception flow
 
-**Nuclei-Nxxx** 支援 `2-Level Nested Exception Stack`
+**Nuclei-N100** 不支援 Nested Exception, 如果發生, 屬於 Critical Fail, 無法預估會發生什麼事
 
 + Priority of Exception
     > `Exception-Code 越小, Priority 就越高`
 
+當發生 Exception 時, Hart 會跳轉到 `mtvec` 紀錄的 entry address
+
 ### Exception Enter
 
 > 當進入 exception routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 `mtvec` 紀錄的 entry address
-> + Hart 更新 CSRs (`mcause`, `mepc`, `mtval`, `mstatus`, `mdcause`)
-> + Hart 更新 Privilege mode to M-mode (Machine mode)
-> + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
+> + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`)
 
 + Hart 保存 PC 到 `mepc` 中
     > Hart 將觸發 Exception 時的 PC (Program Counter) 記錄到 `mepc`;
       當離開 Exception 時, 藉由 `mepc` 跳轉回原 PC address
     >> `mepc` 可以被 S/w 修改, 因此 S/w 可以強制修改跳轉的 address
 
-    -  `ecall/ebreak` instruction 所產生的 Exception 時,
-        > S/w 需自行將 `mepc` 累加到下一條 instruction address
-        > ```
-        > mepc = mepc+4
-        > ```
-        > 否則會造成 Deadlock
 
 + Hart 將 `mcause.EXCCODE`, 更新為當前造成 Exception 的 code number 且 `mcause.INTERRUPT` 設為 0
 + Hart 將發生 Exception 前的 `mstatus.MIE`, 保存到 `mstatus.MPIE`
     > `mstatus.MPIE` 是為了能在離開 Exception 時, 利用 `mstatus.MPIE` 來恢復進入 Exception 前的 `mstatus.MIE`
 + Hart 將 `mstatus.MIE` 設為 0, 停止 Exception 觸發
-+ Hart 將 `mstatus.MPP` 用來記錄進入 Exception 前的 Privilege Mode
-    > `mstatus.MPP` 是為了能在離開 Exception 時, 利用 `mstatus.MPP` 來恢復進入 Exception 前的 Privilege Mode
-+ Hart 強制將 Privilege Mode 切換到 M-Mode (**Trap 基本都會在 M-Mode 處理**)
-    > S-Mode 在 MCU 等級不支援
 
-+ Hart 將發生 Exception 的 address or instruction 保存在 `mtval`
-    > + Access address 造成的 Exception (紀錄 Address)
-    > + 非法 instruction 造成 Exception (紀錄 Instruction OP-Code)
-
-+ Hart 將原本的 `msubm.TYP` 保存到 `msubm.PTYP`
-    > `mstatus.PTYP` 是為了能在離開 Exception 時, 利用 `mstatus.PTYP` 來恢復進入 Exception 前的 Machine Sub-Mode
-
-+ Hart 將 `msubm.TYP` 變更為 real-time 的 Trap mode (Exception/Interrupt/NMI)
 
 
 ### Exception Handle
@@ -107,33 +98,31 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
 > `此階段之後全由 S/w 接手`
 
 + Save Context
-    > + RV32E 需保存 `GPR * 8`
-    > + RV32I 需保存 `GPR * 16`
+    > + RV32E 需保存 `GPR * 14` (?)
+    > + RV32I 需保存 `GPR * 20`
 
 + Save CSRs Context
-    > Push CSRs `mepc`, `mcause`, `msubm`
-    >> 紀錄 CSRs 是為了 Nested interrupt 情況
+    > Push CSRs `mepc`, `mcause`
 
-+ Handle Exception (CSR_MTVEC is the entry address)
-   > + argv[0]: mcause
-   > + argv[1]: sp
++ Handle Exception
+    > 由 S/w 決定要使用何種 Exception Handler (call C-code function)
+    > + argv[0]: mcause
+    > + argv[1]: sp
 
 + Restore CSRs Context
-    > Pop CSRs `mepc`, `mcause`, `msubm`
+    > Pop CSRs `mepc`, `mcause`
 
 + Restore Context
-    > + RV32E 需恢復 `GPR * 8`
-    > + RV32I 需恢復 `GPR * 16`
+    > + RV32E 需恢復 `GPR * 14` (?)
+    > + RV32I 需恢復 `GPR * 20`
 
 ### Exception Leave
 
 > 返回時, S/w 須執行 `mret` instruction, 此指令會讓 **Hart 自動在 1T(sysclk) 內執行以下步驟**
 > + 跳轉到 `mepc` 紀錄的 address
 > + Hart 更新 CSRs (`mstatus`)
-> + Hart 恢復原本的 Privilege mode
-> + Hart 恢復原本的 Machine Sub-Mode
 
-+ `ecall/ebrack` instruction 觸發 Exception 時, S/w 必須在 handler 中, 改變 `mepc` 指向下一條 instruction
++ `ecall/ebrack` instruction 觸發 Exception 時, S/w 可能須要在 handler 中, 改變 `mepc` 指向下一條 instruction
     > 由於現在 `ecall/ebreak` 都是 4-bytes 指令, 可以明確知道下一條 instruction 會 offset 4-bytes
 
     ```
@@ -141,322 +130,336 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
     ```
 
 + Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值, `mstatus.MPIE` 設為 1
-+ Hart 將 Privilege Mode 恢復為 `mstatus.MPP` 內的值
-    > + 0x0: User Mode
-    > + 0x3: Machine Mode
-
-+ Hart 將 Machine Sub-Mode 恢復為 `msubm.PTYP` 內的值
 
 
 ## Interrupt flow
 
+**Nuclei-N100** 統一由 IRQC 處理 Internal (2) and External (32-2) Interrupt
+> Internal Interrupt 固定為
+> + IRQ_0: SWI
+>> 可藉由設定 `msip.MSIP` 產生
+> + IRQ_1: SysTimer
+>> 可藉由設定 System Timer Unit 來產生
 
-#### SysTimer interrupt
 
-+ Members of SysTimer
++ Priority of Interrupt
+    > `IRQ ID 越大, Priority 就越高`
 
-    ```c
-    // ref NMSIS/core_feature_timer.h
+**Nuclei-N100** 不支援 H/w Nested Interupt
 
-    typedef struct {
-        __IOM uint64_t MTIMER;           /*!< Offset: 0x000 (R/W)  System Timer current value 64bits Register */
-        __IOM uint64_t MTIMERCMP;        /*!< Offset: 0x008 (R/W)  System Timer compare Value 64bits Register */
-        __IOM uint32_t RESERVED0[0x3F8]; /*!< Offset: 0x010 - 0xFEC Reserved */
-        __IOM uint32_t MSFTRST;          /*!< Offset: 0xFF0 (R/W)  System Timer Software Core Reset Register */
-        __IOM uint32_t RESERVED1;        /*!< Offset: 0xFF4 Reserved */
-        __IOM uint32_t MTIMECTL;         /*!< Offset: 0xFF8 (R/W)  System Timer Control Register, previously MSTOP register */
-        __IOM uint32_t MSIP;             /*!< Offset: 0xFFC (R/W)  System Timer SW interrupt Register */
-    } SysTimer_Type;
-    ```
-
-#### S/w interrupt
-
-可經由 `SysTimer.MSIP` 來產生 SWI (S/w Interrupt)
+**Nuclei-N100** 會使用 IRQC 的 Interrupt Vectored mode (向量中斷);
+當 Interrupt 發生時, Hart 跳轉到, 以 `mtvt` 為 Vector-Table base, `IRQ ID * 4` 為 offset 的 entry address (ISR)
+> 從中斷觸發到跳轉至 ISR, **花費至少 6T**
 
 ### Interrupt Enter
 
 > 當進入 ISR 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 ////`mtvec` 紀錄的 entry address
-> + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`, `mintstatus`)
-> + Hart 更新 Privilege mode to M-mode (Machine mode)
-> + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
-
-> 正常情況下
-> + `mstatus.MPIE == mcause.MPIE`
-> + `mstatus.MPP == mcause.MPP`
-
+> + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`)
 
 + Hart 將 Interrupt 發生時, 尚未執行的下一條 instruction address (PC+4 or PC+2) 保存到 `mepc` 中
     > `mepc` 可以被 S/w 修改, 因此 S/w 可以強制修改跳轉的 address
 
-    - Interrupt Vectored mode (向量中斷)
-        > `ECLIC->CTRL[irq_id].INTATTR_b.SHV == 1`
-
-        1. Hart 會依照 interrupt source id, 去計算以 `mtvt` 為 base 的中斷向量 offset, 並跳轉到對應的 ISR (花費至少 6T)
-            > H/w 直接響應, 因此在 ISR 中需自行實作 `Save/Restore Context` 流程 (需自行處理 push/pop 行為)
-
-            I. **ISR 必須使用 `__attribute__((interrupt))` 宣告**
-                > Compiler 會對 `__attribute__((interrupt))` 屬性的 ISR 進行分析,
-                若在 ISR 中呼叫其他 funcion, Compiler 則會強制加入 Push/Pop 程式碼
-                >> 不建議在 ISR 中, 再去呼叫其他 function
-
-        1. 在 Interrupt Vectored mode (向量中斷) 中, Hart 會分 2-stages 來完成
-            > + 先從 Vector Table 查表獲得對應的 ISR address
-            > + 再跳轉到獲得的 ISR
-
-            I. `mcause.MINHV` 被用來表示上述的 2-stages 是否正常完成
-                > + `mcause.MINHV == 0`: 正確完成
-                > + `mcause.MINHV == 1`: Something wrong
-                >> 可能會觸發 Exception `mcause.EXCCODE = 1` (Instruction access fault)
-
-    - Interrupt Direct mode (非向量)
-        > `ECLIC->CTRL[irq_id].INTATTR_b.SHV == 0`
-
-        1. `mtvt2.bit[0] == 0`
-            > 跳轉到 `mtvec[31:6]` entry address
-            >> Exception and Interrupt 共用 `mtvec[31:6]`
-
-            - 由 S/w 來分辨 Exception or Interrupt, 並決定調轉到哪一個 handler (需使用 stack)
-
-        1. `mtvt2.bit[0] == 1`
-            > 跳轉到 `mtvt2[31:2]` entry address
-            >> + Exception handler: `mtvec[31:6]` entry address
-            >> + Interrupt ISR: `mtvt2[31:2]` entry address
-
-            - 使用 CSR_JALMNXTI 來做 H/w 跳轉 (無額外 stack 開銷)
-
-+ Hart 將 `mcause.EXCCODE` 更新為 ECLIC 的 IRQ ID 且 `mcause.INTERRUPT` 設為 1
-+ Hart 將中斷前的 `mintstatus.MIL` 保存到 `mcause.MPIL`, `mintstatus.MIL` 更新為目前的 Nested Interrupt Level
-    > 當離開 ISR 時, `mcause.MPIL` 被用來恢復原本的 `mintstatus.MIL`
-
++ Hart 將 `mcause.EXCCODE` 更新為 IRQC 的 IRQ ID 且 `mcause.INTERRUPT` 設為 1
 + Hart 將發生中斷前的 `mstatus.MIE`, 保存到 `mstatus.MPIE`
     > `mstatus.MPIE` 是為了能在離開中斷時, 利用 `mstatus.MPIE` 來恢復進入中斷前的 `mstatus.MIE`
 + **Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發**
-
-+ Hart 將 `mstatus.MPP` 用來記錄進入中斷前的 Privilege Mode
-    > `mstatus.MPP` 是為了能在離開中斷時, 利用 `mstatus.MPP` 來恢復進入中斷前的 Privilege Mode
-+ Hart 強制將 Privilege Mode 切換到 M-Mode (**中斷都會在 M-Mode 處理**)
-
-
-+ Hart 將原本的 `msubm.TYP` 保存到 `msubm.PTYP`
-    > `mstatus.PTYP` 是為了能在離開 Exception 時, 利用 `mstatus.PTYP` 來恢復進入 Exception 前的 Machine Sub-Mode
-
-+ Hart 將 `msubm.TYP` 設為 1 (Interrupt)
 
 
 ### Interrupt Handle
 
 > `此階段之後, 基本由 S/w 接手`
+> + **每個 ISR 都需自行處理 Push/Pop 行為** (?)
+>> `__attribute__((interrupt))` 會處理剛進入 ISR 時的 `Save/Restore GPRs` 行為 (?)
+> + 有 `__attribute__((interrupt))` 屬性的 function, Compiler 會視情況強制加入 `Save/Restore GPRs` 行為
+> + 不支援 H/w Tail-chaining (中斷咬尾)
+>> 可用 S/w 實作 (ref: 7.12 Interrupt Tail-Chaining in Nuclei_N100_Series_Databook.pdf)
 
-+ Interrupt Vectored mode (向量中斷)
-    > + 在此模式下, 從中段觸發到跳轉至 ISR, **花費至少 6T**
-    > + **每個 ISR 都需自行處理 Push/Pop 行為**
-    > + 有 `__attribute__((interrupt))` 屬性的 function, 視情況 Compiler 會強制加入 `Save/Restore GPRs` 行為
-    > + 此模式不支援 Tail-chaining (中斷咬尾)
-
-    - 此模式下進入 ISR 時, Hart 會關閉全域中斷 `mstatus.MIE = 0`,
-      因此若要實作 Nested Interrupt, 每個 ISR 需自行實作 (CPU 執行) 以下步驟
-
-        1. Save Context
-        1. Save CSRs Context
-            > Push CSRs `mepc`, `mcause`, `msubm`
-        1. **開啟全域中斷 `mstatus.MIE = 1`**
-
-        1. 處理此中斷對應的流程
-
-        1. **關閉全域中斷 `mstatus.MIE = 0`**
-        1. Restore CSRs Context
-            > Pop CSRs `mepc`, `mcause`, `msubm`
-
-        1. Restore Context
-
-+ Interrupt Direct mode (非向量)
-
-    - Save Context
-        > + RV32E 需保存 `GPR * 8`
-        > + RV32I 需保存 `GPR * 16`
-
-    - Save CSRs Context
-        > Push CSRs `mepc`, `mcause`, `msubm`
-        >> 紀錄 CSRs 是為了 Nested interrupt 情況
-
-    - Handle Interrupt
-        > 經由底下 instruction (H/w 跳轉至 ISR), Hart 會以 `mtvt` 為 base, 計算 offset 並跳轉到對應的 ISR
-        > ```asm
-        > /* 有 IRQ pending 則跳轉, 若無 IRQ pending 則變 NOP */
-        > csrrw ra, CSR_JALMNXTI, ra    /* 花費至少 5T */
-        > ```
-
-        1. **Hart 在跳轉到 ISR 後, 會自動開啟全域中斷 `mstatus.MIE = 1`**
-            > 為達到 Nested Interrupt 效果
-
-        1. CSR_JALMNXTI
-            > + 有 JAL 的特性, 會紀錄目前 address 到 `GPRs ra` (從 ISR 返回)
-            > + 從 ISR 返回後, 重複執行 CSR_JALMNXTI 直到沒有 Interrupt Pending
-            >> 達到 Tail-chaining (中斷咬尾) 效果 (省下 Save/Restore context 開銷)
-
-
-    - Restore CSRs Context
-        > Pop CSRs `mepc`, `mcause`, `msubm`
-    - Restore Context
-        > + RV32E 需恢復 `GPR * 8`
-        > + RV32I 需恢復 `GPR * 16`
 
 
 ### Interrupt Leave
 
 > 返回時, S/w 須執行 `mret` instruction, 此指令會讓 **Hart 自動在 1T(sysclk) 內執行以下步驟**
 > + 跳轉到 `mepc` 紀錄的 address
-> + Hart 更新 CSRs (`mstatus`, `mcause`, `mintstatus`)
-> + Hart 恢復原本的 Privilege mode
-> + Hart 恢復原本的 Machine Sub-Mode
-
-+ Hart 將 `mintstatus.MIL` 恢復為 `mcause.MPIL` 內的值 (Nested Interrupt Level)
-+ Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值, `mstatus.MPIE` 設為 1
-+ Hart 將 Privilege Mode 恢復為 `mstatus.MPP` 內的值
-    > + 0x0: User Mode
-    > + 0x3: Machine Mode
-
-+ Hart 會同步更新 `mstatus` 及 `mcause`
-    > + `mstatus.MPIE == mcause.MPIE`
-    > + `mstatus.MPP == mcause.MPIE`
-
-+ Hart 將 Machine Sub-Mode `msubm.TYP` 恢復為 `msubm.PTYP` 內的值
-
-
-## Non-Maskable Interrupt (NMI) flow
-
-### NMI Enter
-
-> 當進入 ISR 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 `mnvec` 紀錄的 entry address
-> + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`, `mintstatus`)
-> + Hart 更新 Privilege mode to M-mode (Machine mode)
-> + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
-
-+ Hart 將 Interrupt 發生時, 尚未執行的下一條 instruction address (PC+4 or PC+2) 保存到 `mepc` 中
-    > `mepc` 可以被 S/w 修改, 因此 S/w 可以強制修改跳轉的 address
-
-    - 跳轉到 `mnvec` entry address
-        1. `mmisc_ctl.NMI_CAUSE_FFF == 1`
-            > `mnvec == mtvec`
-
-        1. `mmisc_ctl.NMI_CAUSE_FFF == 0`
-            > `mnvec == reset_vector`
-            >> reset_vector 為 Cool Reset 的程式執行起點 (?)
-
-+ Hart 將 `mcause.EXCCODE` 更新為 NMI_Trap_ID
-    - `mmisc_ctl.NMI_CAUSE_FFF == 1`: `mcause.EXCCODE = 0xFFF`
-    - `mmisc_ctl.NMI_CAUSE_FFF == 0`: `mcause.EXCCODE = 0x1`
-
-
-+ Hart 將發生 NMI 前的 `mstatus.MIE`, 保存到 `mstatus.MPIE`
-    > `mstatus.MPIE` 是為了能在離開 NMI 時, 利用 `mstatus.MPIE` 來恢復進入 NMI 前的 `mstatus.MIE`
-+ **Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發**
-
-+ Hart 將 `mstatus.MPP` 用來記錄進入 NMI 前的 Privilege Mode
-    > `mstatus.MPP` 是為了能在離開 NMI 時, 利用 `mstatus.MPP` 來恢復進入 NMI 前的 Privilege Mode
-+ Hart 強制將 Privilege Mode 切換到 M-Mode (**NMI 都會在 M-Mode 處理**)
-
-
-+ Hart 將原本的 `msubm.TYP` 保存到 `msubm.PTYP`
-    > `mstatus.PTYP` 是為了能在離開 NMI 時, 利用 `mstatus.PTYP` 來恢復進入 NMI 前的 Machine Sub-Mode
-
-+ Hart 將 `msubm.TYP` 設為 3 (NMI)
-
-### NMI Handle
-
-> `此階段之後, 基本由 S/w 接手`
-
-需自行處理 `Save/Restore context`
-
-
-### NMI Leave
-
-> 返回時, S/w 須執行 `mret` instruction, 此指令會讓 **Hart 自動在 1T(sysclk) 內執行以下步驟**
-> + 跳轉到 `mepc` 紀錄的 address
 > + Hart 更新 CSRs (`mstatus`)
-> + Hart 恢復原本的 Privilege mode
-> + Hart 恢復原本的 Machine Sub-Mode
 
 
 + Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值, `mstatus.MPIE` 設為 1
 + Hart 將 Privilege Mode 恢復為 `mstatus.MPP` 內的值
-    > + 0x0: User Mode
-    > + 0x3: Machine Mode
-
-+ Hart 將 Machine Sub-Mode `msubm.TYP` 恢復為 `msubm.PTYP` 內的值
-
-
-### Nested of NMI and Exception
-
+    > N100 只支援 M-Mode, 為何還要動 `mstatus.MPP` (? 沒有勘誤 ?)
 
 
 # CSRs of Nuclei-N100
 
+**Nuclei-N100** 對 CSRs 存取權限進行限制
+> + 對不存在的 CSR register 進行 R/W 操作, 會產生 Illegal Instruction Exception (`mcause.EXCCODE = 2`)
+> + 對 MRW attribute (R/W in M-Mode) 的 CSR register 進行 R/W 則一切正常
+> + 對 MRO attribute (RO in M-Mode) 的 CSR register 進行 read 則一切正常
+> + 對 MRO attribute (RO in M-Mode) 的 CSR register 進行 Write 操作, 則會產生 Illegal Instruction Exception (`mcause.EXCCODE = 2`)
+
+## System TIMER (24-bits) Unit
+
+**Nuclei-N100** 自定義 `CSR Private TIMER Unit`, 按照系統的 Real Time Clock 進行計時
+> default is Enable
+
+為降低功耗, S/w 可設定 `CSR mstop.TIMESTOP` 來停止 System TIMER
+> 只有在 normal mode 下, System TIMER 才會作用 (Debug mode 下不會計數 ?)
+
++ **mtime (timer counter)**
+
+    Nuclei-N100 自定義 `mtime (24-bits)`, 將 System TIMER 的值 real-time 反映在 `CSR mtime` 中
+
++ **mtimecmp (timer compare value)**
+
+    Nuclei-N100 自定義 `mtimecmp (24-bits)`, 作為 TIMER Unit 的比較值,
+    當 System TIMER 的 `mtime >= mtimecmp`, 則產生 System TIMER 中斷
+
++ **msip (software interrupt)**
+
+    Nuclei-N100 自定義 `msip`, 用來產生 Software Interrupt (SWI)
+    > 藉由 System TIMER 來實作 SWI
+
+    - Member fields
+        1. `msip.MSIP`, R/W, bit[0]
+            > + 0: S/w clears the SWI interrupt
+            > + 1: S/w generates the SWI interrupt
+
+
++ **mstop (timer counter stop control)**
+
+    Nuclei-N100 自定義 `mstop`, 用來停止 System TIMER
+
+    - Member fields
+        1. `mstop.TIMESTOP`, R/W, bit[0]
+            > + 1: the System TIMER is paused
+            > + others: increments normally
+
+
 ## `mtvec` (Machine Trap-Vector Base-Address Register, R/W)
+
+用來設定 Exception Handler Address, 在 **Nuclei-N100** 中為 `MRO` (直接用 H/w Hard-Code 指定到固定的 Memory area)
+> S/w 藉由註冊 ISR 的方式來變更 table items
+
+
++ Member fields
+    - `mtvec.MODE`, RO, bit[5:0]
+
+        1. `mtvec.MODE == 0x3` 使用 IRQC interrupt mode (default mode)
+        1. `mtvec.MODE != 0x3` 使用 Interrupt Direct mode (非向量)
+            > Exception and Interrupt 都進入相同的 handler
+            >> 當直接設定 function pointer (4-bytes align) 時, `mtvec.MODE != 0x3` 成立
+
+    - `mtvec.ADDR`, RO, bit[31:6]
+        > `Base Address MUST be 64-align`, 利用 Link Script 將 symbol 放到 H/w Hard-Code 指定的位址
+
+        ```
+            .align 6  /* In IRQC mode, the trap entry must be 64(2^6) bytes aligned */
+            .global trap_entry
+            .weak trap_entry
+        trap_entry:
+            ...
+        ```
+
 
 
 ## `mtvt` (Machine Trap-handler Vector Table base Register)
 
+用來設定 Vector Table base address, 在 **Nuclei-N100** 中為 `MRO` (直接用 H/w Hard-Code 指定到固定的 Memory area).
 
+**Nuclei-N100** 為提升效率及降低 Gate Count, `mtvt` 會依 Interrupt source 數量來決定 align 方式
+> H/w Configuration
 
-## `mnxti` (Next Interrupt Handler Address and Interrupt-Enable)
+| Total IRQ | `mtvt` align in RV32      |
+| :-:       | :-:                       |
+| < 16      | mtvt[31:6]  (64-Bytes)    |
+| < 32      | mtvt[31:7]  (128-Bytes)   |
 
-
-## `mtvt2` (Machine Trap-handler Vector Table base Register)
-
-
-## `jalmnxti` (JAL Next Interrupt Handler Address and Interrupt-Enable)
 
 ## `mcause` (Machine Cause Register)
 
+在 **Nuclei-N100** 中為 `MRW`
 
-## `mdcause` (Machine Detailed Trap Cause Register)
++ Member fields
+    - `mcause.INTERRUPT`, bit[31]
+        > + 0: Exception type of trap
+        > + 1: Interrupt type of trap
+
+    - `mcause.EXCCODE`, bit[11:0]
+        > Exception-Code
+
++ **Exception Code** (Nuclei-N100)
+
+    - Interrupt
+
+        | Interrupt-Flag bit[31] | Exception-Code (IRQ ID) bit[11:0] | Description
+        | :-:                    | :-:                               | :-
+        | 1                      |    0                              |  Machine Software interrupt
+        | 1                      |    1                              |  Machine Timer interrupt
+        | 1                      |    2                              |  External interrupt 0
+        | 1                      |    3                              |  External interrupt 1
+        | 1                      |    ...                            | ...
+        | 1                      |    31  (Priority High)            |  External interrupt 29
+
+    - Exception
+
+        | Interrupt-Flag bit[31] | Exception-Code bit[11:0] | Description
+        | :-:                    | :-:                      | :-
+        | 0                      |    0   (Priority High)   |  Instruction address misaligned (RISC-V Extension 'C' ignoer)
+        | 0                      |    1                     |  Instruction access fault (`mdcause` 提供詳細的錯誤類型)
+        | 0                      |    2                     |  Illegal instruction
+        | 0                      |    3                     |  Breakpoint (`ebreak` instruction trigger exception)
+        | 0                      |    4                     |  Load address misaligned (**Nuclei-N100 H/w 不支援 Non-align Address Access**)
+        | 0                      |    5                     |  Load access fault
+        | 0                      |    6                     |  Store/AMO address misaligned (**Nuclei-N100 H/w 不支援 Non-align Address Access**)
+        | 0                      |    7                     |  Store access fault
+        | 0                      |    8                     |  Reserved
+        | 0                      |    9                     |  Reserved
+        | 0                      |    10                    |  Reserved
+        | 0                      |    11                    |  Environment call from M-mode (`ecall` instruction trigger exception when M-mode)
+        | 0                      |    12                    |  Reserved
+
+
++ Priority
+    > Exception-Code 越小, Priority 就越高
+
 
 ## `mepc` (Machine Exception Program Counter)
 
+在 **Nuclei-N100** 中為 `MRW`
 
-## `mtval` (Machine Trap Value Register)
++ Member fields
+    - `mepc.EPC`, bit[19:1]
 
+用於保存進入 Exception 前, 正在執行指令的 PC 值 (作為 Exception 的返回地址)
+> + `CSR mepc` 可反應當前遇到 Exception 的 instruction address
+>> 發生 Exception 時, `CSR mepc` 會被 Hart 同步更新
+> + `CSR mepc` 為 R/W 屬性, S/w 可以重設返回地址
 
 ## `mstatus` (Machine Status Register)
 
-## `mintstatus` (Machine Interrupt Status Register)
+`mstatus` 是 Machine Mode 下的狀態暫存器, 在 **Nuclei-N100** 中為 `MRW`
+
++ Member fields
+
+    - `mstatus.MIE`, bit[3] (Machine mode Interrupt Enable)
+        > Global interrupt enable in M-Mode
+        >> U-Mode 下無法關中斷
+        > + 1: enable global interrupt
+        > + 0: disable global interrupt
+
+        1. **Nuclei-N100** 進入 trap (Exception/Interrupt/NMI) 時, H/w 自動關中斷 `mstatus.MIE = 0`
 
 
-## `mie` (Machine Interrupt Enable)
+    - `mstatus.MPIE`, bit[7] (Machine mode Previous Interrupt Enable)
+        > 紀錄進入 M-mode trap 之前的 MIE
 
-## `mip` (Machine Interrupt Pending)
-
-## `mscratch` (Machine Scratch Register)
-
-
-## `msubm` (Machine Sub-Mode Register)
-
-## `mnvec` (Machine NMI-Vector Base-Address Register)
-
-
-## `mmisc_ctl`
 
 ## `mcycle` (Machine Cycle counter) and `mcycleh` (Upper 32-bits of mcycle, RV32 only)
 
+在 **Nuclei-N100** 中為 `MRW`
+
+RISC-V 定義了一個 64-bits 的 Clock Counter, 用於反映 Hart 執行了多少個時鐘週期
+> 只要 Hart 處於執行狀態時, 此計數器便會不斷計數
+
+```
+Clock Counter = (mcycleh << 32 | mcycle)
+```
+
+**Nuclei-N100** 為降低功耗, S/w 可設定 `CSR mcountinhibit.CY` 來停止 Clock Counter
+> 只有在 normal mode 下, `mcycle` 才會作用 (Debug mode 下不會計數)
 
 
-## `msavestatus`
+## `minstret` (Machine Instruction Retired Register) and `minstreth` (Upper 32 bits of Instructions-retired counter)
+
+在 **Nuclei-N100** 中為 `MRW`
+
+RISC-V 定義了一個 64-bits 的 Instruction Retired Counter, 用於反映 Core 成功執行了多少條指令
+> 只要 Hart 每成功執行完成一條指令, 此計數器便會自動計數
+
+```
+Instruction Retired Counter = (minstreth << 32 | minstret)
+```
+
+**Nuclei-N100** 為降低功耗, S/w 可設定 `CSR mcountinhibit.IR` 來停止 Instruction Retired Counter
+> 只有在 normal mode 下, `minstret` 才會作用 (Debug mode 下不會計數)
 
 
-## `msaveepc1` and `msaveepc2`
+## `mcountinhibit` (Machine Counter Control Register)
+
+**Nuclei-N100** 自定義 `CSR mcountinhibit` 為 `MRW`, 用來控制 `mcycle` 和 `minstret` 的計數
+
++ Member fields
+
+    - `mcountinhibit.IR`, bit[2]
+        > + 0: minstret/minstreth is start
+        > + 1: minstret/minstreth is stop counting
+
+    - `mcountinhibit.CY`, bit[0]
+        > + 0: mcycle/mcycleh is start
+        > + 1: mcycle/mcycleh is stop counting
 
 
-## `msavecause1` and `msavecause2`
+## `sleepvalue` (Sleep Mode Register)
+
+**Nuclei-N100** 自定義 `CSR sleepvalue` 為 `MRW`, 用來設定不同的 Sleep mode
+
++ Member fields
+
+    - `sleepvalue.SLEEPVALUE`, bit[0]
+        > + 0: Sleep mode (After `WFI`, SoC should turn `core_clk` off)
+        > + 1: DeepSleep mode (After `WFI`, SoC should turn `core_clk` and `core_aon_clk` both off)
+
+## `wfe` (WFE Register)
+
+**Nuclei-N100** 自定義 `CSR wfe` 為 `MRW`, 用來設定進入 Sleep (`WFI`) 後, wake-up 條件 (Interrupt or Event)
+
++ Member fields
+
+    - `wfe.WFE`, bit[0]
+        > + 0: Wake-up by Interrupt (default)
+        > + 1: Wake-up by Event
 
 
-## `msavedcause1` and `msavedcause2`
 
-## `pushmsubm`, `pushmcause` and `pushmepc`
+## IRQC Unit
+
+**Nuclei-N100** 為省面積, 自定義 Interrupt Controller (IRQC), 用來管理所有 Interrupt sources
+> IRQC 只限作用於單一個 Hart
 
 
++ IRQC 有以下特性
+
+    - IRQC 最多只支援 `32 interrupt sources`, 其中 2 個 Interrupt Source 已被 System TIMER Unit (internal) 使用
+        > External Interrupt Source 最多只有 `32 - 2` 個
+        > + IRQ_0: software interrupt
+        > + IRQ_1: system timer interrupt
+
+    - 將 IRQ_ID 直接當作是 Interrupt Priority
+        > **IRQ Id 越大, Priority 越高**
+
+    - IRQC 只支援 Interrupt Vectored mode
+        > 中斷發生時, Hart 會跳轉到以 `CSR mtvt` 為 Vector Tabal base, `IRC_ID * 4` 為 offset 的 entry address
+        >> **Hart 查表並跳轉, 最少需要 6T**
+    - IRQC 只支援 Level interrupt (Nuclei_N100_Series_Databook.pdf)
+    - IRQC 不支援 H/w Nested Interrupt 機制
+        > 必要時可以用 S/w 實作
+        > + Check the pending interrupts to make sure there is a higher priority interrupt exits
+        > + Save the `mcause`, `mstatus`, `mepc` to stack
+        > + Count the Interrupt Level
+        > + Clear current interrupt pending by controls the related peripheral
+        > + Enable MIE
+    - IRQC 不支援 Tail-chaining (中斷咬尾)
+
+
+### `irqcip` (IRQC interrupt pending flag register)
+
+**Nuclei-N100** 自定義 `CSR irqcip` 為 `MRW`, 用來描述是否有 Interrupt pending
+> Bit-Order 對應中斷 ID, e.g. bit[0] => IRQ_0, bit[21] => IRQ_21, ...etc.
+
+
+### `irqcie` (IRQC interrupt enable flag register)
+
+**Nuclei-N100** 自定義 `CSR irqcie` 為 `MRW`, 用來開關 Interrupt Sources in IRQC
+> Bit-Order 對應中斷 ID, e.g. bit[0] => IRQ_0, bit[21] => IRQ_21, ...etc.
 
 # Reference
 

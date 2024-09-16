@@ -63,10 +63,11 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
 + Priority of Exception
     > `Exception-Code 越小, Priority 就越高`
 
+當 Exception 發生時, Hart 會跳轉到 `mtvec` 紀錄的 entry address
+
 ### Exception Enter
 
 > 當進入 exception routine 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 `mtvec` 紀錄的 entry address
 > + Hart 更新 CSRs (`mcause`, `mepc`, `mtval`, `mstatus`, `mdcause`)
 > + Hart 更新 Privilege mode to M-mode (Machine mode)
 > + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
@@ -207,11 +208,11 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
     > + Interrupt Vectored
     >> `ECLIC->CTRL[irq_id].INTATTR_b.SHV = 1`
 
+當 Interrupt 發生時, Hart 會跳轉到 `mtvt2` 紀錄的 entry address
 
 ### Interrupt Enter
 
 > 當進入 ISR 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 ////`mtvec` 紀錄的 entry address
 > + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`, `mintstatus`)
 > + Hart 更新 Privilege mode to M-mode (Machine mode)
 > + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
@@ -284,7 +285,7 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 > `此階段之後, 基本由 S/w 接手`
 
 + Interrupt Vectored mode (向量中斷)
-    > + 在此模式下, 從中段觸發到跳轉至 ISR, **花費至少 6T**
+    > + 在此模式下, 從中斷觸發到跳轉至 ISR, **花費至少 6T**
     > + **每個 ISR 都需自行處理 Push/Pop 行為**
     > + 有 `__attribute__((interrupt))` 屬性的 function, 視情況 Compiler 會強制加入 `Save/Restore GPRs` 行為
     > + 此模式不支援 Tail-chaining (中斷咬尾)
@@ -361,10 +362,11 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 
 ## Non-Maskable Interrupt (NMI) flow
 
+當 NMI 發生時, Hart 會跳轉到 `mnvec` 紀錄的 entry address
+
 ### NMI Enter
 
 > 當進入 ISR 時, **Hart 自動在 1T(sysclk) 內完成以下步驟**
-> + 跳轉到 `mnvec` 紀錄的 entry address
 > + Hart 更新 CSRs (`mcause`, `mepc`, `mstatus`, `mintstatus`)
 > + Hart 更新 Privilege mode to M-mode (Machine mode)
 > + Hart 更新 Machine Sub-Mode (`msubm.TYP`)
@@ -511,7 +513,7 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 
     - Leave (`mret` triggers Hart handle)
 
-        
+
 
 
 
@@ -656,25 +658,25 @@ csrrw ra, CSR_JALMNXTI, ra
 
     - interrupt
 
-        | Interrupt-Flag bit[31] | Exception-Code bit[11:0] | Description
-        | :-:                    | :-:                      | :-
-        | 1                      |    0                     |  Reserved
-        | 1                      |    1                     |  Reserved
-        | 1                      |    2                     |  Reserved
-        | 1                      |    3                     |  Software interrupt (M-mode)
-        | 1                      |    4                     |  Reserved
-        | 1                      |    5                     |  Reserved
-        | 1                      |    6                     |  Reserved
-        | 1                      |    7                     |  Timer interrupt (M-mode)
-        | 1                      |    8                     |  Reserved
-        | 1                      |    9                     |  Reserved
-        | 1                      |    10                    |  Reserved
-        | 1                      |    11                    |  External interrupt (M-mode)
-        | 1                      |    12–15                 |  Reserved
-        | 1                      |    16 + 0                |  CLIC external interrupt 0 (pad_clic_int_vld[0])
-        | 1                      |    16 + 1                |  CLIC external interrupt 1 (pad_clic_int_vld[1])
-        | 1                      |    ...                   | ...
-        | 1                      |    255                   |  CLIC external interrupt 1 (pad_clic_int_vld[239])
+        | Interrupt-Flag bit[31] | Exception-Code (IRQ ID) bit[11:0] | Description
+        | :-:                    | :-:                               | :-
+        | 1                      |    0                              |  Reserved
+        | 1                      |    1                              |  Reserved
+        | 1                      |    2                              |  Reserved
+        | 1                      |    3                              |  Software interrupt (M-mode)
+        | 1                      |    4                              |  Reserved
+        | 1                      |    5                              |  Reserved
+        | 1                      |    6                              |  Reserved
+        | 1                      |    7                              |  Timer interrupt (M-mode)
+        | 1                      |    8                              |  Reserved
+        | 1                      |    9                              |  Reserved
+        | 1                      |    10                             |  Reserved
+        | 1                      |    11                             |  External interrupt (M-mode)
+        | 1                      |    12–15                          |  Reserved
+        | 1                      |    16 + 0                         |  CLIC external interrupt 0 (pad_clic_int_vld[0])
+        | 1                      |    16 + 1                         |  CLIC external interrupt 1 (pad_clic_int_vld[1])
+        | 1                      |    ...                            | ...
+        | 1                      |    255                            |  CLIC external interrupt 1 (pad_clic_int_vld[239])
 
 
     - Exception
@@ -905,13 +907,13 @@ Clock Counter = (mcycleh << 32 | mcycle)
 **Nuclei-Nxxx** 自定義 `CSR msaveepc1` and `CSR msaveepc2`, 用來實現 Nested Exception feature,
 主要為 `mepc` 的 Nested Exception Stack
 
-+ push flow
++ Entry flow
 
     ```
                     +-----------+
                     |   APP     | <- Exception be triggered
                     +-----------+
-                    |   mepc    | <- 0-level Exception
+    PC push0 ===>   |   mepc    | <- 0-level Exception
                     +-----------+
     PC push1 ===>   | msaveepc1 | <- 1-level Exception
                     +-----------+
@@ -919,13 +921,13 @@ Clock Counter = (mcycleh << 32 | mcycle)
                     +-----------+
     ```
 
-+ pop flow
++ Level flow
 
     ```
                     +-----------+
                     |   APP     | <- Exception be triggered
                     +-----------+
-                    |   mepc    | <- 0-level Exception
+    PC pop0 <===    |   mepc    | <- 0-level Exception
                     +-----------+
     PC pop1 <===    | msaveepc1 | <- 1-level Exception
                     +-----------+
@@ -938,13 +940,13 @@ Clock Counter = (mcycleh << 32 | mcycle)
 **Nuclei-Nxxx** 自定義 `CSR msavecause1` and `CSR msavecause2`, 用來實現 Nested Exception feature,
 主要為 `mcause` 的 Nested Exception Stack
 
-+ push flow
++ Entry flow
 
     ```
                         +-------------+
                         |   APP       | <- Exception be triggered
                         +-------------+
-                        |   mcause    | <- 0-level Exception
+    cause0 push ===>    |   mcause    | <- 0-level Exception
                         +-------------+
     cause1 push ===>    | msavecause1 | <- 1-level Exception
                         +-------------+
@@ -952,17 +954,17 @@ Clock Counter = (mcycleh << 32 | mcycle)
                         +-------------+
     ```
 
-+ pop flow
++ Level flow
 
     ```
                         +-------------+
                         |   APP       | <- Exception be triggered
                         +-------------+
-                        |   mcause    | <- 0-level Exception
+    cause pop0 <===     |   mcause    | <- 0-level Exception
                         +-------------+
-    mcause pop1 <===    | msavecause1 | <- 1-level Exception
+    cause pop1 <===     | msavecause1 | <- 1-level Exception
                         +-------------+
-    mcause pop2 <===    | msavecause2 | <- 2-level Exception
+    cause pop2 <===     | msavecause2 | <- 2-level Exception
                         +-------------+
     ```
 
@@ -977,7 +979,7 @@ Clock Counter = (mcycleh << 32 | mcycle)
                         +--------------+
                         |    APP       | <- Exception be triggered
                         +--------------+
-                        |   mdcause    | <- 0-level Exception
+    dcause push 0 ==>   |   mdcause    | <- 0-level Exception
                         +--------------+
     dcause push 1 ==>   | msavedcause1 | <- 1-level Exception
                         +--------------+
@@ -991,11 +993,11 @@ Clock Counter = (mcycleh << 32 | mcycle)
                         +--------------+
                         |    APP       | <- Exception be triggered
                         +--------------+
-                        |   mdcause    | <- 0-level Exception
+    dcause pop0 <==     |   mdcause    | <- 0-level Exception
                         +--------------+
-    mdcause pop1 <==    | msavedcause1 | <- 1-level Exception
+    dcause pop1 <==     | msavedcause1 | <- 1-level Exception
                         +--------------+
-    mdcause pop2 <==    | msavedcause2 | <- 2-level Exception
+    dcause pop2 <==     | msavedcause2 | <- 2-level Exception
                         +--------------+
     ```
 
