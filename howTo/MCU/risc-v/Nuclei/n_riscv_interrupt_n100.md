@@ -168,8 +168,8 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `mtvec` 和 `mcause` 做了最基
 ### Interrupt Handle
 
 > `此階段之後, 基本由 S/w 接手`
-> + **每個 ISR 都需自行處理 Push/Pop 行為** (?)
->> `__attribute__((interrupt))` 會處理剛進入 ISR 時的 `Save/Restore GPRs` 行為 (?)
+> + **每個 ISR 都需自行處理 Push/Pop 行為** (N100 不需要)
+>> 可藉由 `__attribute__((interrupt))`屬性, 來處理剛進入 ISR 時的 `Save/Restore GPRs` 行為
 > + 有 `__attribute__((interrupt))` 屬性的 function, Compiler 會視情況強制加入 `Save/Restore GPRs` 行為
 > + 不支援 H/w Tail-chaining (中斷咬尾)
 >> 可用 S/w 實作 (ref: 7.12 Interrupt Tail-Chaining in Nuclei_N100_Series_Databook.pdf)
