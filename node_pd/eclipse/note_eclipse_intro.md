@@ -77,6 +77,11 @@ eclipse_intro
 + Font and color
     > `Windows -> Preferences-> tab General -> Appearance -> Colors and Fonts`
 
++ function 跳轉
+  - jump to Function Definition
+    > `Ctrl + 滑鼠右鍵`
+  - back
+    > `Alt + 方向左鍵` or `Back` icon
 
 # Reference
 
