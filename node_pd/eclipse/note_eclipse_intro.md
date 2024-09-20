@@ -51,6 +51,7 @@ eclipse_intro
     ![eclipse_IncludeDir.jpg](./eclipse_IncludeDir.jpg)
 
 + Include Existing Files:
+    > + `File -> Import`
     > + Select the directory (加到哪個目錄下)
     > + Select `File System`
 
