@@ -51,6 +51,7 @@ eclipse_intro
     ![eclipse_IncludeDir.jpg](./eclipse_IncludeDir.jpg)
 
 + Include Existing Files:
+    > + `File -> Import`
     > + Select the directory (加到哪個目錄下)
     > + Select `File System`
 
@@ -105,6 +106,11 @@ eclipse_intro
 + Font and color
     > `Windows -> Preferences-> tab General -> Appearance -> Colors and Fonts`
 
++ function 跳轉
+  - jump to Function Definition
+    > `Ctrl + 滑鼠右鍵`
+  - back
+    > `Alt + 方向左鍵` or `Back` icon
 
 # Reference
 

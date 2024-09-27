@@ -120,6 +120,43 @@
 
     ```
 
+- git init
+    > 建立新的 repository
+
+    ```
+    $ git init
+    $ git init --bare                           # 創建一個裸倉儲 (多人 Co-work 時需使用, 否則會造成 Branch 混亂或互斥)
+    $ git init --bare --shared[=(group|all)]    # 創建一個共享的裸倉儲
+                                                #   'group': 與 創建者 相同 group 的人, 有 write permision
+                                                #   'all': 所有人都有 write permision
+    ```
+
+    + example
+
+        1. repository side
+
+            ```
+            $ cd /home/Git_Repos/
+            $ mkdir Project_1
+            $ cd Project_1
+            $ git init --bare --shared=all
+            $ cd ..
+
+            # directory permision: r = 4, w = 2, x = 1
+            # '775' (owner:7,group:7,other:5) 代表
+            # + '7': owner, rwx
+            # + '7': group, rwx
+            # + '5': other, rx
+            $ chmod -R 755 ./Project_1
+            ```
+
+        1. user side
+
+            ```
+            $ cd ~
+            $ git clone /home/Git_Repos/Project_1
+            ```
+
 - git save password
 
     + 儲存 ssh 帳密到 `~/.git-credentials`
@@ -249,8 +286,8 @@
     ```
     $ git tag v1 ebff       # log 是 commit ebff810c461ad1924fc422fd1d01db23d858773b 的內容, 設定簡短好記得 Tag: v1
     $ git tag 中文 ebff     # tag 也可以下中文, 任何文字都可以
-    $ git tag -a [tagname] -m [commit message]  # 新增 tagname 
-    $ git tag --delete [tagname]          # local 刪掉 tagname 
+    $ git tag -a [tagname] -m [commit message]  # 新增 tagname
+    $ git tag --delete [tagname]          # local 刪掉 tagname
     $ git push --delete origin [tagname]  # 刪掉 remote 的 delete tag
     ```
 
@@ -958,7 +995,7 @@ manifests of projects
     $ curl https://storage.googleapis.com/git-repo-downloads/repo > ~[your-git-path]/Git/mingw64/bin
     ```
 
-+ execute `~[your-git-path]/Git/git-bash.exe` with `Administrator` permission
++ execute `~[your-git-path]/Git/git-bash.exe` with `Administrator` permision
 
 + download source code
 

@@ -99,6 +99,8 @@ Open On-Chip Debugger
     > OpenOCD 使用了一種名為 Jim-TCL 的小型 TCL 解析器, 提供了簡單和可擴展的命令解析器.
     >> Jim-Tcl 是著名的 Tcl 語言的精簡版本 (Jim-Tcl 的功能要少得多)
 
+### [Note_Jim-Tcl](note_Jim-Tcl.md)
+
 # Command Overview
 
 + OpenOCD 常用命令
@@ -310,7 +312,8 @@ TAPs 全名為`Test Access Ports`, 為 JTAG 中的核心部分, 而 OpenOCD 在�
 ## Flash Commands
 
 + `flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options]`
-    > 主要用在定義一個 Flash 內的 Bank
+    > 主要用在定義一個 DUT 內的 Flash Bank
+    >> Bank 只是一個抽象的概念, 可以把它當作是一個 flash control 的方式 (e.g. eflash, spi-flash, qspi-flash, ...etc)
 
     ```jim-tcl
     set _CHIPNAME riscv
@@ -409,4 +412,4 @@ TAPs 全名為`Test Access Ports`, 為 JTAG 中的核心部分, 而 OpenOCD 在�
 ---
 + [系統架構秘辛：瞭解RISC-V 架構底層除錯器的秘密！ 系列](https://ithelp.ithome.com.tw/users/20107327/ironman/1359)
 + [*OpenOCD添加第三方設備支持:HT32F52352 Cortex-M0+](https://chowdera.com/2022/02/202202181344586473.html)
-
++ [*Day 28: 高手不輕易透露的技巧(2/2) - Flash Driver & Target Burner - iT 邦幫忙::一起幫忙解決難題，拯救 IT 人的一天](https://ithelp.ithome.com.tw/articles/10197309)

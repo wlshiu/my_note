@@ -1,0 +1,159 @@
+# Executable
+*.out
+
+# Wave file
+*.vcd
+*.vcd.pdf
+
+# modelsim
+# ignore ModelSim generated files and directories (temp files and so on)
+[_@]*
+
+# ignore compilation output of ModelSim
+*.mti
+*.dat
+*.dbs
+*.psm
+*.bak
+*.cmp
+*.html
+*.bsf
+
+# ignore simulation output of ModelSim
+wlf*
+*.wlf
+*.vstf
+*.ucdb
+transcript*
+sc_dpiheader.h
+vsim.dbg
+
+# FOSS
+*.asc
+*.bin
+*.elf
+*.blif
+*.swp
+*.json
+host
+*.o
+*.d
+
+# verilator
+obj_dir
+
+# vivado
+.Xil
+
+# temp
+*.swp
+*.bak
+
+# vcs
+csrc
+simv*
+*.key
+*.vcd
+
+#vcs + verdi
+*.log
+*.daidir
+*.fsdb
+*.vdb
+novas.conf
+novas.rc
+verdiLog
+
+# UVM
+vc_hdrs.h
+
+# MISC
+**/CVS/*
+*.lst
+*.dasm
+*.gz
+*.rar
+*.zip
+*tar*
+*.tgz
+
+
+
+###########################################################################
+##	VIVADO
+###########################################################################
+#########
+#Source files:
+#########
+#Do NOT ignore VHDL, Verilog, block diagrams or EDIF files.
+!*.vhd
+!*.v
+!*.bd
+!*.edif
+
+#########
+#IP files
+#########
+#.xci: synthesis and implemented not possible - you need to return back to the previous version to generate output products
+#.xci + .dcp: implementation possible but not re-synthesis
+#*.xci(www.spiritconsortium.org)
+!*.xci
+#*.dcp(checkpoint files)
+!*.dcp
+!*.vds
+!*.pb
+#All bd comments and layout coordinates are stored within .ui
+!*.ui
+!*.ooc
+
+#########
+#System Generator
+#########
+!*.mdl
+!*.slx
+!*.bxml
+
+#########
+#Simulation logic analyzer
+#########
+!*.wcfg
+!*.coe
+
+#########
+#MIG
+#########
+!*.prj
+!*.mem
+
+#########
+#Project files
+#########
+#XPR  +  *.XML ? XPR (Files are merged into a single XPR file for 2014.1 version)
+#Do NOT ignore *.xpr files
+!*.xpr
+#Include *.xml files for 2013.4 or earlier version
+# !*.xml
+
+#########
+#Constraint files
+#########
+#Do NOT ignore *.xdc files
+!*.xdc
+
+#########
+#TCL - files
+#########
+!*.tcl
+
+#########
+#Journal - files
+#########
+!*.jou
+
+#########
+#Reports
+#########
+!*.rpt
+# !*.txt
+!*.vdi
+
