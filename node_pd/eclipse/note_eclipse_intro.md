@@ -62,6 +62,35 @@ eclipse_intro
 
     ![eclipse_ImportFiles_2.jpg](./eclipse_ImportFiles_2.jpg)
 
+## Create a project with existing files
+
++ Create a empty project file
+    > `File -> New -> C/C++ Project`
+
+    ![create_c_project](./eclipse_create_c_project.jpg)
+
++ 將 source code 目錄, 用**滑鼠左鍵拖到新建立的 project 中**, 需選擇 `Link to files and folders`
+
+    ![link_source_code](./eclipse_link_source_code.jpg)
+
++ Configure compile properties
+
+    - Include header path
+        > `Project -> Properties -> C/C++ Build -> Setting -> Tool Setting -> GCC C Complier -> Includes -> Include paths (-I)`
+
+        1. 用 `+` 新增路徑
+
+        ![cflag_include_dir](./eclipse_cflag_include_dir.jpg)
+
+    - link libraries and library paths
+        > + `Project -> Properties -> C/C++ Build -> Setting -> Tool Setting -> GCC C++ Linker -> Libraries -> Libraries (-l)`
+        > + `Project -> Properties -> C/C++ Build -> Setting -> Tool Setting -> GCC C++ Linker -> Libraries -> Libraries search path(-L)`
+
+        1. 用 `+` 新增
+            > 使用 static lib 時, compiler 會自動補 prefix `lib` and suffix `.a`, 新增 lib 時, 需去除 lib name 的 prefix and suffix
+            >> e.g. `lib`gcc`.a`
+
+        ![ldflags_lib](./eclipse_ldflags_lib.jpg)
 
 # Tips
 
@@ -80,5 +109,7 @@ eclipse_intro
 # Reference
 
 + [手把手教你搭建織女星開發板RISC-V開發環境](https://www.cnblogs.com/whik/p/10952292.html)
-
++ [Nuclei-Software/nuclei-studio: Discussions For Nuclei Studio](https://github.com/Nuclei-Software/nuclei-studio)
++ [Nuclei Studio IDE偵錯](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuclei/gd32vf103_rvstar#nuclei-studio-ide%E8%B0%83%E8%AF%95)
++ [Eclipse IDE for C/C++ Developers新增標頭檔和庫檔案](https://www.cnblogs.com/xi-jiajia/p/13921122.html)
 
