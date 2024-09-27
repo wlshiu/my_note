@@ -334,3 +334,285 @@ Use Absolute path
             ```
 
 
+
+# RISC-V GD32VF103
+
+
+## OpenOCD server side
+
+
+```powershell
+PS D:\portable_tool\> openocd -f .\openocd_gd32vf103.cfg       <------ 'openocd_gd32vf103.cfg' file is from Nuclei Studio
+Open On-Chip Debugger 0.11.0+dev-02400-g1dac85c02 (2024-06-26-07:36)
+Licensed under GNU GPL v2
+For bug reports, read
+        http://openocd.org/doc/doxygen/bugs.html
+Info : libusb_open() failed with LIBUSB_ERROR_NOT_FOUND
+Info : no device found, trying D2xx driver
+Info : D2xx device count: 2
+Info : Connecting to "(null)" using D2xx mode...
+Info : clock speed 5000 kHz
+Info : JTAG tap: riscv.cpu tap/device found: 0x1000563d (mfg: 0x31e (Andes Technology Corporation), part: 0x0005, ver: 0x1)
+Info : JTAG tap: auto0.tap tap/device found: 0x790007a3 (mfg: 0x3d1 (GigaDevice Semiconductor (Beijing) Inc), part: 0x9000, ver: 0x7)
+Warn : AUTO auto0.tap - use "jtag newtap auto0 tap -irlen 5 -expected-id 0x790007a3"
+Info : [riscv.cpu] datacount=4 progbufsize=2
+Info : coreid=0, nuclei debug map reg 00: 0x0, 16: 0x0, 32: 0x0
+Info : Examined RISC-V core; found 1 harts
+Info :  hart 0: XLEN=32, misa=0x40901105
+[riscv.cpu] Target successfully examined.
+Info : starting gdb server for riscv.cpu on 3333
+Info : Listening on port 3333 for gdb connections
+Info : device id = 0x19060410
+Info : flash size = 128kbytes
+semihosting is enabled
+
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections    <----- telnet port
+Info : accepting 'telnet' connection on tcp/4444
+
+```
+
+## Client side
+
+> Enable telnet function in Win11 <br>
+> ![win11-telnet-enable](win11_telnet.jpg)
+
+Open On-Chip Debugger 使用 `>` 作為 prompt
+
++ Powershell
+
+    ```
+    PS C:\Users> telnet localhost 4444  <----- telnet port
+    Open On-Chip Debugger
+    >
+    ```
+
++ tera-term
+
+    - `File -> New connection -> TCP/IP`
+
+        ```
+        Host: localhost
+        TCP port#: 4444
+        ```
+
+## 常用 Commands in Client side
+
++ list all commands
+
+    ```
+    > help
+    ```
+
++ check a command
+
+    ```
+    > help <cmd>
+    ```
+
+### `halt`
+
+```
+> halt
+```
+
+暫停 DUT 運行
+> 所有 Client 操作, 都必須在 DUT Core 停止的狀態下
+
+### `resume`
+
+```
+> resume [address]
+```
+
+恢復 DUT 的運行 (停在 breadpointer 時, 使用 resume 再次運行)
+> 如果指定了 `address`, 則從 address 處開始運行
+
+### `reset`
+
+```
+> reset
+```
+
+reset DUT
+
+### `bp`, `rbp`
+
+Breakpointer (`bp`) and Remove Breakpointer (`rbp`)
+
++ `bp`
+
+    - 在地址 addr 處設定斷點, 指令長度為 length, hw 表示使用硬體斷點
+
+        ```
+        > bp <addr> <length> [hw]
+        # e.g.
+        #   bp 0x84 4
+        ```
+
+    - list breakpointers
+
+        ```
+        > bp
+        0x00000084, 0x4, 1, 0x0
+        ```
+
++ `rbp`
+
+    - 刪除地址 addr 處的斷點
+
+        ```
+        > rbp <addr>
+        ```
+
+
+
+### `step`
+
+單步執行
+
+### `exit`
+
+離開 OpenOCD Client in Telnet
+
+### Memory access commands
+
++ `mdw`
+    > memory display words
+
+    ```
+    > mdw <addr> [word-cnt]  # 顯示從 addr 開始的 word-cnt (default:1) 個 word (4-bytes)
+    ```
+
++ `mdh`
+    > memory display hwords
+
+    ```
+    > mdh <addr> [hword-cnt]  # 顯示從 addr 開始的 hword-cnt (default:1) 個 hword (2-bytes)
+    ```
+
++ `mdb`
+    > memory display bytes
+
+    ```
+    > mdb <addr> [byte-cnt]  # 顯示從 addr 開始的 byte-cnt (default:1) 個 bytes
+    ```
+
++ `mww`
+    > memory (SRAM/IP-Register) write words
+
+    ```
+    > mww <addr> <value> 向 addr 寫入一個 word data, 值為 value
+    ```
+
++ `mwh`
+    > memory (SRAM/IP-Register) write hwords
+
+    ```
+    > mwh <addr> <value> 向 addr 寫入一個 hword data, 值為 value
+    ```
+
++ `mwb`
+    > memory (SRAM/IP-Register) write bytes
+
+    ```
+    > mwh <addr> <value> 向 addr 寫入一個 byte data, 值為 value
+    ```
+
++ `load_image`
+    > 將檔案 <file> 載入地址為 address 的 DUT SRAM, 格式有 `bin`, `ihex`, `elf`
+
+    ```
+    > load_image  <file>     <address>  ['bin'|'ihex'|'elf']
+
+    e.g.
+      load_image ./init/init.bin  0     bin
+    ```
+
++ `dump_image`
+    > 將 DUT Memory (Bus MMP) 從 address 開始的 <size> byts資料讀出, 保存到 <file> 中
+
+    ```
+    > dump_image  <file>  <address>  <size>
+    ```
+
++ `verify_image`
+    > 將檔案 <file> 與 DUT Memory Address (Bus MMP) 開始的資料進行比較, 格式有 `bin`, `ihex`, `elf`
+
+    ```
+    verify_image  <file>  <address>  ['bin'|'ihex'|'elf']
+    ```
+
+### Target Configuration in CPU Configuration
+
+```
+> $_TARGETNAME configure config_params...
+```
+
++ config_params (常用)
+    > Work Areas 是一小塊 SRAM 區域, 被用來加速 OpenOCD 下載 data 到 flash 中
+
+    - `-work-area-backup ('0'|'1')`
+        > 指定是否備份 work area; 默認情況是不備份的, 因為執行備份會導致操作變慢，
+
+    - `-work-area-size size`
+        > 指定 work area 大小 (unit: Bytes), 申請指定大小, 而不管物理或虛擬地址已經被使用
+
+    - `-work-area-phys address`
+        > 當 non-MMU 時, 用來設定 work area 基址
+
+    - `-work-area-virt address`
+        > 當有 MMU 時, 用來設定 work area 基址
+
+
++ Example
+
+    ```
+    > $_TARGETNAME configure -work-area-backup 0 -work-area-size $_WORKAREASIZE -work-area-phys 0x20000000
+    ```
+
+
+
+### `flash`
+
+燒錄到 flash (e.g. eFlash, Nor-Flash, ...etc.)
+
+> OpenOCD official
+> ```
+> > flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options]
+> ```
+
++ `driver == custom` type 是由 Nuclei OpenOCD 自行實作
+    > 當不想 re-build openocd, 但是想增加自己的 flash loader
+
+    ```
+    # openocd flash bank configure command(only parameters in parentheses can be modified)
+    # For detail flash bank explaination, see openocd/doc/pdf/openocd.pdf
+    #
+    # flash bank  <name>    <driver>  <base>    <size> <chip_width> <bus_width>  <target>    <spi_base>  <flashloader_path> [simulation] [sectorsize=]
+    > flash bank $FLASHNAME  custom  <xip_base>   0        0            0       $TARGETNAME  <spi_base>  <loader_path>      [simulation]
+
+
+    # openocd flash bank configure example
+    # Please change 0x20000000
+    #   - the spiflash xip address to the real address of your spiflash xip address
+    # please change 0x10014000
+    #   - the spi base to access the spiflash to the real spi base to access your spiflash or some other value required by you
+    #
+    # please change </path/to/loader.bin> to the real path of your flash loader binary
+    > flash bank $FLASHNAME custom 0x20000000 0 0 0 $TARGETNAME 0x10014000 </path/to/loader.bin>
+
+    # while [simulation] exist, the loader's timeout=0xFFFFFFFF
+    > flash bank $FLASHNAME custom 0x20000000 0 0 0 $TARGETNAME 0x10014000 /path/to/loader.bin simulation
+    ```
+
+
+
+## Reference
+
++ [OpenOCD-JTAG偵錯 - zongzi10010 - 部落格園](https://www.cnblogs.com/zongzi10010/p/9784797.html#%E5%90%AF%E5%8A%A8openocd)
++ [Day 28: 高手不輕易透露的技巧(2/2) - Flash Driver & Target Burner - iT 邦幫忙::一起幫忙解決難題](https://ithelp.ithome.com.tw/articles/10197309)
+    - [*3.4 write (fespi_write)]
++ [Day 04: OpenOCD常用Commands簡介 - iT 邦幫忙::一起幫忙解決難題](https://ithelp.ithome.com.tw/articles/10193006)
+
+
