@@ -93,6 +93,30 @@ eclipse_intro
 
         ![ldflags_lib](./eclipse_ldflags_lib.jpg)
 
+# Debugging
+
+## OpenOCD (ICE)
+
++ Create a OpenOCD Debugging Configuration
+    > 選擇 the project ELF file
+
+    ![create_debug_cfg](./eclipse_create_debug_cfg.jpg)
+
++ Configure OpenOCD environment variables for GDB
+    > 設定 `*.cfg` file of OpenOCD
+    >> 設定時**使用完整絕對路徑**
+
+    - type `Debug` 開始 tracing
+
+    ![config_openocd_cfg](./eclipse_config_openocd_cfg.jpg)
+
++ Debug mode of Eclipse
+
+    ![eclipse_start_debug_in_ide.jpg](./eclipse_start_debug_in_ide.jpg)
+
+## jLink (ICE)
+
+
 # Tips
 
 + 目錄結構 project windows-build-tools/releases/
@@ -112,10 +136,14 @@ eclipse_intro
   - back
     > `Alt + 方向左鍵` or `Back` icon
 
++ Breakpointer
+    > 見 `使用Eclipse的偵錯示例.pdf`
+
+
 # Reference
 
 + [手把手教你搭建織女星開發板RISC-V開發環境](https://www.cnblogs.com/whik/p/10952292.html)
 + [Nuclei-Software/nuclei-studio: Discussions For Nuclei Studio](https://github.com/Nuclei-Software/nuclei-studio)
 + [Nuclei Studio IDE偵錯](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuclei/gd32vf103_rvstar#nuclei-studio-ide%E8%B0%83%E8%AF%95)
 + [Eclipse IDE for C/C++ Developers新增標頭檔和庫檔案](https://www.cnblogs.com/xi-jiajia/p/13921122.html)
-
++ [偵錯示例 - ESP32 程式設計指南 v5.3.1 文件](https://docs.espressif.com/projects/esp-idf/zh_CN/v5.3.1/esp32/api-guides/jtag-debugging/debugging-examples.html)
