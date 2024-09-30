@@ -190,7 +190,7 @@ irq_entry:
 > + 在 RV32E 只支援 16 個 32-bits 的 GPRs
 >> 較少的 GPRs, 在 Push/Pop 時, 速度較快, RV32E 只會 Push/Pop 10 個 GPRs
 
-![riscv_GPRs](flow/riscv_GPRs.jpg)<br>
+![riscv_GPRs](../flow/riscv_GPRs.jpg)<br>
 Fig 1. RISC-V GPRs
 
 Fig 1. 中, caller 代表中斷上層函數, 可以使用的暫存器, 所以
@@ -214,6 +214,163 @@ Fig 1. 中, caller 代表中斷上層函數, 可以使用的暫存器, 所以
 因此當 ISR 執行完成後, 又會回到該指令執行一次, 判斷是否還需要處理中斷
 >> 如此可以達到 `SAVE_CONTEXT` -> ISR_n() -> ISR_m() -> `RESTORE_CONTEXT` 的效率提升,
 這一切的行為, 都是由 H/w 完成, 大大提高中斷處理的效率
+
+
+# RV-Start 環境建置
+
+## Windows
+
+> Environment `cmder`
+> + SDK: nuclei-sdk-0.6.0
+> + EVB: RV-Start
+
++ Set toolchain
+
+    ```batch
+    rem nuclei-sdk-0.6.0/setup.bat
+    set NUCLEI_TOOL_ROOT=<your\NucleiStudio\toolchain>
+    ...
+    ```
+
++ open cmder in `nuclei-sdk-0.6.0`
+
+    - Build sdk
+
+        ```
+        λ .\setup.bat
+        λ riscv64-unknown-elf-gcc.exe --version
+            riscv64-unknown-elf-gcc.exe (gbedea461d) 13.1.1 20230713
+            Copyright (C) 2023 Free Software Foundation, Inc.
+            This is free software; see the source for copying conditions.  There is NO
+            warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+        λ make SOC=gd32vf103 BOARD=gd32vf103v_rvstar all  # 第一次執行
+        λ make SOC=gd32vf103 all  # 第二次執行, 可偷懶
+        ```
+
+    - Run Application
+
+        ```
+        λ make SOC=gd32vf103 BOARD=gd32vf103v_rvstar upload
+            make -C application/baremetal/helloworld upload
+            make[1]: Entering directory 'D:/nuclei-sdk-0.6.0/application/baremetal/helloworld'
+            "Compiling  : " main.c
+            "Linking    : " helloworld.elf
+               text    data     bss     dec     hex filename
+              13936     104    4664   18704    4910 helloworld.elf
+            "Download and run helloworld.elf"   <-------- Burn-Img
+            riscv64-unknown-elf-gdb
+              -ex "set remotetimeout 240"
+              -ex "target remote | openocd
+                            -c \"; gdb_port pipe; log_output openocd.log\"
+                            -f ../../../SoC/gd32vf103/Board/gd32vf103v_rvstar/openocd_gd32vf103.cfg"
+              --batch
+              -ex 'thread apply all monitor reset halt'
+              -ex 'thread apply all info reg pc'
+              -ex 'thread 1' -ex 'load helloworld.elf'
+              -ex 'file helloworld.elf'
+              -ex 'thread apply all set $pc=_start'
+              -ex 'thread apply all info reg pc'
+              -ex 'thread 1'
+              -ex 'monitor resume'
+              -ex 'quit'
+            Open On-Chip Debugger 0.11.0+dev-02400-g1dac85c02 (2024-06-26-07:36)
+            Licensed under GNU GPL v2
+            For bug reports, read
+                    http://openocd.org/doc/doxygen/bugs.html
+            warning: No executable has been specified and target does not support
+            determining executable automatically.  Try using the "file" command.
+            0x080001c2 in ?? ()
+
+            Thread 1 (Remote target):
+            JTAG tap: riscv.cpu tap/device found: 0x1000563d (mfg: 0x31e (Andes Technology Corporation), part: 0x0005, ver: 0x1)
+            JTAG tap: auto0.tap tap/device found: 0x790007a3 (mfg: 0x3d1 (GigaDevice Semiconductor (Beijing) Inc), part: 0x9000, ver: 0x7)
+
+            Thread 1 (Remote target):
+            pc             0x80001c2        0x80001c2
+            [Switching to thread 1 (Remote target)]
+            #0  0x080001c2 in ?? ()
+            Loading section .init, size 0x2f4 lma 0x8000000
+            Loading section .text, size 0x337c lma 0x8000300
+            Loading section .data, size 0x68 lma 0x8003680
+            Start address 0x08000180, load size 14040
+            Transfer rate: 9 KB/sec, 4680 bytes/write.
+        ```
+
+        1. Log message of DUT
+
+            ```
+            Nuclei SDK Build Time: Sep 30 2024, 11:38:15
+            Download Mode: FLASHXIP
+            CPU Frequency 108000000 Hz
+            Nuclei SDK Build Time: Sep 30 2024, 13:14:49
+
+            Download Mode: FLASHXIP
+            CPU Frequency 108000000 Hz
+            Cluster 0, Hart 0, MISA: 0x40901105
+            MISA: RV32IMACUX
+            Got rand integer 2097151 using seed 760716930.
+            0: Hello World From Nuclei RISC-V Processor!
+            1: Hello World From Nuclei RISC-V Processor!
+            2: Hello World From Nuclei RISC-V Processor!
+            3: Hello World From Nuclei RISC-V Processor!
+            4: Hello World From Nuclei RISC-V Processor!
+            5: Hello World From Nuclei RISC-V Processor!
+            6: Hello World From Nuclei RISC-V Processor!
+            7: Hello World From Nuclei RISC-V Processor!
+            8: Hello World From Nuclei RISC-V Processor!
+            9: Hello World From Nuclei RISC-V Processor!
+            10: Hello World From Nuclei RISC-V Processor!
+            11: Hello World From Nuclei RISC-V Processor!
+            12: Hello World From Nuclei RISC-V Processor!
+            13: Hello World From Nuclei RISC-V Processor!
+            14: Hello World From Nuclei RISC-V Processor!
+            15: Hello World From Nuclei RISC-V Processor!
+            16: Hello World From Nuclei RISC-V Processor!
+            17: Hello World From Nuclei RISC-V Processor!
+            18: Hello World From Nuclei RISC-V Processor!
+            19: Hello World From Nuclei RISC-V Processor!
+            ```
+
+    - Debug Application
+
+        ```
+        λ make SOC=gd32vf103 BOARD=gd32vf103v_rvstar debug
+            make -C application/baremetal/helloworld debug
+            make[1]: Entering directory 'D:/nuclei-sdk-0.6.0/application/baremetal/helloworld'
+            "Download and debug helloworld.elf"
+            riscv64-unknown-elf-gdb helloworld.elf
+                -ex "set remotetimeout 240"
+                -ex "target remote | openocd
+                        -c \"; gdb_port pipe; log_output openocd.log\"
+                        -f ../../../SoC/gd32vf103/Board/gd32vf103v_rvstar/openocd_gd32vf103.cfg"
+            GNU gdb (GDB) 13.2.90.20230712-git
+            Copyright (C) 2023 Free Software Foundation, Inc.
+            License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+            This is free software: you are free to change and redistribute it.
+            There is NO WARRANTY, to the extent permitted by law.
+            Type "show copying" and "show warranty" for details.
+            This GDB was configured as "--host=i686-w64-mingw32 --target=riscv64-unknown-elf".
+            Type "show configuration" for configuration details.
+            For bug reporting instructions, please see:
+            <https://www.gnu.org/software/gdb/bugs/>.
+            Find the GDB manual and other documentation resources online at:
+                <http://www.gnu.org/software/gdb/documentation/>.
+
+            For help, type "help".
+            Type "apropos word" to search for commands related to "word"...
+            Reading symbols from helloworld.elf...
+            Remote debugging using | openocd
+                        -c "; gdb_port pipe; log_output openocd.log"
+                        -f ../../../SoC/gd32vf103/Board/gd32vf103v_rvstar/openocd_gd32vf103.cfg
+            Open On-Chip Debugger 0.11.0+dev-02400-g1dac85c02 (2024-06-26-07:36)
+            Licensed under GNU GPL v2
+            For bug reports, read
+                    http://openocd.org/doc/doxygen/bugs.html
+            _start0800 () at ../../../SoC/gd32vf103/Common/Source/GCC/startup_gd32vf103.S:374
+            374         j 1b
+            (gdb)
+        ```
 
 
 

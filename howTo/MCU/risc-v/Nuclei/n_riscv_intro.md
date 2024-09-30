@@ -196,6 +196,7 @@ Nuclei N200 遵循 ISA Spec **riscv-specv2.2** 及 Interrupt Spec **riscv-privil
 
 ### [Interrupt_gd32vf103](./note_GD32VF103_interrupt.md)
 
+# [Nuclei_OpenOCD](./n_riscv_openocd.md)
 # [Nuclei_SDK](./n_riscv_sdk.md)
 
 
