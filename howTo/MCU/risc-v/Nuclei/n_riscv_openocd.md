@@ -122,6 +122,15 @@ flash bank $_FLASHNAME stm32f1x $_FLASH_BASE_ADDR $_FLASH_SIZE 0 0 $_TARGETNAME
 + `<base> (MUST)`
     > DUT flash 燒寫的起始位址
 
+    ```c
+    flash_err_t flash_erase(uint32_t *fmc_base, uint32_t start_addr, uint32_t end_addr)
+    {
+        uint32_t   dut_addr_start = <base> + start_addr;
+        uint32_t   dut_addr_end   = <base> + end_addr;
+        ...
+    }
+    ```
+
 + `<size> (MUST)`
     > DUT flash 的最大 size (bytes)
 
@@ -149,6 +158,16 @@ flash write_image erase nuttx.bin 0x08000000
 + `[offset] (optional)`
     > flash 燒寫的起始位址
 
+    ```c
+    flash_err_t flash_write(uint32_t *fmc_base, uint8_t *pBuffer, uint32_t offset, uint32_t nbytes)
+    {
+        /* flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options] */
+        uint32_t   dut_addr_start = <base> + offset;
+        ...
+    }
+    ```
+
+
 + `[type] (optional)`
     > 可省略, OpenOCD 會 parsing img context
     > + `bin`
@@ -169,6 +188,15 @@ flash write_image erase nuttx.bin 0x08000000
 
 + `[offset] (optional)`
     > flash 燒寫的起始位址
+
+    ```c
+    flash_err_t flash_write(uint32_t *fmc_base, uint8_t *pBuffer, uint32_t offset, uint32_t nbytes)
+    {
+        /* flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options] */
+        uint32_t   dut_addr_start = <base> + offset;
+        ...
+    }
+    ```
 
 + `[file_type] (optional)`
     > + `bin`
@@ -195,6 +223,15 @@ flash write_image erase nuttx.bin 0x08000000
 
 + `[offset] (optional)`
     > flash 燒寫的起始位址
+
+    ```c
+    flash_err_t flash_write(uint32_t *fmc_base, uint8_t *pBuffer, uint32_t offset, uint32_t nbytes)
+    {
+        /* flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options] */
+        uint32_t   dut_addr_start = <base> + offset;
+        ...
+    }
+    ```
 
 
 
