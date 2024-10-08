@@ -239,11 +239,11 @@ Use pure OpenOCD to access DUT (GD32VF13: EVB= RV-START)
     $ minicom -s
         ...
 
-        | A -    Serial Device      : /dev/ttyUSB1                              |
-        | B - Lockfile Location     : /var/lock                                 |
-        | C -   Callin Program      :                                           |
-        | D -  Callout Program      :                                           |
-        | E -    Bps/Par/Bits       : 115200 8N1                                |
+        | A -    Serial Device      : /dev/ttyUSB1        |
+        | B - Lockfile Location     : /var/lock           |
+        | C -   Callin Program      :                     |
+        | D -  Callout Program      :                     |
+        | E -    Bps/Par/Bits       : 115200 8N1          |
 
         ....
     ```
@@ -290,6 +290,63 @@ Use pure OpenOCD to access DUT (GD32VF13: EVB= RV-START)
     18: Hello World From Nuclei RISC-V Processor!
     19: Hello World From Nuclei RISC-V Processor!
     ```
+
+
+### Pure OpenOCD CLI
+
++ OpenOCD Server
+
+    ```
+    $ openocd -d2 -f ./openocd_gd32vf103.cfg
+        Open On-Chip Debugger 0.11.0+dev-02400-g1dac85c02 (2024-06-26-07:32)
+        Licensed under GNU GPL v2
+        For bug reports, read
+                http://openocd.org/doc/doxygen/bugs.html
+        debug_level: 2
+
+        Info : Using libusb driver
+        Info : clock speed 5000 kHz
+        Info : JTAG tap: riscv.cpu tap/device found: 0x1000563d (mfg: 0x31e (Andes Technology Corporation), part: 0x0005, ver: 0x1)
+        Info : JTAG tap: auto0.tap tap/device found: 0x790007a3 (mfg: 0x3d1 (GigaDevice Semiconductor (Beijing) Inc), part: 0x9000, ver: 0x7)
+        Warn : AUTO auto0.tap - use "jtag newtap auto0 tap -irlen 5 -expected-id 0x790007a3"
+        Info : [riscv.cpu] datacount=4 progbufsize=2
+        Info : coreid=0, nuclei debug map reg 00: 0x0, 16: 0x0, 32: 0x0
+        Info : Examined RISC-V core; found 1 harts
+        Info :  hart 0: XLEN=32, misa=0x40901105
+        [riscv.cpu] Target successfully examined.
+        Info : starting gdb server for riscv.cpu on 3333
+        Info : Listening on port 3333 for gdb connections
+        Info : device id = 0x19060410
+        Info : flash size = 128kbytes
+        semihosting is enabled
+
+        Info : Listening on port 6666 for tcl connections
+        Info : Listening on port 4444 for telnet connections
+        Info : accepting 'telnet' connection on tcp/4444
+        Info : dropped 'telnet' connection
+    ```
+
++ OpenOCD Client
+
+    - putty
+
+        ```
+        Host Name: localhost
+        Port: 4444
+        Connection type: Other -> Telnet
+        ```
+
+    - ubuntu terminal
+
+        ```
+        $ vi ./z_ocd_client.sh
+            #!/bin/bash
+
+            telnet localhost 4444
+
+        $ chmod +x ./z_ocd_client.sh
+        $ ./z_ocd_client.sh
+        ```
 
 ## OpenOCD Client Commands
 

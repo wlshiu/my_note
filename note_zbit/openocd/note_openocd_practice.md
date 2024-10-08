@@ -396,6 +396,26 @@ Open On-Chip Debugger 使用 `>` 作為 prompt
         TCP port#: 4444
         ```
 
++ putty
+
+    ```
+    Host Name: localhost
+    Port: 4444
+    Connection type: Other -> Telnet
+    ```
+
++ ubuntu terminal
+
+    ```
+    $ vi ./z_ocd_client.sh
+        #!/bin/bash
+
+        telnet localhost 4444
+
+    $ chmod +x ./z_ocd_client.sh
+    $ ./z_ocd_client.sh
+    ```
+
 ## 常用 Commands in Client side
 
 + list all commands
