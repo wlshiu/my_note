@@ -139,6 +139,15 @@ eclipse_intro
 + Breakpointer
     > 見 `使用Eclipse的偵錯示例.pdf`
 
++ IDE Icon 太小
+    > 加入以下三行到 `eclipse.ini`
+
+    ```
+    # 'eclipse.ini' install root path
+    -Dswt.enable.autoScale=true
+    -Dswt.autoScale=150
+    -Dswt.autoScale.method=nearest
+    ```
 
 # Reference
 
