@@ -80,7 +80,14 @@ Use pure OpenOCD to access DUT (GD32VF13: EVB= RV-START)
 
 + add toolchain path to `.bashrc`
 
++ import usb device to virtualbox
+    > 勾選 usb device 後, 按確定,
+    >> `HBird-Debugger` 和 `ICE on RV-START` 對 PC 連接只能接一個
+
+    ![virtualbox_usb_ice](./virtualbox_usb_ice.jpg)
+
 + `lsusb` 檢查是否有偵測到 USB ICE (base on FTDI chip)
+    > 可以先重新插拔 USB device
 
     ```
     $ lsusb
