@@ -326,6 +326,27 @@ Use pure OpenOCD to access DUT (GD32VF13: EVB= RV-START)
         Info : dropped 'telnet' connection
     ```
 
+    - bash script
+
+        ```
+        $ vi ./z_ocd_server.sh
+            #!/bin/bash
+
+            help()
+            {
+                echo "usage: $0 <cfg file>"
+                exit -1;
+            }
+
+            if [ $# != 1 ]; then
+                help
+            fi
+
+            cfg_file=$1
+
+            openocd -d2 -s ./script/ -f ${cfg_file}
+        ```
+
 + OpenOCD Client
 
     - putty
@@ -584,4 +605,3 @@ $ strace -f openocd 2>&1  | grep cfg
 
 + [Install the Debugger Driver in Linux PC](https://doc.nucleisys.com/nuclei_board_labs/hw/hw.html#on-board-debugger-driver)
 + [使用strace找出程式缺少的檔案路徑 - My code works, I don’t know why.](https://wen00072.github.io/blog/2016/04/10/use-strace-to-trace-missing-files/)
-
