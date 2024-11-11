@@ -148,6 +148,22 @@
 
     - Enter QT source code folder
 
+    - environment variables
+        > `qt_build_env.cmd`
+
+        ```batch
+        @echo off
+        rem qt_build_env.cmd
+
+        set PYTHON_PATH=C:\tool_util\Python\Python310
+        set PYTHON_SCRIPT_PATH=C:\tool_util\Python\Python310\Scripts
+        set PERL_PATH=C:\tool_util\strawberry-perl-5.40.0.1-64bit-portable\perl
+        set MINGW32_PATH=D:\portable_tool\QT\mingw32
+
+        set PATH=%MINGW32_PATH%\bin;%PYTHON_PATH%;%PYTHON_SCRIPT_PATH%;%PERL_PATH%\bin;%PATH%
+        @echo on
+        ```
+
 ### Configure
 
 + check `gcc` version
