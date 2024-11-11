@@ -118,6 +118,7 @@
 ### Official
 
 + [Qt Online Installer](https://download.qt.io/archive/online_installers/4.2/)
+    > 20241111 發現 `Qt Online Installer` 只支援 QT6
 
     - Select tool
         > + MinGW 7.3.0 32-bit/64-bit
