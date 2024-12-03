@@ -225,6 +225,11 @@
     > mingw32-make install
     ```
 
+    - Q/A
+
+        1. `找不到相應的標頭檔' No such file or directory #include "… qfreetypefontdatabase_p.h"'`
+            > mingw 存在bug, 太長的路徑編譯會報錯
+
 ### Reference
 
 + [Qt5.14.2 MinGW-32靜態編譯及壓縮過程配置教程-CSDN博客](https://blog.csdn.net/zhoufoxcn/article/details/120999085?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1.pc_relevant_paycolumn_v3&spm=1001.2101.3001.4242.2&utm_relevant_index=4)

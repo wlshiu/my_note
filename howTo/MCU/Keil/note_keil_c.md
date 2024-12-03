@@ -263,10 +263,12 @@ Link external static libraries
         ```
 
     - include a symbol file
+        > `core.sym` 當作普通的 `*.o` 輸入
 
         ```
-        $ gcc test.c -o test -Wl,-T xxx.ld core.sym
+        $ gcc test.c -o test core.sym -Wl,-T xxx.ld
         ```
+
         1. symbol file format
             > 其中等號旁的空白是必須的, 如果 format 不對的話 ld 會噴 error(file format not recognized;).
             用了這個之後, link 出來的 symbol 就會從 UND 變成 ABS.
@@ -281,6 +283,8 @@ Link external static libraries
 
         ```
         $ gcc test.c -o test -Wl,-T xxx.ld --defsym symbol1=0x12345678
+        $ gcc test.c -o test -Wl,-T xxx.ld -Wl,--defsym=symbol1=0x12345678
+
         ```
 
 + Reference
