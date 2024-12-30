@@ -131,7 +131,7 @@ $ vim ~/.tmux.conf
             > + Press `enter`  => End select mode
             > + `<C+b> + ]`    => 貼上
 
-    - Copy to local clipboard with SSH
+    - Copy to local clipboard with SSH (recommend)
         > + `<shfit> + 左鍵滑鼠選範圍`
         >> 切換到 local 端
         > + `<alt> + c`
@@ -162,12 +162,15 @@ $ vim ~/.tmux.conf
             > 水平分割視窗
         1. `<C+b> %` or `<C+b> -`
             > 垂直分割視窗
-        1. `<C+b> 方向鍵 上/下`
+
+        1. `<C+b> + <alt> + 方向鍵 上/下`
             > 分割視窗大小調整
         1. `<C+b> + <alt> + 方向鍵 左/右`
             > 分割視窗大小調整
+
         1. `<C+b> h,j,k,l` (vim 方向鍵)
             > 切換游標所在區塊
+
         1. `<C+b> space`
             > 重新佈局分割視窗, 內建多種佈局.
         1. `<C+b> x`
