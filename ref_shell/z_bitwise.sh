@@ -98,3 +98,4 @@ value=$((${bit_00} | ${bit_01} | ${bit_02} | ${bit_03} | \
          ${bit_08} | ${bit_09} | ${bit_10} | ${bit_11}))
 
 echo "${value}"
+printf '0x%04X' ${value}
