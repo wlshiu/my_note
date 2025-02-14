@@ -554,10 +554,30 @@ fsflags rs        | csrrw x0, fflags, rs       | Write FP exception flags
 fsflagsi rd, imm  | csrrwi rd, fflags, imm     | Swap FP exception flags, immediate
 fsflagsi imm      | csrrwi x0, fflags, imm     | Write FP exception flags, immediate
 
+# Machine Code
+
++ `NOP`
+
+    ```
+    00000000 <_start>:
+      nop
+    0:  0001        nop
+      nop
+    2:  0001        nop
+    ```
+
++ `while(1);`
+
+    ```
+    00000000 <_start>:
+
+    1:
+        j 1b
+      0:    a001       j  0 <_start>
+    ```
 
 # reference
 + [RISC-V 指令集架構介紹 - RV32I](https://tclin914.github.io/16df19b4/)
 + [RISC-V基本指令集概述](http://www.sunnychen.top/2019/07/06/RISC-V%E5%9F%BA%E6%9C%AC%E6%8C%87%E4%BB%A4%E9%9B%86%E6%A6%82%E8%BF%B0/)
 + [riscv instruction](https://www.francisz.cn/2020/06/23/riscv-instruction/)
 + [RV32I基礎整數指令集](https://www.cnblogs.com/mikewolf2002/p/11196680.html)
-
