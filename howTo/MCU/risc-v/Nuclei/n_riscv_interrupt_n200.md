@@ -58,7 +58,7 @@ RISC-V spec (riscv-privileged-v1.10) 裡只對 `MTVEC` 和 `MCAUSE` 做了最基
 
 ## Exception flow
 
-**Nuclei-Nxxx** 支援 `2-Level Nested Exception Stack`
+**Nuclei-Nxxx** 支援 `2-Level Nested Exception Stack (新版已無限制,由 S/W 存到 stack)`
 
 + Priority of Exception
     > `Exception-Code 越小, Priority 就越高`
@@ -188,9 +188,9 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 
 可經由 `SysTimer.MSIP` 來產生 SWI (S/w Interrupt)
 
-### ECLIC (Enhanced Core Local Interrupt Controller)
+### [ECLIC](./n_riscv_eclic.md)
 
-**Nuclei-N2xx** 使用 `mstatus.MIE` 作為 ECLIC Interrupt 的全域開關
+**Nuclei-N2xx** 使用 `mstatus.MIE` 作為 ECLIC (Enhanced Core Local Interrupt Controller) Interrupt 的全域開關
 
 + ECLIC 為每個 Interrupt source 分配各自的 Interrupt Level/Priority
     > 可藉由設定 ECLIC registers 來管理 Interrupt sources
@@ -262,16 +262,20 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
             - 使用 CSR_JALMNXTI 來做 H/w 跳轉 (無額外 stack 開銷)
 
 + Hart 將 `mcause.EXCCODE` 更新為 ECLIC 的 IRQ ID 且 `mcause.INTERRUPT` 設為 1
-+ Hart 將中斷前的 `mintstatus.MIL` 保存到 `mcause.MPIL`, `mintstatus.MIL` 更新為目前的 Nested Interrupt Level
-    > 當離開 ISR 時, `mcause.MPIL` 被用來恢復原本的 `mintstatus.MIL`
 
 + Hart 將發生中斷前的 `mstatus.MIE`, 保存到 `mstatus.MPIE`
     > `mstatus.MPIE` 是為了能在離開中斷時, 利用 `mstatus.MPIE` 來恢復進入中斷前的 `mstatus.MIE`
+
 + **Hart 將 `mstatus.MIE` 設為 0, 停止中斷觸發**
 
 + Hart 將 `mstatus.MPP` 用來記錄進入中斷前的 Privilege Mode
     > `mstatus.MPP` 是為了能在離開中斷時, 利用 `mstatus.MPP` 來恢復進入中斷前的 Privilege Mode
+
 + Hart 強制將 Privilege Mode 切換到 M-Mode (**中斷都會在 M-Mode 處理**)
+
++ Hart 將中斷前的 `mintstatus.MIL` 保存到 `mcause.MPIL`, `mintstatus.MIL` 更新為目前的 Interrupt Level
+    > 在 Nested interrupt 下, 需要記錄目前的 Interrupt Level (`mintstatus.MIL = current interrup level`), 以判定是否可以被搶占
+    >> 當離開 ISR 時, `mcause.MPIL` 被用來恢復原本的 `mintstatus.MIL`
 
 
 + Hart 將原本的 `msubm.TYP` 保存到 `msubm.PTYP`
@@ -347,7 +351,7 @@ RISC-V spec (riscv-privileged-v1.10) 定義了兩種中斷模式
 > + Hart 恢復原本的 Privilege mode
 > + Hart 恢復原本的 Machine Sub-Mode
 
-+ Hart 將 `mintstatus.MIL` 恢復為 `mcause.MPIL` 內的值 (Nested Interrupt Level)
++ Hart 將 `mintstatus.MIL` 恢復為 `mcause.MPIL` 內的值 (Interrupt Level)
 + Hart 將 `mstatus.MIE` 恢復為 `mstatus.MPIE` 內的值, `mstatus.MPIE` 設為 1
 + Hart 將 Privilege Mode 恢復為 `mstatus.MPP` 內的值
     > + 0x0: User Mode
