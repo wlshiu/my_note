@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1">
-  <zoom_level>20</zoom_level>
+  <zoom_level>15</zoom_level>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>20</x>
-      <y>520</y>
-      <w>500</w>
-      <h>60</h>
+      <x>300</x>
+      <y>435</y>
+      <w>375</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=.
 group=group-0
@@ -17,10 +17,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>520</y>
-      <w>560</w>
-      <h>60</h>
+      <x>630</x>
+      <y>435</y>
+      <w>420</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=.&gt;
 group=group-0
@@ -30,10 +30,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>520</y>
-      <w>60</w>
-      <h>440</h>
+      <x>630</x>
+      <y>435</y>
+      <w>45</w>
+      <h>330</h>
     </coordinates>
     <panel_attributes>lt=.
 fg=BLUE</panel_attributes>
@@ -42,10 +42,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>80</y>
-      <w>60</w>
-      <h>500</h>
+      <x>630</x>
+      <y>105</y>
+      <w>45</w>
+      <h>375</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 group=group-0
@@ -55,10 +55,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
+      <x>630</x>
       <y>180</y>
-      <w>280</w>
-      <h>400</h>
+      <w>210</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 group=group-0</panel_attributes>
@@ -67,10 +67,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>680</x>
+      <x>795</x>
       <y>180</y>
-      <w>240</w>
-      <h>400</h>
+      <w>180</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -79,10 +79,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>240</x>
+      <x>465</x>
       <y>180</y>
-      <w>500</w>
-      <h>60</h>
+      <w>375</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -91,10 +91,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>240</x>
-      <y>520</y>
-      <w>280</w>
-      <h>400</h>
+      <x>465</x>
+      <y>435</y>
+      <w>210</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
 group=group-0</panel_attributes>
@@ -103,10 +103,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>240</x>
-      <y>860</y>
-      <w>500</w>
-      <h>60</h>
+      <x>465</x>
+      <y>690</y>
+      <w>375</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -115,10 +115,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>680</x>
-      <y>520</y>
-      <w>240</w>
-      <h>400</h>
+      <x>795</x>
+      <y>435</y>
+      <w>180</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -127,10 +127,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>60</x>
+      <x>330</x>
       <y>180</y>
-      <w>240</w>
-      <h>400</h>
+      <w>180</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -139,10 +139,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>240</x>
+      <x>465</x>
       <y>180</y>
-      <w>280</w>
-      <h>400</h>
+      <w>210</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 group=group-0</panel_attributes>
@@ -151,10 +151,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>520</y>
-      <w>280</w>
-      <h>400</h>
+      <x>630</x>
+      <y>435</y>
+      <w>210</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
 group=group-0</panel_attributes>
@@ -163,10 +163,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>60</x>
-      <y>520</y>
-      <w>240</w>
-      <h>400</h>
+      <x>330</x>
+      <y>435</y>
+      <w>180</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-0</panel_attributes>
@@ -175,10 +175,10 @@ group=group-0</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>120</x>
-      <y>200</y>
-      <w>720</w>
-      <h>680</h>
+      <x>375</x>
+      <y>195</y>
+      <w>540</w>
+      <h>510</h>
     </coordinates>
     <panel_attributes>lt=.
 valign=top
@@ -189,10 +189,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>980</x>
-      <y>500</y>
-      <w>120</w>
-      <h>80</h>
+      <x>1020</x>
+      <y>420</y>
+      <w>90</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>*Alpha*
 **axis**
@@ -204,10 +204,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>400</x>
-      <y>60</y>
-      <w>160</w>
-      <h>60</h>
+      <x>585</x>
+      <y>90</y>
+      <w>120</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>*Beta axis*
 style=wordwrap
@@ -218,10 +218,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>520</y>
-      <w>320</w>
-      <h>60</h>
+      <x>630</x>
+      <y>435</y>
+      <w>240</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=-&gt;&gt;&gt;
 group=group-0</panel_attributes>
@@ -230,10 +230,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>200</x>
-      <y>520</y>
-      <w>320</w>
-      <h>60</h>
+      <x>435</x>
+      <y>435</y>
+      <w>240</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 group=group-0</panel_attributes>
@@ -242,10 +242,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
-      <y>280</y>
-      <w>320</w>
-      <h>300</h>
+      <x>630</x>
+      <y>255</y>
+      <w>240</w>
+      <h>225</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-
 fg=MAGENTA</panel_attributes>
@@ -254,10 +254,10 @@ fg=MAGENTA</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>660</x>
-      <y>340</y>
-      <w>100</w>
-      <h>40</h>
+      <x>780</x>
+      <y>300</y>
+      <w>75</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>Vref
 style=wordwrap
@@ -267,10 +267,10 @@ fg=MAGENTA</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>420</x>
-      <y>280</y>
-      <w>140</w>
-      <h>40</h>
+      <x>600</x>
+      <y>255</y>
+      <w>105</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector II*
 style=wordwrap
@@ -280,10 +280,10 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>680</x>
-      <y>400</y>
-      <w>140</w>
-      <h>40</h>
+      <x>795</x>
+      <y>345</y>
+      <w>105</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector I*
 style=wordwrap
@@ -293,10 +293,10 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>160</x>
-      <y>400</y>
-      <w>160</w>
-      <h>40</h>
+      <x>405</x>
+      <y>345</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector III*
 style=wordwrap
@@ -306,10 +306,10 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>180</x>
-      <y>640</y>
-      <w>160</w>
-      <h>40</h>
+      <x>420</x>
+      <y>525</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector IV*
 style=wordwrap
@@ -319,10 +319,10 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>420</x>
-      <y>720</y>
-      <w>160</w>
-      <h>40</h>
+      <x>600</x>
+      <y>585</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector V*
 style=wordwrap
@@ -332,10 +332,10 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>620</x>
-      <y>640</y>
-      <w>180</w>
-      <h>40</h>
+      <x>750</x>
+      <y>525</y>
+      <w>135</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*Sector VI*
 style=wordwrap
@@ -345,12 +345,12 @@ fg=ORANGE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>680</x>
-      <y>480</y>
-      <w>200</w>
-      <h>40</h>
+      <x>795</x>
+      <y>405</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v1 (tag 1,0,0)
+    <panel_attributes>v1 (state 1,0,0)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -358,12 +358,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>680</x>
-      <y>220</y>
-      <w>180</w>
-      <h>40</h>
+      <x>795</x>
+      <y>210</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v2(tag1,1,0)
+    <panel_attributes>v2(state 1,1,0)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -371,12 +371,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>280</x>
-      <y>200</y>
-      <w>180</w>
-      <h>40</h>
+      <x>495</x>
+      <y>195</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v3(tag 0,1,0)
+    <panel_attributes>v3(state 0,1,0)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -384,12 +384,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>180</x>
-      <y>480</y>
-      <w>180</w>
-      <h>40</h>
+      <x>405</x>
+      <y>405</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v4(tag 0,1,1)
+    <panel_attributes>v4(state 0,1,1)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -397,12 +397,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>280</x>
-      <y>820</y>
-      <w>180</w>
-      <h>40</h>
+      <x>495</x>
+      <y>660</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v5(tag 0,0,1)
+    <panel_attributes>v5(state 0,0,1)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -410,12 +410,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>620</x>
-      <y>820</y>
-      <w>180</w>
-      <h>40</h>
+      <x>750</x>
+      <y>660</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v6(tag 1,0,1)
+    <panel_attributes>v6(state 1,0,1)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -423,12 +423,12 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>500</x>
-      <y>500</y>
-      <w>180</w>
-      <h>40</h>
+      <x>660</x>
+      <y>420</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v7(tag 1,1,1)
+    <panel_attributes>v7(state 1,1,1)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -436,10 +436,10 @@ fontsize=12</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>460</x>
-      <y>520</y>
-      <w>40</w>
-      <h>40</h>
+      <x>630</x>
+      <y>435</y>
+      <w>30</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -447,10 +447,10 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>80</x>
-      <y>0</y>
-      <w>820</w>
-      <h>60</h>
+      <x>345</x>
+      <y>45</y>
+      <w>615</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>*SV-Space Domain vs*
 style=wordwrap
@@ -460,10 +460,10 @@ fontsize=20</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>520</x>
-      <y>460</y>
-      <w>100</w>
-      <h>120</h>
+      <x>675</x>
+      <y>390</y>
+      <w>75</w>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;-&gt;
 fg=MAGENTA</panel_attributes>
@@ -472,10 +472,10 @@ fg=MAGENTA</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>560</x>
-      <y>460</y>
-      <w>100</w>
-      <h>40</h>
+      <x>705</x>
+      <y>390</y>
+      <w>75</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>theta
 style=wordwrap
@@ -485,12 +485,12 @@ fg=MAGENTA</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>320</x>
-      <y>500</y>
-      <w>180</w>
-      <h>40</h>
+      <x>510</x>
+      <y>420</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>v0(tag 0,0,0)
+    <panel_attributes>v0(state 0,0,0)
 style=wordwrap
 fontsize=12</panel_attributes>
     <additional_attributes/>
@@ -498,10 +498,10 @@ fontsize=12</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>500</x>
-      <y>0</y>
-      <w>380</w>
-      <h>60</h>
+      <x>660</x>
+      <y>45</y>
+      <w>285</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>*Alpha/Beta Space*
 style=wordwrap
@@ -512,10 +512,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>760</x>
-      <y>540</y>
-      <w>200</w>
-      <h>40</h>
+      <x>855</x>
+      <y>450</y>
+      <w>150</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>basis_alpha
 style=wordwrap
@@ -526,10 +526,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>480</x>
-      <y>200</y>
-      <w>160</w>
-      <h>40</h>
+      <x>645</x>
+      <y>195</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>basis_beta
 style=wordwrap
@@ -540,10 +540,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>460</x>
+      <x>630</x>
       <y>180</y>
-      <w>60</w>
-      <h>400</h>
+      <w>45</w>
+      <h>300</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 fg=BLUE</panel_attributes>
@@ -552,43 +552,131 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>520</y>
-      <w>400</w>
-      <h>60</h>
+      <x>645</x>
+      <y>435</y>
+      <w>300</w>
+      <h>45</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 fg=BLUE</panel_attributes>
     <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>765</x>
+      <y>315</y>
+      <w>105</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN</panel_attributes>
+    <additional_attributes>10.0;40.0;30.0;10.0;50.0;50.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>765</x>
+      <y>480</y>
+      <w>105</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN
+layer=0</panel_attributes>
+    <additional_attributes>10.0;20.0;30.0;60.0;50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>240</y>
+      <w>135</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN</panel_attributes>
+    <additional_attributes>50.0;50.0;70.0;10.0;10.0;10.0;30.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>435</x>
+      <y>315</y>
+      <w>105</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN</panel_attributes>
+    <additional_attributes>50.0;50.0;10.0;50.0;30.0;10.0;50.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>435</x>
+      <y>480</y>
+      <w>120</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;40.0;60.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>555</y>
+      <w>135</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+fg=GREEN</panel_attributes>
+    <additional_attributes>50.0;10.0;70.0;50.0;10.0;50.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
     <id>Text</id>
     <coordinates>
-      <x>580</x>
-      <y>80</y>
-      <w>360</w>
-      <h>40</h>
+      <x>720</x>
+      <y>90</y>
+      <w>270</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>* Blue: Alpha/Beta domain
 style=wordwrap
 fontsize=12
 
 fg=BLUE
-group=group-3</panel_attributes>
+group=group-6</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>580</x>
+      <x>720</x>
       <y>120</y>
-      <w>360</w>
-      <h>40</h>
+      <w>270</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>* Black: SV-Space domain
 style=wordwrap
 fontsize=12
-group=group-3</panel_attributes>
+group=group-6</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>720</x>
+      <y>150</y>
+      <w>315</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>* Green: Voltage Vector work order
+style=wordwrap
+fontsize=12
+fg=GREEN
+group=group-6</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

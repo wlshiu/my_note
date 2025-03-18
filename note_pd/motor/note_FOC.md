@@ -108,30 +108,58 @@ Motor FOC
 
 ## SVPWM
 
-將實際 `Motor 3-Phase invertor output Voltages (output Va/Vb/Vc)` 轉換到 SV-Space domain (SV-basis: v0 ~ v7)
-> **Vref** 為 SV-Space domain (基底 V0 ~ V7) 上理想的輸出電壓, **Vref** 可由 SV-basis 合成, 每個 SV-Space 的基底亦可用 Va/Vb/Vc 來表示
->> v0/v7 為 0 向量 (因數學式產生), 實際可忽略
+將實際 `Motor 3-Phase invertor output Voltages (output Va/Vb/Vc)` 轉換到 SV-Space domain (電壓開關向量 SV-basis: v0 ~ v7)
+> **Vref** 為 SV-Space domain (基底 V0 ~ V7) 上理想的輸出電壓, **Vref** 可由 SV-basis (v0 ~ v7)合成,
+  每個 SV-Space 的基底亦可用 `basis_alpha/basis_beta` 來表示 (三角幾何轉換, 7-Dimension to 2-Dimension)
+>> v0/v7 為 0 向量 (因伏秒平衡數學式產生), 當上下臂開關切換頻率高時, 0 向量的作用時間趨近 0 可以忽略不計
 
 **Figure. SV-Space vs. Alpha/Beta Space** <br>
 ![FOC_Space-Vector_Sectors](./FOC_Space-Vector_Sectors.jpg)
 
 在不同的 Sector 區域時, **Vref** 會由該 sector 的 SV-basis 來合成
-> 當 theta 從 `0° => 60°` 時, 會依**時間變數 t 調整 v1/v2 分量比例**, 來合成時間 t 的 **Vref**
+> 當 theta 從 `0° => 60°` 時, 會依**時間變數 t 調整 v0/v1/v2/v7 分量比例**, 來合成時間 t 的 **Vref**
 > + 若 **Vref** 的軌跡越接近圓形, 則 Va/Vb/Vc 的輸出就越接近 sine wave
-> + 其中 `0° => 30°`和 `30° => 60°` 的 v1/v2 比例是對稱, 因此將移動 `30°` 的時間定為 `T`
 
+### Volt-Second_balance (伏秒平衡)
+
+**伏秒平衡**指處於穩定狀態的電感, 電感兩端的正伏秒積等於負伏秒積, 也就是電感兩端的伏秒積在一個開關週期內必須相等
+> + 也因為伏秒平衡是做積分, 重要的是持續時間(面積)而不是順序, 一個週期內可以任意切換順序.
+> + 為了儘量減少 MOS 管的開關次數, 會以最大限度減少開關損耗為目的, 來安排狀態切換順序
+
+當角速度 ω 固定, 只有時間 t 是變量, 因此只要維持當前三相繞組的磁場, 隨時間的改變, 就能產生推力.
+而 **Vref** 的合成 (SV-basis: v0 ~ v7 的切換使用), 是藉由改變 3 個繞組的電壓, 來維持磁場的穩定,
+因此只要能保持磁場狀態, 改變 3 個繞組電壓的順序, 就可以有許多變化
+> 電壓向量對應著不同的逆變器開關狀態, 則在電壓向量間的切換, 就對應著不同的逆變器開關狀態間的切換.
+理想上, 在切換電壓向量的時候, 只更動逆變器一個相上的開關狀態, 其損耗會是最小,
+通過引入 0 向量 (v0/v7), 使產生的 PWM 對稱(有效地降低 PWM 的諧波份量), 就可以輕鬆實現這一目標
+
+將兩個 0 向量, 平均分配到中間和兩端 `v0 -> v_x -> v_y -> v7 -> v7 -> v_y -> v_x -> v0` 來產生對稱的 PWM
+> 取樣週期 (PWM update freq) `v0 => v0` 為 2T (因對稱則 `v0 => v7` 為 T)
+>> 當轉到了下一個 sector 時, 電壓向量合成過程, 都是從一個 0 向量開始, 這可保障**Vref**的連續性
 
 ```
+2T 為 PWM update freq (產生 sine wave 的取樣週期)
+T0 為 Sector-s (s: 1 ~ 6) 中, SV-basis v_0 的持續作用時間 (PWM duty)
 Tx 為 Sector-s (s: 1 ~ 6) 中, SV-basis v_x 的持續作用時間 (PWM duty)
 Ty 為 Sector-s (s: 1 ~ 6) 中, SV-basis v_y 的持續作用時間 (PWM duty)
+T7 為 Sector-s (s: 1 ~ 6) 中, SV-basis v_7 的持續作用時間 (PWM duty)
+
+零向量的作用時間會相同因次 T0 == T7
+
+2T = T0 + Tx + Ty + T7 + T7 + Ty + Tx + T0
+ T = T0 + Tx + Ty + T7
+   = 2*T0 + Tx + Ty
 
 integral{ sector_s(Vref(t), t=0~T }
-    = integral{ sector_s(v_x(t), t=0~Tx) } + integral{ sector_s(v_y(t), t=0~Ty) }
-    = sector_s( v_x(0) + v_x(1) + ... + v_x(Tx) ) + sector_s( v_y(0) + v_y(1) + ... + v_y(Ty) )
+    = integral{ sector_s(v_x(t), t=0~Tx) } + integral{ sector_s(v_y(t), t=0~Ty) } +
+        integral{ sector_s(v_0(t), t=0~T0) } + integral{ sector_s(v_7(t), t=0~T7) }
+    = sector_s( v_x(0) + v_x(1) + ... + v_x(Tx) ) + sector_s( v_y(0) + v_y(1) + ... + v_y(Ty) ) +
+        sector_s( v_0(0) + v_0(1) + ... + v_0(T0) ) + sector_s( v_7(0) + v_7(1) + ... + v_7(Ty) )
 
 ```
 
 + Example of Sector
+    > 當上下臂開關切換頻率高時, 0 向量的作用時間趨近 0 可以忽略不計
 
     - Sector-I
 
@@ -158,7 +186,6 @@ integral{ sector_s(Vref(t), t=0~T }
 + `Vdc`: the voltage of inverter
 
 + 從 **Figure. SV-Space vs. Alpha/Beta Space**, 可獲得 SV-Space Domain 轉換到 Alpha/Beta Space 的關係
-+ `basis_alpha/basis_beta domain` 經 Inv_Clarke 轉換, 可再轉換到  `Va/Vb/Vc` (???)
 
 **Table. SV-basis v.s. Va/Vb/Vc 關係** <br>
 
@@ -171,15 +198,27 @@ integral{ sector_s(Vref(t), t=0~T }
 |     v5 (240°) | (0, 0, 1) |   -1/3     |     -1/3   |     2/3    |       -1/3          |   -1/sqrt(3)
 |     v6 (300°) | (1, 0, 1) |    1/3     |     -2/3   |     1/3    |        1/3          |   -1/sqrt(3)
 |     v7 (360°) | (1, 1, 1) |     0      |       0    |      0     |         0           |      0
-|     v0 ( -0°) | (0, 0, 0) |     0      |       0    |      0     |         0           |      0
+|     v0 (  0°) | (0, 0, 0) |     0      |       0    |      0     |         0           |      0
 
 
 
 ### 各 SV-Sector 中, PWM 持續時間推導
 
 > ```
-> Vref * T = v_x * T_x + v_y * T_y, x = 1~6, y = 1~6
+> Vref * T = v_x * T_x + v_y * T_y + v_0 * T_0 + v_7 * T_7, x = 1~6, y = 1~6
 > ```
+
+**Table. 電壓向量在各 sector 作用順序** <br>
+
+| SV-Space sectors         | Vector  order                                 |
+| :-:                      | :-:                                           |
+| Sector I   (0° ~ 60°)    | v0 -> v1 -> v2 -> v7 -> v7 -> v2 -> v1 -> v0  |
+| Sector II  (60° ~ 120°)  | v0 -> v3 -> v2 -> v7 -> v7 -> v2 -> v3 -> v0  |
+| Sector III (120° ~ 180°) | v0 -> v3 -> v4 -> v7 -> v7 -> v4 -> v3 -> v0  |
+| Sector IV  (180° ~ 240°) | v0 -> v5 -> v4 -> v7 -> v7 -> v4 -> v5 -> v0  |
+| Sector V   (240° ~ 300°) | v0 -> v5 -> v6 -> v7 -> v7 -> v6 -> v5 -> v0  |
+| Sector VI  (300° ~ 360°) | v0 -> v1 -> v6 -> v7 -> v7 -> v6 -> v1 -> v0  |
+
 
 + SV-Sector-I
     > 依照 `Table. SV-basis v.s. Va/Vb/Vc 關係`
@@ -210,78 +249,127 @@ integral{ sector_s(Vref(t), t=0~T }
         ```
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_1](./SVPWM_Duty_Sector_1.jpg)
 
         ```
-        d1 = T1/T, d2 = T2/T
+        T0 = T7 = (T - T1 - T2)/2
 
-        dc = (1 - d1 - d2)/2
-        db = dc + d2
-        da = db + d1
+        Duty(Tc) = (T - T1 - T2) / 2
+        Duty(Tb) = Duty(Tc) + T2
+        Duty(Ta) = Duty(Tb) + T1
+
+        if d1 = T1/T, d2 = T2/T
+
+        dc = Tc/T = (1 - d1 - d2)/2
+        db = Tb/T = (Tc + T2) / T = dc + d2
+        da = Ta/T = (Tb + T1) / T = db + d1
         ```
 
 
 + SV-Sector-II
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_2](./SVPWM_Duty_Sector_2.jpg)
 
         ```
-        d1 = T3/T, d2 = T2/T
+        T0 = T7 = (T - T3 - T2)/2
 
-        dc = (1 - d1 - d2)/2
-        da = dc + d2
-        db = da + d1
+        Duty(Tc) = (T - T3 - T2) / 2
+        Duty(Ta) = Duty(Tc) + T2
+        Duty(Tb) = Duty(Ta) + T1
+
+        if d1 = T3/T, d2 = T2/T
+
+        dc = Tc/T = (1 - d1 - d2)/2
+        da = Ta/T = dc + d2
+        db = Tb/T = da + d1
         ```
-
-
 
 + SV-Sector-III
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_3](./SVPWM_Duty_Sector_3.jpg)
 
         ```
-        d1 = T3/T, d2 = T4/T
+        T0 = T7 = (T - T3 - T4)/2
+        Duty(Ta) = (T - T3 - T4) / 2
+        Duty(Tc) = Duty(Tc) + T4
+        Duty(Tb) = Duty(Tc) + T3
 
-        da = (1 - d1 - d2)/2
-        dc = da + d2
-        db = dc + d1
+        if d1 = T3/T, d2 = T4/T
+
+        da = Ta/T = (1 - d1 - d2)/2
+        dc = Tc/T = da + d2
+        db = Tb/T = dc + d1
         ```
 
 + SV-Sector-IV
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_4](./SVPWM_Duty_Sector_4.jpg)
 
         ```
-        d1 = T5/T, d2 = T4/T
+        T0 = T7 = (T - T5 - T4)/2
+        Duty(Ta) = (T - T5 - T4) / 2
+        Duty(Tb) = Duty(Ta) + T4
+        Duty(Tc) = Duty(Tb) + T5
 
-        da = (1 - d1 - d2)/2
-        db = da + d2
-        dc = db + d1
+
+        if d1 = T5/T, d2 = T4/T
+
+        da = Ta/T = (1 - d1 - d2)/2
+        db = Tb/T = da + d2
+        dc = Tc/T = db + d1
         ```
 
 
 + SV-Sector-V
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_5](./SVPWM_Duty_Sector_5.jpg)
 
         ```
-        d1 = T5/T, d2 = T6/T
+        T0 = T7 = (T - T5 - T6)/2
+        Duty(Tb) = (T - T5 - T6) / 2
+        Duty(Ta) = Duty(Tb) + T6
+        Duty(Tc) = Duty(Ta) + T5
 
-        db = (1 - d1 - d2)/2
-        da = db + d2
-        dc = da + d1
+        if d1 = T5/T, d2 = T6/T
+
+        db = Tb/T = (1 - d1 - d2)/2
+        da = Ta/T = db + d2
+        dc = Tc/T = da + d1
         ```
 
 
 + SV-Sector-VI
 
     - Va/Vb/Vc
+        > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
+
+        ![SVPWM_Duty_Sector_6](./SVPWM_Duty_Sector_6.jpg)
 
         ```
-        d1 = T6/T, d2 = T1/T
+        T0 = T7 = (T - T1 - T6)/2
+        Duty(Tb) = (T - T1 - T6) / 2
+        Duty(Tc) = Duty(Tb) + T6
+        Duty(Ta) = Duty(Tc) + T1
 
-        db = (1 - d1 - d2)/2
-        dc = db + d2
-        da = dc + d1
+        if d1 = T6/T, d2 = T1/T
+
+        db = Tb/T = (1 - d1 - d2)/2
+        dc = Tc/T = db + d2
+        da = Ta/T = dc + d1
         ```
 
 
