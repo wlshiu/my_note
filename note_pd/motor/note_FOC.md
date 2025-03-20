@@ -22,8 +22,12 @@ Motor FOC
         Kt = B * L * (D^2) * N * sin(δ)
         ```
 
+
 # Components of Algorithm
 
+## [Trigonometric-functions](./note_tangent.md)
+
+三角函數
 
 ## PID Controller
 
