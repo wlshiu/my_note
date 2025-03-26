@@ -22,12 +22,14 @@ Motor FOC
         Kt = B * L * (D^2) * N * sin(δ)
         ```
 
+# [Trigonometric-functions](./note_tangent.md)
+
+三角函數
+
 
 # Components of Algorithm
 
-## [Trigonometric-functions](./note_tangent.md)
-
-三角函數
+![FOC_basic_flow](FOC_basic_flow.jpg)
 
 ## PID Controller
 
@@ -106,9 +108,9 @@ Motor FOC
 
     ```
 
-## SMO (Sliding mode observer)
+## [SMO](./note_smo.md)
 
-經典 `ref. Microchip AN1078 2010`
+滑模觀測器 SMO (Sliding mode observer), 經典 `ref. Microchip AN1078 2010`
 
 ## SVPWM
 
