@@ -715,4 +715,84 @@ fontsize=20
 </panel_attributes>
     <additional_attributes/>
   </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>126</x>
+      <y>476</y>
+      <w>700</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>440.0;10.0;480.0;10.0;480.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>98</x>
+      <y>434</y>
+      <w>770</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fg=BLUE</panel_attributes>
+    <additional_attributes>460.0;10.0;530.0;10.0;530.0;80.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>840</x>
+      <y>434</y>
+      <w>42</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>*E_α*
+fontsize=10
+
+group=group-49</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>840</x>
+      <y>420</y>
+      <w>28</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=10
+
+group=group-49</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>798</x>
+      <y>490</y>
+      <w>42</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>*E_β*
+fontsize=10
+
+group=group-50</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>798</x>
+      <y>476</y>
+      <w>28</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=10
+
+group=group-50</panel_attributes>
+    <additional_attributes/>
+  </element>
 </diagram>

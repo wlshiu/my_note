@@ -75,6 +75,3 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 + [三相電機相電感，相電阻和極對數的測量\_電機電感測量方法-CSDN部落格](https://blog.csdn.net/qq_45598353/article/details/122698183)
 
 
-
-
-Discrete time
