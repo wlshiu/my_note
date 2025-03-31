@@ -4,8 +4,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>156</x>
-      <y>180</y>
+      <x>168</x>
+      <y>168</y>
       <w>84</w>
       <h>72</h>
     </coordinates>
@@ -15,8 +15,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>204</x>
-      <y>180</y>
+      <x>216</x>
+      <y>168</y>
       <w>48</w>
       <h>48</h>
     </coordinates>
@@ -27,56 +27,32 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>216</x>
-      <y>168</y>
+      <x>228</x>
+      <y>156</y>
       <w>48</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-23</panel_attributes>
     <additional_attributes>10.0;30.0;20.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>228</x>
-      <y>168</y>
-      <w>48</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>lt=-
-group=group-23</panel_attributes>
-    <additional_attributes>20.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>240</x>
-      <y>168</y>
+      <y>156</y>
       <w>48</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-23</panel_attributes>
-    <additional_attributes>10.0;30.0;20.0;10.0</additional_attributes>
+    <additional_attributes>20.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
       <x>252</x>
-      <y>168</y>
-      <w>48</w>
-      <h>60</h>
-    </coordinates>
-    <panel_attributes>lt=-
-group=group-23</panel_attributes>
-    <additional_attributes>20.0;30.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>264</x>
-      <y>168</y>
+      <y>156</y>
       <w>48</w>
       <h>60</h>
     </coordinates>
@@ -87,8 +63,8 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>276</x>
-      <y>168</y>
+      <x>264</x>
+      <y>156</y>
       <w>48</w>
       <h>60</h>
     </coordinates>
@@ -99,8 +75,32 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
+      <x>276</x>
+      <y>156</y>
+      <w>48</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=group-23</panel_attributes>
+    <additional_attributes>10.0;30.0;20.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
       <x>288</x>
-      <y>180</y>
+      <y>156</y>
+      <w>48</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=-
+group=group-23</panel_attributes>
+    <additional_attributes>20.0;30.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>300</x>
+      <y>168</y>
       <w>48</w>
       <h>48</h>
     </coordinates>
@@ -111,8 +111,8 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>132</x>
-      <y>216</y>
+      <x>144</x>
+      <y>204</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -123,8 +123,8 @@ group=group-24</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>300</x>
-      <y>180</y>
+      <x>312</x>
+      <y>168</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -134,8 +134,8 @@ group=group-24</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>240</x>
-      <y>144</y>
+      <x>252</x>
+      <y>132</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -147,8 +147,8 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>348</x>
-      <y>156</y>
+      <x>360</x>
+      <y>144</y>
       <w>60</w>
       <h>60</h>
     </coordinates>
@@ -159,8 +159,8 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>384</x>
-      <y>156</y>
+      <x>396</x>
+      <y>144</y>
       <w>60</w>
       <h>60</h>
     </coordinates>
@@ -171,8 +171,8 @@ group=group-23</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>420</x>
-      <y>156</y>
+      <x>432</x>
+      <y>144</y>
       <w>60</w>
       <h>60</h>
     </coordinates>
@@ -183,8 +183,8 @@ group=group-23</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>492</x>
-      <y>156</y>
+      <x>504</x>
+      <y>144</y>
       <w>60</w>
       <h>60</h>
     </coordinates>
@@ -196,8 +196,8 @@ EMF
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>444</x>
-      <y>180</y>
+      <x>456</x>
+      <y>168</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
@@ -207,8 +207,8 @@ EMF
   <element>
     <id>Text</id>
     <coordinates>
-      <x>384</x>
-      <y>120</y>
+      <x>396</x>
+      <y>108</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -219,8 +219,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>492</x>
-      <y>120</y>
+      <x>504</x>
+      <y>108</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -231,8 +231,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>156</x>
-      <y>180</y>
+      <x>168</x>
+      <y>168</y>
       <w>444</w>
       <h>144</h>
     </coordinates>
@@ -242,8 +242,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>144</x>
-      <y>228</y>
+      <x>156</x>
+      <y>216</y>
       <w>60</w>
       <h>36</h>
     </coordinates>
@@ -254,8 +254,8 @@ group=group-24</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>132</x>
-      <y>240</y>
+      <x>144</x>
+      <y>228</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -266,8 +266,8 @@ group=group-24</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>144</x>
-      <y>252</y>
+      <x>156</x>
+      <y>240</y>
       <w>60</w>
       <h>36</h>
     </coordinates>
@@ -278,19 +278,7 @@ group=group-24</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>120</x>
-      <y>204</y>
-      <w>24</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>*+*
-fontsize=18</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>480</x>
+      <x>132</x>
       <y>192</y>
       <w>24</w>
       <h>36</h>
@@ -302,8 +290,20 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>552</x>
-      <y>192</y>
+      <x>492</x>
+      <y>180</y>
+      <w>24</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>*+*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>564</x>
+      <y>180</y>
       <w>24</w>
       <h>36</h>
     </coordinates>
@@ -314,8 +314,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>120</x>
-      <y>252</y>
+      <x>132</x>
+      <y>240</y>
       <w>24</w>
       <h>36</h>
     </coordinates>
@@ -326,8 +326,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>144</x>
-      <y>144</y>
+      <x>156</x>
+      <y>132</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -338,8 +338,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>84</x>
-      <y>228</y>
+      <x>96</x>
+      <y>216</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -350,8 +350,8 @@ fontsize=18</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>468</x>
-      <y>336</y>
+      <x>480</x>
+      <y>324</y>
       <w>216</w>
       <h>36</h>
     </coordinates>
@@ -364,8 +364,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>252</x>
-      <y>60</y>
+      <x>264</x>
+      <y>48</y>
       <w>228</w>
       <h>36</h>
     </coordinates>
@@ -377,8 +377,8 @@ fontsize=20
   <element>
     <id>Text</id>
     <coordinates>
-      <x>132</x>
-      <y>336</y>
+      <x>144</x>
+      <y>324</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -390,8 +390,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>204</x>
-      <y>336</y>
+      <x>216</x>
+      <y>324</y>
       <w>276</w>
       <h>36</h>
     </coordinates>
@@ -403,8 +403,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>360</x>
-      <y>312</y>
+      <x>372</x>
+      <y>300</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -416,8 +416,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>348</x>
-      <y>348</y>
+      <x>360</x>
+      <y>336</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -429,8 +429,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>336</x>
-      <y>336</y>
+      <x>348</x>
+      <y>324</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
@@ -441,8 +441,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>384</x>
-      <y>324</y>
+      <x>396</x>
+      <y>312</y>
       <w>36</w>
       <h>36</h>
     </coordinates>
@@ -454,8 +454,8 @@ group=group-35</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>204</x>
-      <y>396</y>
+      <x>216</x>
+      <y>384</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -467,8 +467,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>456</x>
-      <y>396</y>
+      <x>468</x>
+      <y>384</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -480,8 +480,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>144</x>
-      <y>372</y>
+      <x>156</x>
+      <y>360</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -493,8 +493,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>132</x>
-      <y>408</y>
+      <x>144</x>
+      <y>396</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -506,8 +506,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>168</x>
-      <y>384</y>
+      <x>180</x>
+      <y>372</y>
       <w>36</w>
       <h>36</h>
     </coordinates>
@@ -519,8 +519,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>120</x>
-      <y>396</y>
+      <x>132</x>
+      <y>384</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
@@ -531,8 +531,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>216</x>
-      <y>396</y>
+      <x>228</x>
+      <y>384</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -543,8 +543,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>264</x>
-      <y>408</y>
+      <x>276</x>
+      <y>396</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -556,8 +556,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>240</x>
-      <y>372</y>
+      <x>252</x>
+      <y>360</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -569,8 +569,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>324</x>
-      <y>396</y>
+      <x>336</x>
+      <y>384</y>
       <w>108</w>
       <h>36</h>
     </coordinates>
@@ -582,8 +582,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>384</x>
-      <y>396</y>
+      <x>396</x>
+      <y>384</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -594,8 +594,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>408</x>
-      <y>408</y>
+      <x>420</x>
+      <y>396</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -607,8 +607,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>408</x>
-      <y>372</y>
+      <x>420</x>
+      <y>360</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -620,8 +620,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>564</x>
-      <y>396</y>
+      <x>576</x>
+      <y>384</y>
       <w>144</w>
       <h>36</h>
     </coordinates>
@@ -633,8 +633,8 @@ group=group-34</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>120</x>
-      <y>456</y>
+      <x>132</x>
+      <y>444</y>
       <w>216</w>
       <h>36</h>
     </coordinates>
@@ -646,8 +646,8 @@ fontsize=18
   <element>
     <id>Text</id>
     <coordinates>
-      <x>612</x>
-      <y>384</y>
+      <x>624</x>
+      <y>372</y>
       <w>24</w>
       <h>24</h>
     </coordinates>
@@ -659,8 +659,8 @@ fontsize=14
   <element>
     <id>Text</id>
     <coordinates>
-      <x>648</x>
-      <y>384</y>
+      <x>660</x>
+      <y>372</y>
       <w>24</w>
       <h>24</h>
     </coordinates>
@@ -672,8 +672,8 @@ fontsize=14
   <element>
     <id>Text</id>
     <coordinates>
-      <x>588</x>
-      <y>516</y>
+      <x>600</x>
+      <y>504</y>
       <w>216</w>
       <h>36</h>
     </coordinates>
@@ -685,8 +685,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>372</x>
-      <y>528</y>
+      <x>384</x>
+      <y>516</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -698,8 +698,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>348</x>
-      <y>492</y>
+      <x>360</x>
+      <y>480</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -711,8 +711,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>432</x>
-      <y>516</y>
+      <x>444</x>
+      <y>504</y>
       <w>108</w>
       <h>36</h>
     </coordinates>
@@ -724,8 +724,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>528</x>
-      <y>516</y>
+      <x>540</x>
+      <y>504</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
@@ -736,8 +736,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>540</x>
-      <y>528</y>
+      <x>552</x>
+      <y>516</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -749,8 +749,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>540</x>
-      <y>492</y>
+      <x>552</x>
+      <y>480</y>
       <w>24</w>
       <h>36</h>
     </coordinates>
@@ -762,8 +762,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>168</x>
-      <y>696</y>
+      <x>180</x>
+      <y>684</y>
       <w>420</w>
       <h>36</h>
     </coordinates>
@@ -775,8 +775,8 @@ group=group-41</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>324</x>
-      <y>516</y>
+      <x>336</x>
+      <y>504</y>
       <w>132</w>
       <h>36</h>
     </coordinates>
@@ -787,8 +787,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>132</x>
-      <y>516</y>
+      <x>144</x>
+      <y>504</y>
       <w>204</w>
       <h>36</h>
     </coordinates>
@@ -799,8 +799,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>216</x>
-      <y>528</y>
+      <x>228</x>
+      <y>516</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
@@ -812,8 +812,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>156</x>
-      <y>492</y>
+      <x>168</x>
+      <y>480</y>
       <w>156</w>
       <h>36</h>
     </coordinates>
@@ -825,8 +825,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>312</x>
-      <y>516</y>
+      <x>324</x>
+      <y>504</y>
       <w>84</w>
       <h>36</h>
     </coordinates>
@@ -838,8 +838,8 @@ group=group-42</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>144</x>
-      <y>660</y>
+      <x>156</x>
+      <y>648</y>
       <w>420</w>
       <h>36</h>
     </coordinates>
@@ -851,8 +851,8 @@ group=group-41</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>168</x>
-      <y>720</y>
+      <x>180</x>
+      <y>708</y>
       <w>420</w>
       <h>36</h>
     </coordinates>
@@ -864,8 +864,8 @@ group=group-41</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>168</x>
-      <y>744</y>
+      <x>180</x>
+      <y>732</y>
       <w>420</w>
       <h>36</h>
     </coordinates>
@@ -877,129 +877,297 @@ group=group-41</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>144</x>
-      <y>600</y>
-      <w>84</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>*Is(t) = *
-fontsize=18
-group=group-48</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>216</x>
-      <y>600</y>
+      <x>156</x>
+      <y>588</y>
       <w>576</w>
       <h>36</h>
     </coordinates>
-    <panel_attributes>*Is  = (1 - Ts *             ) * Is(t-1) + *
+    <panel_attributes>*Is(t)  = (1 - Ts *             ) * Is(t-1) + *
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>216</x>
-      <y>588</y>
-      <w>48</w>
+      <x>156</x>
+      <y>576</y>
+      <w>24</w>
       <h>24</h>
     </coordinates>
     <panel_attributes>*^*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>372</x>
-      <y>624</y>
+      <x>336</x>
+      <y>612</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>*Ls*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>348</x>
-      <y>612</y>
+      <x>312</x>
+      <y>600</y>
       <w>96</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>lt=-
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>372</x>
-      <y>588</y>
+      <x>336</x>
+      <y>576</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>*Rs*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>540</x>
-      <y>624</y>
+      <x>504</x>
+      <y>612</y>
       <w>48</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>*Ls*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>528</x>
-      <y>612</y>
+      <x>492</x>
+      <y>600</y>
       <w>72</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>lt=-
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
     <additional_attributes>10.0;10.0;40.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>540</x>
-      <y>588</y>
+      <x>504</x>
+      <y>576</y>
       <w>36</w>
       <h>36</h>
     </coordinates>
     <panel_attributes>*Ts*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>552</x>
+      <y>588</y>
+      <w>216</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>** ( Vs(t-1) - Es(t-1) )*
+fontsize=18
+group=group-53</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>156</x>
+      <y>120</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>216</x>
+      <y>312</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>396</x>
+      <y>300</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>/^/
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>180</x>
+      <y>360</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>/^/
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>348</x>
+      <y>372</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
       <x>588</x>
-      <y>600</y>
-      <w>216</w>
-      <h>36</h>
+      <y>372</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
-    <panel_attributes>** ( Vs(t-1) - Es(t-1) )*
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>168</x>
+      <y>468</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>228</x>
+      <y>468</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>456</x>
+      <y>492</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>408</x>
+      <y>576</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
 fontsize=18
-group=group-48</panel_attributes>
+group=group-53</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>672</x>
+      <y>576</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>504</x>
+      <y>96</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>444</x>
+      <y>312</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>540</x>
+      <y>372</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>720</x>
+      <y>492</y>
+      <w>24</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>*^*
+fontsize=18</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

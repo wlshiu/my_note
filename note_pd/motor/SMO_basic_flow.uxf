@@ -10,7 +10,7 @@
       <h>98</h>
     </coordinates>
     <panel_attributes>SMO
-Algo</panel_attributes>
+Model</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -750,7 +750,8 @@ fg=BLUE</panel_attributes>
     <panel_attributes>*E_α*
 fontsize=10
 
-group=group-49</panel_attributes>
+group=group-49
+fg=BLUE</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -764,7 +765,8 @@ group=group-49</panel_attributes>
     <panel_attributes>^
 fontsize=10
 
-group=group-49</panel_attributes>
+group=group-49
+fg=BLUE</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -778,7 +780,8 @@ group=group-49</panel_attributes>
     <panel_attributes>*E_β*
 fontsize=10
 
-group=group-50</panel_attributes>
+group=group-50
+fg=BLUE</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -792,7 +795,8 @@ group=group-50</panel_attributes>
     <panel_attributes>^
 fontsize=10
 
-group=group-50</panel_attributes>
+group=group-50
+fg=BLUE</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
