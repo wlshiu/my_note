@@ -541,7 +541,7 @@ group=group-10</panel_attributes>
       <w>210</w>
       <h>98</h>
     </coordinates>
-    <panel_attributes>atan2(          )
+    <panel_attributes>atan(          )
 fontsize=20
 group=group-10</panel_attributes>
     <additional_attributes/>

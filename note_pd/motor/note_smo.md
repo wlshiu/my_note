@@ -3,8 +3,6 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
 
 滑模觀測器(Sliding Mode Observer, SMO)的作用, 是用來估算 motor 的感應電動勢 (Es, Back EMF), 位置(θ), 速度(ω)
 
-經典 `ref. Microchip AN1078 2010`
-
 
 # Definitions
 
@@ -48,6 +46,23 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
             V = Rs * I = Rs * 0.1
             ```
 
++ 機械角頻率 vs. 電氣角頻率
+    > 轉子轉一圈, 機械角度等於360°, 電角度等於 `Pole_pair * 360 = Pole_pair * 機械角度`.
+    >> 電角度可以理解為所有 Pole_Pair 轉過角度的總和
+
+
++ RPM (Revolutions Per Minute)
+    > 每分鐘轉幾圈 (0° ~360° or 0 ~ 2PI)
+
++ RPS (Revolutions Per Second)
+    > 每秒轉幾圈 (0° ~3 60° or 0 ~ 2PI)
+
+    - eRPS (Electrical RPS, motor 電氣轉速)
+
+        ```
+        eRPS = (RPM * Pole_pair)/60sec
+        ```
+
 + `^` 估計符號
     > 變數上有 `^ (hat)` 符號, 表示為估算預測的值
 
@@ -64,14 +79,68 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 
 ![SMO_motor_math_model](SMO_motor_math_model.jpg)
 
-## SMO basic block
 
-![SMO_basic_flow](SMO_basic_flow.jpg)
+
+
+## Texas Instruments (TI)
+
++ SMO basic block
+
+    ![SMO_basic_flow_ti](SMO_basic_flow_ti.jpg)
+
+
+## Microchip
+
+`ref. Microchip AN1078 2010`
+
+![SMO_basic_flow_microchip](SMO_basic_flow_microchip.jpg)
+
++ 估算電流公式
+
+    ![smo_microchip_est_ecurr](smo_microchip_est_ecurr.jpg)
+
++ 估算反電動勢 BEMF
+    > 經過 `2-stage low-pass filter`
+
+    ![smo_microchip_est_bemf](smo_microchip_est_bemf.jpg)
+
+    - Adaptive Filter
+        > 由於截止頻率, 在馬達轉速不斷上升的過程中, 始終在變化;
+        因此 LPF 的 K_slf 也應 run-time 修正
+
+        ```
+        K_slf = (2*Pi * f_c)/f_pwm
+              = (2*Pi * f_c) * T_pwm
+              = 2*Pi * T_pwm * f_c
+              = 2*Pi * T_pwm * ω_m
+              = 2*Pi * T_pwm * eRPS
+
+        f_c  : cuto-off frequency
+        f_pwm: PWM update-parameters frequency
+        ```
+
+    - 截止頻率相當於 eRPS
+
+        ```
+        機械角頻率 ω_m = 2Pi * f_m, 即單位時間內轉幾圈, 故 ω_m 相當於 RPM or RPS
+        ps. RPM => 每分鐘轉 N 圈 (即 "N * 2Pi")
+
+        電氣角頻率 ω_e = 2Pi * f_e
+                      = Pole_Pair * ω_m
+                      = Pole_Pair * (2Pi * N/60sec)
+
+            f_e = Pole_Pair * (N/60sec) = Pole_Pair * (RPM/60) = eRPS (電機的電氣轉速)
+
+        ```
+
++ 速度估算
+    > 從反電動勢 BEMF 分量, 計算出位置 θ, 再從累積的 θ 來換算轉速
 
 
 
 # Reference
 
 + [三相電機相電感，相電阻和極對數的測量\_電機電感測量方法-CSDN部落格](https://blog.csdn.net/qq_45598353/article/details/122698183)
-
++ [Sliding-Mode Rotor Position Observer of PMSM - TI E2E](http://e2e.ti.com/cfs-file.ashx/__key/CommunityServer-Discussions-Components-Files/171/3513.smopos.pdf)
++ [節能型循環泵控製器-Chapt 3](https://www.ti.com/cn/lit/pdf/zhca521)
 
