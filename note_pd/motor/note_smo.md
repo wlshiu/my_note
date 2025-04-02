@@ -1,7 +1,7 @@
 SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
 ----
 
-滑模觀測器(Sliding Mode Observer, SMO)的作用, 是用來估算 motor 的感應電動勢 (Es, Back EMF), 位置(θ), 速度(ω)
+滑模觀測器(Sliding Mode Observer, SMO)的作用, 是用來估算 motor 的感應電動勢 (Es, Back EMF), 角度位置(θ), 速度(ω)
 
 
 # Definitions
@@ -46,16 +46,38 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
             V = Rs * I = Rs * 0.1
             ```
 
-+ 機械角頻率 vs. 電氣角頻率
++ 角頻率 (Angular frequency)
+    > 單位是弧度每秒(rad/sec)
+    >> 有時也叫**角速度 (Angular velocity)**
+
+    ```
+    ω = dθ/dt (單位時間內轉多少弧度)
+    ```
+
+    - Frequency domain 轉換到 Angular frequency domain
+
+        ```
+        ω (單位時間內轉多少弧度) = 2PI * (1/T)
+                               = 2PI * freq
+        ```
+
+
++ 機械角頻率 (ω_m) vs. 電氣角頻率 (ω_e)
     > 轉子轉一圈, 機械角度等於360°, 電角度等於 `Pole_pair * 360 = Pole_pair * 機械角度`.
     >> 電角度可以理解為所有 Pole_Pair 轉過角度的總和
+
+    - 當轉子轉一圈 (機械角度 ω_m 0° -> 360°), 則可量測到 Output 訊號, 有**極對數 (Pole_pair)個週期訊號**
+
+        ```
+        ω_e = Pole_pair * ω_m
+        ```
 
 
 + RPM (Revolutions Per Minute)
     > 每分鐘轉幾圈 (0° ~360° or 0 ~ 2PI)
 
 + RPS (Revolutions Per Second)
-    > 每秒轉幾圈 (0° ~3 60° or 0 ~ 2PI)
+    > 每秒轉幾圈 (0° ~ 360° or 0 ~ 2PI)
 
     - eRPS (Electrical RPS, motor 電氣轉速)
 
@@ -65,6 +87,28 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
 
 + `^` 估計符號
     > 變數上有 `^ (hat)` 符號, 表示為估算預測的值
+
+
++ 頻率響應
+    > Input 訊號與 Output 訊號的對應關係
+
+    - 響應的影響
+        1. 增益 (Gain)
+            > Output 訊號與 Input 訊號的強度比例
+            >> 通常以分貝(dB)表示
+
+        1. 相位響應 (Phase Response)：
+            > Output 訊號對於 Input 訊號的相位變化
+
+        1. 截止頻率(Cutoff Frequency)
+            > 訊號開始明顯衰減的頻率點, 通常在`-3dB` 處定義
+
+        1. 頻寬 (Bandwidth)
+            > 系統能有效處理訊號的頻率範圍
+
+        1. 共振(Resonance)
+            > 某些系統在特定頻率會產生放大的現象, 如機械系統的共振點
+
 
 
 # SMO Algorithm
@@ -92,34 +136,64 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 ## Microchip
 
 `ref. Microchip AN1078 2010`
+> + Observer 藉由重複觀測 Z_s (Output of SMC) 來估算電流 `I_alpha_hat/I_beta_hat`
+> + 利用 SMC (Sliding Mode Controller) 來讓 `Err_s` 快速收斂 (達到估算準確目的)
+>> `Err_s` 只能收斂到某個範圍, 因為量測的電流 `I_alpha/I_beta` 含有 BEMF,
+而估算的電流 `I_alpha_hat/I_beta_hat` 已經去除 BEMF
+
 
 ![SMO_basic_flow_microchip](SMO_basic_flow_microchip.jpg)
+
+
 
 + 估算電流公式
 
     ![smo_microchip_est_ecurr](smo_microchip_est_ecurr.jpg)
 
 + 估算反電動勢 BEMF
-    > 經過 `2-stage low-pass filter`
+    > 理想上, 假設估算電流 `I_alpha_hat/I_beta_hat` 已達準確, 此時 `Err_s` 就會只剩下 BEMF 及 Noise 成分
 
     ![smo_microchip_est_bemf](smo_microchip_est_bemf.jpg)
 
-    - Adaptive Filter
-        > 由於截止頻率, 在馬達轉速不斷上升的過程中, 始終在變化;
-        因此 LPF 的 K_slf 也應 run-time 修正
+    - 經過 `2 次 low-pass filter`
+        1. 第一個 LPF 是為了濾除 SMC 輸出 `Z_s` 所產生的雜訊
+        1. 第二個 LPF 是為了讓後續估算電角位置 `θ_hat` 時, `θ_hat` 不會發生劇烈震盪
+            > 平滑 `E_filtered_alpha_hat/E_filtered_beta_hat` 數值
 
-        ```
-        K_slf = (2*Pi * f_c)/f_pwm
-              = (2*Pi * f_c) * T_pwm
-              = 2*Pi * T_pwm * f_c
-              = 2*Pi * T_pwm * ω_m
-              = 2*Pi * T_pwm * eRPS
+        1. 做濾波後會發生相位延遲
+            > e.g. `5-stage 濾波器` 取 5 個輸入 sample 點才產生出 1 點輸出, 相位因此產生 delay,
 
-        f_c  : cuto-off frequency
-        f_pwm: PWM update-parameters frequency
-        ```
+            > + 相位延遲會造成估算的相位角 `θ_hat` 並非實際的機械相位角 `θ_m`, 因此需做**相位補償**
 
-    - 截止頻率相當於 eRPS
+        1. 相位補償
+            > 相位補償量取決**相位角的變化量**
+
+
++ 速度估算
+    > 從反電動勢 BEMF 分量, 計算出位置 `θ_hat`, 再累積單位時間 `θ_hat` 的變化量, 來計算轉速 (rad/sec)
+
+    ![smo_microchip_est_speed](smo_microchip_est_speed.jpg)
+
++ Adaptive Low-Pass Filter
+    > 由於截止頻率, 在馬達轉速不斷上升的過程中, 始終在變化; <br>
+    因此 LPF 的 K_slf (Gain of LPF) 也應 run-time 修正
+
+    ```
+    K_slf = (2*Pi * f_c)/f_pwm
+          = (2*Pi * f_c) * T_pwm
+          = 2*Pi * T_pwm * f_c
+          = 2*Pi * T_pwm * ω_m
+          = 2*Pi * T_pwm * eRPS
+
+    f_c  : cuto-off frequency
+    f_pwm: PWM update-parameters frequency
+    ```
+
+    - 設定截止頻率相當於 eRPS
+        > 可得到固定的相位延遲, 以補償所有速度範圍內的 `θ_hat`
+        >> 一個 LPF 會 delay `45°`
+
+        > Low-Pass Filter 的截止頻率 (f_cute_off) 轉換到角頻率 domain, `ω_m = 2Pi * f_cute_off`
 
         ```
         機械角頻率 ω_m = 2Pi * f_m, 即單位時間內轉幾圈, 故 ω_m 相當於 RPM or RPS
@@ -132,11 +206,6 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             f_e = Pole_Pair * (N/60sec) = Pole_Pair * (RPM/60) = eRPS (電機的電氣轉速)
 
         ```
-
-+ 速度估算
-    > 從反電動勢 BEMF 分量, 計算出位置 θ, 再從累積的 θ 來換算轉速
-
-
 
 # Reference
 

@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1">
-  <zoom_level>14</zoom_level>
+  <zoom_level>10</zoom_level>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>700</x>
-      <y>154</y>
-      <w>84</w>
-      <h>98</h>
+      <x>730</x>
+      <y>180</y>
+      <w>60</w>
+      <h>70</h>
     </coordinates>
     <panel_attributes>SMO
+Math
 Model</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>770</x>
-      <y>168</y>
-      <w>112</w>
-      <h>42</h>
+      <x>780</x>
+      <y>190</y>
+      <w>80</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
@@ -27,10 +28,10 @@ Model</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>770</x>
-      <y>210</y>
-      <w>112</w>
-      <h>42</h>
+      <x>780</x>
+      <y>220</y>
+      <w>80</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
@@ -38,10 +39,10 @@ Model</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>812</x>
-      <y>154</y>
-      <w>42</w>
-      <h>28</h>
+      <x>810</x>
+      <y>180</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*V_α*
 fontsize=10
@@ -51,10 +52,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>812</x>
-      <y>196</y>
-      <w>42</w>
-      <h>28</h>
+      <x>810</x>
+      <y>210</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*V_β*
 fontsize=10</panel_attributes>
@@ -63,10 +64,10 @@ fontsize=10</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
-      <y>168</y>
-      <w>112</w>
-      <h>42</h>
+      <x>670</x>
+      <y>190</y>
+      <w>80</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
@@ -74,10 +75,10 @@ fontsize=10</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>574</x>
-      <y>210</y>
-      <w>154</w>
-      <h>42</h>
+      <x>640</x>
+      <y>220</y>
+      <w>110</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
@@ -85,10 +86,10 @@ fontsize=10</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>154</y>
-      <w>42</w>
-      <h>28</h>
+      <x>700</x>
+      <y>180</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*I_α*
 fontsize=10
@@ -99,10 +100,10 @@ group=group-0</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>196</y>
-      <w>42</w>
-      <h>28</h>
+      <x>700</x>
+      <y>210</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*I_β*
 fontsize=10
@@ -113,10 +114,10 @@ group=group-1</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>182</y>
-      <w>28</w>
-      <h>28</h>
+      <x>700</x>
+      <y>200</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -127,10 +128,10 @@ group=group-1</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>140</y>
-      <w>28</w>
-      <h>28</h>
+      <x>700</x>
+      <y>170</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -140,37 +141,37 @@ group=group-0</panel_attributes>
   </element>
   <element>
     <id>Text</id>
+    <coordinates>
+      <x>680</x>
+      <y>150</y>
+      <w>30</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*I_α*
+fontsize=10
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>610</x>
+      <y>150</y>
+      <w>30</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*I_β*
+fontsize=10
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
     <coordinates>
       <x>630</x>
-      <y>112</y>
-      <w>42</w>
-      <h>28</h>
-    </coordinates>
-    <panel_attributes>*I_α*
-fontsize=10
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>532</x>
-      <y>112</y>
-      <w>42</w>
-      <h>28</h>
-    </coordinates>
-    <panel_attributes>*I_β*
-fontsize=10
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLSpecialState</id>
-    <coordinates>
-      <x>560</x>
-      <y>210</y>
-      <w>28</w>
-      <h>28</h>
+      <y>220</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>type=flow_final</panel_attributes>
     <additional_attributes/>
@@ -178,10 +179,10 @@ fontsize=10
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>602</x>
-      <y>168</y>
-      <w>28</w>
-      <h>28</h>
+      <x>660</x>
+      <y>190</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>type=flow_final</panel_attributes>
     <additional_attributes/>
@@ -189,21 +190,21 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>490</x>
-      <y>210</y>
-      <w>98</w>
-      <h>42</h>
+      <x>520</x>
+      <y>220</y>
+      <w>130</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>602</x>
-      <y>98</y>
-      <w>42</w>
-      <h>98</h>
+      <x>660</x>
+      <y>140</y>
+      <w>30</w>
+      <h>70</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
@@ -211,10 +212,10 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>98</y>
-      <w>42</w>
-      <h>140</h>
+      <x>630</x>
+      <y>140</y>
+      <w>30</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
@@ -222,10 +223,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>630</x>
-      <y>182</y>
-      <w>28</w>
-      <h>28</h>
+      <x>680</x>
+      <y>200</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*+*</panel_attributes>
     <additional_attributes/>
@@ -233,10 +234,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>616</x>
-      <y>126</y>
-      <w>28</w>
-      <h>28</h>
+      <x>670</x>
+      <y>160</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*-*</panel_attributes>
     <additional_attributes/>
@@ -244,21 +245,21 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>490</x>
-      <y>168</y>
-      <w>140</w>
-      <h>42</h>
+      <x>520</x>
+      <y>190</y>
+      <w>160</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>588</x>
-      <y>224</y>
-      <w>28</w>
-      <h>28</h>
+      <x>650</x>
+      <y>230</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*+*</panel_attributes>
     <additional_attributes/>
@@ -266,10 +267,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>546</x>
-      <y>182</y>
-      <w>28</w>
-      <h>28</h>
+      <x>620</x>
+      <y>200</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*-*</panel_attributes>
     <additional_attributes/>
@@ -277,10 +278,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>294</x>
-      <y>56</y>
-      <w>252</w>
-      <h>42</h>
+      <x>460</x>
+      <y>100</y>
+      <w>180</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>+  "   " is estimated symbol
 fontsize=14
@@ -291,10 +292,10 @@ group=group-3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>322</x>
-      <y>56</y>
-      <w>28</w>
-      <h>42</h>
+      <x>480</x>
+      <y>100</y>
+      <w>20</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*^*
 fontsize=14
@@ -306,10 +307,10 @@ group=group-3</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>294</x>
-      <y>14</y>
-      <w>308</w>
-      <h>42</h>
+      <x>460</x>
+      <y>70</y>
+      <w>220</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*SMO Microchip Flow*
 fontsize=20
@@ -319,10 +320,10 @@ fontsize=20
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>224</x>
-      <y>140</y>
-      <w>224</w>
-      <h>112</h>
+      <x>320</x>
+      <y>170</y>
+      <w>160</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>type=decision
 is Err_s &lt; 
@@ -332,21 +333,21 @@ MaxSMCError ?</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>434</x>
-      <y>182</y>
-      <w>98</w>
-      <h>42</h>
+      <x>470</x>
+      <y>200</y>
+      <w>80</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>490</x>
-      <y>168</y>
-      <w>42</w>
-      <h>84</h>
+      <x>520</x>
+      <y>190</y>
+      <w>30</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
@@ -354,10 +355,10 @@ MaxSMCError ?</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>476</x>
-      <y>154</y>
-      <w>84</w>
-      <h>28</h>
+      <x>510</x>
+      <y>180</y>
+      <w>60</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Err_alpha*
 fontsize=10
@@ -367,10 +368,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>476</x>
-      <y>224</y>
-      <w>84</w>
-      <h>28</h>
+      <x>510</x>
+      <y>230</y>
+      <w>60</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Err_beta*
 fontsize=10
@@ -380,10 +381,10 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>322</x>
-      <y>238</y>
-      <w>42</w>
-      <h>84</h>
+      <x>390</x>
+      <y>240</y>
+      <w>30</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
@@ -391,10 +392,10 @@ fontsize=10
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>252</x>
-      <y>294</y>
-      <w>168</w>
-      <h>84</h>
+      <x>350</x>
+      <y>280</y>
+      <w>100</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>type=decision
 is Err_s 
@@ -404,21 +405,21 @@ is Err_s
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>126</x>
-      <y>182</y>
-      <w>126</w>
-      <h>140</h>
+      <x>260</x>
+      <y>200</y>
+      <w>80</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;80.0;10.0;10.0;70.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0;60.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>56</x>
-      <y>294</y>
-      <w>182</w>
-      <h>98</h>
+      <x>210</x>
+      <y>280</y>
+      <w>130</w>
+      <h>70</h>
     </coordinates>
     <panel_attributes>
 group=group-5</panel_attributes>
@@ -427,10 +428,10 @@ group=group-5</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>112</x>
-      <y>322</y>
-      <w>126</w>
-      <h>28</h>
+      <x>250</x>
+      <y>300</y>
+      <w>90</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*K_slide * Err_s*
 fontsize=10
@@ -441,10 +442,10 @@ group=group-5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>84</x>
-      <y>336</y>
-      <w>168</w>
-      <h>42</h>
+      <x>230</x>
+      <y>310</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-5</panel_attributes>
@@ -453,10 +454,10 @@ group=group-5</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>112</x>
-      <y>350</y>
-      <w>98</w>
-      <h>28</h>
+      <x>250</x>
+      <y>320</y>
+      <w>70</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*MaxSMCError*
 fontsize=10
@@ -467,10 +468,10 @@ group=group-5</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>56</x>
-      <y>336</y>
-      <w>42</w>
-      <h>28</h>
+      <x>210</x>
+      <y>310</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Z_s =*
 fontsize=10
@@ -481,10 +482,10 @@ group=group-5</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>70</x>
-      <y>294</y>
-      <w>154</w>
-      <h>28</h>
+      <x>220</x>
+      <y>280</y>
+      <w>110</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>/SMC in  Linear Region/
 fontsize=10
@@ -495,32 +496,32 @@ group=group-5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>406</x>
-      <y>322</y>
-      <w>98</w>
-      <h>42</h>
+      <x>440</x>
+      <y>300</y>
+      <w>60</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>50.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>40.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>322</x>
-      <y>364</y>
-      <w>42</w>
-      <h>84</h>
+      <x>390</x>
+      <y>330</y>
+      <w>30</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>336</x>
-      <y>378</y>
-      <w>28</w>
-      <h>28</h>
+      <x>420</x>
+      <y>330</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Y*
 fontsize=10
@@ -530,21 +531,21 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>126</x>
-      <y>462</y>
-      <w>140</w>
-      <h>252</h>
+      <x>260</x>
+      <y>410</y>
+      <w>100</w>
+      <h>200</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>80.0;160.0;10.0;160.0;10.0;10.0</additional_attributes>
+    <additional_attributes>80.0;180.0;10.0;180.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>196</x>
-      <y>168</y>
-      <w>28</w>
-      <h>28</h>
+      <x>310</x>
+      <y>190</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Y*
 fontsize=10
@@ -554,10 +555,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>308</x>
-      <y>252</y>
-      <w>28</w>
-      <h>28</h>
+      <x>380</x>
+      <y>250</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*N*
 fontsize=10
@@ -567,10 +568,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>420</x>
-      <y>308</y>
-      <w>28</w>
-      <h>28</h>
+      <x>450</x>
+      <y>290</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*N*
 fontsize=10
@@ -580,10 +581,10 @@ fontsize=10
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>476</x>
-      <y>322</y>
-      <w>168</w>
-      <h>42</h>
+      <x>480</x>
+      <y>300</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>Z_s = -1* K_slide</panel_attributes>
     <additional_attributes/>
@@ -591,10 +592,10 @@ fontsize=10
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>266</x>
-      <y>420</y>
-      <w>140</w>
-      <h>42</h>
+      <x>350</x>
+      <y>360</y>
+      <w>100</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>Z_s = K_slide</panel_attributes>
     <additional_attributes/>
@@ -602,43 +603,43 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>126</x>
-      <y>238</y>
-      <w>658</w>
-      <h>266</h>
+      <x>260</x>
+      <y>240</y>
+      <w>530</w>
+      <h>200</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>450.0;10.0;450.0;170.0;10.0;170.0;10.0;110.0</additional_attributes>
+    <additional_attributes>510.0;10.0;510.0;180.0;10.0;180.0;10.0;110.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>322</x>
-      <y>448</y>
-      <w>42</w>
-      <h>56</h>
+      <x>390</x>
+      <y>380</y>
+      <w>30</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;20.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>546</x>
-      <y>350</y>
-      <w>42</w>
-      <h>154</h>
+      <x>530</x>
+      <y>320</y>
+      <w>30</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
-    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>700</x>
-      <y>630</y>
-      <w>252</w>
-      <h>42</h>
+      <x>670</x>
+      <y>550</y>
+      <w>180</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>*arctan(                          )*
 fontsize=14
@@ -648,10 +649,10 @@ fontsize=14
   <element>
     <id>Text</id>
     <coordinates>
-      <x>756</x>
-      <y>280</y>
-      <w>70</w>
-      <h>70</h>
+      <x>770</x>
+      <y>270</y>
+      <w>50</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>*Z_s*
 - Z_alpha
@@ -663,10 +664,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>140</x>
-      <y>448</y>
-      <w>42</w>
-      <h>28</h>
+      <x>270</x>
+      <y>400</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Z_s*
 fontsize=10
@@ -676,10 +677,10 @@ fontsize=10
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>238</x>
-      <y>546</y>
-      <w>112</w>
-      <h>70</h>
+      <x>340</x>
+      <y>490</y>
+      <w>80</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>Low-Pass
 Filter</panel_attributes>
@@ -688,10 +689,10 @@ Filter</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>238</x>
-      <y>672</y>
-      <w>112</w>
-      <h>70</h>
+      <x>340</x>
+      <y>580</y>
+      <w>80</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>Low-Pass
 Filter</panel_attributes>
@@ -700,10 +701,10 @@ Filter</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>126</x>
-      <y>588</y>
-      <w>140</w>
-      <h>42</h>
+      <x>260</x>
+      <y>520</y>
+      <w>100</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
@@ -711,10 +712,10 @@ Filter</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>154</x>
-      <y>574</y>
-      <w>70</w>
-      <h>28</h>
+      <x>280</x>
+      <y>510</y>
+      <w>50</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Z_alpha*
 fontsize=10
@@ -724,10 +725,10 @@ fontsize=10
   <element>
     <id>Text</id>
     <coordinates>
-      <x>154</x>
-      <y>616</y>
-      <w>56</w>
-      <h>28</h>
+      <x>280</x>
+      <y>540</y>
+      <w>40</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*Z_beta*
 fontsize=10
@@ -737,10 +738,10 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>336</x>
-      <y>560</y>
-      <w>140</w>
-      <h>42</h>
+      <x>410</x>
+      <y>500</y>
+      <w>100</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
@@ -748,10 +749,10 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>336</x>
-      <y>686</y>
-      <w>140</w>
-      <h>42</h>
+      <x>410</x>
+      <y>590</y>
+      <w>100</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>80.0;10.0;10.0;10.0</additional_attributes>
@@ -759,22 +760,22 @@ fontsize=10
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>378</x>
-      <y>182</y>
-      <w>560</w>
-      <h>420</h>
+      <x>440</x>
+      <y>200</y>
+      <w>460</w>
+      <h>330</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
-    <additional_attributes>290.0;10.0;380.0;10.0;380.0;250.0;10.0;250.0;10.0;280.0</additional_attributes>
+    <additional_attributes>350.0;10.0;440.0;10.0;440.0;280.0;10.0;280.0;10.0;310.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>868</x>
-      <y>154</y>
-      <w>28</w>
-      <h>28</h>
+      <x>850</x>
+      <y>180</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -786,10 +787,10 @@ group=group-6</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>868</x>
-      <y>168</y>
-      <w>42</w>
-      <h>28</h>
+      <x>850</x>
+      <y>190</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_α*
 fontsize=10
@@ -801,22 +802,22 @@ group=group-6</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>392</x>
-      <y>224</y>
-      <w>518</w>
-      <h>504</h>
+      <x>450</x>
+      <y>230</y>
+      <w>420</w>
+      <h>390</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
-    <additional_attributes>280.0;10.0;350.0;10.0;350.0;200.0;10.0;200.0;10.0;340.0</additional_attributes>
+    <additional_attributes>340.0;10.0;400.0;10.0;400.0;230.0;10.0;230.0;10.0;370.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>350</x>
-      <y>546</y>
-      <w>42</w>
-      <h>28</h>
+      <x>420</x>
+      <y>490</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_α*
 fontsize=10
@@ -827,10 +828,10 @@ group=group-7</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>350</x>
-      <y>532</y>
-      <w>28</w>
-      <h>28</h>
+      <x>420</x>
+      <y>480</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -841,10 +842,10 @@ group=group-7</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>350</x>
-      <y>672</y>
-      <w>42</w>
-      <h>28</h>
+      <x>420</x>
+      <y>580</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_β*
 fontsize=10
@@ -855,10 +856,10 @@ group=group-8</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>350</x>
-      <y>658</y>
-      <w>28</w>
-      <h>28</h>
+      <x>420</x>
+      <y>570</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -869,25 +870,25 @@ group=group-8</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>868</x>
+      <x>850</x>
+      <y>220</y>
+      <w>30</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*E_β*
+fontsize=10
+
+fg=BLUE
+group=group-9</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>850</x>
       <y>210</y>
-      <w>42</w>
-      <h>28</h>
-    </coordinates>
-    <panel_attributes>*E_β*
-fontsize=10
-
-fg=BLUE
-group=group-9</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>868</x>
-      <y>196</y>
-      <w>28</w>
-      <h>28</h>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -899,10 +900,10 @@ group=group-9</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>448</x>
-      <y>546</y>
-      <w>112</w>
-      <h>70</h>
+      <x>490</x>
+      <y>490</y>
+      <w>80</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>Low-Pass
 Filter</panel_attributes>
@@ -911,10 +912,10 @@ Filter</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>448</x>
-      <y>672</y>
-      <w>112</w>
-      <h>70</h>
+      <x>490</x>
+      <y>580</y>
+      <w>80</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>Low-Pass
 Filter</panel_attributes>
@@ -923,10 +924,10 @@ Filter</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>546</x>
-      <y>574</y>
-      <w>182</w>
-      <h>42</h>
+      <x>560</x>
+      <y>510</y>
+      <w>130</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
@@ -934,10 +935,10 @@ Filter</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>546</x>
-      <y>700</y>
-      <w>182</w>
-      <h>42</h>
+      <x>560</x>
+      <y>600</y>
+      <w>130</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>110.0;10.0;10.0;10.0</additional_attributes>
@@ -945,10 +946,10 @@ Filter</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>574</x>
-      <y>560</y>
-      <w>112</w>
-      <h>28</h>
+      <x>580</x>
+      <y>500</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_filtered_α*
 fontsize=10
@@ -959,10 +960,10 @@ group=group-10</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>574</x>
-      <y>546</y>
-      <w>28</w>
-      <h>28</h>
+      <x>580</x>
+      <y>490</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -973,10 +974,10 @@ group=group-10</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>574</x>
-      <y>672</y>
-      <w>28</w>
-      <h>28</h>
+      <x>580</x>
+      <y>580</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -987,10 +988,10 @@ group=group-11</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>574</x>
-      <y>686</y>
-      <w>112</w>
-      <h>28</h>
+      <x>580</x>
+      <y>590</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_filtered_β*
 fontsize=10
@@ -1001,10 +1002,10 @@ group=group-11</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>700</x>
-      <y>574</y>
-      <w>266</w>
-      <h>154</h>
+      <x>670</x>
+      <y>510</y>
+      <w>190</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -1012,10 +1013,10 @@ group=group-11</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>826</x>
-      <y>602</y>
-      <w>28</w>
-      <h>28</h>
+      <x>760</x>
+      <y>530</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1026,10 +1027,10 @@ group=group-27</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>798</x>
-      <y>616</y>
-      <w>112</w>
-      <h>28</h>
+      <x>740</x>
+      <y>540</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*-1 * E_filtered_α*
 fontsize=10
@@ -1040,10 +1041,10 @@ group=group-27</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>798</x>
-      <y>644</y>
-      <w>28</w>
-      <h>28</h>
+      <x>740</x>
+      <y>560</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1054,10 +1055,10 @@ group=group-27</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>798</x>
-      <y>658</y>
-      <w>112</w>
-      <h>28</h>
+      <x>740</x>
+      <y>570</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_filtered_β*
 fontsize=10
@@ -1068,10 +1069,10 @@ group=group-27</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>770</x>
-      <y>630</y>
-      <w>168</w>
-      <h>42</h>
+      <x>720</x>
+      <y>550</y>
+      <w>120</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=-
 group=group-27</panel_attributes>
@@ -1080,49 +1081,21 @@ group=group-27</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>952</x>
-      <y>644</y>
-      <w>112</w>
-      <h>42</h>
+      <x>490</x>
+      <y>560</y>
+      <w>420</w>
+      <h>240</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>1036</x>
-      <y>644</y>
-      <w>28</w>
-      <h>42</h>
-    </coordinates>
-    <panel_attributes>*θ*
-fontsize=16
-
-group=group-18</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>1036</x>
-      <y>630</y>
-      <w>28</w>
-      <h>28</h>
-    </coordinates>
-    <panel_attributes>^
-fontsize=16
-
-group=group-18</panel_attributes>
-    <additional_attributes/>
+    <additional_attributes>10.0;220.0;400.0;220.0;400.0;10.0;370.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
-      <y>210</y>
-      <w>140</w>
-      <h>126</h>
+      <x>670</x>
+      <y>220</y>
+      <w>100</w>
+      <h>90</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
@@ -1131,10 +1104,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>644</x>
-      <y>168</y>
-      <w>98</w>
-      <h>140</h>
+      <x>690</x>
+      <y>190</y>
+      <w>70</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
@@ -1143,10 +1116,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>630</x>
-      <y>280</y>
-      <w>42</w>
-      <h>28</h>
+      <x>680</x>
+      <y>270</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*I_β*
 fontsize=10
@@ -1158,10 +1131,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>630</x>
-      <y>266</y>
-      <w>28</w>
-      <h>28</h>
+      <x>680</x>
+      <y>260</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1173,10 +1146,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>252</y>
-      <w>42</w>
-      <h>28</h>
+      <x>700</x>
+      <y>250</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*I_α*
 fontsize=10
@@ -1188,10 +1161,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>658</x>
-      <y>238</y>
-      <w>28</w>
-      <h>28</h>
+      <x>700</x>
+      <y>240</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1203,10 +1176,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>182</x>
-      <y>518</y>
-      <w>238</w>
-      <h>70</h>
+      <x>300</x>
+      <y>470</y>
+      <w>170</w>
+      <h>50</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
@@ -1215,10 +1188,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>154</x>
-      <y>532</y>
-      <w>42</w>
-      <h>28</h>
+      <x>280</x>
+      <y>480</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_α*
 fontsize=10
@@ -1230,10 +1203,10 @@ group=group-21</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>154</x>
-      <y>518</y>
-      <w>28</w>
-      <h>28</h>
+      <x>280</x>
+      <y>470</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1245,22 +1218,22 @@ group=group-21</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>98</x>
-      <y>490</y>
-      <w>350</w>
-      <h>266</h>
+      <x>240</x>
+      <y>450</y>
+      <w>240</w>
+      <h>190</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
-    <additional_attributes>100.0;170.0;10.0;170.0;10.0;10.0;230.0;10.0</additional_attributes>
+    <additional_attributes>100.0;170.0;10.0;170.0;10.0;10.0;220.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>112</x>
-      <y>686</y>
-      <w>28</w>
-      <h>28</h>
+      <x>250</x>
+      <y>590</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1272,10 +1245,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>112</x>
-      <y>700</y>
-      <w>42</w>
-      <h>28</h>
+      <x>250</x>
+      <y>600</y>
+      <w>30</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_β*
 fontsize=10
@@ -1287,10 +1260,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>406</x>
-      <y>574</y>
-      <w>210</w>
-      <h>84</h>
+      <x>460</x>
+      <y>510</y>
+      <w>150</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
@@ -1299,10 +1272,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>406</x>
-      <y>700</y>
-      <w>210</w>
-      <h>84</h>
+      <x>460</x>
+      <y>600</y>
+      <w>150</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
 fg=BLUE</panel_attributes>
@@ -1311,10 +1284,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>588</x>
-      <y>602</y>
-      <w>28</w>
-      <h>28</h>
+      <x>590</x>
+      <y>530</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1326,10 +1299,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>588</x>
-      <y>616</y>
-      <w>112</w>
-      <h>28</h>
+      <x>590</x>
+      <y>540</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_filtered_α*
 fontsize=10
@@ -1341,10 +1314,10 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>448</x>
-      <y>756</y>
-      <w>28</w>
-      <h>28</h>
+      <x>490</x>
+      <y>640</y>
+      <w>20</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>^
 fontsize=10
@@ -1356,16 +1329,342 @@ fg=BLUE</panel_attributes>
   <element>
     <id>Text</id>
     <coordinates>
-      <x>448</x>
-      <y>770</y>
-      <w>112</w>
-      <h>28</h>
+      <x>490</x>
+      <y>650</y>
+      <w>80</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>*E_filtered_β*
 fontsize=10
 
 group=group-24
 fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>200</x>
+      <y>160</y>
+      <w>410</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=..
+bg=YELLOW</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>200</x>
+      <y>160</y>
+      <w>50</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*SMC*
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>730</x>
+      <y>710</y>
+      <w>100</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Speed 
+Calculation</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>890</x>
+      <y>540</y>
+      <w>20</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*θ*
+fontsize=16
+
+group=group-28</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>890</x>
+      <y>530</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=16
+
+group=group-28</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>580</x>
+      <y>710</y>
+      <w>80</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Low-Pass
+Filter</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>650</x>
+      <y>720</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>720</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>480</x>
+      <y>770</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=flow_final</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>510</x>
+      <y>700</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=10
+
+group=group-29</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>510</x>
+      <y>710</y>
+      <w>60</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*ω_filtered*
+fontsize=10
+
+group=group-29</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>720</y>
+      <w>120</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0;100.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>290</x>
+      <y>770</y>
+      <w>210</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;190.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>170</x>
+      <y>750</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=16
+
+group=group-30</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>170</x>
+      <y>760</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*θ_compensated*
+fontsize=16
+
+group=group-30</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>690</x>
+      <y>700</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=10
+
+group=group-31</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>690</x>
+      <y>710</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*ω*
+fontsize=10
+
+group=group-31</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>470</x>
+      <y>740</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*+*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>500</x>
+      <y>780</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>*+*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>330</x>
+      <y>680</y>
+      <w>580</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=..
+bg=ORANGE
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>330</x>
+      <y>680</y>
+      <w>160</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Speed Estimation*
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLObject</id>
+    <coordinates>
+      <x>220</x>
+      <y>440</y>
+      <w>770</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>lt=..
+bg=PINK
+layer=-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>850</x>
+      <y>490</y>
+      <w>140</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*Position Estimation*
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>290</x>
+      <y>720</y>
+      <w>220</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;200.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>700</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>^
+fontsize=16
+
+group=group-32</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>210</x>
+      <y>710</y>
+      <w>90</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>*ω_filtered*
+fontsize=16
+
+group=group-32</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

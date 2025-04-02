@@ -4,5 +4,9 @@
 \begin{array}{l}\text{Estimated back EMF：} \\\text{  stage-1 Low-Pass Filter：} \\\qquad \hat{E_s}(t) = \hat{E_s}(t-1) + K_{slf} \ast (Z_s(t-1) - \hat{E_s}(t-1)) \\\text{  stage-2 Low-Pass Filter：} \\\qquad \hat {E_{s_{filtered}}}(t) = \hat{E_{s_{filtered}}}(t-1) + K_{slf} \ast (\hat{E_s}(t-1) - \hat{E_{s_{filtered}}}(t-1))\\\\\begin{align}\quad s &= \alpha, \beta \\\quad \hat{E_s} &= Estimated\ Back\ EMF \\\quad K_{slf} &= Sliding\ control\ filter\ gain\\\quad Z_s & = \frac {K_{slide} \ast Err_s } {MaxSMCError} \\\quad Err_s & = \hat {I_s} - I_s\\\end{align} \\\qquad \hat{ }\ : estimation\ symbol \\\qquad K_{slide} : Slide\ Mode\ Controller\ Gain\ (0.0\ to\ 0.9999) \\\qquad MaxSMCError : limitation\ of\ SMC\ linear\ area(0.0\ to\ 0.9999) \\\qquad t: current\ timestamp \\\qquad t-1: previous\ timestamp \\\end{array}
 
 
+\begin{array}{l}\text{Speed Calculation：} \\\omega = \sum_{t = 0}^{N} (\theta (t) - \theta (t-1)) \ast K_{speed}\\\begin{align}\\\qquad \omega &: Angular\ velocity\ of\ the\ motor \\\qquad \theta &: The\ position\ (radian) \\\qquad K_{speed} &: Amplification\ factor\ for\ desired\ speed\ rang \\\qquad N &: The\ target\ timestamp \\\qquad t &: current\ timestamp \\\qquad t-1 &: previous\ timestamp \\\end{align} \\\end{array}
+
+
+
 
 
