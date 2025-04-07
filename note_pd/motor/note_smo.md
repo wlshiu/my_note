@@ -189,23 +189,23 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
     f_pwm: PWM update-parameters frequency
     ```
 
-    - 設定截止頻率相當於 eRPS
+    - 設定截止頻率為 eRPS
         > 可得到固定的相位延遲, 以補償所有速度範圍內的 `θ_hat`
         >> 第一次 LPF 會 delay `45°`, 第二次 LPF 則會 delay `90°`
 
-        > Low-Pass Filter 的截止頻率 (f_cute_off) 轉換到角頻率 domain, `ω_m = 2Pi * f_cute_off`
+        1. Low-Pass Filter 的截止頻率 (f_cute_off) 轉換到角頻率 domain, `ω_m = 2Pi * f_cute_off`
 
-        ```
-        機械角頻率 ω_m = 2Pi * f_m, 即單位時間內轉幾圈, 故 ω_m 相當於 RPM or RPS
-        ps. RPM => 每分鐘轉 N 圈 (即 "N * 2Pi")
+            ```
+            機械角頻率 ω_m = 2Pi * f_m, 即單位時間內轉幾圈, 故 ω_m 相當於 RPM or RPS
+            ps. RPM => 每分鐘轉 N 圈 (即 "N * 2Pi")
 
-        電氣角頻率 ω_e = 2Pi * f_e
-                      = Pole_Pair * ω_m
-                      = Pole_Pair * (2Pi * N/60sec)
+            電氣角頻率 ω_e = 2Pi * f_e
+                          = Pole_Pair * ω_m
+                          = Pole_Pair * (2Pi * N/60sec)
 
-            f_e = Pole_Pair * (N/60sec) = Pole_Pair * (RPM/60) = eRPS (電機的電氣轉速)
+                f_e = Pole_Pair * (N/60sec) = Pole_Pair * (RPM/60) = eRPS (電機的電氣轉速)
 
-        ```
+            ```
 
 # Reference
 
