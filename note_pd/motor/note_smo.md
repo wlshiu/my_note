@@ -155,6 +155,10 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 
     ![smo_microchip_est_bemf](smo_microchip_est_bemf.jpg)
 
+    - Basic Digital Low-Pass Filter
+
+        ![LPF_basic](LPF_basic.jpg)
+
     - 經過 `2 次 low-pass filter`
         1. 第一個 LPF 是為了濾除 SMC 輸出 `Z_s` 所產生的雜訊
         1. 第二個 LPF 是為了讓後續估算電角位置 `θ_hat` 時, `θ_hat` 不會發生劇烈震盪
@@ -178,16 +182,10 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
     > 由於截止頻率, 在馬達轉速不斷上升的過程中, 始終在變化; <br>
     因此 LPF 的 K_slf (Gain of LPF) 也應 run-time 修正
 
-    ```
-    K_slf = (2*Pi * f_c)/f_pwm
-          = (2*Pi * f_c) * T_pwm
-          = 2*Pi * T_pwm * f_c
-          = 2*Pi * T_pwm * ω_m
-          = 2*Pi * T_pwm * eRPS
+    - Gain 值估算
 
-    f_c  : cuto-off frequency
-    f_pwm: PWM update-parameters frequency
-    ```
+        ![smo_microchip_gain_kslf](smo_microchip_gain_kslf.jpg)
+
 
     - 設定截止頻率為 eRPS
         > 可得到固定的相位延遲, 以補償所有速度範圍內的 `θ_hat`

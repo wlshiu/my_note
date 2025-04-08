@@ -6,6 +6,24 @@
 
 \begin{array}{l}\text{Speed Calculation：} \\\omega = \sum_{t = 0}^{N} (\theta (t) - \theta (t-1)) \ast K_{speed}\\\begin{align}\\\qquad \omega &: Angular\ velocity\ of\ the\ motor \\\qquad \theta &: The\ position\ (radian) \\\qquad K_{speed} &: Amplification\ factor\ for\ desired\ speed\ rang \\\qquad N &: The\ target\ timestamp \\\qquad t &: current\ timestamp \\\qquad t-1 &: previous\ timestamp \\\end{align} \\\end{array}
 
+LPF (PDK)
+\begin{array}{l}\text{Low-Pass Filter：} \\Output(t) = \frac{Input(t) \ast \omega_s \ast T_s + Output(t-1)}{1 + \omega_s \ast T_s}\\ \begin{align}\\\qquad s &: \alpha, \beta \\\qquad \omega &: cute-off\ angular\ frequency\ (2 \pi \ast f_{cute-off} ) \\\qquad T_s &: sample\ period(PWM\ update\ period) \\\qquad t &: current\ timestamp \\\qquad t-1 &: previous\ timestamp \\\end{align}\end{array}
+
+Estimated Electric Current (PDK)
+\begin{array}{l}\text{Estimated Electric Current：} \\\hat{I_s}(t) = \hat{I_s}(t-1) \ast (1 - \frac{I_{pu} \ast I_{base} \ast R_s \ast T_s} {L_s}) + \frac {I_{pu} \ast V_{bus} \ast T_s} {L_s} \ast (V_s(t-1) - E_s(t-1)) \\Err_s = (\hat{I_s}(t) - I_s(t)) \ast \frac{I_{base}}{V_{bus}}  \\\begin{align}\\\qquad s &: \alpha, \beta \\\qquad \hat{ }\ &: estimation\ symbol \\\qquad T_s &: sample\ period(PWM\ update\ period) \\\qquad R_s &: Phase\ Resistance \\\qquad L_s &: Phase\ inductance \\\quad E_s &= Estimated\ Back\ EMF \\\qquad I_{pu} &: Per-Unit\ of\ Electric\ Current\\\qquad I_{base} &: A\ peak\ of\ Electric\ Current\ of\ inverter \\\qquad V_{bus} &: V_{DC}\ of\ inverter \\\qquad t &: current\ timestamp \\\qquad t-1 &: previous\ timestamp \\\end{align}\end{array}
+
+Clarke
+\begin{array}{l}\text{Clarke Transform：} \\\begin{bmatrix}  I_{\alpha} \\ I_{\beta}\end{bmatrix}  = \begin{bmatrix} 1 & 0 \\ \frac{1}{\sqrt{3}}  & \frac{2}{\sqrt{3}} \end{bmatrix}\begin{bmatrix} I_a \\ I_b\end{bmatrix}\\\end{array}
+
+Park
+\begin{array}{l}\text{Park Transform：} \\\quad \begin{bmatrix} I_d\\ I_q\end{bmatrix}=\begin{bmatrix} cos(\hat{\theta}) &  sin(\hat{\theta}) \\  -sin(\hat{\theta}) & con(\hat{\theta})\end{bmatrix}\begin{bmatrix} I_{\alpha}\\ I_{\beta}\end{bmatrix}\\\text{Inverse Park Transform：} \\\quad \begin{bmatrix} I_{\alpha}\\ I_{\beta}\end{bmatrix}= \begin{bmatrix} cos(\hat{\theta}) & -sin(\hat{\theta}) \\ sin(\hat{\theta}) & cos(\hat{\theta})\end{bmatrix}\begin{bmatrix} I_d\\ I_q\end{bmatrix}\end{array}
+
+Basic Digital Low-Pass Filter
+\begin{array}{l}\text{Basic Digital Low-Pass Filter：} \\\begin{align}\\Output(t) &= Output(t-1) + T_s \ast 2\pi \ast f_{cute-off} \ast(Input(t) - Output(t-1))\\          &= Output(t-1) + K \ast(Input(t) - Output(t-1))\\\\\qquad T_s &: sample\ period(PWM\ update\ period) \\\quad f_{cute-off} &: Cut-off\ frequency\ of\ the\ filter \\\qquad t &: current\ timestamp \\\qquad t-1 &: previous\ timestamp \\\end{align}\end{array}
+
+Gain of Adaptive Low-Pass Filter
+\begin{array}{l}\text{Gain of Adaptive Low-Pass Filter：} (K_{slf}) \\\quad Motor-Poles = 2 \ast Pole-Pair \\\quad Set\\\qquad f_{cute-off} == eRPS\ (phase\ delay\ 45^{\circ} after\ LPF\ once)\\\begin{align} \\RPM (rad/minute) &= \frac{ \omega} {T_{speed} \ast (Motor-Poles)} \ast 60sec  \\eRPS (rad/sec) &= \frac{RPM \ast (Pole-Pair)}{60sec} \\               &= \frac{\omega} { T_{speed} \ast 2 }\\\\K_{slf} &= T_s \ast 2\pi \ast f_{cute-off} \\ &= T_s \ast 2\pi \ast eRPS \\ &= \frac{T_s \ast 2\pi \ast \omega} {T_{speed} \ast 2} \\ & = \omega \ast \frac{ \pi \ast T_s} {T_{speed}}\\\\\quad T_{speed} &: speed-loop\ period \\\quad T_s &: sample\ period(PWM\ update\ period) \\\quad f_{cute-off} &: Cut-off\ frequency\ of\ the\ filter \\\quad \omega &: Angular\ velocity\\\end{align}\end{array}
+
 
 
 

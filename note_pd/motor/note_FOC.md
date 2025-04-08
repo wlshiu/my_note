@@ -380,3 +380,8 @@ integral{ sector_s(Vref(t), t=0~T }
 
 
 
+# Reference
+
++ [淺析SVPWM調製技術 - 知乎](https://zhuanlan.zhihu.com/p/449581786)
++ [SVPWM原理分析-基於STM32 MC SDK 5.0 - Aliank - 部落格園](https://www.cnblogs.com/temo/p/13993993.html)
+

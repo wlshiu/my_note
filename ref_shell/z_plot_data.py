@@ -93,8 +93,12 @@ ax2.plot(degree, err_rate[0], label="err-sin")
 ax2.plot(degree, err_rate[1], label="err-cos")
 
 plt.xlabel(x_name)
-plt.ylabel('fix-point')
+# plt.ylabel('fix-point')
 # plt.legend()
+
+ax1.set_ylabel('fix-point')
+ax2.set_ylabel('%%')
+
 ax1.legend()
 ax2.legend()
 plt.savefig('data_waveform.jpg')
