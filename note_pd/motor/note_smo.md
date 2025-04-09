@@ -124,15 +124,6 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 ![SMO_motor_math_model](SMO_motor_math_model.jpg)
 
 
-
-
-## Texas Instruments (TI)
-
-+ SMO basic block
-
-    ![SMO_basic_flow_ti](SMO_basic_flow_ti.jpg)
-
-
 ## Microchip
 
 `ref. Microchip AN1078 2010`
@@ -204,6 +195,21 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
                 f_e = Pole_Pair * (N/60sec) = Pole_Pair * (RPM/60) = eRPS (電機的電氣轉速)
 
             ```
+
+## Texas Instruments (TI)
+
++ SMO basic block
+
+    ![SMO_basic_flow_ti](SMO_basic_flow_ti.jpg)
+
+
+
+## PD
+
++ SMO basic block
+
+    ![SMO_basic_flow_pdk](SMO_basic_flow_pdk.jpg)
+
 
 # Reference
 
