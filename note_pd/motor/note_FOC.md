@@ -22,6 +22,33 @@ Motor FOC
         Kt = B * L * (D^2) * N * sin(δ)
         ```
 
++ 機械角度
+    > 實際物理轉子轉動角度, 一圈為 360°
+
++ 電角度
+    > 轉子從**磁級 N 到下一個磁級 N 為 360°**
+    >> 磁級 N 和 S 必為一對
+
+    - 當轉子轉一圈 (機械角度 ω_m 0° -> 360°), 則可量測到 Output 訊號, 有**極對數 (Pole_pair)個週期訊號**
+
+        ```
+        ω_e = Pole_pair * ω_m
+        ```
+
++ 六步方波 (梯形波) 換相(相位)控制
+    > 適用於低速產品, 且因換相時瞬間劇烈變化 (方波 edge), 而造成振動噪音的產生
+
+    ```
+    T_phase: 單步換相時間 (T/step)
+
+    (Sec/rad) = (T/step) * 6step * Pole_pair
+    (60/RPM) = T_phase * 6 * Pole_pair
+
+    T_phase = 10 / (RPM * Pole_pair)
+    ```
+
+
+
 # [Trigonometric-functions](./note_tangent.md)
 
 三角函數
@@ -108,48 +135,27 @@ Motor FOC
 
     ```
 
-## Position Estimator
+## [Position Estimator](note_position_estimator.md)
 
-Sensorless FOC 是通過估算 Motor 的位置, 來計算 FOC 所需的換相角度, 實現FOC演算法.
-> 通常 Motor 的速度和位置, 是根據測量 Motor 的電流和電壓估算出的
+FOC 的位置 (θ) 估算主要可分為 Sensor/Sensorless
++ Sensor
+    > 外加位置感測器
+    > + 高精度的速度和位置控制
+    > + 在高負載和低速工作條件下, 也能保持高效工作
+    > + 能夠自動識別電機轉子的初始位置
 
-### [SMO](./note_smo.md)
+    > 有位置感測器的電機控制演算法, 具備精確位置控制的能力,
+    適用於需要高精度位置控制的場景, 如機器人運動控制, 工業自動化控制等
 
-滑膜觀測器(SMO)是一種在不影響電機控制性能的前提下, 將 BLDC 的數學模型簡化,
-補償數學模型後, 引入了一個修正值或者叫校正因子(Z), 通過反饋來不斷的計算 Z,
-使電機數學模型無限的接近真實 Motor, 就算外部突發干擾也能通過修正值 Z 快速的修正狀態
++ Sensorless
+    > 通過各種演算法, 計算或估計電機轉子的位置
+    > + 價格低, 便於生產
+    > + 電路簡單, 不需要額外的位置感測器和複雜的控制演算法
 
-> 如果真實系統是一條曲線, SMO 觀測器就是圍繞這條曲線來回滑動的線條, 簡單且性能較好的演算法
->> 優點: SMO 的波形更平滑好看, 適合**中高速的 Motor**
+    > 無位置感測器的電機控制演算法, 適用於一些價格敏感的場景, 如家電, 電動工具, 無人機等
 
-+ ASMO (自適應滑模觀測器)
-    > ASMO 相對於 SMO 觀測器, 參數調整更加容易.
-    ASMO 自適應滑模觀測器, 對反電動勢 Ke 參數的敏感度降低
-    >> Ke 參數設定值在很大範圍內都能使 演算法 穩定運行
-
-    - 優點: 相容性比 SMO 好, 對 Ke 反電動勢敏感度降低, **調整參數更容易**
-
-
-### PLL
-
-PLL (Phase-Locked Loop, 鎖相環)是一種通過**相位誤差控制**的反饋系統, 對基準訊號與 feedback 訊號進行頻率比較,
-當輸出訊號的頻率與輸入訊號的頻率相等時, 輸出電壓與輸入電壓保持固定的相位差值,
-二者的相位必須相同, 且鎖住其中電壓控制振盪器和相位比較器相互連接,
-使得振盪器頻率(相位), 可以精準跟蹤施加的頻率或相位調製訊號的頻率
-
-> 優點: 相容多種電機, 適合**低轉速 Motor**
-
-
-
-
-
-
-
-
-
-Phase-Locked Loop
-
-滑模觀測器 SMO (Sliding mode observer), 經典 `ref. Microchip AN1078 2010`
+    > Sensorless FOC 是通過估算 Motor 的位置, 來計算 FOC 所需的換相角度, 實現FOC演算法.
+    >> 通常 Motor 的速度和位置, 是根據測量 Motor 的電流和電壓估算出的
 
 ## SVPWM
 
@@ -423,4 +429,4 @@ integral{ sector_s(Vref(t), t=0~T }
 
 + [淺析SVPWM調製技術 - 知乎](https://zhuanlan.zhihu.com/p/449581786)
 + [SVPWM原理分析-基於STM32 MC SDK 5.0 - Aliank - 部落格園](https://www.cnblogs.com/temo/p/13993993.html)
-
++ [【永磁同步電機（PMSM）】 8. 位置觀測器的原理與模擬模型-CSDN部落格](https://blog.csdn.net/youcans/article/details/142528528)

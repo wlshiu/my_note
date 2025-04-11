@@ -2,7 +2,7 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
 ----
 
 滑模觀測器(Sliding Mode Observer, SMO)的作用, 是用來估算 motor 的感應電動勢 (Es, Back EMF), 角度位置(θ), 速度(ω)
-
+> 經典 ref. Microchip AN1078 2010
 
 # Definitions
 
@@ -63,15 +63,21 @@ SMO (Sliding Mode Observer) [[Back](./note_FOC.md#SMO)]
 
 
 + 機械角頻率 (ω_m) vs. 電氣角頻率 (ω_e)
-    > 轉子轉一圈, 機械角度等於360°, 電角度等於 `Pole_pair * 360 = Pole_pair * 機械角度`.
+    > 轉子轉一圈, 機械角度等於 360°, 電角度等於 `Pole_pair * 360 = Pole_pair * 機械角度`.
     >> 電角度可以理解為所有 Pole_Pair 轉過角度的總和
+
+    - 機械角度
+        > 實際物理轉子轉動角度, 一圈為 360°
+
+    - 電角度
+        > 轉子從**磁級 N 到下一個磁級 N 為 360°**
+        >> 磁級 N 和 S 必為一對
 
     - 當轉子轉一圈 (機械角度 ω_m 0° -> 360°), 則可量測到 Output 訊號, 有**極對數 (Pole_pair)個週期訊號**
 
         ```
         ω_e = Pole_pair * ω_m
         ```
-
 
 + RPM (Revolutions Per Minute)
     > 每分鐘轉幾圈 (0° ~360° or 0 ~ 2PI)
