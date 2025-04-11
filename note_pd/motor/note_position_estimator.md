@@ -64,7 +64,7 @@ Position Estimator [[Back](./note_FOC.md##Position_Estimator)]
 
 # Sensorless
 
-基本可分為最早的 **間接磁場導向控制(Indirect Field-Oriented Control, IFOC)** 
+基本可分為最早的 **間接磁場導向控制(Indirect Field-Oriented Control, IFOC)**
 到現在主流 **直接磁場導向控制(Direct Field-Oriented Control, DFOC)**
 >> DFOC 也稱為**回饋磁場導向控制**, IFOC 也稱為**前饋磁場導向控制**
 
@@ -72,21 +72,33 @@ Position Estimator [[Back](./note_FOC.md##Position_Estimator)]
     > 在 IFOC 中會先量測定子電流及轉子速度, 再利用轉子速度及轉差率的計算值推導轉子角度, 再得到磁通的轉子角度
 
 + DFOC 利用電壓型或電流型的磁通模型, 計算磁通大小及轉子角度
+    > 利用 close-loop 來控制磁鏈幅值和相位, 減少系統對電機參數的敏感度, 進而實現磁場的精準定向
 
 無位置感測器的 PMSM 控制方法從估算來源可分為
-> + 反電動勢 (BEMF) 位置估算
 > + 定子磁鏈 (magnetic flux linkage) 位置估算
+> + 反電動勢 (BEMF) 位置估算
 > + other
 
-## 定子磁鏈 (magnetic flux linkage) 位置估算
+## 磁鏈 (magnetic flux linkage) 位置估算
 
-利用定子磁鏈向量, 使用轉子參考系 dq 電壓方程式計算
-> 其主要問題是, 由於整合過程可能會隨著時間的推移而產生偏移(可以透過使用適當的積分方法來解決這個問題), 
+PMSM 中有三種磁鏈 `轉子/定子/氣隙`, 其中轉子磁鏈定向, 可以實現勵磁電流(磁場控制)和轉矩電流(轉矩控制)的完全解耦,
+因此目前轉子磁鏈定向為主要採用的方式.
+> 轉子磁鏈定向的缺點:
+>> 轉子磁場的觀測, 受轉子參數影響較大, 在電機溫升等變化導致轉子參數變化時, 轉子磁場的觀測會出現較大偏差
+
+在實際系統中, 常採用的獲取轉子磁鏈的向量方法, 是通過對電機的**定子電壓**, **定子電流**和**轉速**等易於測得的物理量,
+利用轉子磁鏈觀察模型, **即時觀測轉子磁鏈的模值和空間位置**
+> 即通過電壓模型法和電流模型法, 可以得到 α-axis 和 β-axis 的轉子磁鏈, 對其求模值即可得到轉子磁鏈的幅值,
+再求其反正切即可得到轉子磁鏈的角度
+
+利用磁鏈向量, 使用參考系 dq 電壓方程式計算
+> 其主要問題是, 由於整合過程可能會隨著時間的推移而產生偏移(可以透過使用適當的積分方法來解決這個問題),
 同時也無法檢測到初始轉子位置
 
-+ **磁鏈觀測器**以其簡單，低速效果好而聞名
++ **非線性磁鏈觀測器**以其簡單, 低速效果好而聞名
     > 龍貝格觀測器
 
+    ![nonlinear_flux_observer arch](nonlinear_flux_observer.jpg)
 
 ## 反電動勢 (BEMF) 位置估算
 
@@ -142,7 +154,7 @@ PLL (Phase-Locked Loop, 鎖相環)是一種通過**相位誤差控制**的反饋
 
 ## Other 位置估算
 
-### 高頻注入法 (High Frequency Signal Injection)
+### 高頻注入法 (High Frequency Signal Injection, HFI)
 
 由於凸極比高, 此類技術特別用於**凸極**或**內建磁鐵** PMSM 類型
 
@@ -161,3 +173,9 @@ PLL (Phase-Locked Loop, 鎖相環)是一種通過**相位誤差控制**的反饋
 + [Module 9: Position Observer (Part 1/2) - NXP Community](https://community.nxp.com/t5/Model-Based-Design-Toolbox-MBDT/Module-9-Position-Observer-Part-1-2/m-p/747798)
 + [【永磁同步電機（PMSM）】 8. 位置觀測器的原理與模擬模型-CSDN部落格](https://blog.csdn.net/youcans/article/details/142528528)
 + [【實用】一文搞明白磁鏈、磁導、磁阻、磁通、磁動勢、電感之間的關係！-CSDN部落格](https://blog.csdn.net/weixin_44114030/article/details/143277742)
++ [交流非同步電機向量控制（三）——磁場定向與磁鏈觀測器的設計\_定子磁場定向-CSDN部落格](https://blog.csdn.net/sy243772901/article/details/123067981?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-123067981-blog-134099891.235^v43^pc_blog_bottom_relevance_base7&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
++ [基於磁鏈模型的非線性觀測器 - 知乎](https://zhuanlan.zhihu.com/p/259856568)
++ [非線性磁鏈觀測器實現零速閉環啟動 - 知乎](https://zhuanlan.zhihu.com/p/620378087)
+
+
+
