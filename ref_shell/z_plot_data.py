@@ -2,24 +2,27 @@
 
 import sys
 import argparse
+from argparse import RawTextHelpFormatter
 import numpy as np
 import matplotlib.pyplot as plt
 
 '''
-$ ./z_plot_data.py -i ./cordic_rot_arm_q15.csv -c 5
+$ ./z_plot_data.py -i ./xxx.csv -c 3
 '''
-parser = argparse.ArgumentParser(description='Render data to waveform')
+parser = argparse.ArgumentParser(description='Render data to waveform\n e.g. ./z_plot_data.py -i ./xxx.csv -c 3', formatter_class=RawTextHelpFormatter)
 parser.add_argument("-o", "--Output", type=str, help="output waveform")
-parser.add_argument("-i", "--Input", type=str, help="input csv file")
+parser.add_argument("-i", "--Input", type=str, help="input csv file:\n"
+                                                    "a, b, c, \n"
+                                                    "0.000000, 0.000000, 32768.000000,\n")
 parser.add_argument("-c", "--Columns", type=str, help="input column count (in csv)")
 
 args = parser.parse_args()
 
 '''
 csv file
-degree, ideal-sin, ideal-cos, sim-sin, sim-cos,
-0.000000, 0.000000, 32768.000000, 0.000000, 32767.000000,
-0.100000, 57.190922, 32767.949219, 56.000000, 32767.000000,
+ideal-sin, ideal-cos, sim-sin, sim-cos,
+0.000000, 32768.000000, 0.000000, 32767.000000,
+57.190922, 32767.949219, 56.000000, 32767.000000,
 ...
 '''
 
@@ -33,8 +36,8 @@ if not args.Columns:
 else:
     columns_max = int(args.Columns)
 
-
-degree = []
+line_cnt = 0
+x_axis = []
 column_data = [[] for i in range(columns_max)]
 x_name = ""
 data_name = [[] for i in range(columns_max)]
@@ -45,10 +48,7 @@ with open(args.Input, 'r') as in_file:
     line = in_file.readline()
     items = line.split(', ')
     for i in range(columns_max):
-        if i == 0:
-            x_name = items[0]
-        else:
-            data_name[i-1] = items[i]
+        data_name[i] = items[i]
 
 
     while True:
@@ -57,50 +57,21 @@ with open(args.Input, 'r') as in_file:
         if not line:
             break;
 
+        x_axis.append(line_cnt);
+        line_cnt = line_cnt + 1
+
         items = line.split(', ')
         for i in range(columns_max):
-            if i == 0:
-                degree.append(float(items[i]));
-            else:
-                column_data[i-1].append(float(items[i]))
+            column_data[i].append(float(items[i]))
 
 
-        ideal_sin = abs(float(items[1]))
-        ideal_cos = abs(float(items[2]))
-        sim_sin = abs(float(items[3]))
-        sim_cos = abs(float(items[4]))
 
-        Denominator = ideal_sin
-        if ideal_sin == 0:
-            Denominator = 1
+for i in range(columns_max):
+    plt.plot(x_axis, column_data[i], '*-', label=data_name[i])
 
-        err_rate[0].append(abs(sim_sin - ideal_sin)*100/Denominator)
-
-        Denominator = ideal_cos
-        if ideal_cos == 0:
-            Denominator = 1
-        err_rate[1].append(abs(sim_cos - ideal_cos)*100/Denominator)
+plt.legend(loc='upper right')
 
 
-# plt.subplot(2, 1, 1)
-f, (ax1, ax2) = plt.subplots(2, sharex=True)
-
-for i in range(columns_max - 1):
-    ax1.plot(degree, column_data[i], label=data_name[i])
-
-# plt.subplot(2, 1 ,2)
-ax2.plot(degree, err_rate[0], label="err-sin")
-ax2.plot(degree, err_rate[1], label="err-cos")
-
-plt.xlabel(x_name)
-# plt.ylabel('fix-point')
-# plt.legend()
-
-ax1.set_ylabel('fix-point')
-ax2.set_ylabel('%%')
-
-ax1.legend()
-ax2.legend()
 plt.savefig('data_waveform.jpg')
 plt.show()
 
