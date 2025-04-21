@@ -42,6 +42,11 @@ AN1078 Pre-Unit Duty Sector 3
 AN1078 Pre-Unit Duty Sector 4
 \begin{array}{l}\text{Duty in Sector 4: 180-240 degrees：} \\\begin{align} \\T_4 &= \frac{T_s * \sqrt{3} }{V_{dc}} * \left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right ) \\T_5 &= \frac{-1 * Ts * \sqrt{3} }{V_{dc}} * V_{\beta} \\\\T_{4-pu} &= \frac{T_4}{T_s} = V_{b-pu} = \frac{\left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{V_{base}} =\frac{\left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{\frac{v_{dc}}{\sqrt{3} } } \\T_{5-pu} &= \frac{T_5}{T_s} = V_{c-pu} = \frac{-V_{\beta}}{V_{base}} = \frac{-V_{\beta}}{\frac{V_{dc}}{\sqrt{3} } } \\\end{align} \\\end{array}
 
+Duty Calculation sector 1
+\begin{array}{l}\text{Sector 1 Duty Calculation:} \\\begin{align}V_{ref} * T_s &= T_1 * \vec{v_1} + T_2 * \vec{v_2}\\              &= T_1 * \left ( \frac{2*V_{dc}}{3} * \vec{\alpha }\right ) + T_2 * \left ( \frac{V_{dc}}{3} *\vec{\alpha } + \frac{V_{dc}}{\sqrt{3} } *\vec{\beta} \right ) \\\\V_{ref}  &= \left ( \frac{\frac{T_1}{T_s} * 2*V_{dc}}{3} + \frac{\frac{T_2}{T_s} * V_{dc}}{3} \right ) * \vec{\alpha } + \frac{\frac{T_2}{T_s} * V_{dc}}{\sqrt{3} } *\vec{\beta} \\              &= V_{\alpha } * \vec{\alpha } + V_{\beta} * \vec{\beta} \\\\V_{\alpha} &= \frac{\frac{T_1}{T_s}* 2*V_{dc}}{3} + \frac{\frac{T_2}{T_s}* V_{dc}}{3} \qquad \text{(1)}\\V_{\beta} &= \frac{\frac{T_2}{T_s}* V_{dc}}{\sqrt{3} }\\\\T_2 &= \frac{T_s * \sqrt{3} }{V_{dc}} * V_{\beta} \qquad \text{代入 (1)}\\T_1 &= \frac{T_s * \sqrt{3} }{V_{dc}} * \left ( \frac{\sqrt{3} * V_{\alpha } }{2} + \frac{-V_{\beta}}{2} \right )  \end{align}\end{array}
+
+
+
 
 
 
