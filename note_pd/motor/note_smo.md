@@ -141,11 +141,31 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 
 ![SMO_basic_flow_microchip](SMO_basic_flow_microchip.jpg)
 
-
-
 + 估算電流公式
 
     ![smo_microchip_est_ecurr](smo_microchip_est_ecurr.jpg)
+
+    - **Pre-Unit** (標么(ㄧㄠ)化)
+        > 使用 Pre-Unit 來**等效關係式**
+
+        1. 電氣物理量關係式
+
+            ![Elec_Physical_Quantity](./Elec_Physical_Quantity.jpg)
+
+        1. 定義最基本物理量的 PU-Value
+            > `頻率 f(Hz)/電流 I(A)/電壓 V(V)`
+
+            ```
+            F_base = 1 / (2 * Time_SpeedLoop) => 使用速度環週期,與 AN1078控制架構有關
+            I_base = 8.8A => I-PEAK 電流 peak 值, 即 Hardware 量測到的最大電流
+            V_base = 24V  => Hardware 量測到的最大 Vdc
+            ```
+
+        1. G_smopos and F_smopos
+
+            ![smo_microchip_pre_unit](./smo_microchip_pre_unit.jpg)
+
+
 
 + 估算反電動勢 BEMF
     > 理想上, 假設估算電流 `I_alpha_hat/I_beta_hat` 已達準確, 此時 `Err_s` 就會只剩下 BEMF 及 Noise 成分
@@ -222,4 +242,5 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 + [三相電機相電感，相電阻和極對數的測量\_電機電感測量方法-CSDN部落格](https://blog.csdn.net/qq_45598353/article/details/122698183)
 + [Sliding-Mode Rotor Position Observer of PMSM - TI E2E](http://e2e.ti.com/cfs-file.ashx/__key/CommunityServer-Discussions-Components-Files/171/3513.smopos.pdf)
 + [節能型循環泵控製器-Chapt 3](https://www.ti.com/cn/lit/pdf/zhca521)
-
++ [*AN1078電機控制中的數學模型標幺化計算 - 知乎](https://zhuanlan.zhihu.com/p/469634745)
++ [*揭秘隱藏的標幺化基準值——AN1078原始碼解讀 - 知乎](https://zhuanlan.zhihu.com/p/615229940)

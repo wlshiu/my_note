@@ -24,6 +24,13 @@ Basic Digital Low-Pass Filter
 Gain of Adaptive Low-Pass Filter
 \begin{array}{l}\text{Gain of Adaptive Low-Pass Filter：} (K_{slf}) \\\quad Motor-Poles = 2 \ast Pole-Pair \\\quad Set\\\qquad f_{cute-off} == eRPS\ (phase\ delay\ 45^{\circ} after\ LPF\ once)\\\begin{align} \\RPM (rad/minute) &= \frac{ \omega} {T_{speed} \ast (Motor-Poles)} \ast 60sec  \\eRPS (rad/sec) &= \frac{RPM \ast (Pole-Pair)}{60sec} \\               &= \frac{\omega} { T_{speed} \ast 2 }\\\\K_{slf} &= T_s \ast 2\pi \ast f_{cute-off} \\ &= T_s \ast 2\pi \ast eRPS \\ &= \frac{T_s \ast 2\pi \ast \omega} {T_{speed} \ast 2} \\ & = \omega \ast \frac{ \pi \ast T_s} {T_{speed}}\\\\\quad T_{speed} &: speed-loop\ period \\\quad T_s &: sample\ period(PWM\ update\ period) \\\quad f_{cute-off} &: Cut-off\ frequency\ of\ the\ filter \\\quad \omega &: Angular\ velocity\\\end{align}\end{array}
 
+Electric Physical Quantity
+\begin{array}{l}\text{Electric Physical Quantity Relationship：} \\V=I \ast R = I \ast Z\\R=\frac{V}{I} \\V=L \ast \frac{\mathrm{d} i}{\mathrm{d} t} \Rightarrow T \ast V = L \ast I \\L=T\ast Z_l = \frac{Z_l}{2\pi \ast f} = \frac{Z_l}{\omega} = \frac{V}{I \ast \omega } \\T=\frac{1}{f} \\\text{Circular motion:}\\T= \frac{1}{2\pi \ast f} = \frac{1}{\omega } = \frac{L}{Z_l} = L \ast \frac{ I}{V} \\\begin{align} \\\qquad V &: Voltage \\\qquad I &: Electric\ Current \\\qquad R &: Resistance (Ohm) \\\qquad L &: Electric\ Inductance (H) \\\qquad T &: Period \\\qquad f &: Frequency \\\qquad Z_l &: Electrical\ Impedance\ of\ Inductance \\\qquad \omega &: Angular\ Frequency \\\end{align} \\\end{array}
+
+AN1078 Pre-Unit
+\begin{array}{l}PU-Value = \frac{Value_{real}}{Value_{base}} \\\begin{align} \\G_{smopos} &= \frac{T_s}{L_s}\\G_{smopos-pu} &= \frac{T_{s-pu}}{L_{s-pu}} = \frac{\frac{T_s}{T_{base}}}{\frac{L_s}{L_{base}}} = \frac{T_s}{L_s} \ast \frac{L_{base}}{T_{base}} \\           &= \frac{T_s}{L_s} \ast R_{base} \\           &= \frac{T_s}{L_s} \ast \frac{V_{base}}{I_{base}} \\F_{smopos} &= \left ( 1 - T_s \ast \frac{R_s}{L_s}  \right ) \\F_{smopos-pu} &= \left ( 1 - T_{s-pu} \ast \frac{R_{s-pu}}{L_{s-pu}}  \right ) \\           &= \left ( 1 - (T_s/T_{base}) \ast \frac{R_s/R_{base}}{L_s/L_{base}} \right ) \\           &= \left ( 1 - T_s \ast \frac{R_s}{L_s}  \right ) \ast \left ( \frac{L_{base}}{T_{base} \ast R_{base}} \right ) \\\frac{L_{base}}{T_{base} \ast R_{base}} &= \frac{L_{base}}{R_{base}} \ast \frac{1}{T_{base}} = T_{base} \ast \frac{1}{T_{base}} = 1 \\\end{align} \\\end{array}
+
+
 
 
 
