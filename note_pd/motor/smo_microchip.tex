@@ -30,6 +30,23 @@ Electric Physical Quantity
 AN1078 Pre-Unit
 \begin{array}{l}PU-Value = \frac{Value_{real}}{Value_{base}} \\\begin{align} \\G_{smopos} &= \frac{T_s}{L_s}\\G_{smopos-pu} &= \frac{T_{s-pu}}{L_{s-pu}} = \frac{\frac{T_s}{T_{base}}}{\frac{L_s}{L_{base}}} = \frac{T_s}{L_s} \ast \frac{L_{base}}{T_{base}} \\           &= \frac{T_s}{L_s} \ast R_{base} \\           &= \frac{T_s}{L_s} \ast \frac{V_{base}}{I_{base}} \\F_{smopos} &= \left ( 1 - T_s \ast \frac{R_s}{L_s}  \right ) \\F_{smopos-pu} &= \left ( 1 - T_{s-pu} \ast \frac{R_{s-pu}}{L_{s-pu}}  \right ) \\           &= \left ( 1 - (T_s/T_{base}) \ast \frac{R_s/R_{base}}{L_s/L_{base}} \right ) \\           &= \left ( 1 - T_s \ast \frac{R_s}{L_s}  \right ) \ast \left ( \frac{L_{base}}{T_{base} \ast R_{base}} \right ) \\\frac{L_{base}}{T_{base} \ast R_{base}} &= \frac{L_{base}}{R_{base}} \ast \frac{1}{T_{base}} = T_{base} \ast \frac{1}{T_{base}} = 1 \\\end{align} \\\end{array}
 
+AN1078 Pre-Unit Duty Sector 1
+\begin{array}{l}\text{Duty in Sector 1: 0-60 degrees：} \\\begin{align} \\T_2 &= \frac{T_s \ast V_{\beta} \ast \sqrt{3}}{V_{dc}} = \frac{T_s \ast \sqrt{3} } { V_{dc}} \ast V_{\beta} \\T_1 &= \frac{ T_s \ast (3 \ast V_{\alpha } - \sqrt{3} \ast V_{\beta})}{2 \ast V_{dc}} \\    &= \frac{ T_s \ast \sqrt{3} \ast(\sqrt{3} \ast V_{\alpha } - V_{\beta})} {2 \ast V_{dc}} \\    &= \frac{ T_s \ast \sqrt{3}} {V_{dc}} \ast \left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} - \frac{V_{\beta}}{2}  \right ) \\\\T_{2-pu} &= \frac{T_2}{T_s} = V_{b-pu} = \frac{ V_{\beta}} {V_{base}} = \frac{V_{\beta}}{\frac{V_{dc}}{\sqrt{3} } } \\T_{1-pu} &= \frac{T_1}{ T_s} = V_{a-pu} = \frac{\left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} - \frac{V_{\beta}}{2} \right)}{V_{base}} =\frac{\left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} - \frac{V_{\beta}}{2} \right)}{\frac{V_{dc}}{\sqrt{3}}} \\\end{align} \\\end{array}
+
+AN1078 Pre-Unit Duty Sector 2
+\begin{array}{l}\text{Duty in Sector 2: 60-120 degrees：} \\\begin{align} \\T_2 &= \frac { T_s \ast \sqrt{3} } {V_{dc}} \ast \left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right ) \\T_1 &= \frac { T_s \ast \sqrt{3} } {V_{dc}} \ast \left ( \frac{- \sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right ) \\\\T_{2-pu} &= \frac{T_2}{T_s} = V_{a-pu} = \frac{\left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{V_{base}} =  \frac{\left ( \frac{\sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{\frac{V_{dc}}{ \sqrt{3} } } \\T_{1-pu} &= \frac{T_2}{T_s} = V_{b-pu} = \frac{\left ( \frac{- \sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{V_{base}} =  \frac{\left (- \frac{\sqrt{3} \ast V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{\frac{V_{dc}}{ \sqrt{3} } } \\\end{align} \\\end{array}
+
+AN1078 Pre-Unit Duty Sector 3
+\begin{array}{l}\text{Duty in Sector 3: 120-180 degrees：} \\\begin{align} \\T_3 &= \frac{T_s * \sqrt{3} }{V_{dc}} \ast V_{\beta} \\T_4 &= \frac{T_s * \sqrt{3} }{V_{dc}} \ast \left ( \frac{-\sqrt{3} * V_{\alpha }}{2} - \frac{ V_{\beta}}{2} \right ) \\\\T_{3-pu} &= \frac{T_3}{T_s} = V_{b-pu} = \frac{V_{\beta}}{V_{base}} = \frac{V_{\beta}}{\frac{V_{dc}}{\sqrt{3} } } \\  T_{4-pu} &= \frac{T_4}{T_s} = V_{c-pu} = \frac{ \left ( \frac{-\sqrt{3}*V_{\alpha } }{2} - \frac{V_{\beta}}{2} \right ) } {V_{base}} = \frac{ \left ( \frac{-\sqrt{3}*V_{\alpha } }{2} - \frac{V_{\beta}}{2} \right ) } {\frac{V_{dc}}{\sqrt{3}}}\\\end{align} \\\end{array}
+
+AN1078 Pre-Unit Duty Sector 4
+\begin{array}{l}\text{Duty in Sector 4: 180-240 degrees：} \\\begin{align} \\T_4 &= \frac{T_s * \sqrt{3} }{V_{dc}} * \left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right ) \\T_5 &= \frac{-1 * Ts * \sqrt{3} }{V_{dc}} * V_{\beta} \\\\T_{4-pu} &= \frac{T_4}{T_s} = V_{b-pu} = \frac{\left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{V_{base}} =\frac{\left ( \frac{-\sqrt{3}*V_{\alpha } }{2} + \frac{V_{\beta}}{2} \right )}{\frac{v_{dc}}{\sqrt{3} } } \\T_{5-pu} &= \frac{T_5}{T_s} = V_{c-pu} = \frac{-V_{\beta}}{V_{base}} = \frac{-V_{\beta}}{\frac{V_{dc}}{\sqrt{3} } } \\\end{align} \\\end{array}
+
+
+
+
+
+
 
 
 

@@ -162,10 +162,75 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             ```
 
         1. G_smopos and F_smopos
+            > + 若 Rs 的範圍超過預期的 QVlaue 時, 可先將 Rs 縮小, 等到計算時, 再 run-time 放大
+            >> e.g. Rs = 2.3 omh, (Q1.15 支援浮點範圍 -0.999999 ~ 0.999999), `int16_t Rs_fixpointer = (int)Q15(Rs) >> 2`,
+            run-time 計算時再 `((int)Rs_fixpointer << 2) * xxxx`
+            > + G_smopos-pu 應落在 [-1,1] 範圍內, 若 G_smopos-pu 超過範圍, 可放大 Ls, 到 `G*(Vs - Es)` 再補償回來
 
             ![smo_microchip_pre_unit](./smo_microchip_pre_unit.jpg)
 
+        1. Pre-Unit duty period
 
+            > + Sector 1
+            > ![smo_microchip_pre_unit_duty_sec1](smo_microchip_pre_unit_duty_sector1.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 1:  0-60 degrees
+            > T1 = abc->a;  // V_1-pu
+            > T2 = abc->b;  // V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
+
+            > + Sector 2
+            > ![smo_microchip_pre_unit_duty_sec2](smo_microchip_pre_unit_duty_sector2.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 2:  60-120 degrees
+            > T1 = -abc->c;  // V_1-pu
+            > T2 = -abc->b;  // V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
+
+            > + Sector 3
+            > ![smo_microchip_pre_unit_duty_sec3](smo_microchip_pre_unit_duty_sector3.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 3:  120-180 degrees
+            > T1 = abc->c;  // V_1-pu
+            > T2 = abc->a;  // V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
+
+            > + Sector 4
+            > ![smo_microchip_pre_unit_duty_sec4](smo_microchip_pre_unit_duty_sector4.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 4:  180-240 degrees
+            > T1 = -abc->b;  // V_1-pu
+            > T2 = -abc->a;  // V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
+
+
+            > + Sector 5
+
+            > + Sector 6
 
 + 估算反電動勢 BEMF
     > 理想上, 假設估算電流 `I_alpha_hat/I_beta_hat` 已達準確, 此時 `Err_s` 就會只剩下 BEMF 及 Noise 成分

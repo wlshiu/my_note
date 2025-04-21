@@ -50,6 +50,68 @@ Motor FOC
     > 將物理量的實際值, 除以一選定的同單位數值, 這一被選定的同單位數值稱為基準值，這個過程就叫做**標么化**
 
 
++ Q-Format
+
+    - 有號 Q格式的表示方式會寫成`Qm.n`
+        > + `m` 表示 float value 的 `sign + integer` 的位元數
+        >> 可省略 (省略則表示 m = 0)
+        > + `n` 表示 float value 的中小數的位元數
+
+        1. `Q1.15` (or Q15)
+            > float range: `-0.99999 ~ 0.99999` (1-bit 做為 sign-bit)
+
+        1. `Q2.14` (or Q14)
+            > float range: `-1.9999999 ~ 1.99999` (1-bit 做為 sign-bit, 1-bit 做為 integer-bits)
+
+        1. `Q3.13` (or Q13)
+            > float range: `-3.9999999 ~ 3.99999` (1-bit 做為 sign-bit, 2-bit 做為 integer-bits)
+
+
+
+
++ 電壓利用率
+    > 是指 Inverter 輸出線電壓的基波幅值, 與直流母線電壓之比值 (一般只討論最高利用率)
+
+    ```
+    電壓利用率 (Voltage Utilization) = max(Va) * sqrt(3) / Vdc-max
+                                    = max(Vb) * sqrt(3) / Vdc-max
+                                    = max(Vc) * sqrt(3) / Vdc-max
+    ```
+
+    - 相電壓 (Phase Voltage, Va/Vb/Vc)
+        > 單向電壓(三相交流中的單一相), 一般所說的 `110v/220v` 指的就是單相電壓
+
+
+    - 線電壓 (Line Voltage, Vdc or Vbus)
+        > Inverter 任兩相之間的電壓 (有最高額定線電壓)
+        >> 三相交流中兩相電壓, 可在直流 Domain 疊加
+
+        ```
+        # 相位差 120°
+        Vdc = max(Va) * sqrt(3)
+            = max(Vb) * sqrt(3)
+            = max(Vc) * sqrt(3)
+        ```
+
+    - SPWM vs. SVPWM
+        > 由 SV-Sector domain 中, SVPWM 輸出電壓為**六角形內切圓**
+        > + SPWM 演算法所輸出**相電壓**的基波幅值最大為 `Vdc/2`
+        > + SVPWM 演算法所輸出的**相電壓**的基波幅值最大則為 `Vdc/sqrt(3)`
+
+        ```
+        # SPWM
+        電壓利用率 (Voltage Utilization) = (Vdc/2) * sqrt(3) / Vdc
+                                        = sqrt(3) / 2
+                                        = 0.866
+
+        # SVPWM
+        電壓利用率 (Voltage Utilization) = (Vdc/sqrt(3)) * sqrt(3) / Vdc
+                                        = sqrt(3) / sqrt(3)
+                                        = 1
+
+        ```
+
+
 + 六步方波 (梯形波) 換相(相位)控制
     > 適用於低速產品, 且因換相時瞬間劇烈變化 (方波 edge), 而造成振動噪音的產生
 
