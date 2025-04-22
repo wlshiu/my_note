@@ -351,7 +351,9 @@ integral{ sector_s(Vref(t), t=0~T }
 + SV-Sector-I
     > 依照 `Table. SV-basis v.s. Va/Vb/Vc 關係`
 
-    - alpha/beta
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector1](./smo_microchip_duty_sector1.jpg)
 
         ```
         Vref * T = v1 * T1 + v2 * T2
@@ -398,6 +400,10 @@ integral{ sector_s(Vref(t), t=0~T }
 
 + SV-Sector-II
 
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector2](./smo_microchip_duty_sector2.jpg)
+
     - Va/Vb/Vc
         > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
 
@@ -419,6 +425,10 @@ integral{ sector_s(Vref(t), t=0~T }
 
 + SV-Sector-III
 
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector3](./smo_microchip_duty_sector3.jpg)
+
     - Va/Vb/Vc
         > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
 
@@ -438,6 +448,10 @@ integral{ sector_s(Vref(t), t=0~T }
         ```
 
 + SV-Sector-IV
+
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector4](./smo_microchip_duty_sector4.jpg)
 
     - Va/Vb/Vc
         > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
@@ -461,6 +475,10 @@ integral{ sector_s(Vref(t), t=0~T }
 
 + SV-Sector-V
 
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector5](./smo_microchip_duty_sector5.jpg)
+
     - Va/Vb/Vc
         > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製
 
@@ -481,6 +499,10 @@ integral{ sector_s(Vref(t), t=0~T }
 
 
 + SV-Sector-VI
+
+    - duty Derivation with alpha/beta basis
+
+        ![smo_microchip_duty_sector6](./smo_microchip_duty_sector6.jpg)
 
     - Va/Vb/Vc
         > 依照 **Table. 電壓向量在各 sector 作用順序** 繪製

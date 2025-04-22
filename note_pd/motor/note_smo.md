@@ -176,8 +176,8 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             > ```
             > /* at MC_CalculateSpaceVectorPhaseShifted() */
             > // Sector 1:  0-60 degrees
-            > T1 = abc->a;  // V_1-pu
-            > T2 = abc->b;  // V_2-pu
+            > T1 = abc->a;  // ??? V_1-pu
+            > T2 = abc->b;  // ??? V_2-pu
             >
             > T1 = period * T1;     // Ts * V_1-pu
             > T2 = period * T2;     // Ts * V_2-pu
@@ -190,8 +190,8 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             > ```
             > /* at MC_CalculateSpaceVectorPhaseShifted() */
             > // Sector 2:  60-120 degrees
-            > T1 = -abc->c;  // V_1-pu
-            > T2 = -abc->b;  // V_2-pu
+            > T1 = -abc->c;  // ??? V_1-pu
+            > T2 = -abc->b;  // ??? V_2-pu
             >
             > T1 = period * T1;     // Ts * V_1-pu
             > T2 = period * T2;     // Ts * V_2-pu
@@ -204,8 +204,8 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             > ```
             > /* at MC_CalculateSpaceVectorPhaseShifted() */
             > // Sector 3:  120-180 degrees
-            > T1 = abc->c;  // V_1-pu
-            > T2 = abc->a;  // V_2-pu
+            > T1 = abc->c;  // ??? V_1-pu
+            > T2 = abc->a;  // ??? V_2-pu
             >
             > T1 = period * T1;     // Ts * V_1-pu
             > T2 = period * T2;     // Ts * V_2-pu
@@ -218,8 +218,8 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
             > ```
             > /* at MC_CalculateSpaceVectorPhaseShifted() */
             > // Sector 4:  180-240 degrees
-            > T1 = -abc->b;  // V_1-pu
-            > T2 = -abc->a;  // V_2-pu
+            > T1 = -abc->b;  // ??? V_1-pu
+            > T2 = -abc->a;  // ??? V_2-pu
             >
             > T1 = period * T1;     // Ts * V_1-pu
             > T2 = period * T2;     // Ts * V_2-pu
@@ -229,8 +229,33 @@ FOC 控制的實現, 需要當前轉子位置信息, 為了準確的施加計算
 
 
             > + Sector 5
+            > ![smo_microchip_pre_unit_duty_sec5](smo_microchip_pre_unit_duty_sector5.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 5:  240-300 degrees
+            > T1 = abc->b;  // ??? V_1-pu
+            > T2 = abc->c;  // ??? V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
 
             > + Sector 6
+            > ![smo_microchip_pre_unit_duty_sec6](smo_microchip_pre_unit_duty_sector6.jpg)
+            > ```
+            > /* at MC_CalculateSpaceVectorPhaseShifted() */
+            > // Sector 6:  300-0 degrees
+            > T1 = -abc->a;  // ??? V_1-pu
+            > T2 = -abc->c;  // ??? V_2-pu
+            >
+            > T1 = period * T1;     // Ts * V_1-pu
+            > T2 = period * T2;     // Ts * V_2-pu
+            >
+            > ....
+            > ```
+
 
 + 估算反電動勢 BEMF
     > 理想上, 假設估算電流 `I_alpha_hat/I_beta_hat` 已達準確, 此時 `Err_s` 就會只剩下 BEMF 及 Noise 成分
