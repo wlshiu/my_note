@@ -328,9 +328,34 @@ integral{ sector_s(Vref(t), t=0~T }
 |     v7 (360°) | (1, 1, 1) |     0      |       0    |      0     |         0           |      0
 |     v0 (  0°) | (0, 0, 0) |     0      |       0    |      0     |         0           |      0
 
+### SVM Sector location
 
+利用改良過的 InvClarke (α-β axis 對調且相差 120°), 將 α-β basis domain 轉換到 X-Y-Z basis domain,
+再依照座落在 X-Y-Z basis domain 的象限, 來判定真正的 Sector 區域
 
-### 各 SV-Sector 中, PWM 持續時間推導
+![svm_sector_location](./svm_sector_location.jpg)
+
+觀察 X-Y-Z 關係來產生公式對應 Sector
+
+```
+X = (X > 0) ? 1 : 0
+Y = (Y > 0) ? 1 : 0
+Z = (Z > 0) ? 1 : 0
+
+index = X + 2*Y + 4*Z
+```
+
+| index  | sector_id |
+|  :-:   |  :-:      |
+|   0    |    0      |
+|   1    |    2      |
+|   2    |    6      |
+|   3    |    1      |
+|   4    |    4      |
+|   5    |    3      |
+|   6    |    5      |
+
+### 各 SV-Sector 中, 推導 PWM Duty 時間
 
 > ```
 > Vref * T = v_x * T_x + v_y * T_y + v_0 * T_0 + v_7 * T_7, x = 1~6, y = 1~6

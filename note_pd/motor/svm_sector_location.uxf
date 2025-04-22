@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>297</x>
+      <y>638</y>
+      <w>385</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>330.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>473</x>
+      <y>418</y>
+      <w>33</w>
+      <h>396</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;340.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>506</y>
+      <w>187</w>
+      <h>297</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>385</x>
+      <y>506</y>
+      <w>209</w>
+      <h>297</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=BLUE</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>528</x>
+      <y>484</y>
+      <w>264</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>(sqrt(3)/2) * α - (1/2) * β = 0
+fontsize=18
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>176</x>
+      <y>484</y>
+      <w>275</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>-1*(sqrt(3)/2) * α - (1/2) * β = 0
+fontsize=18
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>605</x>
+      <y>517</y>
+      <w>77</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>Y &gt; 0
+fontsize=18
+fg=BLUE
+group=group-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>297</x>
+      <y>517</y>
+      <w>66</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>Z &gt; 0
+fontsize=18
+fg=MAGENTA
+group=group-2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>528</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.
+fg=BLUE
+group=group-1</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>352</x>
+      <y>528</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.
+fg=MAGENTA
+group=group-2</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>594</x>
+      <y>726</y>
+      <w>264</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Y = (sqrt(3)/2) * α - (1/2) * β 
+fontsize=18
+fg=BLUE
+group=group-0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>594</x>
+      <y>759</y>
+      <w>275</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Z = -1*(sqrt(3)/2) * α - (1/2) * β
+fontsize=18
+fg=MAGENTA
+group=group-0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>594</x>
+      <y>693</y>
+      <w>66</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>X = β
+fontsize=18
+group=group-0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>528</x>
+      <y>638</y>
+      <w>88</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>550</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>528</x>
+      <y>550</y>
+      <w>88</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>363</x>
+      <y>550</y>
+      <w>88</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>726</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>363</x>
+      <y>638</y>
+      <w>88</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>517</x>
+      <y>605</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*I*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>484</x>
+      <y>572</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*II*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>418</x>
+      <y>605</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*III*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>418</x>
+      <y>660</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*IV*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>484</x>
+      <y>693</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*V*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>517</x>
+      <y>660</y>
+      <w>33</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>*VI*
+fontsize=24</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>671</x>
+      <y>638</y>
+      <w>22</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>*β*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>473</x>
+      <y>396</y>
+      <w>22</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>*α*
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>594</x>
+      <y>572</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>X &gt; 0
+fontsize=18</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>605</x>
+      <y>594</y>
+      <w>33</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+</diagram>
