@@ -47,7 +47,22 @@ Motor FOC
 
 
 + [Per-unit](./note_per_unit.md)
-    > 將物理量的實際值, 除以一選定的同單位數值, 這一被選定的同單位數值稱為基準值，這個過程就叫做**標么化**
+    > 將物理量的實際值, 除以一選定的同單位數值, 這一被選定的同單位數值稱為基準值, 這個過程就叫做**標么化**
+
+    - 在電機控制中標幺化(Per-unit)的作用是什麼?
+        > 在控制系統中, 為了提高晶片計算速度, 大部分按照 Fix-Pointer MCU 去處理和控制運算.
+        但是在這個過程中, 只用一套電機控制演算法, 去相容不同廠家, 不同電壓, 不同功率等級的電機, 顯然是無法做到的.
+        >> 在用 Fix-Pointer MCU 處理電機電壓, 電流, 及模型參數變數及控制運算的過程中,
+        因為**變數實際值變化範圍較大, 而 MCU 資源有限, 難以滿足不同電機的變數表示和計算精度要求, 從而影響電機控制性能**.
+
+        > 但不同電壓等級的電機雖然參數不同, 其物理模型是一致的, 公式的物理本質也是相同, 故某台電機上應用的控制演算法,
+        在其他電機上也是通用的
+        >> 比如 PI controller 的輸入是轉速誤差, 輸出是 iq 的給定或者轉矩給定, 這些都是完全固定的東西,
+        最終的控製表現形式為通過 PWM 讓 inverter 輸出交流電壓到電機
+
+        > 因此, 如果通過標幺化(Per-unit)的方式, 將電機參數實際值經過標幺化處理,
+        將能夠大大弱化了這些不同電機在變數數值上的差別, 從而實現一台控制器, 在不同電壓等級電機對象上的通用控制效果
+
 
 
 + Q-Format
@@ -66,7 +81,31 @@ Motor FOC
         1. `Q3.13` (or Q13)
             > float range: `-3.9999999 ~ 3.99999` (1-bit 做為 sign-bit, 2-bit 做為 integer-bits)
 
++ PWM(Pulse-width modulation)
+    > PWM 波本質, 是利用面積等效原理, 來改變波形的有效值.
+    舉個例子, 一個電燈只有開和關兩個狀態, 那麼要如何實現 50% 亮度的效果的呢?
+    只需要讓它在一半時間開, 一半時間關, 交替執行這兩個動作, 只要頻率足夠高,
+    在人眼(低通濾波器)看起來就是 50% 亮度的樣子了
+    >> 其中**高電平**佔一個開關週期的比例, 就叫做佔空比(Duty); 利用 PWM 可以實現使用離散的開關量, 來模擬連續的電壓值
 
+
++ SVPWM 電壓
+
+    ![SVPWM_Voltages](./SVPWM_Voltages.jpg)
+
+    - 相電壓 (Phase voltage)
+        > 經 Low-Pass Filter 後, 會呈現 正弦波
+        >> 一般相電壓無法直接量測(N node 不會引出來), 會用等效電路模擬量測
+    - 線電壓 (Line voltage)
+        > 經 Low-Pass Filter 後, 會呈現 正弦波
+
+    - 端電壓 (Terminal Voltage)
+        > 經 Low-Pass Filter 後, 會呈現 馬鞍波
+
+        ![SVPWM_Terminal_Voltage_waveform](SVPWM_Terminal_Voltage_waveform.jpg)
+
+        > Timer counter value (中央對齊) 產生三角波型, 預期產生的弦波與三角波交錯的位置, 就是 PWM 的 Duty 的規律
+        >> 將抽象的三角波與弦波合成, 即可在現實中量測到端電壓為馬鞍波 (經 Low-Pass Filter)
 
 
 + 電壓利用率
@@ -236,7 +275,7 @@ FOC 的位置 (θ) 估算主要可分為 Sensor/Sensorless
 
 ## SVPWM
 
-將實際 `Motor 3-Phase invertor output Voltages (output Va/Vb/Vc)` 轉換到 SV-Space domain (電壓開關向量 SV-basis: v0 ~ v7)
+將實際 `Motor 3-Phase inverter output Voltages (output Va/Vb/Vc)` 轉換到 SV-Space domain (電壓開關向量 SV-basis: v0 ~ v7)
 > **Vref** 為 SV-Space domain (基底 V0 ~ V7) 上理想的輸出電壓, **Vref** 可由 SV-basis (v0 ~ v7)合成,
   每個 SV-Space 的基底亦可用 `basis_alpha/basis_beta` 來表示 (三角幾何轉換, 7-Dimension to 2-Dimension)
 >> v0/v7 為 0 向量 (因伏秒平衡數學式產生), 當上下臂開關切換頻率高時, 0 向量的作用時間趨近 0 可以忽略不計
