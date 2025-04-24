@@ -86,6 +86,8 @@ with open(args.Input, 'r') as in_file:
         err_rate[1].append(abs(sim_cos - ideal_cos)*100/Denominator)
 
 
+plt.figure(figsize=(15, 9))
+
 # plt.subplot(2, 1, 1)
 f, (ax1, ax2) = plt.subplots(2, sharex=True)
 
@@ -105,7 +107,7 @@ ax2.set_ylabel('%%')
 
 ax1.legend()
 ax2.legend()
-plt.savefig('data_waveform.jpg')
+plt.savefig('data_waveform.jpg', dpi=300)
 plt.show()
 
 

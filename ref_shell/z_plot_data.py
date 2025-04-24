@@ -65,6 +65,7 @@ with open(args.Input, 'r') as in_file:
             column_data[i].append(float(items[i]))
 
 
+plt.figure(figsize=(15, 9))
 
 for i in range(columns_max):
     plt.plot(x_axis, column_data[i], '*-', label=data_name[i])
@@ -72,7 +73,7 @@ for i in range(columns_max):
 plt.legend(loc='upper right')
 
 
-plt.savefig('data_waveform.jpg')
+plt.savefig('data_waveform.jpg', dpi=300)
 plt.show()
 
 
