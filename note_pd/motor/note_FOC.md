@@ -34,6 +34,9 @@ Motor FOC
         ```
         ω_e = Pole_pair * ω_m
         ```
++ Clarke 轉換
+    > 將三維訊號(相差 120°)轉換到 2-D domain (相差 90°), 降低運算量
+    >> I_alpha 與 I_beta 必相差 90°
 
 + Park 轉換
     > 圓周運動是指運動軌跡為圓形, 其作用到一個質點的力可拆分為 `切線向量(圓周切線方向)`與`法向量(向心方向)`; <br>
@@ -586,6 +589,12 @@ index = X + 2*Y + 4*Z
         da = Ta/T = dc + d1
         ```
 
+### SVPWM Duty
+
+Duty 是 **三角波(Timer counter 中央對齊)** 與 **預期生成弦波**交錯的投影,
+> 合成三角波與弦波, 形成馬鞍波
+
+![SVPWM_duty](SVPWM_duty.jpg)
 
 
 # Reference
