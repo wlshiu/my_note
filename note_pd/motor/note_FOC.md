@@ -173,6 +173,79 @@ Motor FOC
 
 三角函數
 
+# Low-Pass Filter
+
+
+## 一階有限差分
+
+不同的差分公式在不同的情況下, 具有不同的精度和穩定性 <br>
+通常**中心差分法**比前向/後向差分法**更準確**, 因為它使用了當前點前後的資訊, 減少了誤差的傳播.
+
+> + 如果要求高精度, 推薦使用中心差分法
+> + 如果計算量較小, 且可以接受較低的精度, 可以使用前向/後向差分
+
+
+> Microchip AN1078 中, 文件說明使用**前向差分法**, 但在 demo code 中卻是使用 **後向差分法**
+
++ 前向差分(Forward Difference)
+    > **前向差分法**是一種簡單的差分法, 通過當前點和下一個點的差, 來估計導數
+
+    ```
+    Out(t) = Out(t-1) + Ts * 2PI*f_cuteoff * (In(t) - Out(t))
+           = Out(t-1) + Ts * ω_cuteoff * (In(t) - Out(t))
+
+    Out(t) = (In(t) * ω_cuteoff * Ts + Out(t-1)) / (1 + ω_cuteoff * Ts)
+    ```
+
++ 後向差分(Backward Difference)
+    > **後向差分法**使用當前點和上一個點, 來估計導數
+
+    ```
+    Out(t) = Out(t-1) + T*2PI*f_cuteoff * (In(t) - Out(t-1))
+           = Out(t-1) + T * ω_cuteoff * (In(t) - Out(t-1))
+
+    Out(t) = In(t) * ω_cuteoff * Ts + Out(t-1) * (1 - ω_cuteoff * Ts)
+    ```
+
++ 中心差分(Central Difference)
+    > **中心差分**通過使用當前點的前後點, 來計算導數(精度較高)
+
+## example
+
+```
+import numpy as np
+# 定義目標函數
+def f(x):
+    return np.sin(x)
+    
+# 計算一階導數（前向差分）
+def forward_diff(f, x, h):
+    return (f(x + h) - f(x)) / h
+    
+# 計算一階導數（中心差分）
+def central_diff(f, x, h):
+    return (f(x + h) - f(x - h)) / (2 * h)
+    
+# 計算二階導數（中心差分）
+def second_derivative(f, x, h):
+    return (f(x + h) - 2 * f(x) + f(x - h)) / (h ** 2)
+    
+# 設定步長和計算點
+x = np.pi / 4
+h = 1e-5
+
+# 計算一階導數
+forward_result = forward_diff(f, x, h)
+central_result = central_diff(f, x, h)
+
+# 計算二階導數
+second_deriv_result = second_derivative(f, x, h)
+
+print(f"前向差分法一階導數: {forward_result}")
+print(f"中心差分法一階導數: {central_result}")
+print(f"中心差分法二階導數: {second_deriv_result}")
+
+```
 
 # Components of Algorithm
 
