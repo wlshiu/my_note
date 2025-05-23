@@ -57,7 +57,21 @@
 
         ```
         key   : PATH
-        value : %PATH%;C:\Qt\5.12.6\mingw73_32\bin
+        value : C:\Qt\5.12.6\mingw73_32\bin;%PATH%;
+
+        ps. press 'Set now'
+        ```
+
+        ```
+        key   : QT_PLUGIN_PATH
+        value : C:\tool_util\QT5.12.6\share\plugins\
+
+        ps. press 'Set now'
+        ```
+
+        ```
+        key   : QT_QPA_PLATFORM_PLUGIN_PATH
+        value : C:\tool_util\QT5.12.6\share\plugins\platforms
 
         ps. press 'Set now'
         ```
