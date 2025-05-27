@@ -82,6 +82,11 @@ $ sudo apt-get install lubuntu-desktop
         1. https://mirrors.wikimedia.org/ubuntu/ (https)
            > dependency (https): `$ sudo apt install apt-transport-https`
            >> [deb packages](https://pkgs.org/)
+        1. install
+            ```
+            $ wget https://ports.ubuntu.com/pool/universe/a/apt/apt-transport-https_2.4.13_all.deb
+            $ sudo dpkg -i ./apt-transport-https_2.4.13_all.deb
+            ```
 
     - update list
         ```
