@@ -1,6 +1,11 @@
 Touch module
 ----
 
+Goertzel algorithm 為離散傅立葉轉換 (DFT) 的一種, 對於分析小區段的頻率組成, 有較高的效率
+> 傳統 DFT 會做全頻段分析
+
+
+
 # Intrudution
 
 touch module 運作原理可分為
