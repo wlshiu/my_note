@@ -72,10 +72,17 @@ Support TSC (Touch Sensing  Controller)
         Equivalent capacitances = C_x + 1 / ((1 / C_T) + (1 / C_F))
         ```
 
-### 自电容測量模型 (Self-Capacitance)
+### 自電容測量模型 (Self-Capacitance)
 
-![Self-Capacitance_Sensor_Model_Static](Self-Capacitance_Sensor_Model_Static.jpg)
-![Self-Capacitance_Sensor_Model_Dyn](Self-Capacitance_Sensor_Model_Dyn.jpg)
++ 靜態場景
+    > 無任何接觸
+
+    ![Self-Capacitance_Sensor_Model_Static](Self-Capacitance_Sensor_Model_Static.jpg)
+    
++ 動態場景
+    > 觸發 touch
+
+    ![Self-Capacitance_Sensor_Model_Dyn](Self-Capacitance_Sensor_Model_Dyn.jpg)
 
 
 # Reference
