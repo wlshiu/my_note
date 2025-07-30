@@ -8,7 +8,7 @@ Touch Key (自容式, Self-capacitance)
 ## Goertzel-Algo
 
 Goertzel-Algo 同時具備 Bandpass(濾波)與共振的效果
-> 對目標頻段做**共振**, 並 feedback 回 input, 當 input 減去前次 feedback 的資料, 達到**Bandpass**效果
+> 轉換到 Frequency-domain 並對目標頻段做**共振**, 同時 feedback 回 input, 由 input 減去前次 feedback 的資料, 達到**Bandpass**效果
 >> 因此 Goertzel-Algo 輸出波型會呈現喇叭狀震盪 (震幅從小到大)
 
 + Reference
@@ -20,6 +20,7 @@ Goertzel-Algo 同時具備 Bandpass(濾波)與共振的效果
 
 電容式觸控按鍵利用了電容值的變化來偵測是否有觸摸, 而 PWM(脈衝寬度調製) 則是用於控制電容值的變化, 並以此來實現觸摸感應和按鍵的觸發
 > PWM 的頻率, 則影響著觸摸檢測的**靈敏度**和**響應速度**
+
 
 + 電容觸控按鍵的原理
 
@@ -65,7 +66,11 @@ Goertzel-Algo 同時具備 Bandpass(濾波)與共振的效果
             > 過高的頻率, 可能受到其他電磁干擾的影響
 
 
+    - 板端有很多干擾源會影響電容, 造成頻率響應而充放電, 因此電容值會震盪.
+        > 將電容值轉換到 Frequency-domain, 可觀察到不同頻率的響應狀況
 
+        1. 產生特定頻率 PWM, 與電容產生頻率響應來充放電, 對電容震盪轉換到 Frequency-domain,
+        並觀察特定頻率的響應狀態, 藉此來提高 touch 的靈敏(其他頻率視為干擾)
 
 
 

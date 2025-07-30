@@ -84,6 +84,9 @@ Support TSC (Touch Sensing  Controller)
 
     ![Self-Capacitance_Sensor_Model_Dyn](Self-Capacitance_Sensor_Model_Dyn.jpg)
 
+### 電荷轉移原理概述
+
+![STM_Charge_Transfer](STM_Charge_Transfer.jpg)
 
 # Reference
 
