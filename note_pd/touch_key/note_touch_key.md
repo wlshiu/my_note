@@ -5,6 +5,22 @@ Touch Key (自容式, Self-capacitance)
 > 當用戶用手指或其他導電物體觸摸螢幕時, 手指和電極之間會形成一個電容.
 手指上的電荷會與電極上的電荷相互吸引, 導致一部分電荷從電極轉移到手指上
 
+## 電荷轉移 (Charge Transfer)
+
+以裝水來比喻, 用水去裝滿小容器(充電), 然後以固定周期將小容器裡的水, 倒空(轉移)到大容器中. <br>
+填滿大容器所需的次數, 對應了小容器每個周期下, 其平均裝水量的大小(電容值);
+若填滿大容器的次數發生變化, 代表小容器在每個週期的平均裝水量發生了變化
+> 當發生觸控時, 小容器的平均電容值(裝水量)發生改變
+
+![Charge_Transfer_Concept_Self](Charge_Transfer_Concept_Self.jpg)
+
++ Self Mode (Touch-Key)
+    > 人體的寄生電容會耦合到外部電容上, 使按鍵的最終`電容值變大`, 充電放電週期變長,
+    進而在單位時間內, 偵測到的飽和電壓次數會比校正值少
+
++ Reference
+    - Design-Guide_CapTIvate_trade_Technology_Guide_1.83.00.08.pdf
+
 ## Goertzel-Algo
 
 Goertzel-Algo 同時具備 Bandpass(濾波)與共振的效果
