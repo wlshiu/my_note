@@ -399,6 +399,63 @@ Open On-Chip Debugger
 > write memory (SRAM) address as <word-value>
 >> 寫 flash 需要使用 Flash-loader
 
+
+### `write_memory <address> <width> <{ data }> ['phys']`
+
+寫入連續資料串到 memory
+> + `<address>`: target memory address
+> + `<width>`  : access bit size, can be 8, 16, 32 or 64
+> + `<{data}>` : 連續資料串,用 `{}` 包裹
+
+```
+> write_memory 0x20000000 32 { 0xdeadbeef 0x00230500 }
+```
+
+### `read_memory <address> <width> <count> ['phys']`
+
+連續讀取資料
+> + `<address>`: target memory address
+> + `<width>`  : access bit size, can be 8, 16, 32 or 64
+> + `<count>`  : 讀幾筆資料
+
+```
+> read_memory 0x20000000 32 2
+0xdeadbeef 0x230500
+```
+
+
+### `reg`
+
+list all support CPU-Registers name
+
+```
+> reg
+===== RISC-V Registers
+(0) zero (/32)
+(1) ra (/32)
+(2) sp (/32)
+(3) gp (/32)
+...
+```
+
+### `set_reg <{ dict }>`
+
+寫值到指定的 CPU-Registers
+
+```
+> set_reg {pc 0 sp 0x1000}
+```
+
+### `get_reg [-force] <{ list }>`
+
+讀取 CPU-Registers 值
+> + `[-force]`: 強制直接讀取 physical registers 的值 (bypassing any caching)
+
+```
+> get_reg { pc sp}
+pc 0x000035ee sp 0x00000000
+```
+
 ### `flash bank <name> <driver> <base> <size> <chip_width> <bus_width> <target> [driver_options]`
 
 定義一個 Flash controller
