@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\OpenMsys2Here]
+@="Open msys2 here"
+"Icon"="D:\\portable_tool\\msys64\\msys2.ico"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\OpenMsys2Here\command]
+@="D:\\portable_tool\\msys64\\msys2_shell.cmd -msys2 -here"
