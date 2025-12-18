@@ -182,6 +182,26 @@ static float InvSqrt(float x)
     x = x*(1.5f-xhalf*x*x);
     return x;
 }
+
+
+/**
+ *  min <= x < max
+ */
+static inline bool
+_check_range_normal(int x, int max, int min)
+{
+    return (x >= min && x < max);
+}
+
+static inline bool
+_check_range_fast(int x, int max, int min)
+{
+    return ((uint32_t)(x - min) < (uint32_t)(max - min));
+}
+
+#define CHECK_RANGE_FAST(__val__, __max__, __min__)  \
+            ((uint32_t)((int32_t)(__val__) - (int32_t)(__min__)) < (uint32_t)((int32_t)(__max__) - (int32_t)(__min__)))
+
 ///////////////////////////////////////////////////
 
 int main()
