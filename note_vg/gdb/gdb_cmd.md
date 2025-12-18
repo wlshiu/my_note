@@ -7,6 +7,27 @@ GDB_CMD
 
 [GDB條件斷點(condition命令)詳解](http://c.biancheng.net/view/8255.html)
 
++ 編譯時加上 `-g3` 參數, 可使用 SVD 產生的 register macro definitions
+
+    - access a register
+
+        ```
+        (gdb) set GPIOB->ODR = 0xFF
+        (gdb) p/x GPIOB->ODR
+        ```
+
+    - display all fields of a register
+
+        ```
+        (gdb) p/x GPIOB->ODR_b
+        ```
+
+    - display all registers
+
+        ```
+        (gdb) p/x *GPIOB
+        ```
+
 + help (h)
     > 顯示指令簡短說明.例:help breakpoint
 
