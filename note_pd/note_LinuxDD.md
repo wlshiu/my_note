@@ -131,7 +131,7 @@ Linux Device Driver with (Qemu)
 
         ```
         $ cd <busybox_root>/_install
-        $ mkdir -pv {sbin,dev,etc/init.d,usr/{bin,sbin}}
+        $ mkdir -pv {sbin,dev,etc/init.d,usr/{bin,sbin,lib},proc}
 
         $ cd dev/
         $ sudo mknod console c 5 1
@@ -218,7 +218,7 @@ Linux Device Driver with (Qemu)
         ```
 
 
-+ Creat the fully directory architecture of rootfs
++ Creat the fully directory architecture of rootfs (?)
 
     ```
     $ cd <busybox_dir>/_install
@@ -429,6 +429,120 @@ Linux Device Driver with (Qemu)
 
 # Device Driver
 
+Use `dmesg` command to display the log message
+
+## My device driver
+
+### Basic methods of a device module
+> 建立一個模組, 只需提供 `init` 跟 `exit` 兩個 functions 就可以了;
+>> 將 `init`/`exit` 註冊成, 這個這個模組插入的初始化, 與卸載的清理函數
+
++ Create files
+
+    ```
+    $ ls
+    hello.c  Makefile
+    ```
+
+    - source c code
+
+        ```
+        #include <linux/module.h>
+        #include <linux/kernel.h>
+        #include <linux/init.h>
+
+        static int __init hello_drv_init(void)
+        {
+            pr_info("Initializing HELLO module.\n");
+            return 0;
+        }
+
+        static void __exit hello_drv_exit(void)
+        {
+            pr_info("Unloading HELLO module.\n");
+            return;
+        }
+
+        module_init(hello_drv_init);
+        module_exit(hello_drv_exit);
+
+        MODULE_LICENSE("GPL");
+        ```
+
+    - makefile for a device module
+
+        ```
+        # Set target architecture and cross-compiler prefix
+        ARCH ?= arm
+        CROSS_COMPILE ?= arm-linux-gnueabi-
+
+        # ARCH ?= arm64
+        # CROSS_COMPILE ?= aarch64-none-linux-gnu-
+
+        #
+        # Path to the kernel source directory
+        # Replace with the actual path to your kernel source
+        #
+        KERNEL_DIR := $HOME/linux-4.19.319/
+
+        obj-m += hello.o
+
+        all:
+            $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_DIR) M=$(PWD) modules
+
+        clean:
+            $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KERNEL_DIR) M=$(PWD) clean
+
+        ```
+
++ Compile a device module
+    > The `.ko` file is the target to insert to kernel
+
+    ```
+    $ make
+    $ ls -al
+        total 208
+        drwxrwxr-x 3  15:26 .
+        drwxrwxr-x 4  14:19 ..
+        -rw-r--r-- 1  15:09 hello.c
+        -rw-rw-r-- 1  15:26 hello.ko
+        -rw-rw-r-- 1  15:26 .hello.ko.cmd
+        -rw-rw-r-- 1  15:26 hello.mod.c
+        -rw-rw-r-- 1  15:26 hello.mod.o
+        -rw-rw-r-- 1  15:26 .hello.mod.o.cmd
+        -rw-rw-r-- 1  15:26 hello.o
+        -rw-rw-r-- 1  15:26 .hello.o.cmd
+        -rw-r--r-- 1  15:07 Makefile
+        -rw-rw-r-- 1  15:26 modules.order
+        -rw-rw-r-- 1  15:26 Module.symvers
+        drwxrwxr-x 2  15:26 .tmp_versions
+    ```
+
+
++ Put `.ko` file to `rootfs`
+
+    ```
+    $ sudo mount rootfs.img rootfs_tmp      # as above ext4 img
+    $ cd rootfs_tmp
+    $ sudo mkdir -p ./usr/lib/modules
+    $ sudo cp -f .../hello.ko ./usr/lib/modules
+    $ sudo umount rootfs_tmp
+    ```
+
++ Insert/Remove a device module to/form kernel (with Qemu)
+
+    ```
+    /usr/lib/modules # insmod ./hello.ko
+        [  139.600608] hello: loading out-of-tree module taints kernel.
+        [  139.631224] Initializing HELLO module.
+    /usr/lib/modules #
+    /usr/lib/modules # rmmod hello
+        [  299.409253] Unloading HELLO module.
+
+    ```
+
+### Advance methods of a device module
+
 
 
 # Reference
@@ -437,4 +551,6 @@ Linux Device Driver with (Qemu)
 + [Running 64- and 32-bit RISC-V Linux on QEMU — RISC-V - Getting Started Guide](https://risc-v-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html)
 + [qemu搭建arm64 linux kernel环境 - 知乎](https://zhuanlan.zhihu.com/p/667525514)
 + [*QEMU搭建Linux实验环境 - 知乎](https://zhuanlan.zhihu.com/p/612120655)
++ [iT 邦幫忙:Day 9：暖身運動 - 媽！我在核心裡面了！第一個核心模組](https://ithelp.ithome.com.tw/m/articles/10243519)
 
++ [使用 GDB 對 QEMU/vng 進行除錯](https://hackmd.io/@RinHizakura/SJ8GXUPJ6#%E4%BD%BF%E7%94%A8-GDB-%E5%B0%8D-QEMUvng-%E9%80%B2%E8%A1%8C%E9%99%A4%E9%8C%AF)
