@@ -543,6 +543,372 @@ Use `dmesg` command to display the log message
 
 ### Advance methods of a device module
 
++ Device type
+
+    - Character Device
+        > 當成 A stream (sequential access) of bytes
+
+        1. 又叫做 `raw device`, 只要是直接存取硬體的裝置, 都可歸到此類
+            > `disk` 也可能屬於這種 character device, 只是他們的 raw 是一個 sector
+
+        1. `raw device` 直接寫入寫出, 故 **DMA 是直接把資料搬到 user-space buffer**,
+            > 所以要讓 user-space buffer 一直在 ram 裡面, 並且要注意 device 要有能對 buffer 寫入的權限
+
+        1. 另外對 `raw device` 的 `poll/select` 沒意義, 因為沒有中間的 kernel buffer,
+            只要有資料自然會發起 interrupt, 所以 `select/poll` 在 `raw device` 使用 `selture()` 將永遠回傳 true
+
+
+    - Block Device
+        > 一次拿一個 block, 像 Storage device (e.g. HDD, SSD, Flash, ...etc.)
+
+        1. 中間有 kernel buffer (linux 叫做 page-cache) 的存取, 速度比較快
+
+    - Network Devices
+        > 網路相關的裝置
+
+    - MTD Devices
+        > 直接存取 nand interface,
+        >> 但通常 flash 會透過 Flash Translation Layer 模擬成 block devic
+
+    - Loop Device
+        > 將檔案當作 block device
+
+
++ An example of character-Device
+
+    - Kernel space
+
+        ```c
+        #include <linux/module.h>
+        #include <linux/kernel.h>
+        #include <linux/init.h>
+        #include <linux/fs.h>
+        #include <linux/uaccess.h>
+
+        #define HELLO_DEV_MAJOR     200
+        #define HELLO_DEV_NAME      "hello_dev"
+
+        static char g_kernel_buf[30] = {0};
+
+        static int hello_dev_open(struct inode *inode, struct file *filp)
+        {
+            pr_info("[%s: %d]\n", __func__, __LINE__);
+            return 0;
+        }
+
+        static int hello_dev_release(struct inode *inode, struct file *filp)
+        {
+            pr_info("[%s: %d]\n", __func__, __LINE__);
+            return 0;
+        }
+
+        static ssize_t hello_dev_read(struct file *filp, char __user *buffer, size_t length, loff_t *offset)
+        {
+            int     ret = 0;
+
+            pr_info("[%s: %d]\n", __func__, __LINE__);
+
+            length = (sizeof(g_kernel_buf) < length) ? sizeof(g_kernel_buf) : length;
+
+            ret = copy_to_user(buffer, g_kernel_buf, length);
+            if( ret == 0 ) {
+                pr_info("kernel send data: %s\n", g_kernel_buf);
+            } else {
+                /* error handle */
+            }
+            return length;
+
+        }
+
+        static ssize_t hello_dev_write(struct file *filp, const char __user *buffer, size_t length, loff_t *offset)
+        {
+            int     ret = 0;
+
+            pr_info("[%s: %d]\n", __func__, __LINE__);
+
+            length = (sizeof(g_kernel_buf) < length) ? sizeof(g_kernel_buf) : length;
+
+            ret = copy_from_user(g_kernel_buf, buffer, length);
+            if( ret == 0 ) {
+                pr_info("kernel receive data: %s\n", g_kernel_buf);
+            } else {
+                /* error handle */
+            }
+
+            return length;
+        }
+
+        static struct file_operations   hello_dev_fops = {
+            .owner   = THIS_MODULE,
+            .open    = hello_dev_open,
+            .release = hello_dev_release,
+            .read    = hello_dev_read,
+            .write   = hello_dev_write,
+        };
+
+        static int __init hello_drv_init(void)
+        {
+            int     ret = 0;
+
+            pr_info("Initializing HELLO module.\n");
+
+            ret = register_chrdev(HELLO_DEV_MAJOR, HELLO_DEV_NAME, &hello_dev_fops);
+            if (ret < 0) {
+                printk(KERN_INFO "HELLO init failed!\n");
+            }
+            return 0;
+        }
+
+        static void __exit hello_drv_exit(void)
+        {
+            pr_info("Unloading HELLO module.\n");
+            unregister_chrdev(HELLO_DEV_MAJOR, HELLO_DEV_NAME);
+            return;
+        }
+
+        module_init(hello_drv_init);
+        module_exit(hello_drv_exit);
+
+        MODULE_LICENSE("GPL");
+        ```
+
+    - User space
+        > It should copy the libs from toolchain to rootfs...
+
+        1. Create the c codes of App
+
+            ```c
+            #include <linux/module.h>
+            #include <linux/kernel.h>
+            #include <linux/init.h>
+            #include <linux/fs.h>
+            #include <linux/uaccess.h>
+
+            #define HELLO_DEV_MAJOR     200
+            #define HELLO_DEV_NAME      "hello_dev"
+
+            static char g_kernel_buf[30] = {0};
+
+            static int hello_dev_open(struct inode *inode, struct file *filp)
+            {
+                pr_info("[%s: %d]\n", __func__, __LINE__);
+                return 0;
+            }
+
+            static int hello_dev_release(struct inode *inode, struct file *filp)
+            {
+                pr_info("[%s: %d]\n", __func__, __LINE__);
+                return 0;
+            }
+
+            static ssize_t hello_dev_read(struct file *filp, char __user *buffer, size_t length, loff_t *offset)
+            {
+                int     ret = 0;
+
+                pr_info("[%s: %d] len= %d\n", __func__, __LINE__, length);
+
+                length = (sizeof(g_kernel_buf) < length) ? sizeof(g_kernel_buf) : length;
+
+                ret = copy_to_user(buffer, g_kernel_buf, length);
+                if( ret == 0 ) {
+                    pr_info("kernel send data: %s\n", g_kernel_buf);
+                } else {
+                    /* error handle */
+                }
+
+                return 0;
+            }
+
+            static ssize_t hello_dev_write(struct file *filp, const char __user *buffer, size_t length, loff_t *offset)
+            {
+                int     ret = 0;
+
+                pr_info("[%s: %d]\n", __func__, __LINE__);
+
+                length = (sizeof(g_kernel_buf) < length) ? sizeof(g_kernel_buf) : length;
+
+                ret = copy_from_user(g_kernel_buf, buffer, length);
+                if( ret == 0 ) {
+                    pr_info("kernel receive data: %s\n", g_kernel_buf);
+                } else {
+                    /* error handle */
+                }
+
+                return length;
+            }
+
+            static struct file_operations   hello_dev_fops = {
+                .owner   = THIS_MODULE,
+                .open    = hello_dev_open,
+                .release = hello_dev_release,
+                .read    = hello_dev_read,
+                .write   = hello_dev_write,
+            };
+
+            static int __init hello_drv_init(void)
+            {
+                int     ret = 0;
+
+                pr_info("Initializing HELLO module.\n");
+
+                ret = register_chrdev(HELLO_DEV_MAJOR, HELLO_DEV_NAME, &hello_dev_fops);
+                if (ret < 0) {
+                    printk(KERN_INFO "HELLO init failed!\n");
+                }
+                return 0;
+            }
+
+            static void __exit hello_drv_exit(void)
+            {
+                pr_info("Unloading HELLO module.\n");
+                unregister_chrdev(HELLO_DEV_MAJOR, HELLO_DEV_NAME);
+                return;
+            }
+
+            module_init(hello_drv_init);
+            module_exit(hello_drv_exit);
+
+            MODULE_LICENSE("GPL");
+            ```
+
+        1. Create makefile for App layer of linux
+
+            ```
+            # Set target architecture and cross-compiler prefix
+            ARCH := arm
+            CROSS_COMPILE := arm-linux-gnueabi-
+
+            # ARCH ?= arm64
+            # CROSS_COMPILE ?= aarch64-none-linux-gnu-
+
+
+            RED="\033[0;31m"
+            GREEN="\033[0;32m"
+            LIGHT_GREEN="\033[1;32m"
+            YELLOW="\033[0;33m"
+            LIGHT_YELLOW="\033[1;33m"
+            GREY="\033[0;37m"
+            BWHITE="\033[1;37m"
+            MAGENTA="\033[1;35m"
+            CYAN="\033[1;36m"
+            NC="\033[0m"
+
+
+            # target
+            TARGET = test_char_dev
+            OUT = out
+
+            DEBUG = y
+            OPT =
+            ifeq ("$(D)","0")
+                DEBUG = n
+                OPT = -O2
+            endif
+
+            V ?= $(VERBOSE)
+            ifeq ("$(V)","1")
+                Q =
+            else
+                Q = @
+            endif
+
+            PLATFORM = $(shell uname -o)
+            ifeq ("$(findstring Linux, $(PLATFORM))","Linux")
+                ECHO = echo
+                TUI = -tui
+            else
+                ECHO = echo -e
+                TUI =
+            endif
+
+            export OUT Q DEBUG OPT ECHO TUI
+
+            # Define the cross-compiler prefix
+            CC = $(CROSS_COMPILE)gcc
+            AS = $(CROSS_COMPILE)gcc -x assembler-with-cpp
+            SZ = $(CROSS_COMPILE)size
+            GDB= $(CROSS_COMPILE)gdb
+            OBJCOPY = $(CROSS_COMPILE)objcopy
+            OBJDUMP = $(CROSS_COMPILE)objdump
+
+            # Project settings
+            C_SOURCES = \
+                test_char_dev.c
+
+            CFLAGS = $(OPT) -Wall -fdata-sections -ffunction-sections -fno-common
+
+            OBJECTS = $(addprefix $(OUT)/,$(notdir $(C_SOURCES:.c=.o)))
+            vpath %.c $(sort $(dir $(C_SOURCES)))
+
+            LDFLAGS = \
+                -Wl,-gc-sections \
+                -Wl,--check-sections \
+                -Wl,--start-group \
+                -lgcc -lm \
+                -Wl,--end-group
+
+
+            .PHONY: all clean
+
+            all: $(OUT) $(OUT)/$(TARGET)
+
+            $(OUT)/$(TARGET): $(OBJECTS)
+                $(Q)$(CC) $(LDFLAGS) $^ -o $@
+                @$(ECHO) $(GREEN)"\nSize $(OUT)/$(TARGET)" $(NC)
+                $(Q)$(SZ) $@
+
+
+            $(OUT)/%.o: %.c Makefile | $(OUT)
+                @$(ECHO) "  CC $@"
+                $(Q)$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(OUT)/$(notdir $(<:.c=.lst)) $< -o $@
+
+            $(OUT):
+                @mkdir -p $@
+
+            clean:
+                @$(ECHO) "  Remove $(OUT)\n"
+                @rm -fr $(OUT)
+
+            ```
+
+    - Execute module
+
+        ```
+        / # insmod usr/lib/modules/hello.ko
+            [   16.605207] hello: loading out-of-tree module taints kernel.
+            [   16.617320] Initializing HELLO module.
+        / # mknod /dev/hello c 200 0
+        / # ls /dev/
+            hello  pts
+        ```
+
+        1. `mknod`
+            > create a node of device
+            > + `c` means character-Device
+            > + `200` is the Device MAJOR number which is defined in device driver (`HELLO_DEV_MAJOR in hello.c`)
+            > + `0` is the the Device Sub-MAJOR number which is defined in device driver (`hello.c`)
+
+        1. Read from device
+
+            ```
+            / # cat /dev/hello
+                [   81.026688] [hello_dev_open: 14]
+                [   81.031322] [hello_dev_read: 28] len= 4096
+                [   81.032852] kernel send data: 111
+                [   81.032852]
+                [   81.033813] [hello_dev_release: 20]
+            ```
+
+        1. Write to device
+
+            ```
+            / # echo "hiiii~" > /dev/hello
+                [   70.220697] [hello_dev_open: 14]
+                [   70.222468] [hello_dev_write: 46]
+                [   70.222668] kernel receive data: hiiii~
+                [   70.222668]
+                [   70.222863] [hello_dev_release: 20]
+            ```
 
 
 # Reference
@@ -552,5 +918,7 @@ Use `dmesg` command to display the log message
 + [qemu搭建arm64 linux kernel环境 - 知乎](https://zhuanlan.zhihu.com/p/667525514)
 + [*QEMU搭建Linux实验环境 - 知乎](https://zhuanlan.zhihu.com/p/612120655)
 + [iT 邦幫忙:Day 9：暖身運動 - 媽！我在核心裡面了！第一個核心模組](https://ithelp.ithome.com.tw/m/articles/10243519)
-
++ 正點原子【第四期】手把手教你學 Linux之驅動開發篇
+    - [[課程筆記]Linux Driver正點原子課程筆記3 - 我的第一個Linux驅動 - MeetonFriday](https://meetonfriday.com/posts/62f55520/)
+    - [[課程筆記]Linux Driver正點原子課程筆記4 - Led燈驅動實驗 - MeetonFriday](https://meetonfriday.com/posts/9aca0070/)
 + [使用 GDB 對 QEMU/vng 進行除錯](https://hackmd.io/@RinHizakura/SJ8GXUPJ6#%E4%BD%BF%E7%94%A8-GDB-%E5%B0%8D-QEMUvng-%E9%80%B2%E8%A1%8C%E9%99%A4%E9%8C%AF)
