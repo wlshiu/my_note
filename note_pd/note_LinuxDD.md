@@ -910,6 +910,7 @@ Use `dmesg` command to display the log message
                 [   70.222863] [hello_dev_release: 20]
             ```
 
+## [Kernel-Module](note_kernel_module.md)
 
 # Reference
 
@@ -922,3 +923,4 @@ Use `dmesg` command to display the log message
     - [[課程筆記]Linux Driver正點原子課程筆記3 - 我的第一個Linux驅動 - MeetonFriday](https://meetonfriday.com/posts/62f55520/)
     - [[課程筆記]Linux Driver正點原子課程筆記4 - Led燈驅動實驗 - MeetonFriday](https://meetonfriday.com/posts/9aca0070/)
 + [使用 GDB 對 QEMU/vng 進行除錯](https://hackmd.io/@RinHizakura/SJ8GXUPJ6#%E4%BD%BF%E7%94%A8-GDB-%E5%B0%8D-QEMUvng-%E9%80%B2%E8%A1%8C%E9%99%A4%E9%8C%AF)
+
