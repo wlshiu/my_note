@@ -26,9 +26,14 @@ Linux Kernel 的 framework 中, 對 hardware 與 driver 定義為 device, device
     - 配對成功後, 就會使用 `probe method` 來做 driver 的初始化
 
 
+`Linux Kernel v3.9` 以後開始支援 Device-Tree (源於 Open-Firmware), 用來描述 Hardware 相關資訊, 
+而 device driver 利用 `of_xxx` APIs, 來取得 Device-Tree 的資料, 藉此來配對 device 及 device-driver
+
+
 ## [Device-Tree](../note_vg/linux/note_decive_tree.md)
 
 + [device-tree demo](./note_device_tree_demo.md)
+
 
 ## edu device (todo)
 

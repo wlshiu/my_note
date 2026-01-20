@@ -107,6 +107,9 @@ $ sudo apt-get install lubuntu-desktop
 
     $ sudo apt -y install ssh openssh-server
     $ sudo apt -y install python-pip python3-pip
+
+    $ sudo apt -y install gdb-multiarch
+    $ sudo apt -y install libmpc-dev libgmp-dev libmpfr-dev
     ```
     - svn
         > In RTK, it only support `subversion 1.6.17`
@@ -783,71 +786,67 @@ $ sudo apt-get install lubuntu-desktop
     - VirtualBox
 
         1. set network `Adapter 2`
-            a. Atteched to: Bridged Adapter
-            a. name: MAC Bridge Miniport
-                > In windows PC side
-                > + Control Panel -> Network and Sharing Center ->  Change adapter settings
-                > + select both your physical adapter and *VirtualBox Host-Only Network*
-                > + right key of mouse, press *Bridge Connections*
-                > + Windows will new a network bridge *MAC Bridge Miniport*
-            a. Adapter Type: Intel .... (82540EM)
-            a. Promiscuous Mode: Allow All (maybe 'Deny' also work)
-            a. Reflash MAC address
+            > + Atteched to: Bridged Adapter
+            > + name: MAC Bridge Miniport
+            >> In windows PC side
+            >> + Control Panel => Network and Sharing Center =>  Change adapter settings
+            >> + select both your physical adapter and **VirtualBox Host-Only Network**
+            >> + right key of mouse, press **Bridge Connections**
+            >> + Windows will new a network bridge **MAC Bridge Miniport**
+            > + Adapter Type: Intel .... (82540EM)
+            > + Promiscuous Mode: Allow All (maybe 'Deny' also work)
+            > + Reflash MAC address
 
     - lunbuntu 16.04
 
         1. install
+
             ```
             $ apt-get install nfs-kernel-server nfs-common portmap
             ```
 
         1. setup
 
-            a. set network interface
+            > set network interface
+            > + manual setting
+            >> ```
+            >> $ sudo ifconfig enp0s8 192.168.0.100 network 255.255.255.0
+            >> ```
 
-                g. manual setting
+            > + edit /etc/network/interface for auto enable
+            >> ```
+            >> # Add network interface setting
+            >> auto enp0s8
+            >> iface enp0s8 inet static    # static ip
+            >> address 192.168.0.100       # it should be in the same domain with PCBA
+            >> netmask 255.255.255.0
+            >> network 192.168.1.1
+            >> broadcast 192.168.0.255
+            >> gateway 192.168.0.254       # it should be in the same domain with PCBA
+            >>
+            >>
+            >> # rtk route setting
+            >> up route add default gw 172.22.49.254 metric 1
+            >> dns-nameservers 172.21.1.10 172.21.1.11
+            >> dns-search realtek.com.tw
+            >> ```
 
-                    ```
-                    $ sudo ifconfig enp0s8 192.168.0.100 network 255.255.255.0
-                    ```
+            > + edit /etc/exports
+            >> ```
+            >> # Allow connection from any (*)
+            >> /home/username/my_nfs *(rw,sync,no_root_squash,no_subtree_check)
+            >>
+            >>   # update export info
+            >> $ exportfs -ra
+            >> ```
 
-                g. edit /etc/network/interface for auto enable
-
-                    ```
-                    # Add network interface setting
-                    auto enp0s8
-                    iface enp0s8 inet static    # static ip
-                    address 192.168.0.100       # it should be in the same domain with PCBA
-                    netmask 255.255.255.0
-                    network 192.168.1.1
-                    broadcast 192.168.0.255
-                    gateway 192.168.0.254       # it should be in the same domain with PCBA
-
-
-                    # rtk route setting
-                    up route add default gw 172.22.49.254 metric 1
-                    dns-nameservers 172.21.1.10 172.21.1.11
-                    dns-search realtek.com.tw
-                    ```
-
-            a. edit /etc/exports
-
-                ```
-                # Allow connection from any (*)
-                /home/username/my_nfs *(rw,sync,no_root_squash,no_subtree_check)
-
-                  # update export info
-                $ exportfs -ra
-                ```
-
-            a. Set the share folder
-
-                ```
-                $ mkdir ~/my_nfs
-
-                  # it is available by anyone.
-                $ sudo chmod 777 ~/my_nfs
-                ```
+            > + Set the share folder
+            >> ```
+            >> $ mkdir ~/my_nfs
+            >>
+            >>   # it is available by anyone.
+            >> $ sudo chmod 777 ~/my_nfs
+            >> ```
 
         1. enable NFS
 
@@ -857,14 +856,14 @@ $ sudo apt-get install lubuntu-desktop
 
         1. test
 
-            a. local test
+            > local test
+            >> ```
+            >> $ sudo mkdir /tmp/test_nfs
+            >> $ sudo chmod 777 /tmp/test_nfs
+            >> $ sudo mount -t nfs -o nolock localhost:/home/username/my_nfs/ /tmp/test_nfs
+            >> $ ls /tmp/test_nfs
+            >> ```
 
-                ```
-                $ sudo mkdir /tmp/test_nfs
-                $ sudo chmod 777 /tmp/test_nfs
-                $ sudo mount -t nfs -o nolock localhost:/home/username/my_nfs/ /tmp/test_nfs
-                $ ls /tmp/test_nfs
-                ```
     - PCBA
         1. manual setting
 

@@ -1,18 +1,18 @@
 Device Tree Demo [[Back](./note_kernel_module.md#device-tree)]
 ---
 
-Device Tree 起源於 `Open Firmware IEEE 1275 (OF)`, 將許多硬體的細節, 直接透過 Device Tree 傳遞給 Linux kernel,
+Device-Tree 起源於 `Open Firmware IEEE 1275 (OF)`, 將許多硬體的細節, 直接透過 Device-Tree 傳遞給 Linux kernel,
 而不再需要在 kernel 中進行大量的 hard-code 編碼.
 
-Device Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 和 property 組成, 而 node 本身可包含 sub-node.
+Device-Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 和 property 組成, 而 node 本身可包含 sub-node.
 所謂 property, 其實就是成對出現的 name 和 value
 
-通常由 `.dts` (Device Tree Source) 檔案, 以文字方式對系統設備樹進行描述, 經過 Device Tree Compiler (DTC),
-將 dts 檔案轉換成二進位檔案 `.dtb` (Binary Device Tree Blob).
+通常由 `.dts` (Device-Tree Source) 檔案, 以文字方式對系統設備樹進行描述, 經過 Device-Tree Compiler (DTC),
+將 dts 檔案轉換成二進位檔案 `.dtb` (Binary Device-Tree Blob).
 
 `.dtb` 檔案可由 Linux kernel 解析, 因此就可在不改動 Linux kernel 的情況下, 實現不同的平台狀況
 
-在 kernel 中查看 Device Tree
+在 kernel 中查看 Device-Tree
 > 可對 `/proc/device-tree` 用 `ls`, `cat`, `tree` 等 commands 來查看
 
 ```
@@ -40,7 +40,7 @@ Device Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 
 
 # 基本概念
 
-為了幫助理解 device tree 的用法, 我們從一個簡單的電腦開始,  手把手建立一個 device tree 來描述它
+為了幫助理解 Device-Tree 的用法, 我們從一個簡單的電腦開始,  手把手建立一個 Device-Tree 來描述它
 
 ## Symbol definition
 
@@ -105,7 +105,7 @@ Device Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 
 
 ### 初始結構
 
-第一步, 先建構一個電腦的基本架構, 也就是一個有效 Device Tree 的最小架構
+第一步, 先建構一個電腦的基本架構, 也就是一個有效 Device-Tree 的最小架構
 > 在這一步, 要唯一地標誌這台計算機
 
 ```
@@ -156,7 +156,7 @@ Device Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 
 
 ### Device
 
-系統中的**每個 device 皆由 Device Tree 的一個 node 來表示**, 接下來將為 Device Tree 新增 device node
+系統中的**每個 device 皆由 Device-Tree 的一個 node 來表示**, 接下來將為 Device-Tree 新增 device node
 > 在我們講到如何定址和處理中斷之前, 暫時將新節點置空
 
 ```
@@ -210,13 +210,13 @@ Device Tree 是一種描述硬體的資料結構, 由一系列被命名的 node 
 
 ```
 
-在上面的 Device Tree 中, 系統中的 device node 已經加入進來, tree 的層次結構, 反映了 devices 如何連接到系統中.
+在上面的 Device-Tree 中, 系統中的 device node 已經加入進來, tree 的層次結構, 反映了 devices 如何連接到系統中.
 外部匯流排上的 devices, 就是 `external-bus node` 的 sub-node, i2c devices 是 i2c-bus node (`i2c@...`) 的 sub-node.
 
 總的來說, 層次結構表現的是**從 CPU 觀點來看的系統視圖**
 > 目前這棵樹依然是無效的, 它缺少關於 devices 之間的連接資訊, 稍後將添加這些數據
 
-Device Tree 中應注意, `每個 device node 都有一個 compatible 屬性`.
+Device-Tree 中應注意, `每個 device node 都有一個 compatible 屬性`.
 
 flash node (`flash@...`) 的 compatible 屬性有兩個字串, 請閱讀下一節以了解更多內容
 > 先前提到的, node 命名應反映 device 的類型, 而不是特定型號
@@ -243,7 +243,7 @@ chip vendor 總是會改變並打破你的通配符假設, 到時候再想修改
 
 ### address
 
-可定址的 device 使用下列屬性, 將 address 資訊編碼進 Device Tree
+可定址的 device 使用下列屬性, 將 address 資訊編碼進 Device-Tree
 
 > + `reg`
 > + `#address-cells`
@@ -261,7 +261,7 @@ chip vendor 總是會改變並打破你的通配符假設, 到時候再想修改
 既然 `address` 和 `length` 欄位是大小可變的變量, parents node 的 `#address-cells` 和 `#size-cells` 屬性, 用來說明各個 sub-node 有多少個 cells
 > 換句話說, 正確解釋一個 sub-node 的 `reg` 屬性, 需要 parents node 的 `#address-cells` 和 `#size-cells` 值
 
-下面從 CPU 開始, 新增 address 屬性到範例 Device Tree
+下面從 CPU 開始, 新增 address 屬性到範例 Device-Tree
 
 + CPU Address
 
@@ -345,7 +345,7 @@ chip vendor 總是會改變並打破你的通配符假設, 到時候再想修改
 
     在下面的範例中, 每個 address 值是 1 cell (32-bits), 每個的 length 值也為 1 cell, 這在 32 位元系統中是非常典型的.
 
-    64-bits 平台可以在 Device Tree 中, 使用 `#address-cells = <2>;` 和 `#size-cells = <2>;`, 來實現 64-bits addressing
+    64-bits 平台可以在 Device-Tree 中, 使用 `#address-cells = <2>;` 和 `#size-cells = <2>;`, 來實現 64-bits addressing
 
     ```
     / {
@@ -651,7 +651,7 @@ dcsr: dcsr@f00000000 {
 + `interrupt-parent`
     > device node 的屬性, 包含一個指向該 device 所連接中斷控制器的 Handle.
 
-    - 為了使 Device Tree 可以反應實際 physical layer 的層級關係
+    - 為了使 Device-Tree 可以反應實際 physical layer 的層級關係
         > 有些 SoC 會將外部中斷, 先連接到一個中斷子系統 (擴充中斷數量), 再統一連接到一個 GIC (Global Interrupt Controller);
         也有 SoC 直接將外部中斷接到 GIC
 
@@ -760,46 +760,38 @@ dcsr: dcsr@f00000000 {
 
 ### MISC node
 
-
 + Alias node
 
-特定節點通常透過完整路徑引用, 例如/external-bus/ethernet@0,0,
-但當使用者真正想要知道的是哪個設備是 eth0 時, 這很不具有易讀性,
-別名節點可分配一個短的 alias 給一個完整的設備路徑。
-例如：
-```
-aliases {
-    ethernet0 = &ethernet0;
-    serial0 = &serial0;
-};
-```
+    特定節點通常透過完整路徑引用, 例如`/external-bus/ethernet@0,0`,
+    但當 user 真正想知道是哪個 device 是 `eth0` 時, 這很不具有易讀性,
+    Alias node 可分配一個短的 alias 給一個完整的 device path
 
-分配標識符給設備時, 使用別名是受作業系統歡迎的。
+    例如:
+    ```
+    aliases {
+        ethernet0 = &ethernet0;
+        serial0 = &serial0;
+    };
+    ```
 
-這裡使用了一個新的語法 property = &label; 該語法指定透過標籤引用的完整節點路徑為一個字串屬性。
-這與 phandle = <&label>;不同, 它是把一個 pHandle 值插入到一個 cell。
+    分配標識符給 device 時, 使用別名是受 OS 歡迎的
 
-+ chosen node
+    這裡使用了一個新的語法 `property = &label;`, 該語法指定透過 label 引用的完整節點路徑, 為一個字串屬性.
+    這與 `phandle = <&label>;` 不同, 它是把一個 pHandle 值插入到一個 cell
 
-可選節點並不代表真正的設備, 而是作為韌體和作業系統之間傳遞資料的地方, 例如啟動參數。
-選擇節點中的資料並不代表硬體。
-通常情況下, 選擇節點在 DTS 來源檔案中為空, 並在開機時填充。
-在我們的範例係統中, 韌體可以新增以下選擇節點
++ Chosen node
 
-```
-chosen {
-    bootargs = "root=/dev/nfs rw nfsroot=192.168.1.1 console=ttyS0,115200";
-}
+    chosen node 並不代表真正的 device, 而是作為 F/w 和 OS 之間傳遞資料的地方, 例如啟動參數.
 
-```
+    通常情況下, chosen node 在 DTS  source 檔案中為空, 並在開機時填bj4
 
+    在範例中, F/w 可以新增以下 chosen node
 
-
-
-
-
-
-
+    ```
+    chosen {
+        bootargs = "root=/dev/nfs rw nfsroot=192.168.1.1 console=ttyS0,115200";
+    }
+    ```
 
 
 

@@ -15,6 +15,7 @@ Linux Device Driver with (Qemu)
         > + [arm-linux-gnueabi](https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/)
         > + [gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu](https://developer.arm.com/-/media/files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz?rev=1cb9c51b94f54940bdcccd791451cec3&revision=1cb9c51b-94f5-4940-bdcc-cd791451cec3&hash=448E26250A9F882931F13D985ADA554B)
         > + `$ sudo apt install gcc-arm-linux-gnueabihf`
+        >> download [toolchain arm-linux-gnueabi](https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabi/)
 
 + environment varables
 
@@ -93,6 +94,9 @@ Linux Device Driver with (Qemu)
     ```
 
 ### Create root file-system (rootfs)
+
+> Use `minirootfs` of `my_zb_test` to auto-create
+>> copy the customer directories or files to `minirootfs/skel`
 
 + Relation of rootfs and linux kernel
     > `rootfs` is the first mounted file-system of kernel
@@ -217,6 +221,14 @@ Linux Device Driver with (Qemu)
         $ sudo umount rootfs_tmp
         ```
 
+    - Add lib for user application
+        > copy libs (`*.so`)from toolchain
+
+        ```
+        $ cd  .../gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabi/arm-linux-gnueabi/libc
+        $ sudo mkdir -p .../busybox/_install/lib
+        $ sudo cp *so* .../busybox/_install/lib
+        ```
 
 + Creat the fully directory architecture of rootfs (?)
 
@@ -426,6 +438,32 @@ Linux Device Driver with (Qemu)
                 -nographic \
                 -append "root=/dev/ram0 ramdisk_size=4096 console=ttyAMA0"  # set root location
             ```
+
+        1. boot from SD
+
+            ```
+            $ qemu-system-arm               \
+                -M vexpress-a9              \
+                -m 256M                     \
+                -kernel arch/arm/boot/zImage \
+                -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
+                -nographic                  \
+                -append "root=/dev/mmcblk0 rw console=ttyAMA0" \
+                -sd rootfs.ext4
+            ```
+
+    - Debug kernel with Qemu
+
+        1. qemu GDB-Server
+
+        1. GDB client
+
+
++ Attach rootfs to kernel with NFS (Network File System)
+
+
+    - Reference
+        1. [Qemu搭建ARM vexpress开发环境(三)----NFS网络根文件系统 - 简书](https://www.jianshu.com/p/cf46f7225db6)
 
 # Device Driver
 
@@ -909,6 +947,27 @@ Use `dmesg` command to display the log message
                 [   70.222668]
                 [   70.222863] [hello_dev_release: 20]
             ```
+
+        1. execute `test_char_dev` on user-space
+
+            ```
+            / # test_char_dev /dev/hello
+                @ Open device
+                [hello_dev_open: 14]
+                @ Read data
+                [hello_dev_read: 28] len= 50
+                kernel send data:
+                @ Write data
+                [hello_dev_write: 46]
+                kernel receive data:
+                @ Close device
+                [hello_dev_release: 20]
+            / #
+            ```
+
+## Debug device driver
+
+
 
 ## [Kernel-Module](note_kernel_module.md)
 
