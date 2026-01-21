@@ -864,6 +864,81 @@ $ sudo apt-get install lubuntu-desktop
             >> $ ls /tmp/test_nfs
             >> ```
 
+    - lunbuntu 22.04
+
+        1. dependency
+
+            ```
+            $ sudo apt install bridge-utils nfs-kernel-server
+            $ sudo apt install uml-utilities
+            ```
+
+        1. Configure NFS server
+
+            ```
+            $ mdkir -p /home/nfs
+            $ sudo chmod 777 /home/nfs
+            $ sudo vi /etc/exports
+
+                # add
+                /home/nfs *(rw,sync,no_subtree_check,all_squash,insecure,anonuid=1000,anongid=1000)
+
+            $ sudo vi /etc/default/nfs-kernel-server
+                # add to support NFS v2/v3/v4
+                RPCSVCGSSDOPTS="--nfs-version 2,3,4 --debug --syslog"
+
+            ```
+
+            ```
+            ### start NFS server
+            $ sudo /etc/init.d/rpcbind restart
+            $ sudo /etc/init.d/nfs-kernel-server restart
+            $ sudo exportfs
+                /home/nfs       <world>
+
+            ### check NFS configuration
+            $ sudo showmount -e
+                Export list for wl-virtualbox:
+                /home/nfs *
+            ```
+
+            ```
+            $ sudo mount -t nfs 127.0.1.1:/home/nfs /mnt    # 在 local 臨時掛載測試
+            $ df -h | grep nfs                              # 查看掛載結果, 存在就表示正常
+                127.0.1.1:/home/nfs  196G   15G  172G   8% /mnt
+            $ sudo umount /mnt                              # 卸載
+            ```
+
+        1. Create a virtual (temporary) network interface (tap0)
+
+            ```
+            $ sudo tunctl -t tap0 -u $USER
+            $ sudo ifconfig tap0 192.168.1.1
+
+            $ ifconfig
+                enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+                        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+                        inet6 fe80::a044:8023:692:c11d  prefixlen 64  scopeid 0x20<link>
+                        ether 08:00:27:30:71:66  txqueuelen 1000  (Ethernet)
+                            ...
+
+                enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+                        inet 192.168.56.103  netmask 255.255.255.0  broadcast 192.168.56.255
+                        inet6 fe80::824a:ebdd:6c00:a351  prefixlen 64  scopeid 0x20<link>
+                        ether 08:00:27:07:3e:51  txqueuelen 1000  (Ethernet)
+                            ...
+
+                lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+                        inet 127.0.0.1  netmask 255.0.0.0
+                        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+                            ...
+
+                tap0: flags=4355<UP,BROADCAST,PROMISC,MULTICAST>  mtu 1500
+                        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
+                        inet6 fe80::64ab:99ff:fe97:1ee3  prefixlen 64  scopeid 0x20<link>
+                            ...
+            ```
+
     - PCBA
         1. manual setting
 

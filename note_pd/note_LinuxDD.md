@@ -298,6 +298,59 @@ Linux Device Driver with (Qemu)
                     (4096)  Default RAM disk size (kbytes) (NEW)
             ```
 
+        1. Disable floating pointer
+
+            ```
+            > Floating point emulation
+                    *** At least one emulation must be selected ***
+                [ ] VFP-format floating point maths
+            ```
+        1. Kernel debug feature
+
+        ```
+         > Kernel hacking > Compile-time checks and compiler options
+            [*] Compile the kernel with debug info
+            [ ]   Reduce debugging information
+            [ ]   Produce split debuginfo in .dwo files
+            [*]   Generate dwarf4 debuginfo
+            [*]   Provide GDB scripts for kernel debugging
+            [*] Enable __must_check logic
+            (1024) Warn for stack frames larger than (needs gcc 4.4)
+            [ ] Strip assembler-generated symbols during link
+            [*] Generate readable assembler code
+
+         > Kernel hacking
+            [*] KGDB: kernel debugger  --->
+        ```
+
+
+        1. Enable NFS feature
+
+        ```
+        > Networking support > Networking options
+            [*] TCP/IP networking
+            [ ]   IP: multicasting
+            [ ]   IP: advanced router
+            [*]   IP: kernel level autoconfiguration
+            [*]     IP: DHCP support
+            [*]     IP: BOOTP support
+        ```
+
+        1. Enable NFS version
+
+            ```
+            > File systems > Network File Systems
+                --- Network File Systems
+                <*>   NFS client support
+                <*>     NFS client support for NFS version 2
+                <*>     NFS client support for NFS version 3
+                [*]       NFS client support for the NFSv3 ACL protocol extension
+                <*>     NFS client support for NFS version 4
+                [ ]     Provide swap over NFS support
+                [*]   NFS client support for NFSv4.1
+                [*]     NFS client support for NFSv4.2
+            ```
+
 
 + Build kernel
 
@@ -439,7 +492,7 @@ Linux Device Driver with (Qemu)
                 -append "root=/dev/ram0 ramdisk_size=4096 console=ttyAMA0"  # set root location
             ```
 
-        1. boot from SD
+        1. boot from SD (?)
 
             ```
             $ qemu-system-arm               \
@@ -982,4 +1035,6 @@ Use `dmesg` command to display the log message
     - [[課程筆記]Linux Driver正點原子課程筆記3 - 我的第一個Linux驅動 - MeetonFriday](https://meetonfriday.com/posts/62f55520/)
     - [[課程筆記]Linux Driver正點原子課程筆記4 - Led燈驅動實驗 - MeetonFriday](https://meetonfriday.com/posts/9aca0070/)
 + [使用 GDB 對 QEMU/vng 進行除錯](https://hackmd.io/@RinHizakura/SJ8GXUPJ6#%E4%BD%BF%E7%94%A8-GDB-%E5%B0%8D-QEMUvng-%E9%80%B2%E8%A1%8C%E9%99%A4%E9%8C%AF)
+
++ [The kernel's command-line parameters — The Linux Kernel documentation](https://www.kernel.org/doc/html/v4.14/admin-guide/kernel-parameters.html)
 
