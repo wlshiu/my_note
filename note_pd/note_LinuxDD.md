@@ -307,34 +307,33 @@ Linux Device Driver with (Qemu)
             ```
         1. Kernel debug feature
 
-        ```
-         > Kernel hacking > Compile-time checks and compiler options
-            [*] Compile the kernel with debug info
-            [ ]   Reduce debugging information
-            [ ]   Produce split debuginfo in .dwo files
-            [*]   Generate dwarf4 debuginfo
-            [*]   Provide GDB scripts for kernel debugging
-            [*] Enable __must_check logic
-            (1024) Warn for stack frames larger than (needs gcc 4.4)
-            [ ] Strip assembler-generated symbols during link
-            [*] Generate readable assembler code
+            ```
+             > Kernel hacking > Compile-time checks and compiler options
+                [*] Compile the kernel with debug info
+                [ ]   Reduce debugging information
+                [ ]   Produce split debuginfo in .dwo files
+                [*]   Generate dwarf4 debuginfo
+                [*]   Provide GDB scripts for kernel debugging
+                [*] Enable __must_check logic
+                (1024) Warn for stack frames larger than (needs gcc 4.4)
+                [ ] Strip assembler-generated symbols during link
+                [*] Generate readable assembler code
 
-         > Kernel hacking
-            [*] KGDB: kernel debugger  --->
-        ```
-
+             > Kernel hacking
+                [*] KGDB: kernel debugger  --->
+            ```
 
         1. Enable NFS feature
 
-        ```
-        > Networking support > Networking options
-            [*] TCP/IP networking
-            [ ]   IP: multicasting
-            [ ]   IP: advanced router
-            [*]   IP: kernel level autoconfiguration
-            [*]     IP: DHCP support
-            [*]     IP: BOOTP support
-        ```
+            ```
+            > Networking support > Networking options
+                [*] TCP/IP networking
+                [ ]   IP: multicasting
+                [ ]   IP: advanced router
+                [*]   IP: kernel level autoconfiguration
+                [*]     IP: DHCP support
+                [*]     IP: BOOTP support
+            ```
 
         1. Enable NFS version
 
@@ -350,7 +349,6 @@ Linux Device Driver with (Qemu)
                 [*]   NFS client support for NFSv4.1
                 [*]     NFS client support for NFSv4.2
             ```
-
 
 + Build kernel
 
@@ -514,8 +512,192 @@ Linux Device Driver with (Qemu)
 
 + Attach rootfs to kernel with NFS (Network File System)
 
+    - Configure NFS server on Host side
+        > lunbuntu 22.04 with VirtualBox v7.0
+
+        1. dependency
+
+            ```
+            $ sudo apt install nfs-kernel-server
+            ```
+
+        1. Configure NFS server
+
+            ```
+            $ mdkir -p /home/nfs
+            $ sudo chmod 777 /home/nfs
+            $ sudo vi /etc/exports
+
+                # add
+                /home/nfs *(rw,sync,no_subtree_check,all_squash,insecure,anonuid=1000,anongid=1000)
+
+            $ sudo vi /etc/default/nfs-kernel-server
+                # add to support NFS v2/v3/v4
+                RPCSVCGSSDOPTS="--nfs-version 2,3,4 --debug --syslog"
+
+            ```
+
+            ```
+            ### start NFS server
+            $ sudo /etc/init.d/rpcbind restart
+            $ sudo /etc/init.d/nfs-kernel-server restart
+            $ sudo exportfs
+                /home/nfs       <world>
+
+            ### check NFS configuration
+            $ sudo showmount -e
+                Export list for wl-virtualbox:
+                /home/nfs *
+            ```
+
+            ```
+            $ sudo mount -t nfs 127.0.1.1:/home/nfs /mnt    # 在 local 臨時掛載測試
+            $ df -h | grep nfs                              # 查看掛載結果, 存在就表示正常
+                127.0.1.1:/home/nfs  196G   15G  172G   8% /mnt
+            $ sudo umount /mnt                              # 卸載
+            ```
+    - Configure NFS server on Guest side
+        > base on `kernel 4.19.319` with `busybox v1.36.1` (盡量維持 defconfig, 尚未了解 NFS 需要那些 features)
+        >> Use **dhcp** to get the ip-address from host dhcp server
+
+        1. busbox configuration
+            > Enable `udhcpc` cmd
+            >> defconfig will involve `udhcpc` cmd
+
+
+        1. kernel configuration
+
+            > + Enable NFS version supportment
+            >
+            > ```
+            > File System -> Network File Systems -> NFS client support for NFS version 4
+            >
+            > --- Network File Systems
+            >  <*>   NFS client support
+            >  <*>     NFS client support for NFS version 2
+            >  <*>     NFS client support for NFS version 3
+            >  [ ]       NFS client support for the NFSv3 ACL protocol extension
+            >  <*>     NFS client support for NFS version 4
+            >  [*]     Provide swap over NFS support
+            >  [*]   NFS client support for NFSv4.1
+            >  [*]     NFS client support for NFSv4.2
+            >  (kernel.org) NFSv4.1 Implementation ID Domain (NEW)
+            >  [*]     NFSv4.1 client support for migration
+            >  [*]   Root file system on NFS
+            > ```
+
+            > + Enable DHCP
+            > ```
+            > > Networking support > Networking options
+            >     [*] TCP/IP networking
+            >     [ ]   IP: multicasting
+            >     [ ]   IP: advanced router
+            >     [*]   IP: kernel level autoconfiguration
+            >     [*]     IP: DHCP support
+            >     [*]
+            > ```
+
+        1. use `minirootfs` to generate rootfs
+            > udhcpc will execute `usr/share/udhcpc/default.script`
+
+            ```
+            $ cd .../minirootfs/skel/
+            $ mkdir -p usr/share/udhcpc
+            $ cd usr/share/udhcpc
+            $ cp <busybox_src>/examples/udhcp/simple.script ./default.script
+            ```
+
+        1. execute qemu
+
+            ```
+            $ qemu-system-arm \
+                -M vexpress-a9 \
+                -m 128M \
+                -kernel arch/arm/boot/zImage \
+                -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
+                -initrd initramfs.cpio.gz \
+                -nographic \
+                -append "rdinit=/linuxrc console=ttyAMA0"
+
+            ```
+
+        1. Setup manually kernel (Guest-OS)
+            > It should add script to `/etc/init.d/rcS`
+
+            ```
+            / # ifconfig
+                eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+                          inet addr:192.168.1.3  Bcast:192.168.1.255  Mask:255.255.255.0
+                          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+                            ...
+
+                lo        Link encap:Local Loopback
+                          inet addr:127.0.0.1  Mask:255.0.0.0
+                          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+                          ...
+
+            / # ifconfig eth0 0.0.0.0 up
+            / # ifconfig
+                eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+                          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+                          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+                          ...
+
+                lo        Link encap:Local Loopback
+                          inet addr:127.0.0.1  Mask:255.0.0.0
+                          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+                          ...
+            / # udhcpc -i eth0
+                udhcpc: started, v1.36.1
+                Clearing IP addresses on eth0, upping it
+                udhcpc: broadcasting discover
+                udhcpc: broadcasting select for 10.0.2.15, server 10.0.2.2
+                udhcpc: lease of 10.0.2.15 obtained from 10.0.2.2, lease time 86400
+                Setting IP address 10.0.2.15 on eth0
+                Deleting routers
+                route: SIOCDELRT: No such process
+                Adding router 10.0.2.2
+                Recreating /etc/resolv.conf
+                 Adding DNS server 10.0.2.3
+            / # ifconfig
+                eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+                          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+                          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+                          ...
+
+                lo        Link encap:Local Loopback
+                          inet addr:127.0.0.1  Mask:255.0.0.0
+                          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+                          ...
+
+            ```
+
+        1. Check Guest-OS links with Host-OS
+
+            ```
+            #
+            ## Check network connects successfully
+            ## Host ip: 192.168.56.101
+            #
+            / # ping 192.168.56.101
+                PING 192.168.56.101 (192.168.56.101): 56 data bytes
+                64 bytes from 192.168.56.101: seq=0 ttl=255 time=9.899 ms
+                64 bytes from 192.168.56.101: seq=1 ttl=255 time=9.365 ms
+                ^C
+                --- 192.168.56.101 ping statistics ---
+            ```
+
+        1. Mount the NFS server of Host-OS
+            > hook remote directory to local `/mnt`
+
+            ```
+            / # mount -t nfs -o nolock 192.168.56.101:/home/nfs /mnt
+            / # ls /mnt
+            ```
+
 
     - Reference
+        1. [使用Qemu通过NFS挂载共享文件夹调试Linux内核-开发者社区-阿里云](https://developer.aliyun.com/article/1599043)
         1. [Qemu搭建ARM vexpress开发环境(三)----NFS网络根文件系统 - 简书](https://www.jianshu.com/p/cf46f7225db6)
 
 # Device Driver

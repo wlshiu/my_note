@@ -869,8 +869,8 @@ $ sudo apt-get install lubuntu-desktop
         1. dependency
 
             ```
-            $ sudo apt install bridge-utils nfs-kernel-server
-            $ sudo apt install uml-utilities
+            $ sudo apt install nfs-kernel-server
+            $ sudo apt install bridge-utils uml-utilities   # maybe not necessary
             ```
 
         1. Configure NFS server
@@ -910,6 +910,7 @@ $ sudo apt-get install lubuntu-desktop
             ```
 
         1. Create a virtual (temporary) network interface (tap0)
+            > it is not necessary
 
             ```
             $ sudo tunctl -t tap0 -u $USER
