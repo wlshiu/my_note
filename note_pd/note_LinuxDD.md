@@ -512,13 +512,14 @@ Linux Device Driver with (Qemu)
 
 + Attach rootfs to kernel with NFS (Network File System)
 
-    - Configure NFS server on Host side
+    - Configure NFS server on Host-OS
         > lunbuntu 22.04 with VirtualBox v7.0
 
         1. dependency
 
             ```
             $ sudo apt install nfs-kernel-server
+            $ sudo apt install bridge-utils uml-utilities   # maybe not necessary
             ```
 
         1. Configure NFS server
@@ -541,6 +542,7 @@ Linux Device Driver with (Qemu)
             ### start NFS server
             $ sudo /etc/init.d/rpcbind restart
             $ sudo /etc/init.d/nfs-kernel-server restart
+
             $ sudo exportfs
                 /home/nfs       <world>
 
@@ -556,7 +558,330 @@ Linux Device Driver with (Qemu)
                 127.0.1.1:/home/nfs  196G   15G  172G   8% /mnt
             $ sudo umount /mnt                              # 卸載
             ```
-    - Configure NFS server on Guest side
+
+        1. Create a `tap-device` (virtual network interface)
+
+            ```
+            $ sudo ip tuntap add dev tap0 mode tap
+            $ sudo ip link set dev tap0 up
+            $ sudo ip address add dev tap0 192.168.1.1/16   # set tap ip-address
+
+            $ ip addr
+            1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+                link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+                inet 127.0.0.1/8 scope host lo
+                   valid_lft forever preferred_lft forever
+                inet6 ::1/128 scope host
+                   valid_lft forever preferred_lft forever
+            2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 000
+                link/ether 08:00:27:12:4d:ae brd ff:ff:ff:ff:ff:ff
+                inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic noprefixroute enp0s3
+                   valid_lft 69272sec preferred_lft 69272sec
+                inet6 fd17:625c:f037:2:2eb4:5406:23c4:5c74/64 scope global temporary dynamic
+                   valid_lft 86001sec preferred_lft 14001sec
+                inet6 fd17:625c:f037:2:18ae:2c0b:75e6:7fc3/64 scope global dynamic mngtmpaddr noprefixroute
+                   valid_lft 86001sec preferred_lft 14001sec
+                inet6 fe80::9709:3d8d:24ac:28e2/64 scope link noprefixroute
+                   valid_lft forever preferred_lft forever
+            3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 000
+                link/ether 08:00:27:30:c4:a9 brd ff:ff:ff:ff:ff:ff
+                inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic noprefixroute enp0s8
+                   valid_lft 571sec preferred_lft 571sec
+                inet6 fe80::7220:5560:ed27:bec8/64 scope link noprefixroute
+                   valid_lft forever preferred_lft forever
+            4: tap0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qle 1000
+                link/ether f6:5e:c5:fe:1a:4a brd ff:ff:ff:ff:ff:ff
+                inet 192.168.1.1/16 scope global tap0
+                   valid_lft forever preferred_lft forever
+            ```
+
+    - Configure NFS server on Guest-OS (with tap-devide)
+        > + base on `kernel 4.19.319` with `busybox v1.36.1`
+        > + use ethernet driver `smsc911x`
+        > ```
+        > ...
+        > smsc911x 4e000000.ethernet eth0: SMSC911x/921x identified at 0x8c910000, IRQ: 22
+        > ```
+
+        1. kernel configuration
+            > `make vexpress_defconfig`
+
+            > + About NFS
+            > ```
+            > > Device Drivers > Remoteproc drivers
+            >     <*> Support for Remote Processor subsystem
+            > > Device Drivers > Rpmsg drivers
+            >     <*> RPMSG device interface
+            >     <*> Virtio RPMSG bus driver
+            > ```
+            >
+            > ```
+            > > Device Drivers > Network device support
+            >     --- Network device support
+            >     [*]   Network core driver support
+            >     < >     Bonding driver support
+            >     < >     Dummy net driver support
+            >     < >     EQL (serial line load balancing) support
+            >     < >     Ethernet team driver support  ----
+            >     < >     MAC-VLAN support
+            >     < >     Virtual eXtensible Local Area Network (VXLAN)
+            >     < >     Generic Network Virtualization Encapsulation
+            >     < >     GPRS Tunneling Protocol datapath (GTP-U)
+            >     < >     IEEE 802.1AE MAC-level encryption (MACsec)
+            >     < >     Network console logging support
+            >     <*>     Universal TUN/TAP device driver support
+            >
+            > > Device Drivers > Network device support > Ethernet driver support
+            >     [*]   SMC (SMSC)/Western Digital devices
+            >     <*>     SMC 91C9x/91C1xxx support
+            >     < >     SMSC LAN911[5678] support
+            >     <*>     SMSC LAN911x/LAN921x families embedded ethernet support
+            > ```
+            >
+            > ```
+            > > File systems > Network File Systems
+            >     --- Network File Systems
+            >     <*>   NFS client support
+            >     <*>     NFS client support for NFS version 2
+            >     <*>     NFS client support for NFS version 3
+            >     [ ]       NFS client support for the NFSv3 ACL protocol extension
+            >     <*>     NFS client support for NFS version 4
+            >     [*]     Provide swap over NFS support
+            >     [*]   NFS client support for NFSv4.1
+            >     [*]     NFS client support for NFSv4.2
+            >     (kernel.org) NFSv4.1 Implementation ID Domain
+            >     [*]     NFSv4.1 client support for migration
+            >     [*]   Root file system on NFS
+            >     [ ]   Use the legacy NFS DNS resolver
+            > ```
+            >
+
+            > + About kernel debug
+            > ```
+            > > Kernel hacking > Compile-time checks and compiler options
+            >     [*] Compile the kernel with debug info
+            >     [ ]   Reduce debugging information
+            >     [ ]   Produce split debuginfo in .dwo files
+            >     [*]   Generate dwarf4 debuginfo
+            >     [*]   Provide GDB scripts for kernel debugging
+            >     [*] Enable __must_check logic
+            >     (1024) Warn for stack frames larger than (needs gcc 4.4)
+            >     [ ] Strip assembler-generated symbols during link
+            >     [*] Generate readable assembler code
+            >     [ ] Enable unused/obsolete exported symbols
+            > ```
+
+        1. Qemu start on Host-OS
+
+            ```
+            $ qemu-system-arm -M vexpress-a9 \
+               -smp 2 \
+               -m 128M \
+               -kernel arch/arm/boot/zImage \
+               -append "rdinit=/linuxrc console=ttyAMA0 loglevel=8" \
+               -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb \
+               -initrd initramfs.cpio.gz \
+               -net nic -net tap,ifname=tap0,script=no,downscript=no \
+               -nographic
+            ```
+
+        1. Network status of Guest-OS
+
+            ```
+            / # ifconfig
+            eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56
+                      inet addr:192.168.1.3  Bcast:192.168.1.255  Mask:255.255.255.0
+                      UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+                      RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+                      TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+                      collisions:0 txqueuelen:1000
+                      RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+                      Interrupt:22
+
+            lo        Link encap:Local Loopback
+                      inet addr:127.0.0.1  Mask:255.0.0.0
+                      UP LOOPBACK RUNNING  MTU:65536  Metric:1
+                      RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+                      TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+                      collisions:0 txqueuelen:1000
+                      RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+            / # ping 192.168.1.1
+                PING 192.168.1.1 (192.168.1.1): 56 data bytes
+                64 bytes from 192.168.1.1: seq=0 ttl=64 time=71.960 ms
+                64 bytes from 192.168.1.1: seq=1 ttl=64 time=1.855 ms
+                64 bytes from 192.168.1.1: seq=2 ttl=64 time=1.152 ms
+                ...
+            / #
+            ```
+
+        1. Mount NFS on Guest-OS
+
+            ```
+            / # mount -t nfs -o nolock 192.168.1.1:/home/nfs /mnt/rwfs
+            ```
+
+        1. kernel boot log
+
+            ```
+            Booting Linux on physical CPU 0x0
+            Linux version 4.19.319 (lub20wl@lub20wl-virtualbox) (gcc version 7.5.0 (Linaro GCC 7.5-2019.12)) 7 SMP Sun Jan 25 11:20:51 CST 2026
+            CPU: ARMv7 Processor [410fc090] revision 0 (ARMv7), cr=10c5387d
+            CPU: PIPT / VIPT nonaliasing data cache, VIPT nonaliasing instruction cache
+            OF: fdt: Machine model: V2P-CA9
+            Memory policy: Data cache writealloc
+            On node 0 totalpages: 32768
+              Normal zone: 256 pages used for memmap
+              Normal zone: 0 pages reserved
+              Normal zone: 32768 pages, LIFO batch:7
+            percpu: Embedded 16 pages/cpu s32908 r8192 d24436 u65536
+            pcpu-alloc: s32908 r8192 d24436 u65536 alloc=16*4096
+            pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3
+            Built 1 zonelists, mobility grouping on.  Total pages: 32512
+            Kernel command line: rdinit=/linuxrc console=ttyAMA0 loglevel=8
+            log_buf_len individual max cpu contribution: 4096 bytes
+            log_buf_len total cpu_extra contributions: 12288 bytes
+            log_buf_len min size: 16384 bytes
+            log_buf_len: 32768 bytes
+            early log buf free: 15164(92%)
+            Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+            Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+            Memory: 114504K/131072K available (6144K kernel code, 473K rwdata, 1292K rodata, 1024K init, 146Kbss, 16568K reserved, 0K cma-reserved)
+            Virtual kernel memory layout:
+                vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+                fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+                vmalloc : 0x88800000 - 0xff800000   (1904 MB)
+                lowmem  : 0x80000000 - 0x88000000   ( 128 MB)
+                modules : 0x7f000000 - 0x80000000   (  16 MB)
+                  .text : 0x(ptrval) - 0x(ptrval)   (7136 kB)
+                  .init : 0x(ptrval) - 0x(ptrval)   (1024 kB)
+                  .data : 0x(ptrval) - 0x(ptrval)   ( 474 kB)
+                   .bss : 0x(ptrval) - 0x(ptrval)   ( 147 kB)
+            SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+            rcu: Hierarchical RCU implementation.
+            rcu:    RCU event tracing is enabled.
+            rcu:    RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=4.
+            rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+            NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+            L2C: platform modifies aux control register: 0x02020000 -> 0x02420000
+            L2C: DT/platform modifies aux control register: 0x02020000 -> 0x02420000
+            L2C-310 enabling early BRESP for Cortex-A9
+            L2C-310 full line of zeros enabled for Cortex-A9
+            L2C-310 dynamic clock gating disabled, standby mode disabled
+            L2C-310 cache controller enabled, 8 ways, 128 kB
+            L2C-310: CACHE_ID 0x410000c8, AUX_CTRL 0x46420001
+            sched_clock: 32 bits at 24MHz, resolution 41ns, wraps every 89478484971ns
+            clocksource: arm,sp804: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275 ns
+            smp_twd: clock not found -2
+            Console: colour dummy device 80x30
+            Calibrating local timer... 103.46MHz.
+            Calibrating delay loop... 652.08 BogoMIPS (lpj=3260416)
+            CPU: Testing write buffer coherency: ok
+            CPU0: Spectre v2: using BPIALL workaround
+            pid_max: default: 32768 minimum: 301
+            Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+            Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+            CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+            Setting up static identity map for 0x60100000 - 0x60100060
+            rcu: Hierarchical SRCU implementation.
+            smp: Bringing up secondary CPUs ...
+            CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+            CPU1: Spectre v2: using BPIALL workaround
+            CPU2: failed to boot: -38
+            CPU3: failed to boot: -38
+            smp: Brought up 1 node, 2 CPUs
+            SMP: Total of 2 processors activated (1337.75 BogoMIPS).
+            CPU: All CPU(s) started in SVC mode.
+            devtmpfs: initialized
+            clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+            futex hash table entries: 1024 (order: 4, 65536 bytes)
+            NET: Registered protocol family 16
+            DMA: preallocated 256 KiB pool for atomic coherent allocations
+            cpuidle: using governor ladder
+            hw-breakpoint: debug architecture 0x4 unsupported.
+            Serial: AMBA PL011 UART driver
+            10009000.uart: ttyAMA0 at MMIO 0x10009000 (irq = 29, base_baud = 0) is a PL011 rev1
+            console [ttyAMA0] enabled
+            1000a000.uart: ttyAMA1 at MMIO 0x1000a000 (irq = 30, base_baud = 0) is a PL011 rev1
+            1000b000.uart: ttyAMA2 at MMIO 0x1000b000 (irq = 31, base_baud = 0) is a PL011 rev1
+            1000c000.uart: ttyAMA3 at MMIO 0x1000c000 (irq = 32, base_baud = 0) is a PL011 rev1
+            OF: amba_device_add() failed (-19) for /smb@4000000/motherboard/iofpga@7,00000000/wdt@f000
+            OF: amba_device_add() failed (-19) for /memory-controller@100e0000
+            OF: amba_device_add() failed (-19) for /memory-controller@100e1000
+            OF: amba_device_add() failed (-19) for /watchdog@100e5000
+            irq: type mismatch, failed to map hwirq-75 for interrupt-controller@1e001000!
+            SCSI subsystem initialized
+            usbcore: registered new interface driver usbfs
+            usbcore: registered new interface driver hub
+            usbcore: registered new device driver usb
+            clocksource: Switched to clocksource arm,sp804
+            NET: Registered protocol family 2
+            IP idents hash table entries: 2048 (order: 2, 16384 bytes)
+            tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 6144 bytes)
+            TCP established hash table entries: 1024 (order: 0, 4096 bytes)
+            TCP bind hash table entries: 1024 (order: 1, 8192 bytes)
+            TCP: Hash tables configured (established 1024 bind 1024)
+            UDP hash table entries: 256 (order: 1, 8192 bytes)
+            UDP-Lite hash table entries: 256 (order: 1, 8192 bytes)
+            NET: Registered protocol family 1
+            RPC: Registered named UNIX socket transport module.
+            RPC: Registered udp transport module.
+            RPC: Registered tcp transport module.
+            RPC: Registered tcp NFSv4.1 backchannel transport module.
+            Unpacking initramfs...
+            Freeing initrd memory: 5196K
+            hw perfevents: enabled with armv7_cortex_a9 PMU driver, 7 counters available
+            workingset: timestamp_bits=30 max_order=15 bucket_order=0
+            squashfs: version 4.0 (2009/01/31) Phillip Lougher
+            NFS: Registering the id_resolver key type
+            Key type id_resolver registered
+            Key type id_legacy registered
+            nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+            nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+            jffs2: version 2.2. (NAND) © 2001-2006 Red Hat, Inc.
+            9p: Installing v9fs 9p2000 file system support
+            io scheduler noop registered (default)
+            io scheduler mq-deadline registered
+            io scheduler kyber registered
+            40000000.flash: Found 2 x16 devices at 0x0 in 32-bit bank. Manufacturer ID 0x000000 Chip ID 0x00000
+            Intel/Sharp Extended Query Table at 0x0031
+            Using buffer write method
+            erase region 0: offset=0x0,size=0x40000,blocks=256
+            40000000.flash: Found 2 x16 devices at 0x0 in 32-bit bank. Manufacturer ID 0x000000 Chip ID 0x00000
+            Intel/Sharp Extended Query Table at 0x0031
+            Using buffer write method
+            erase region 0: offset=0x0,size=0x40000,blocks=256
+            Concatenating MTD devices:
+            (0): "40000000.flash"
+            (1): "40000000.flash"
+            into device "40000000.flash"
+            tun: Universal TUN/TAP device driver, 1.6
+            smsc911x 4e000000.ethernet: Linked as a consumer to regulator.1
+            smsc911x 4e000000.ethernet eth0: MAC Address: 52:54:00:12:34:56
+            usbcore: registered new interface driver usbhid
+            usbhid: USB HID core driver
+            oprofile: using arm/armv7-ca9
+            NET: Registered protocol family 17
+            9pnet: Installing 9P2000 support
+            Key type dns_resolver registered
+            Registering SWP/SWPB emulation handler
+            input: AT Raw Set 2 keyboard as /devices/platform/smb@4000000/smb@4000000:motherboard/smb@4000000motherboard:iofpga@7,00000000/10006000.kmi/serio0/input/input0
+            Freeing unused kernel memory: 1024K
+            Run /linuxrc as init process
+            Starting /etc/rc.d/init.d/S01filesystems
+            Mounting filesystems
+            Starting /etc/rc.d/init.d/S02network
+            Network up
+            Generic PHY 4e000000.ethernet-ffffffff:01: attached PHY driver [Generic PHY] (mii_bus:phy_addr=4e00000.ethernet-ffffffff:01, irq=POLL)
+            smsc911x 4e000000.ethernet eth0: SMSC911x/921x identified at 0x8c910000, IRQ: 22
+            Starting /etc/rc.d/init.d/S03hostname
+
+            Please press Enter to activate this console.
+            / #
+            ```
+
+
+    - Configure NFS server on Guest-OS (with DHCP, Guest-OS somethimes losses connection)
         > base on `kernel 4.19.319` with `busybox v1.36.1` (盡量維持 defconfig, 尚未了解 NFS 需要那些 features)
         >> Use **dhcp** to get the ip-address from host dhcp server
 

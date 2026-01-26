@@ -913,31 +913,36 @@ $ sudo apt-get install lubuntu-desktop
             > it is not necessary
 
             ```
-            $ sudo tunctl -t tap0 -u $USER
-            $ sudo ifconfig tap0 192.168.1.1
-
-            $ ifconfig
-                enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-                        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
-                        inet6 fe80::a044:8023:692:c11d  prefixlen 64  scopeid 0x20<link>
-                        ether 08:00:27:30:71:66  txqueuelen 1000  (Ethernet)
-                            ...
-
-                enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-                        inet 192.168.56.103  netmask 255.255.255.0  broadcast 192.168.56.255
-                        inet6 fe80::824a:ebdd:6c00:a351  prefixlen 64  scopeid 0x20<link>
-                        ether 08:00:27:07:3e:51  txqueuelen 1000  (Ethernet)
-                            ...
-
-                lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-                        inet 127.0.0.1  netmask 255.0.0.0
-                        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-                            ...
-
-                tap0: flags=4355<UP,BROADCAST,PROMISC,MULTICAST>  mtu 1500
-                        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
-                        inet6 fe80::64ab:99ff:fe97:1ee3  prefixlen 64  scopeid 0x20<link>
-                            ...
+            $ sudo ip tuntap add dev tap0 mode tap
+            $ sudo ip link set dev tap0 up
+            $ sudo ip address add dev tap0 192.168.1.1/16   # set tap ip-address
+            $ ip addr
+            1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+                link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+                inet 127.0.0.1/8 scope host lo
+                   valid_lft forever preferred_lft forever
+                inet6 ::1/128 scope host
+                   valid_lft forever preferred_lft forever
+            2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 000
+                link/ether 08:00:27:12:4d:ae brd ff:ff:ff:ff:ff:ff
+                inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic noprefixroute enp0s3
+                   valid_lft 69272sec preferred_lft 69272sec
+                inet6 fd17:625c:f037:2:2eb4:5406:23c4:5c74/64 scope global temporary dynamic
+                   valid_lft 86001sec preferred_lft 14001sec
+                inet6 fd17:625c:f037:2:18ae:2c0b:75e6:7fc3/64 scope global dynamic mngtmpaddr noprefixroute
+                   valid_lft 86001sec preferred_lft 14001sec
+                inet6 fe80::9709:3d8d:24ac:28e2/64 scope link noprefixroute
+                   valid_lft forever preferred_lft forever
+            3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 000
+                link/ether 08:00:27:30:c4:a9 brd ff:ff:ff:ff:ff:ff
+                inet 192.168.56.101/24 brd 192.168.56.255 scope global dynamic noprefixroute enp0s8
+                   valid_lft 571sec preferred_lft 571sec
+                inet6 fe80::7220:5560:ed27:bec8/64 scope link noprefixroute
+                   valid_lft forever preferred_lft forever
+            4: tap0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN group default qle 1000
+                link/ether f6:5e:c5:fe:1a:4a brd ff:ff:ff:ff:ff:ff
+                inet 192.168.1.1/16 scope global tap0
+                   valid_lft forever preferred_lft forever
             ```
 
     - PCBA
