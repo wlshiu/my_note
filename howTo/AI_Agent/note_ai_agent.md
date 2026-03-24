@@ -1,9 +1,27 @@
 note_ai_agent
 ---
 
+# Definitions
+
++ KV-cache (Key/Value)
+    > KV-cache 是 AI 模型的**短期記憶**, 它能讓模型記住之前的問題中,已經處理過的內容;
+    當用戶重啟之前的討論或提出新問題時,系統會依賴既有記憶回答,避免從頭重新計算整段對話歷史
+
+    > 簡單來說,到了 AI 推論階段時,會用到一種類似人腦的**注意力機制**,包括記住查詢中重要的部分(Key)以及上下文中重要部分(Value),以便回答提示
+
+    > 如果每處理一個新的 Token,模型必須針對先前處理過的所有 Token,並重新計算每個詞的重要性(Key 與 Value),來更新注意力權重,
+    但這樣的做法,如同學生每讀一個新句子,都要重新回顧整篇文章,過程會相當耗時
+
+    > 因此大語言模型加入了一種稱為`KV-cache`的機制,能將先前的重要資訊(Key 與 Value)儲存在記憶體中,
+    免去每次重新計算的成本,從而將 Token 處理與生成速度提升數個數量級。
+
+
+
+
 # Setup Local LLM module
 
 目前常見的佈署工具包含 `Ollama`, `vLLM` 以及 `llama.cpp`
+> + Ollama 使用 GPU 只認 Nvidia (需安裝 CUDA) 及 AMD (需安裝 ROCm)
 
 ### LLM佈署工具比較表
 
@@ -101,11 +119,14 @@ note_ai_agent
 | Qwen 2.5 Coder | 0.5B/1.5B/3B/7B/14B/32B | 提供最強大的開源程式碼生成、修復與推理能力 | 支援 `C/C++/C#/Java` <br> `Python/Shell/Lua` <br> `JavaScript//Go/Rust/TypeScript/PHP/Ruby/Swift` <br> `R/Julia/MATLAB` <br> `HTML/CSS/SQL/React` <br> `Haskell/Racket` <br> 等語言
 
 + 選模型的兩個原則
-    - 先從小模型開始。llama3.2(3B)是最好的入門選擇——下載快、記憶體需求低、回應速度快。它的品質雖然不如 8B 以上的模型,但足以讓你體驗本地 AI 的運作方式,也能處理簡單的問答和摘要任務。
+    - 先從小模型開始。llama3.2(3B)是最好的入門選擇——下載快、記憶體需求低、回應速度快。
+    它的品質雖然不如 8B 以上的模型,但足以讓你體驗本地 AI 的運作方式,也能處理簡單的問答和摘要任務。
 
-    - 根據語言需求選擇。如果你的主要用途是繁體中文,qwen2.5 是目前中文表現最好的開源模型之一。7B 版本在中文理解和生成上的品質,已經能應付多數日常場景。想了解各模型在不同任務上的詳細比較,可以參考OpenClaw AI 模型比較。
+    - 根據語言需求選擇。如果你的主要用途是繁體中文,qwen2.5 是目前中文表現最好的開源模型之一。
+    7B 版本在中文理解和生成上的品質,已經能應付多數日常場景。想了解各模型在不同任務上的詳細比較,可以參考OpenClaw AI 模型比較。
 
-
++ AI module banchmark
+    > [PinchBench - Success Rate Leaderboard](https://pinchbench.com/)
 
 
 # Reference
@@ -115,7 +136,7 @@ note_ai_agent
 + [iT 邦幫忙::從 RAG 到 Agentic RAG：30 天打造本機智慧檢索系統](https://ithelp.ithome.com.tw/m/users/20178499/ironman/8472)
     - [iT 邦幫忙::在地端運行 LLM：Ollama、vLLM 與 llama.cpp 比較以及ollama安裝](https://ithelp.ithome.com.tw/m/articles/10390964)
 
-
++ [LLM 記憶體用量縮減 20 倍！NVIDIA 超狂新技術 KVTC，靠「KV 快取」翻轉記憶體瓶頸 | TechNews 科技新報](https://technews.tw/2026/03/21/nvidia-kv-cache-transform-coding/)
 
 
 

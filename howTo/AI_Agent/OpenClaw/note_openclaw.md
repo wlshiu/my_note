@@ -1,6 +1,16 @@
 note_openclaw
 ---
 
+```
+OpenClaw:
+    +-------------+         +----------+                        +-------------------+
+    | Front-End   |         | OpenClaw |  local LLM server IP   |    Local LLM      |
+    | + CLI       | ------> |  Gateway | ---------------------> |      Server       |
+    | + WebUI     |         +----------+                        | (attach AI-Model) |
+    +-------------+                                             +-------------------+
+
+```
+
 # Prerequisites
 
 OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分組件(如本地模型支持)需要編譯環境
@@ -362,6 +372,99 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
                 Sessions: OK: ~/.openclaw/agents/main/sessions
             ```
 
+# Skills
+
+> configuration files `<user-name>/.openclaw/skills/`
+
++ Install skill
+
+    - Use front-end of OpenClaw
+
+        1. `install [技能名稱] skill`
+            > 自動從 [ClawHub](https://docs.openclaw.ai/tools/clawhub) 下載並引導您完成設定
+
+            ```WebUI
+            install calendar skill
+            ```
+
+   - CLI
+        > `<skill-slug>` 改為 skill-name 即可
+
+        ```
+        PS > openclaw skills install <skill-slug>
+        PS > openclaw skills search "calendar"
+        PS > openclaw skills update --all
+        ```
+
++ Un-Install skill
+
+    - Manually un-install
+        > Remove the directory of skill-name in `<user-name>/.openclaw/skills/`
+
+        ```
+        # e.g.
+        $ rm -rf ~/.openclaw/skills/google-calendar
+        ```
+
++ 停止 gateway
+
+    ```
+    PS > openclaw gateway stop
+    ```
+
++ 查詢 skill
+
+    - List installed skills
+
+        ```
+        PS > openclaw skills list --eligible
+        ```
+
+    - Info a skill
+
+        ```
+        PS > openclaw skills info <skill-name>
+        ```
+
+## Skills collection
+
+> + [GitHub - VoltAgent/awesome-openclaw-skills · GitHub](https://github.com/VoltAgent/awesome-openclaw-skills)
+> + [ClawHub - OpenClaw official skills](https://clawhub.ai/skills?sort=downloads)
+
++ `skill-vetter`
+    > 在安裝前對 ClawHub 上的技能做安全審計,識別潛在的惡意指示與風險
+
+    ```
+    PS > npx clawhub@latest install skill-vetter
+    ```
+
++ `find-skills`
+    > 讓 AI Agent 自己去 ClawHub 搜並安裝所需的 skill,解決**不知道用哪個工具**的痛點
+
+    ```
+    PS > npx clawhub@latest install find-skills
+    ```
+
++ `tavily-search`
+    > 讓 Agent 能聯網並實時搜索,查最新資訊、數據
+
+    ```
+    PS > npx clawhub@latest install tavily-search
+    ```
+
++ `summarize`
+    > 內容總結,快速消化,資訊降噪神器,快速提煉核心價值,支援格式有: 網頁、文件(Word/PDF)、郵件、長文、視訊字幕(需搭配 OCR 技能)
+
+    ```
+    PS > npx clawhub@latest install summarize
+    ```
+
++ `proactive-agent`
+    > 給 Agent 加**自主思考**能力,從**被動執行** 到**主動規劃**,加**主動性**和**自我迭代**能力,能記住歷史、優化行為、減少重複問,長期用會很香
+
+    ```
+    PS > clawhub install proactive-agent
+    ```
 
 # Reference
 
