@@ -32,12 +32,24 @@ note_ai_agent
     - `Evaluation Batch Size`
         > 內顯頻寬較低,批次太大會導致輸入處理(Prompt ingestion)變得很卡, 可調低到 256 或更低
 
-    - 確保 `GPU Offload` 數量盡量大,讓模型權重與 KV-cache 盡可能都留在顯存中,避免與系統記憶體（RAM）交換資料導致變慢
+    - 確保 `GPU Offload` 數量盡量大,讓模型權重與 KV-cache 盡可能都留在顯存中,避免與系統記憶體(DRAM)交換資料導致變慢
         > LLM model 內的運算層數,可放多少層在 GPU 中
+        >> 太大也可能會撐爆 VRAM
 
     - 調整上下文長度 `Context Length`
         > `Context Length` 會影響到 `KV-cache` 的用量, 太大會撐爆 VRAM
 
+    - Local LLM server
+
+        1. Local server configuration in LM-Studio
+
+            ![lm_studio_server](./OpenClaw/lm_studio_server.jpg)
+
+        1. Sever on Local Network
+            > + OFF: 使用 IP `127.0.0.1`, 僅限本機存取
+            > + ON: 自動偵測區網 IP, 可在區網服務 (會因外部防火牆而效能大幅降低)
+
+            ![lm_studio_local_net](./OpenClaw/lm_studio_local_net.jpg)
 
 
 

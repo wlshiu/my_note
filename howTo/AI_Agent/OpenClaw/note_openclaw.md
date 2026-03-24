@@ -17,7 +17,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 
 + Local LLM module with [LM-Studio](https://lmstudio.ai/download)
 
-    - LM-Studio enaables the local network feature
+    - LM-Studio enables the local network feature
 
         ![lm_studio_local_net](./lm_studio_local_net.jpg)
 
