@@ -21,6 +21,11 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 
         ![lm_studio_local_net](./lm_studio_local_net.jpg)
 
+        1. Sever on Local Network
+            > + OFF: 使用 IP `127.0.0.1`, 僅限本機存取
+            > + ON: 自動偵測區網 IP, 可在區網服務 (會因外部防火牆而效能大幅降低)
+
+
     - Local server configuration in LM-Studio
 
         ![lm_studio_server](./lm_studio_server.jpg)
