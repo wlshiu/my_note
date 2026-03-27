@@ -59,30 +59,39 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 + 目錄結構
     > + windows: `C:\Users\<user-name>\.openclaw`
 
-```
-    ~/.openclaw/
-    ├── openclaw.json           # 主設定檔
-    ├── openclaw.json.backup    # 自動備份
-    ├── credentials/            # 敏感憑證（自動加密）
-    │   ├── telegram.json
-    │   ├── whatsapp.json
-    │   └── discord.json
-    ├── workspace/             # Agent 工作區
-    │   ├── AGENTS.md          # 全域行為指導
-    │   ├── SOUL.md            # Agent 人格
-    │   ├── TOOLS.md           # 自訂工具說明
-    │   ├── USER.md            # 使用者資訊
-    │   └── skills/            # 技能目錄
-    │       ├── gmail/
-    │       │   └── SKILL.md
-    │       └── calendar/
-    │           └── SKILL.md
-    ├── sessions/              # 工作階段資料
-    ├── logs/                  # 日誌檔案
-    │   ├── gateway.log
-    │   └── agent.log
-    └── cache/                 # 快取資料
-```
+    ```
+        ~/.openclaw/
+        ├── openclaw.json           # 主設定檔
+        ├── openclaw.json.backup    # 自動備份
+        ├── credentials/            # 敏感憑證（自動加密）
+        │   ├── telegram.json
+        │   ├── whatsapp.json
+        │   └── discord.json
+        ├── workspace/             # Agent 工作區
+        │   ├── AGENTS.md          # 全域行為指導
+        │   ├── SOUL.md            # Agent 人格
+        │   ├── TOOLS.md           # 自訂工具說明
+        │   ├── USER.md            # 使用者資訊
+        │   └── skills/            # 技能目錄
+        │       ├── gmail/
+        │       │   └── SKILL.md
+        │       └── calendar/
+        │           └── SKILL.md
+        ├── sessions/              # 工作階段資料
+        ├── logs/                  # 日誌檔案
+        │   ├── gateway.log
+        │   └── agent.log
+        └── cache/                 # 快取資料
+    ```
+    - `dir: agents`
+        > 所有與 Agent的對話紀錄
+
+    - `dir: skills`
+        > 集中所有 skills of customer installed
+
+    - `dir: workspace`
+        > 單一個 Agent 的訊息紀錄, 若建立第二個 Agent, 則會再新增第二個 workspace folder
+
 
 + first execute openclaw
 
@@ -439,6 +448,10 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 > configuration files `<user-name>/.openclaw/skills/`
 
 + Install skill
+    > 安裝 ClawHub 命令列工具
+    > ```
+    > PS > npm install -g clawhub
+    > ```
 
     - Use front-end of OpenClaw
 
@@ -456,6 +469,17 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
         PS > openclaw skills install <skill-slug>
         PS > openclaw skills search "calendar"
         PS > openclaw skills update --all
+        ```
+
+    - external skills (Not clawhub)
+        > [vercel-labs/skills: The open agent skills tool - npx skills](https://github.com/vercel-labs/skills)
+
+        ```
+        # Direct path to a skill in a repo
+        PS > npx skills add https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines
+
+        # Full GitHub URL
+        PS > npx skills add https://github.com/vercel-labs/agent-skills
         ```
 
 + Un-Install skill
@@ -507,7 +531,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
     PS > npx clawhub@latest install find-skills
     ```
 
-+ `tavily-search`
++ `arun-8687/tavily-search` (Removed)
     > 讓 Agent 能聯網並實時搜索,查最新資訊、數據
 
     ```
@@ -533,7 +557,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 + [OpenClaw 安裝教學：打造你的個人 AI 助理（2026 更新）](https://vocus.cc/article/69a81841fd897800016d184d)
 + [Openclaw 本地安装 Windows 快速部署深度详细全程演示 超强爆火个人 AI 助理（原 clowdbot moltbot） - YouTube](https://www.youtube.com/watch?v=8DJfvK4QK5M)
 + [OpenClaw + LM Studio Tutorial: Free Local AI Setup (No OpenAI/Gemini/Claude) - YouTube](https://www.youtube.com/watch?v=Bn_hkXCwO-U)
-
++ [OpenClaw 完全新手指南 --- OpenClaw 完全新手指南](https://vercel-deploy-livid-nine.vercel.app/)
 
 
 
