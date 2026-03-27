@@ -56,6 +56,34 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
         $ curl -fsSL https://openclaw.ai/install.sh | bash
         ```
 
++ 目錄結構
+    > + windows: `C:\Users\<user-name>\.openclaw`
+
+```
+    ~/.openclaw/
+    ├── openclaw.json           # 主設定檔
+    ├── openclaw.json.backup    # 自動備份
+    ├── credentials/            # 敏感憑證（自動加密）
+    │   ├── telegram.json
+    │   ├── whatsapp.json
+    │   └── discord.json
+    ├── workspace/             # Agent 工作區
+    │   ├── AGENTS.md          # 全域行為指導
+    │   ├── SOUL.md            # Agent 人格
+    │   ├── TOOLS.md           # 自訂工具說明
+    │   ├── USER.md            # 使用者資訊
+    │   └── skills/            # 技能目錄
+    │       ├── gmail/
+    │       │   └── SKILL.md
+    │       └── calendar/
+    │           └── SKILL.md
+    ├── sessions/              # 工作階段資料
+    ├── logs/                  # 日誌檔案
+    │   ├── gateway.log
+    │   └── agent.log
+    └── cache/                 # 快取資料
+```
+
 + first execute openclaw
 
     ```
@@ -265,6 +293,26 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
     Opened in your browser. Keep that tab to control OpenClaw.
     ```
 
++ 啟動 Gateway
+
+    ```
+    # 前景執行並啟用詳細 log (除錯模式)
+    openclaw gateway --verbose
+
+    # 背景執行
+    openclaw gateway --daemon
+
+    # 指定連接埠
+    openclaw gateway --port 18790
+    ```
+
++ 更新 OpenClaw
+
+    ```
+    PS > npm update -g openclaw@latest
+    PS > openclaw --version
+    ```
+
 + Re-Configure
 
     - guide of quickstart
@@ -372,6 +420,20 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
                 Sessions: OK: ~/.openclaw/agents/main/sessions
             ```
 
++ Web UI
+    > 啟動 Gateway 後, 開啟 browser 存取 `http://127.0.0.1:18789`
+
++ Log Management
+
+    ```
+    # 查看工作階段歷史
+    PS > openclaw sessions list
+    PS > openclaw sessions show <session-id>
+
+    # 稽核命令執行
+    PS > grep "bash" ~/.openclaw/logs/gateway.log
+    ```
+
 # Skills
 
 > configuration files `<user-name>/.openclaw/skills/`
@@ -467,7 +529,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
     ```
 
 # Reference
-
++ [* Category: Openclaw-Series - 代碼與歷史](https://www.ququ123.top/zh-tw/categories/openclaw-series/)
 + [OpenClaw 安裝教學：打造你的個人 AI 助理（2026 更新）](https://vocus.cc/article/69a81841fd897800016d184d)
 + [Openclaw 本地安装 Windows 快速部署深度详细全程演示 超强爆火个人 AI 助理（原 clowdbot moltbot） - YouTube](https://www.youtube.com/watch?v=8DJfvK4QK5M)
 + [OpenClaw + LM Studio Tutorial: Free Local AI Setup (No OpenAI/Gemini/Claude) - YouTube](https://www.youtube.com/watch?v=Bn_hkXCwO-U)
