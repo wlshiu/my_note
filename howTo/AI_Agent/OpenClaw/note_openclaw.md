@@ -1,6 +1,18 @@
 note_openclaw
 ---
 
+因為 AI LLM model 是金魚腦 (記憶容量只有 context-length),
+一但長時間運作, 就很容易超過腦容量限制, 進而發生不可預期的思維, e.g. 幻覺(AI hallucination)
+
+OpenClaw 的 Agent 則定位為`可長時間且在某個範圍內, 符合預期的運作` (可幫我做 routine 事務的助理).
+
+因此為了結合 `AI LLM model` 和 `OpenClaw Agent`,
+就像電影`我的失憶女友`, 需要有人將過往發生過的事, 精煉後每天重複灌輸給女主.
+> User 將`人物設定`, `Skills`, ...etc. 整理成 markdown files (精煉資訊),
+並在每次對話中, 重複傳送給 AI-model, 以保持 AI-model 的人設
+>> 由於每次對話, 都需要重複傳送**人設資訊**以及**過往累積的經驗**, 因此時間一久, 就會造成 token 大噴發 (鈔票也噴掉了...)
+
+
 ```
 OpenClaw:
     +-------------+         +----------+                        +-------------------+
@@ -25,7 +37,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
     > Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
     ```
 
-+ Local LLM module with [LM-Studio](https://lmstudio.ai/download)
++ Local LLM model with [LM-Studio](https://lmstudio.ai/download)
 
     - LM-Studio enables the local network feature
 
@@ -47,9 +59,34 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
 
     - Windows
 
-        ```PowerShell
-        > irm https://openclaw.ai/install.ps1 | iex
-        ```
+        1. insall
+
+            ```PowerShell
+            > irm https://openclaw.ai/install.ps1 | iex
+            ```
+
+            ```
+            PS > npm install -g openclaw           <== the latest
+            PS > npm install -g openclaw@2026.2.24 <== specific version
+
+            ```
+
+        1. 更新版本
+
+            ```
+            PS > openclaw update                   <== update to the latest version
+            PS > openclaw update --tag 2026.2.20   <== update to a specific version
+            ```
+
+        1. Un-Install
+
+            ```
+            PS > npm uninstall -g openclaw
+
+            # 解除安裝並清除所有設定、狀態、工作區
+            PS > openclaw uninstall --all --yes
+            ```
+
     - Linux
 
         ```shell
@@ -83,6 +120,7 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
         │   └── agent.log
         └── cache/                 # 快取資料
     ```
+
     - `dir: agents`
         > 所有與 Agent的對話紀錄
 
@@ -329,6 +367,13 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
         > openclaw onboard --flow quickstart
         ```
 
+    - Configure
+
+        ```
+        # 啟動互動式設定精靈
+        > openclaw configure
+        ```
+
     - Modify configuration file
         > `<user>/.openclaw/openclaw.json`
 
@@ -442,6 +487,24 @@ OpenClaw 基於 [Node.js](https://nodejs.org/zh-tw/download) 運行, 且部分�
     # 稽核命令執行
     PS > grep "bash" ~/.openclaw/logs/gateway.log
     ```
+
+# Advance configuration
+
+AI-Model 提供的是大腦, 而 OpenClaw 的 Agent 則是提供身體.
+
+User 藉由前端的 `TUI 介面`, `WebUI`, `Web_Search/Web_fetch tools`, 及 `Channels (e.g. telegram, line, ...etc.)`, 將訊息灌給 OpenClaw-Gateway,
+OpenClaw-Gateway 再轉傳給 AI-Model 分析思考, 最後 AI-Model 將思考結果轉化為行為指令(調用 OpenClaw 提供的 Tools, 即物件導向的 methods),
+傳回 OpenClaw-Gateway 去執行
+> 就如電影`獵殺代理人`一樣, 機器身體提供感官訊息(e.g. 看到, 聽到)給遠端的人類, 人類再控制機器身體去執行各種行為
+
+## [Tools](./note_openclaw_tools.md)
+
+Exec Tools 允許 Agent 執行系統指令; 可透過搭配的 `process` 工具, 支援前台(task blocking)和後台(multi-tasks)兩種執行模式
+> 如果 `process` 被停用,  Exec Tool 將同步運作並忽略 `yieldMs/background` 參數
+
++ Exec Tools 的配置
+    > 使用 `tools` node 來配置並存放在`<user>/.openclaw/openclaw.json`
+
 
 # Skills
 
