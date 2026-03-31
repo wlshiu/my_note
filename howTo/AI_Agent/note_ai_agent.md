@@ -1,6 +1,80 @@
 note_ai_agent
 ---
 
+# 演進
+
++ Level 0
+    > 一問一答簡單的話家常, 結果輸出不可控
+
++ Level 1 (**結構化Prompt**)
+    > 給出具體指示 **Role**, **Task**, **Action Rule**, ...etc.
+
++ Level 2 (Command 化)
+    > 為了具體結構化Prompt, 需要較長的Prompts, 在一般使用上不方便;
+    因此將對應的 **結構化Prompt**, 封裝成 `Slash-Commands (/command)` 來呼叫
+
++ Level 3 (**System Prompt**)
+    > 當對話變多時, `Context-Length`的限制就產生較大的影響 (e.g. AI 失憶);
+    因此在每次對話的最前頭, 都加上 **System Prompt**, 以保證 AI 都能記住最重要的事
+
++ Level 4 (Meta Data)
+    > 當 AI 處理的項目與種類變多時, 每個種類都有不同的 **System Prompt**,
+    在有限的 `Context-Length`上是無法承受, 因此使用 Meta Data, 來**索引**不同種類事務所需要的 Prompts,
+    使用時再加載所需的 Prompts, 同時也可以節省 token 數
+
++ Level 5 (Skill)
+    > 通過 Progressive Disclosure (漸進式揭露) 來逐步拓展能力,
+    類似使用 Summary or Menu, 讓 AI-LLM 自己逐步去讀取所需的數據,
+    甚至更進一步的**撰寫/呼叫 Script**執行
+
+    - Skill 可以想像為一個 lib, 裡面會有描述 lib 的使用場景及限制 (SKILL.md),
+    APIs 總攬 (Meta-Data), 細節說明或依賴性 (Reference data), 協助工具(Scripts)
+
+        ```
+        # 必要 <>, 選項 []
+        Skill = <SKILL.md> + [Meta-Data] + [Reference data] + [Scripts]
+        ```
+
+    - Example
+
+        ```
+                            Client              AI-LLM
+                               |                   |
+               do-something    |                   |
+        User ------------->    |                   |
+                               |                   |
+                               V                   |
+                        +--------------+           |
+                        | Preper all   |           |
+                        |  Meta-Data   |           |
+                        |  of Skills   |           |
+                        +--------------+           |
+                               |  send meta-datas  |
+                               | ----------------> |
+                               |                   |
+                               |                   |
+                               |   Select a Skill  |
+                               |      and          |
+                               |   request to load |
+                               |   the specific    |
+                               |    Skill data     |
+                               | <---------------- |
+                               |                   |
+                               | Load the specific |
+                               |   Skill data set  |
+                               | ----------------> |
+                               |                   |
+                               |                   V
+                               |              +------------+
+                               |              | Handle the |
+                               |              | something  |
+                               |              +------------+
+                               |                   |
+                               |   Report results  |
+                               | <---------------- |
+                               |                   |
+        ```
+
 # Definitions
 
 + KV-cache (Key/Value)
@@ -15,6 +89,18 @@ note_ai_agent
     > 因此大語言模型加入了一種稱為`KV-cache`的機制,能將先前的重要資訊(Key 與 Value)儲存在記憶體中,
     免去每次重新計算的成本,從而將 Token 處理與生成速度提升數個數量級。
 
++ Workflow
+    > pip-line 固定的執行流程 (e.g. n8n)
+
++ Agent Skill
+    > 可想像成`處理某種事物的經驗`, 依照要求 run-time 選擇在什麼情況下, 使用什麼樣的工具,
+    >> e.g. 司機依照乘客需求(趕時間), 選擇不同的路線 (不塞車或最短路線)
+
+
++ MCP (Module Context Protocol)
+    > OpenClaw 中的 `Tool/Plug-In`, 可想像成工具箱, 讓 AI-LLM 從 Agent-Skill中, 得知該如何使用工具
+
+    - MCP 就是 **物件導向中的 method interface**
 
 
 
