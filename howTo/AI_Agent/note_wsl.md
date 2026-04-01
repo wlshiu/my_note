@@ -63,6 +63,18 @@ $ sudo vi /etc/apt/sources.list.d/ubuntu.sources
     change http://... to https://...
 ```
 
+## 免密碼設置
+
+為了在後續安裝文本運行中避免頻繁輸入密碼, 建議為當前用戶開啟`sudo 免密許可`
+
+> 在檔末添加資訊並存檔 (`Ctrl+O` -> Enter -> `Ctrl+X`)
+
+```
+$ sudo visudo
+    ...
+    <usre-name> ALL=(ALL) NOPASSWD: ALL <--- 將 <usre-name> 替換為實際使用者名
+```
+
 ## VM 配置文件
 
 > 新建或編輯 `C:\Users\<user-name>\.wslconfig`
