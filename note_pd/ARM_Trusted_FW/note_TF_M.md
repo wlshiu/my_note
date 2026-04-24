@@ -26,125 +26,34 @@ Trusted_Firmware-M
     $ sudo apt-get install -y git curl wget build-essential libssl-dev cmake make
     $ sudo apt install ninja-build
     $ sudo apt install python3.12 python3.12-pip python3.12-venv python3.12-dev
+    $ sudo apt install gdb-multiarch
+
+    $ cd <user-local-tf-m_dir>
+    $ python3 -m venv .venv
+    $ source .venv/bin/activate
+    $ cd <user-local>/trusted-firmware-m/tools
+    $ pip install -r requirements.txt
+
+    # if necessary
+    $ pip uninstall requirements.txt
     ```
 
 + download source code
+    > Use `ver: TF-Mv1.8.1`
+    >> involve SPE(Secure Processing Environment) and NSPE (Non Secure Processing Environment)
 
-    - SPE (Secure Processing Environment)
+    ```
+    $ git clone https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
+    $ git checkout TF-Mv1.8.1  # use GNU Arm Embedded Toolchain 11.2-2022.02
+    ```
 
-        ```
-        $ git clone https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
-        $ git checkout TF-Mv2.2.2  # use GNU Arm Embedded Toolchain 10.3-2021.10
-        ```
-
-    - NSPE (Non Secure Processing Environment)
-
-        ```
-        $ git clone https://git.trustedfirmware.org/TF-M/tf-m-tests.git
-        ```
-
-+ [Building TF-M (SPE)](https://trustedfirmware-m.readthedocs.io/en/latest/building/tfm_build_instruction.html#building-tf-m-spe)
-
-    - Create `z_build.sh`
-        > use default `ARM-AN521` platform
-        >
-        > ```
-        > .../trusted-firmware-m/platform/ext/target/arm
-        >     ├── corstone1000
-        >     ├── drivers
-        >     ├── mps2
-        >     ├── mps3
-        >     ├── mps4
-        >     ├── musca_b1
-        >     ├── musca_s1
-        >     └── rse
-        > ```
-
-        ```
-        #!/bin/bash
-
-        set -e
-
-        #
-        # -S: source code directory
-        # -B (--build): output directory
-        #
-        cmake -S . -B out \
-            -DTFM_PLATFORM=arm/mps2/an521 \
-            -DTFM_TOOLCHAIN_FILE=toolchain_GNUARM.cmake \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -GNinja
-
-        cmake --build out -- install
-        ```
-
-+ [Building Application (NSPE)](https://trustedfirmware-m.readthedocs.io/en/latest/building/tests_build_instruction.html)
-
-    - Create `z_build_tfm_tests.sh`
-        > `$ cd <user-local>/tf-m-tests/tests_reg`
-
-        ```bash
-        #!/bin/bash
-
-        TFM_SRC_PATH=<user-local>/trusted-firmware-m/
-        TFM_TEST_SRC_PATH=<user-local>/tf-m-tests/
-
-        cd ${TFM_TEST_SRC_PATH}/tests_reg
-
-        cmake -S spe -B ./out_spe -DTFM_PLATFORM=arm/mps2/an521 \
-              -DCONFIG_TFM_SOURCE_PATH=${TFM_SRC_PATH} \
-              -DTFM_TOOLCHAIN_FILE=${TFM_SRC_PATH}/toolchain_GNUARM.cmake \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DTEST_S=ON -DTEST_NS=ON
-        cmake --build ./out_spe -- install
-
-
-        cmake -S . -B ./out_test -DCONFIG_SPE_PATH=${TFM_TEST_SRC_PATH}/tests_reg/out_spe/api_ns/ \
-              -DTFM_TOOLCHAIN_FILE=${TFM_TEST_SRC_PATH}/tests_reg/out_spe/api_ns/cmake/toolchain_ns_GNUARM.cmake \
-              -DCMAKE_BUILD_TYPE=Debug
-        cmake --build out_test
-        ```
-
-# Qemu
-
-+ Create `z_qemu_server.sh`
++ build
+    > create `z_build_tfm.sh`
 
     ```
     #!/bin/bash
 
-    TARGET_SECU=<user-local>/tf-m-tests/tests_reg/out_spe/bin/tfm_s.elf
-    TARGET_NON_SECU=<user-local>/tf-m-tests/tests_reg/out_test/bin/tfm_ns.elf
-
-
-    qemu-system-arm \
-        -M mps2-an521 \
-        -cpu cortex-m33 -m 16M \
-        -kernel ${TARGET_SECU} \
-        -device loader,file=${TARGET_NON_SECU},addr=0x00100000 \
-        -nographic \
-        -s -S
-    ```
-
-
-+ Create `z_qemu_gdb.sh` (not work..)
-
-    ```bash
-    #!/bin/bash
-
-    TARGET_SECU=<user-local>/tf-m-tests/tests_reg/out_spe/bin/tfm_s.elf
-
-    # arm-none-eabi-gdb ${TARGET_SECU} -ex "target remote:1234" -tui
-
-    cgdb -D arm-none-eabi-gdb ${TARGET_SECU} -ex "target remote:1234"
-    ```
-
-# Example
-
-- bakcup flow
-    ```
-    $ cd <local-root>/trusted-firmware-m
-
-    $ cmake -S . -B out \
+    cmake -S . -B out \
         -DTFM_PLATFORM=arm/mps2/an521 \
         -DTFM_TOOLCHAIN_FILE=toolchain_GNUARM.cmake \
         -DCMAKE_BUILD_TYPE=Debug \
@@ -153,21 +62,49 @@ Trusted_Firmware-M
         -DTFM_PSA_API=ON \
         -DBL2=OFF
 
-    $ cd out && make
-
-    $ arm-none-eabi-readelf -l bin/tfm_ns.elf
-    $ arm-none-eabi-readelf -l bin/tfm_s.elf
-
-    $ qemu-system-arm \
-        -M mps2-an521 \
-        -kernel "bin/tfm_s.elf" \
-        -device loader,file="bin/tfm_ns.bin",addr=0x00100000 \
-        -nographic \
-        -s -S
-
-    # In a new terminal
-    $ cgdb -D arm-none-eabi-gdb bin/tfm_s.elf
+    cd out
+    make
     ```
+
+    ```
+    $ cd <user-local>/trusted-firmware-m/out/bin
+    $ ls
+        tfm_ns.axf  tfm_ns.elf  tfm_ns.map  tfm_s.bin  tfm_s.hex
+        tfm_ns.bin  tfm_ns.hex  tfm_s.axf   tfm_s.elf  tfm_s.map
+    ```
+
+# Qemu
+
++ Create `z_qemu_server.sh`
+
+    ```
+    #!/bin/bash
+
+    TARGET_SECU="<user-local>/trusted-firmware-m/out/bin/tfm_s.elf"
+    TARGET_NON_SECU="<user-local>/trusted-firmware-m/out/bin/tfm_ns.bin"
+
+    qemu-system-arm \
+        -M mps2-an521 \
+        -kernel ${TARGET_SECU} \
+        -device loader,file=${TARGET_NON_SECU},addr=0x00100000 \
+        -nographic -s -S
+    ```
+
+
++ Create `z_qemu_gdb.sh` (not work..)
+
+    ```bash
+    #!/bin/bash
+
+    TARGET_SECU=<user-local>/trusted-firmware-m/out/bin/tfm_s.elf
+    TARGET_NON_SECU=<user-local>/trusted-firmware-m/out/bin/tfm_ns.elf
+
+    cgdb -d gdb-multiarch ${TARGET_SECU} \
+        -ex "target remote:1234" \
+        -ex "add-symbol-file ${TARGET_NON_SECU}" \
+        -ex "b tfm_ns_platform_init"
+    ```
+
 
 # Reference
 
@@ -175,6 +112,7 @@ Trusted_Firmware-M
     - [Building default configuration for an521](https://trustedfirmware-m.readthedocs.io/en/latest/building/tfm_build_instruction.html#building-default-configuration-for-an521)
 
 + [Understanding ARM Trusted Firmware using QEMU](https://lnxblog.github.io/2020/08/20/qemu-arm-tf.html)
++ [ARM Trusted Firmware-M (TF-M): build and run on QEMU - YouTube](https://www.youtube.com/watch?v=Tn9O44ur_xs)
 
 + MCUboot
     - [MCUboot | mcuboot](https://docs.mcuboot.com/)
