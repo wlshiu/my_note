@@ -880,6 +880,16 @@ GDB Terminal User Interface
 
 [CGDB中文手冊](https://leeyiw.gitbooks.io/cgdb-manual-in-chinese/content/index.html)
 
+> 本地配置檔 `$HOME/.cgdb/cgdbrc`
+> ```
+> set ignorecase
+> set tabstop=4
+> set hlsearch
+> set winsplitorientation=vertical
+>
+> ```
+
+
 + MSYS2 build
 
     - `makeinfo` not found
@@ -943,6 +953,9 @@ GDB Terminal User Interface
 
 + `i` key
     > move to gdb window, and use gdb cmd to operate
+
++ `Ctrl + w`
+    > 切換 window layout
 
 + `_` (on source window)
     > Shrink source window 25%
