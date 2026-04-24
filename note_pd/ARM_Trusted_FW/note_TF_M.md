@@ -20,23 +20,28 @@ Trusted_Firmware-M
 
 + dependencies
     > + **CMake version 3.21 or later**
+    > + **Python version 3.12 or later**
 
     ```
-    $ sudo apt-get install -y git curl wget build-essential libssl-dev python3 python3-pip cmake make
+    $ sudo apt-get install -y git curl wget build-essential libssl-dev cmake make
     $ sudo apt install ninja-build
+    $ sudo apt install python3.12 python3.12-pip python3.12-venv python3.12-dev
     ```
 
 + download source code
 
-    ```
-    $ git clone https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
-    $ git checkout TF-Mv2.2.2  # use GNU Arm Embedded Toolchain 10.3-2021.10
-    ```
+    - SPE (Secure Processing Environment)
 
-    ```
-    $ git clone https://git.trustedfirmware.org/TF-M/tf-m-tests.git
+        ```
+        $ git clone https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
+        $ git checkout TF-Mv2.2.2  # use GNU Arm Embedded Toolchain 10.3-2021.10
+        ```
 
-    ```
+    - NSPE (Non Secure Processing Environment)
+
+        ```
+        $ git clone https://git.trustedfirmware.org/TF-M/tf-m-tests.git
+        ```
 
 + [Building TF-M (SPE)](https://trustedfirmware-m.readthedocs.io/en/latest/building/tfm_build_instruction.html#building-tf-m-spe)
 
@@ -66,7 +71,8 @@ Trusted_Firmware-M
         #
         cmake -S . -B out \
             -DTFM_PLATFORM=arm/mps2/an521 \
-            -DTFM_TOOLCHAIN_FILE=toolchain_GNUARM.cmake -DCMAKE_BUILD_TYPE=Debug \
+            -DTFM_TOOLCHAIN_FILE=toolchain_GNUARM.cmake \
+            -DCMAKE_BUILD_TYPE=Debug \
             -GNinja
 
         cmake --build out -- install
@@ -80,20 +86,24 @@ Trusted_Firmware-M
         ```bash
         #!/bin/bash
 
-        TFM_SRC_PATH=<user-local>/trusted-firmware-m
-        TFM_TEST_SRC_PATH=<user-local>/tf-m-tests
+        TFM_SRC_PATH=<user-local>/trusted-firmware-m/
+        TFM_TEST_SRC_PATH=<user-local>/tf-m-tests/
 
-        cmake -S spe -B build_spe -DTFM_PLATFORM=arm/mps2/an521 \
+        cd ${TFM_TEST_SRC_PATH}/tests_reg
+
+        cmake -S spe -B ./out_spe -DTFM_PLATFORM=arm/mps2/an521 \
               -DCONFIG_TFM_SOURCE_PATH=${TFM_SRC_PATH} \
               -DTFM_TOOLCHAIN_FILE=${TFM_SRC_PATH}/toolchain_GNUARM.cmake \
+              -DCMAKE_BUILD_TYPE=Debug \
               -DTEST_S=ON -DTEST_NS=ON
-        cmake --build build_spe -- install
+        cmake --build ./out_spe -- install
 
-        cmake -S . -B build_test -DCONFIG_SPE_PATH=${TFM_TEST_SRC_PATH}/tests_reg/build_spe/api_ns \
-              -DCMAKE_BUILD_TYPE=Debug -DTFM_TOOLCHAIN_FILE=${TFM_TEST_SRC_PATH}/tests_reg/build_spe/api_ns/cmake/toolchain_ns_GNUARM.cmake
-        cmake --build build_test
+
+        cmake -S . -B ./out_test -DCONFIG_SPE_PATH=${TFM_TEST_SRC_PATH}/tests_reg/out_spe/api_ns/ \
+              -DTFM_TOOLCHAIN_FILE=${TFM_TEST_SRC_PATH}/tests_reg/out_spe/api_ns/cmake/toolchain_ns_GNUARM.cmake \
+              -DCMAKE_BUILD_TYPE=Debug
+        cmake --build out_test
         ```
-
 
 # Qemu
 
@@ -102,8 +112,9 @@ Trusted_Firmware-M
     ```
     #!/bin/bash
 
-    TARGET_SECU=/home/lubwl/working/test/arm/tf-m-tests/tests_reg/build_spe/build-spe/bin/tfm_s.elf
-    TARGET_NON_SECU=/home/lubwl/working/test/arm/tf-m-tests/tests_reg/build_test/bin/tfm_ns.elf
+    TARGET_SECU=<user-local>/tf-m-tests/tests_reg/out_spe/bin/tfm_s.elf
+    TARGET_NON_SECU=<user-local>/tf-m-tests/tests_reg/out_test/bin/tfm_ns.elf
+
 
     qemu-system-arm \
         -M mps2-an521 \
@@ -120,9 +131,9 @@ Trusted_Firmware-M
     ```bash
     #!/bin/bash
 
-    TARGET_SECU=/home/lubwl/working/test/arm/tf-m-tests/tests_reg/build_spe/build-spe/bin/tfm_s.elf
+    TARGET_SECU=<user-local>/tf-m-tests/tests_reg/out_spe/bin/tfm_s.elf
 
-    arm-none-eabi-gdb ${TARGET_SECU} -ex "target remote:1234" -tui
+    # arm-none-eabi-gdb ${TARGET_SECU} -ex "target remote:1234" -tui
 
     cgdb -D arm-none-eabi-gdb ${TARGET_SECU} -ex "target remote:1234"
     ```
