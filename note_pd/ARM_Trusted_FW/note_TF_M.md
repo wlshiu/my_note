@@ -16,7 +16,55 @@ Trusted_Firmware-M
     > In TF-M this means the secure domain protected by TF-M.
 
 
-# Setup development environment
+# Conception
+
+Architecture of Trusted Firmware-M
+![Arch_TF-M](./Arch_TF-M.jpg)
+
+## Secure Boot
+
+Secure boot 最主要的目的, 就是防止系統使用到惡意的程式
+> 在開機流程中, boot-code 會先透過密碼學(cryptography)演算法, 驗證是否為可信任的的程式,
+如果驗證成功即會開始執行, 否則中止流程
+
+![Secure_boot_of_TF-M](./Secure_boot_of_TF-M.jpg)
+
++ BL-1 (Bootloader 1)
+    > 此階段主要是必要的硬體初始化或設定, 因此 BL1 必須是可信任且不可被竄改.
+    執行完初始化後, 就會跳到 BL2 的 entry point 繼續執行 BL2
+
++ BL-2 (Bootloader 2)
+    > BL2 負責其他所需的初始化操作, 例如啟動 MCUboot 前所需的設定或檢查, 接著就會把執行交給 MCUboot
+
++ MCUboot
+    > MCUboot 是針對 32-bits MCU 所設計的 Secure-Bootloader, 其中包含**完整的程式驗證流程**,
+    因此也是 Trusted Firmware-M Secure-Boot 流程的核心.
+    >> 而 MCUboot 本身就是獨立的 open source project, 因此也能移植到其他 project
+
++ TF-M Core
+    > + TF-M Core 會依據 memory layout, 放在指定的 Flash Address，而 MCUboot 會先去該 Address 取得 TF-M Core 的 Binary data, 並進行相關驗證確認.
+    >     > 如果 Binary data 已被加密, 也會在這階段進行解密
+    >
+    > + 在確認完 TF-M 是正確且可信任後, 才會載入 TF-M Core
+
+    > 要注意的是, Trusted Firmware-M 手冊中有提到, 驗證和解密所需 key, 建議放在 OTP 中,以確保不可修改
+
+    > 此外, 由於需要在載入 TF-M Core 前, 就需要對 TF-M Binary data 進行驗證,
+    因此需要 **只獨立存在 SPE 中的 crypto API, 來處理驗證與加解密**
+    >> 在 BL-2 階段需設定好必要的 hardware/software
+
++ RTOS
+    > 最後階段載入 App (with/without RTOS)
+    >> 此時同樣需要驗證解密, 確認正確無誤後, 才能載入執行
+
+
+## Handshake between SPE and NSPE
+
+![Scenario_of_TF-M](./Scenario_of_TF-M.jpg)
+
+# Practice
+
+## Setup development environment
 
 + dependencies
     > + **CMake version 3.21 or later**
@@ -73,7 +121,7 @@ Trusted_Firmware-M
         tfm_ns.bin  tfm_ns.hex  tfm_s.axf   tfm_s.elf  tfm_s.map
     ```
 
-# Qemu
+## Qemu
 
 + Create `z_qemu_server.sh`
 
@@ -113,6 +161,7 @@ Trusted_Firmware-M
 
 + [Understanding ARM Trusted Firmware using QEMU](https://lnxblog.github.io/2020/08/20/qemu-arm-tf.html)
 + [ARM Trusted Firmware-M (TF-M): build and run on QEMU - YouTube](https://www.youtube.com/watch?v=Tn9O44ur_xs)
++ [一文熟悉Trusted Firmware-M - 知乎](https://zhuanlan.zhihu.com/p/651683753)
 
 + MCUboot
     - [MCUboot | mcuboot](https://docs.mcuboot.com/)
