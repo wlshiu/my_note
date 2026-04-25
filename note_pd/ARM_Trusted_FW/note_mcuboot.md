@@ -228,8 +228,9 @@ $ pip3 install -r ./scripts/requirements.txt
 + qemu gdb server
 
     ```
-    $ west build -p -b mps2/an521/cpu0/ns samples/tfm_integration/psa_crypto -t debugserver_qemu
-    arm-none-eabi-gdb
+    $ west build -p -b mps2/an521/cpu0/ns \
+        samples/tfm_integration/psa_crypto \
+        -t debugserver_qemu
     ```
 
 + gdb-client
