@@ -285,7 +285,7 @@ Power_On -> BL1 (ROM if exsit)
             -device loader,file=${TARGET_FULL_BIN},addr=0x10080000 \
             -nographic -s -S
 
-        # full load (? tfm_ns 似乎無法執行)
+        # full load (? why does tfm_ns NOT work ? )
         qemu-system-arm \
             -M mps2-an521 \
             -device loader,file=${TARGET_BL2_BIN},addr=0x10000000 \
@@ -338,12 +338,57 @@ Power_On -> BL1 (ROM if exsit)
             -ex "target remote:1234" \
             -ex "add-symbol-file ${TARGET_NON_SECU}" \
             -ex "add-symbol-file ${TARGET_SECU}" \
+            -ex "b main"
             -ex "b tfm_ns_platform_init"
 
-
+        # arm-none-eabi-gdb -tui ${TARGET_SECU} \
+        #     -ex "target remote:1234" \
+        #     -ex "add-symbol-file ${TARGET_NON_SECU}" \
+        #     -ex "b main"
+        #     -ex "b tfm_ns_platform_init"
         ```
 
 
+## Source code
+
++ common codes (system-core layer)
+
+    - boot from `Reset_Handler`
+
+        ```c
+        // at trusted-firmware-m/platform/ext/target/arm/mps2/an521/cmsis_core/startup_an521.c: Reset_Handler
+        void Reset_Handler(void)
+        {
+        #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+            __disable_irq();
+        #endif
+            __set_PSP((uint32_t)(&__INITIAL_SP));
+
+            __set_MSPLIM((uint32_t)(&__STACK_LIMIT));
+            __set_PSPLIM((uint32_t)(&__STACK_LIMIT));
+
+        #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+            __TZ_set_STACKSEAL_S((uint32_t *)(&__STACK_SEAL));
+        #endif
+
+            SystemInit();                             /* CMSIS System Initialization */
+            __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
+        }
+        ```
+
+### BL2 (MCUboot)
+
+```
+trusted-firmware-m/bl2/ext/mcuboot/bl2_main.c: main()
+```
+
+### TF-M SPE
+
+```
+trusted-firmware-m/secure_fw/spm/cmsis_psa/main.c: main()
+```
+
+### TF-M NSPE
 
 
 # Reference
