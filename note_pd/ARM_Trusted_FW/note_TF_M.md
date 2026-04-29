@@ -131,10 +131,114 @@ Power_On -> BL1 (ROM if exsit)
     - 初始化 Mailbox/IPC 溝通機制 (on Non-Secure Core Side)
     - 當需要安全功能時, 會透過 Mailbox/IPC, 將請求傳送給 Secure Core 的 tfm_s 處理
 
-
 ## Handshake between SPE and NSPE
 
 ![Scenario_of_TF-M](./Scenario_of_TF-M.jpg)
+
+# Hardware Implementation with ARM
+
+## Attribution units
+
+### IDAU (Implementation Defined Attribution Unit)
+IDAU 用來指示 CPU, Memory Address Area 是 Secure/Non-Secure/Non-Secure-Callable
+> 使用 Address_bit[28] 來標示 Secure type (Vendor 可自行定義, ARM 原生定義 0: Non-Secure, 1: Secure)
+
++ IDAU 是位於 CPU 與 AMBA-BUS 間的的 Hardware module, 使用 Hard-Code Configuration
+    > 電路就決定 Memory Area 的 Secure type
+
+### SAU (Security Attribution Unit)
+
+SAU 提供在 run-time 的情況下, 可重新更改 Secure type
+> **最終的 Secure type, 是取 IDAU 和 SAU 兩者中, 最高的安全等級**
+
+> 安全等級 `Secure(S) > Non-Secure-Callable(NSC) > Non-Secure(NS)`
+>> `NSC`代表次一級的 Secure mdoe: 允許 NS code 透過 `SG` instruction, 跳轉到 NSC Region 並轉為 Secure state
+
++ SAU 也是位於 CPU 與 AMBA-BUS 間的的 Hardware module, 但可使用 Registers 來動態配置
+
++ SAU Registers
+    > SAU **ONLY** be accessed in SPE
+
+    >> `gdb) p/x *((SAU_Type*)0xE000EDD0)`
+
+    | Address     | SAU Register | Type |  Description
+    | :-:         | :-:          | :-:  | :-
+    | 0xE000EDD0  | SAU_CTRL     |  RW  | SAU Control Register.
+    | 0xE000EDD4  | SAU_TYPE     |  RO  | Indicates the number of available region.
+    | 0xE000EDD8  | SAU_RNR      |  RW  | SAU Region Number Register. Selects a region.
+    | 0xE000EDDC  | SAU_RBAR     |  RW  | SAU Region Base Address Register
+    | 0xE000EDE0  | SAU_RLAR     |  RW  | SAU Region Limit (End) Address Register
+
+
+    - SAU_CTRL
+        > + `SAU_CTRL.ENABLE` 是 Global SAU 開關
+        > + `SAU_CTRL.ALLNS` 是所有 Regions 預設的 Secure type
+
+        | Bits   | Field    |  Description
+        | :-:    | :-:      | :-
+        | [31:2] | Reserved | Reserved – read as 0 (RES0)
+        | 1      | ALLNS    | All Non-secure <br> 當 SAU_CTRL.ENABLE 為 0 時, 這個 ALLNS 控制整個 Secure type 為 SPE (vlaue: 0) 或 NSPE(value: 1)
+        | 0      | ENABLE   | Enable SAU, (0: disable, 1: enable)
+
+    - SAU_TYPE
+
+        | Bits   | Field    |  Description
+        | :-:    | :-:      | :-
+        | [31:8] | Reserved	| Reserved
+        | [7:0]	 | SREGION	| SAU regions. 說明 SAU region 的數量
+
+    - SAU_RNR (Region Number)
+        > 將 SAU_RBAR/SAU_RLAR 切換到對應的 Region registers
+
+        | Bits   | Field    |  Description
+        | :-:    | :-:      | :-
+        | [31:8] | Reserved | Reserved
+        | [7:0]  | REGION   | Region number. Indicates the SAU region that SAU_RBAR and SAU_RLAR accesses
+
+    - SAU_RBAR (Region Base Address)
+
+        | Bits   | Field    |  Description
+        | :-:    | :-:      | :-
+        | [31:5] | BADDR    | Base address. Holds bits [31:5] of the base address for the selected SAU region
+        | [4:0]  | Reserved | Reserved
+
+    - SAU_RLAR (Region Limit Address)
+        > `SAU_RLAR.ENABLE` 使否啟用此 Region 的 SAU,
+        當 `SAU_RLAR.ENABLE = 0` 時, 則 Secure type 由 `SAU_CTRL.ALLNS` 決定
+
+        | Bits   | Field    |  Description
+        | :-:    | :-:      | :-
+        | [31:5] | LADDR    | Limit address [31:5]. Bits [4:0] of the limit address are defined as 0x1F
+        | [4:2]  | Reserved | Reserved
+        | 1      | NSC      | 0: Disable Non-secure-callable, 1: Enable Non-secure-callable
+        | 0      | ENABLE   | 0: Disabled SAU region, 1: Enable SAU region
+
++ Relation of SAU Security Attribution Configuration
+
+    ```
+                 SAU_CTRL.ENABLE (Global SAU Enable)
+              0  |             | 1
+                 V             V
+        SAU_CTRL.ALLNS        SAU-Region Matched ?
+         0 |        | 1       (SAU_RLAR.ENABLE = 1)
+           |        |           N |            |
+           |        |             |            V
+           |        |             |         SAU_RLAR.NSC
+           |        |             |        0 |        | 1
+           V        V             V          V        V
+        Secure   Non-Secure     Secure   Non-Secure   Non-Secure-Callable
+
+    ```
+
+
+## Instruction to switch between SPE and NSPE
+
+| Instruction   | Description   |
+| :-:           | :-            |
+| `SG`          | **Secure gateway**<br> Used for switching from Non-secure to Secure state at the first instruction of Secure entry point |
+| `BXNS`        | **Branch with exchange to Non-secure state** <br> Used by Secure software to branch or return to Non-secure program |
+| `BLXNS`       | **Branch with link and exchange to Non-secure state** <br> Used by Secure software to call Non-secure functions |
+
 
 # Practice
 
@@ -390,8 +494,71 @@ trusted-firmware-m/secure_fw/spm/cmsis_psa/main.c: main()
 
 ### TF-M NSPE
 
+> Clone repository (tfm_test) when build-time
+
+```
+./out/lib/ext/tfm_test_repo-src/app/main_ns.c: main()
+./out/lib/ext/tfm_test_repo-src/app/test_app.c: test_app()
+```
+
+## Generator Expressions of CMake
+
++ `$<...>` 相當於 `C-language: (...)`
+
++ `BOOL` 運算子
+    > 變數轉成 BOOL Type
+
+    ```cmake
+    $<BOOL:${CONFIG_ENABLE_MSG}>
+
+    # BOOL 運算子會將變數 ${CONFIG_ENABLE_MSG} 轉換為 0 或 1
+    # > 如果該變數被定義為 ON, TRUE, 1 或非空字串時, 則統一轉為 1
+    ```
+
++ 三元運算子 (類似 C-language 中的 `? :`)
+
+    ```cmake
+    $< $<Condition> : Content>
+
+    # 當 'Condition' == true, 傳回 Content
+    # 當 'Condition' == false, 傳回 empty
+    # 相當於 C-language: 'Condition ? Content : void;'
+    ```
+
++ `STREQUAL` 運算子
+    > 比較 string1 與 string2, 相同返回 true, 不同返回 false
+
+    ```cmake
+    $<STREQUAL: string1, string2>
+    ```
+
++ `AND` 運算子
+    > 所有條件都成立才返回 true, 否則為 false
+
+    ```cmake
+    $<AND: cond1, cond2, ...>
+    ```
+
++ `NOT` 運算子
+    > 反轉 boolean 結果
+
+
+    ```cmake
+    $<NOT: $<BOOL:${CONFIG_AAA}>>
+    ```
 
 # Reference
+
++ Armv8-M
+    - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
+    - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
+
++ IoT 安全基礎知識
+    - [IoT 安全基礎知識第 1 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-1-using-cryptography)
+    - [IoT 安全基礎知識：第 2 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-2-protecting-secrets)
+    - [IoT 安全基礎知識：第 3 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-3-ensuring-secure-boot-and-firmware-update)
+    - [IoT 安全基礎知識：第 4 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-4-mitigating-runtime-threats)
+    - [IoT 安全基礎知識第 5 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-5-connecting-securely-to-iot-cloud-services)
 
 + [Trusted Firmware-M Documentation — Trusted Firmware-M Unknown documentation](https://trustedfirmware-m.readthedocs.io/en/latest/index.html)
     - [Building default configuration for an521](https://trustedfirmware-m.readthedocs.io/en/latest/building/tfm_build_instruction.html#building-default-configuration-for-an521)
