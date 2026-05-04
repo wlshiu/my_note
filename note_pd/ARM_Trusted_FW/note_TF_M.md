@@ -274,6 +274,8 @@ SAU 提供在 run-time 的情況下, 可重新更改 Secure type
     ```
     $ git clone https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
     $ git checkout TF-Mv1.8.1  # use GNU Arm Embedded Toolchain 11.2-2022.02
+        or
+    $ git checkout TF-Mv1.4.0  # STM base on TF-Mv1.4.0 to develop
     ```
 
 + build
