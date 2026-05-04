@@ -217,17 +217,20 @@ SAU 提供在 run-time 的情況下, 可重新更改 Secure type
 
     ```
                  SAU_CTRL.ENABLE (Global SAU Enable)
-              0  |             | 1
+               0 |             | 1
                  V             V
         SAU_CTRL.ALLNS        SAU-Region Matched ?
          0 |        | 1       (SAU_RLAR.ENABLE = 1)
-           |        |           N |            |
+           |        |           N |            | Y
+           |        |             |            |
            |        |             |            V
            |        |             |         SAU_RLAR.NSC
            |        |             |        0 |        | 1
            V        V             V          V        V
         Secure   Non-Secure     Secure   Non-Secure   Non-Secure-Callable
-
+                                   ^
+                                   |
+                           (base on SAU_CTRL.ALLNS)
     ```
 
 
