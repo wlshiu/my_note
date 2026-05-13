@@ -139,6 +139,32 @@ Power_On -> BL1 (ROM if exsit)
 
 ## Attribution units
 
+```
+                   +-------+
+                   | CM-33 |
+                   +-------+
+                       |
+                       V
+      +-------------------------------+
+      |     SAU        /     IDAU     |
+      | (S/w Setting)  / (H/w Config) |
+      +-------------------------------+
+                       |
+            +----------+----------+
+            |                     |
+            V                     V
+        +--------+          +------------+
+        | Secure |          | Non-Secure |
+        |  MPU   |          |     MPU    |
+        +--------+          +------------+
+            |                     |
+            V                     V
+    +-----------------------------------------+
+    |                  AHB Bus                |
+    +-----------------------------------------+
+
+```
+
 ### IDAU (Implementation Defined Attribution Unit)
 IDAU 用來指示 CPU, Memory Address Area 是 Secure/Non-Secure/Non-Secure-Callable
 > 使用 Address_bit[28] 來標示 Secure type (Vendor 可自行定義, ARM 原生定義 0: Non-Secure, 1: Secure)
@@ -152,9 +178,12 @@ SAU 提供在 run-time 的情況下, 可重新更改 Secure type
 > **最終的 Secure type, 是取 IDAU 和 SAU 兩者中, 最高的安全等級**
 
 > 安全等級 `Secure(S) > Non-Secure-Callable(NSC) > Non-Secure(NS)`
->> `NSC`代表次一級的 Secure mdoe: 允許 NS code 透過 `SG` instruction, 跳轉到 NSC Region 並轉為 Secure state
+>> `NSC`代表次一級的 Secure mode (在 SPE 中, 但允許被 NSPE 呼叫): 允許 NS code 透過 `SG` instruction, 跳轉到 NSC Region 並轉為 Secure state
 
 + SAU 也是位於 CPU 與 AMBA-BUS 間的的 Hardware module, 但可使用 Registers 來動態配置
+
++ SAU region 偵測會拖慢 CPU 效能, 因此經綜合考量後, 搭配 IDAU 的硬體 hard code 設定, 一般將 SAU Region 數量會訂為 8, 以達到比較平衡的效能
+    > 用 IDAU 設定幾個較大的 memory region, 配合 memory alias address, 讓 CPU 對不同的 mapping addresses 做不同的處理方式
 
 + SAU Registers
     > SAU **ONLY** be accessed in SPE
@@ -238,9 +267,30 @@ SAU 提供在 run-time 的情況下, 可重新更改 Secure type
 
 | Instruction   | Description   |
 | :-:           | :-            |
-| `SG`          | **Secure gateway**<br> Used for switching from Non-secure to Secure state at the first instruction of Secure entry point |
-| `BXNS`        | **Branch with exchange to Non-secure state** <br> Used by Secure software to branch or return to Non-secure program |
-| `BLXNS`       | **Branch with link and exchange to Non-secure state** <br> Used by Secure software to call Non-secure functions |
+| `SG`          | **Secure Gateway**<br> Used for switching from Non-secure to Secure state at the first instruction of Secure entry point |
+| `BXNS`        | **Branch with eXchange to Non-Secure state** <br> Used by Secure software to branch or return to Non-secure program |
+| `BLXNS`       | **Branch with Link and eXchange to Non-Secure state** <br> Used by Secure software to call Non-secure functions |
+
+
+### `sg` instruction
+
+`sg` 為 NSPE 進入 SPE 時, 第一個執行的 instruction,
+但 `sg` instruction 只有 Machine Code (沒有其他參數), 因此設定 `NSC` region 來存放 `sg` 指令及相關的跳轉指令
+> `NSC` 屬性也可以限制進入 SPE 的入口,
+e.g. SPE 有 10 個 APIs, 限制只有 2 個 APIs 可被 NSPE 呼叫時, **這 2 個 API instances 就被放到 NSC region 裡**
+
+
+```asm
+100019c0 <sec_sum>:
+100019c0:  e97f e97f  sg                                    <--- 切換 space
+100019c4:  f7ff ba7a  b.w  10000ebc <__acle_se_sec_sum>     <--- 使用對應 space 的 address 跳轉
+```
+
+
+## Switch procedure between SPE and NSPE
+
+
+
 
 
 # Practice
@@ -557,6 +607,8 @@ trusted-firmware-m/secure_fw/spm/cmsis_psa/main.c: main()
 + Armv8-M
     - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
     - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
++ STM32
+    - [STM32L5 入門課程系列（一） 從 Cortex-M33 核心認識 TrustZone | STMCU 中文官網 --- STM32L5 入门课程系列（一） 从Cortex-M33内核认识TrustZone | STMCU中文官网](https://www.stmcu.com.cn/ecosystem/chip/chipfamily-STM32L5)
 
 + IoT 安全基礎知識
     - [IoT 安全基礎知識第 1 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-1-using-cryptography)
