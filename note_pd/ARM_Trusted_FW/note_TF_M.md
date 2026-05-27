@@ -12,13 +12,31 @@ Trusted_Firmware-M
 + NSPE (Non Secure Processing Environment)
     > In TF-M this means non secure domain typically running an OS using services provided by TF-M.
 
+    - 在 NSPE 下, 非法呼叫 SPE 資源時, 會觸發 Exception (SecureFault)
+
 + SPE (Secure Processing Environment)
     > In TF-M this means the secure domain protected by TF-M.
+
++ NSC (Non-Secure-Callable)
+    > 在 ARM TrustZone 的概念中, NSPE 是完全不知道 SPE 的存在, 也無法呼叫 SPE 內的 functions;
+    但使用 SPE 內的資源(e.g. APIs, hardware)是必然存在的, 因此在 SPE memory 中開闢一個小區域 `NSC region`,
+    利用 `NSC region` 來專門只做 wrap 的動作(兩階段跳轉, NSPE 先跳到 NSC region 再跳到 SPE),
+    同時也可藉 `NSC region` 來做 Secure mode 切換, 進一步保護 SPE 中的 binary data
+
+    > 這些在 `NSC region` 的 re-direct APIs 被稱為 `veneer functions` or `SG stups`
+
+    >> hacker 可藉由搜尋 SPE binary data 中, 與 `sg instruction` op-code 相同數值的 data 位址,
+    再將 $PC 指到這個 data address 執行 (把 data 當指令執行, 來打開 SPE mode), 藉此來繞過預設的 APIs 入口
+
+
 
 
 # Conception
 
-Architecture of Trusted Firmware-M
+Cortex-M33 core GPRs <br>
+![cm33_core_GPRs](./cm33_core_GPRs.jpg)
+
+Architecture of Trusted Firmware-M <br>
 ![Arch_TF-M](./Arch_TF-M.jpg)
 
 
@@ -45,7 +63,7 @@ Secure boot 最主要的目的, 就是防止系統使用到惡意的程式
 
 + TF-M Core
     > + TF-M Core 會依據 memory layout, 放在指定的 Flash Address，而 MCUboot 會先去該 Address 取得 TF-M Core 的 Binary data, 並進行相關驗證確認.
-    >     > 如果 Binary data 已被加密, 也會在這階段進行解密
+    >> 如果 Binary data 已被加密, 也會在這階段進行解密
     >
     > + 在確認完 TF-M 是正確且可信任後, 才會載入 TF-M Core
 
@@ -274,22 +292,200 @@ SAU 提供在 run-time 的情況下, 可重新更改 Secure type
 
 ### `sg` instruction
 
-`sg` 為 NSPE 進入 SPE 時, 第一個執行的 instruction,
-但 `sg` instruction 只有 Machine Code (沒有其他參數), 因此設定 `NSC` region 來存放 `sg` 指令及相關的跳轉指令
-> `NSC` 屬性也可以限制進入 SPE 的入口,
-e.g. SPE 有 10 個 APIs, 限制只有 2 個 APIs 可被 NSPE 呼叫時, **這 2 個 API instances 就被放到 NSC region 裡**
+`sg` 為 NSPE 進入 SPE 時, 第一個執行的 instruction, 用來切換到 SPE mode.
+> 為了避免非法程式, 藉由搜尋 `sg op-code` 來分析破解 SPE binary data,
+將 呼叫`sg`的程式, 集中放到特定的 `NSC region`, 並進行**兩階段跳轉到 SPE**
 
 
 ```asm
+/* the SG-stups in NSC region */
 100019c0 <sec_sum>:
-100019c0:  e97f e97f  sg                                    <--- 切換 space
-100019c4:  f7ff ba7a  b.w  10000ebc <__acle_se_sec_sum>     <--- 使用對應 space 的 address 跳轉
+100019c0:  e97f e97f  sg                                 <--- 切換 Secure space
+100019c4:  f7ff ba7a  b.w  10000ebc <__acle_se_sec_sum>  <--- 跳轉到對應 SPE space 的 address
+
+/* The real instance in SPE region */
+10000ebc <__acle_se_sec_sum>:
+10000ebc:   b508        push    {r3, lr}
+10000ebe:   4806        ldr r0, [pc, #24]   ; (10000ed8 <__acle_se_sec_sum+0x1c>)
+10000ec0:   f000 f866   bl  10000f90 <printf>
+10000ec4:   e8bd 4008   ldmia.w sp!, {r3, lr}
+10000ec8:   4670        mov r0, lr              <--+
+10000eca:   4671        mov r1, lr                 |
+10000ecc:   4672        mov r2, lr                 |--- CPU clear r0~r3 and ip(r12),
+10000ece:   4673        mov r3, lr                 |    此時 $lr 為 FNC_RETURN
+10000ed0:   46f4        mov ip, lr              <--+
+10000ed2:   f38e 8c00   msr CPSR_fs, lr         <--- 真正的指令: msr APSR_nzcvq, lr (toolchain version issue),
+                                                     為了清除 CPU 狀態暫存器
+10000ed6:   4774        bxns    lr              <--- 從 SPE 跳轉到 NSPE 時, 使用 'bxns'
+10000ed8:   10000a60    .word   0x10000a60
 ```
 
+NSPE 呼叫 `sec_sum` function 時, 先進入 NSC region, 切換到 SPE mode (`sg instruction`),
+再跳轉到 SPE space 中的 `sec_sum() instance`
+> Toolchain 會自動將 SPE space 的 symbol name 加上 prefix `__acle_se` (e.g. `sec_sum` -> `__acle_se_sec_sum`)
 
 ## Switch procedure between SPE and NSPE
 
+SPE 和 NSPE 可以互相呼叫對方的 functions
+> 只要 IRQ priority 夠高, 都有可能在任何執行狀況下, 被對方的 IRQ 來中斷目前執行的程序.
+但為了維持 Secure status, 在進入對方 space 時, 都需特別處理
 
+> 在 SPE 和 NSPE 切換時, 是透過以下配合來完成
+> + new-instructions (e.g. sg, bxns, blxns)
+> + new-register-flag (Cortex-M33 core GPRs, xxx_S and xxx_NS)
+> + software 橋接
+
+
++ SPE 呼叫 NSPE function
+
+    ![SPE_call_NSPE_flow](./SPE_call_NSPE_flow.jpg)
+
++ NSPE 呼叫 SPE function
+
+    ![NSPE_call_SPE_flow](./NSPE_call_SPE_flow.jpg)
+
+
+`FNC_RETURN (0xFEFFFFFE)` 是一個 hardware 檢查的特殊 tag, 用來隱藏 SPE 中, 真正的 address
+> + 如果 NSPE 在沒有被 SPE 呼叫的情況下, 自主執行 `bx 0xFEFFFFFE`,
+CPU 會偵測到 `Secure Stack` 中, 並沒有對應的有效返回記錄(Stack Frame 錯誤),
+此時會立刻觸發 `SecureFault exception`, 直接鎖死或重啟系統
+
+> + 在 Nested interrupt 中, CPU 會確保 `FNC_RETURN` push/pop 的順序是符合 LIFO (Last Input First Output)
+
+### CMSE (Cortex-M Secure Extension) of ARMv8-M of ARM GCC
+
+在編譯時, 加上 `-mcmse` option flag 讓 ARM-GCC 啟用 CMSE 功能,
+此時 ARM-GCC 會將 SPE APIs 的 instances 放在對應的 `.txt section`,
+而 `veneer functions (or SG stups)` 則被放到 `.gnu.sgstubs section`
+
+```linkscript
+// Linkerscript Section for TrustZone Secure Gateway veneers
+.gnu.sgstubs : ALIGN (32)
+{
+    . = ALIGN(32);
+    _start_sg = .;
+    *(.gnu.sgstubs*)
+    . = ALIGN(32);
+    _end_sg = .;
+} > SECURE_FLASH
+```
+
+| 特性      |    `__attribute__((cmse_nonsecure_entry))`  | `__attribute__((cmse_nonsecure_call))`
+| :-:      | :-                                         | :-
+| 定義位置  |  寫在安全端(Secure)的函數宣告上              | 寫在安全端(Secure)的函數指標上
+| 通俗定義  |  **我是SPE func,允許 NSPE 端來呼叫我**      | **我是 SPE，我要透過這個 func-pointer 去呼叫 NSPE func**
+| 安全模式  |  NSPE -> SPE                               |    SPE -> NSPE
+| 放置區域  |  該函數的 entry pointer 必須被放置於 NSC 區域 |   存在於一般的 Secure 區域 (呼叫外部 NS 區域)
+| 關鍵指令  |  編譯器會自動在此函數開頭,插入 `SG` 指令     |   編譯器會使用 `BLXNS` 指令進行切換
+
+
++ `__attribute__((cmse_nonsecure_entry))`
+    > 編譯器自動產生, 讓 NSPE 呼叫的 NSC veneer func (放在 `.gnu.sgstubs section`), 但實體放在 SPE memory 中
+
+    ```c
+
+    /**
+     *  位於 Secure space 中
+     *  Non-Secure side 可以直接呼叫這個函數來對資料進行解密
+     */
+    __attribute__((cmse_nonsecure_entry))
+    uint32_t Secure_Decrypt_Data(uint32_t *cipher, uint32_t len)
+    {
+        // 執行安全加密運算...
+        return status;
+    }
+    ```
+
++ `__attribute__((cmse_nonsecure_call))`
+    > 宣告讓 SPE 呼叫的 NSPE func
+
+    ```
+    /**
+     *  位於 Secure space 中
+     *  + 定義一個特殊的 func-pointer of Non-Secure
+     */
+    typedef void __attribute__((cmse_nonsecure_call)) ns_callback_t(uint32_t);
+
+    void Secure_Process(uint32_t ns_func_addr)
+    {
+        // 將 Non-Secure 的地址轉型為 func-pointer (強制清除 Bit 0 標記為非安全地址)
+        ns_callback_t   NS_Callback = (ns_callback_t)(ns_func_addr & ~1UL);
+
+        // 在 Secure space 中, 呼叫 Non-Secure func, 此處會觸發暫存器清洗與 BLXNS 指令
+        NS_Callback(42);
+    }
+    ```
+
+
+SPE/NSPE 是個別編譯並燒錄, 通常 SPE 會提供 header/object file 給 NSPE.
+> + header file: 宣告 `veneer functions (or SG stups)`
+> + object file (e.g. CMSE_importLib.o): `veneer functions (or SG stups)` 的 machine code
+
+使用 ARM-GCC linker 來產生 `CMSE_importLib.o`
+
+```
+# 產生新的 CMSE_importLib.o
+$ arm-none-eabi-gcc -Xlinker --cmse-implib \
+    -Xlinker --sort-section=alignment \
+    -Xlinker --out-implib=CMSE_importLib.o
+
+
+# 使用 '--in-implib', 在原本的 CMSE_importLib.o 中, 新增 veneer functions
+$ arm-none-eabi-gcc -Xlinker --cmse-implib \
+    -Xlinker --sort-section=alignment \
+    -Xlinker --in-implib=CMSE_importLib.o
+
+```
+
+ARMv8-M CMSE lib 提供了 `cmse_check_address_range()` 來檢查 address 是否完全在 NSPE space
+> 需使用 `arm_cmse.h`
+
++ 底下是一個 example, 它 run-time 從 NSPE 呼叫 SPE API 再 callback 到 NSPE
+    > 其中 `__attribute__((cmse_nonsecure_entry))` 讓編譯器自行產生 NSC 的 veneer functions,
+    而 `__attribute__((cmse_nonsecure_call))` 則讓編譯器在返回到 NSPE 時, 使用 `bxns/blxns`並加入清除 GPRs 的 assembly code,
+    使用 `cmse_check_address_range()` 讓 SPE 的核心程式,
+    在收到 NSPE 傳來的 address 時, 檢查該 address 是否安全且是否符合 NSPE 的存取權限,以防止**惡意指標欺騙**
+
+    > `CMSE_AU_NONSECURE/ CMSE_MPU_NONSECURE/ CMSE_NONSECURE` 差異:
+    >
+    > | type                                | 檢查的核心目標                                           |  典型使用場景
+    > | :-:                                 | :-                                                      |:-
+    > | CMSE_AU_NONSECURE(Attribute-Unit)   | 確保此 Address 在硬體 SAU 上,是 NSPE 區域                 | 僅需驗證硬體隔離邊界
+    > | CMSE_MPU_NONSECURE                  | MPU 對該 address 的存取權限                              |  網域存取且需考量 NSPE OS 的 MPU 限制
+    > | CMSE_NONSECURE                      | 雙重確認上述兩項: 既是硬體 NSPE區域, NSPE 的 MPU 也允許存取 | 最推薦; 在SPE 入口函式, 驗證 NSPE 傳入的資料指標
+
+
+    ```c
+    /*
+     * some c file of secure firmware project defining veneer gateway functions
+     * must compiled with -mcmse gcc flag (!)
+     */
+
+    #include "arm_cmse.h"   <--- cmse lib header
+
+    typedef void (*funcptr_ns) (void) __attribute__((cmse_nonsecure_call));
+
+    void ControlCriticalIO(funcptr_ns  callback_fn) __attribute__((cmse_nonsecure_entry))
+    {
+        funcptr_ns  cb_ns_method = callback_fn;    // save volatile pointer from non-secure code
+
+        // check if given pointer to non-secure memory is actually non-secure as expected
+        cb_ns_method = cmse_check_address_range(cb_ns_method, sizeof(cb_ns_method), CMSE_NONSECURE);
+
+        if( cb_ns_method != 0 )
+        {
+            /* do some critical things e.g. use other secure functions */
+            cb_ns_method(); // invoke non-secure call back function
+        }
+        else
+        {
+            // do nothing if pointer is incorrect
+        }
+    }
+    ```
+
+
+當封裝成 lib (*.a) 時, 需使用 `whole-archive` linker 選項, 這樣 CMSE import lib 才會加入 veneer functions
 
 
 
@@ -609,6 +805,10 @@ trusted-firmware-m/secure_fw/spm/cmsis_psa/main.c: main()
     - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
 + STM32
     - [STM32L5 入門課程系列（一） 從 Cortex-M33 核心認識 TrustZone | STMCU 中文官網 --- STM32L5 入门课程系列（一） 从Cortex-M33内核认识TrustZone | STMCU中文官网](https://www.stmcu.com.cn/ecosystem/chip/chipfamily-STM32L5)
+
+
++ [Using the ARMv8-M TrustZone with GCC – Lobaro.com](https://www.lobaro.com/using-the-armv8-m-trustzone-with-gcc/#)
+    - [ARMV8-M TRUSTZONE的基本概念 - 代码复刻版](https://linmingjie.cn/index.php/archives/285/)
 
 + IoT 安全基礎知識
     - [IoT 安全基礎知識第 1 篇 | DigiKey](https://www.digikey.tw/zh/articles/iot-security-fundamentals-part-1-using-cryptography)

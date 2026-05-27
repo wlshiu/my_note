@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>320</x>
+      <y>190</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>NSPE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>360</x>
+      <y>210</y>
+      <w>30</w>
+      <h>480</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;460.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>640</x>
+      <y>190</y>
+      <w>100</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>SPE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>210</y>
+      <w>30</w>
+      <h>480</h>
+    </coordinates>
+    <panel_attributes>lt=.
+bg=YELLOW</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;460.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>680</x>
+      <y>270</y>
+      <w>20</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>410</y>
+      <w>330</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+Jump to NSPE-Address</panel_attributes>
+    <additional_attributes>10.0;20.0;310.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>360</x>
+      <y>430</y>
+      <w>20</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>
+layer=1
+bg=ORANGE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>470</y>
+      <w>330</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+Return and back to SPE</panel_attributes>
+    <additional_attributes>310.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>680</x>
+      <y>490</y>
+      <w>20</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>
+bg=yellow
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>710</x>
+      <y>270</y>
+      <w>350</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>Brach to call NSPE function
+**'blxns'**
+--
++ Software push GPRs to Secure-Stack
++ Software clean 'R0~R3, R12'
+    &gt;  Toolchain auto-insert
++ CPU hardware flow
+    1. Push the 'return-addr' to Secure-Stack (MSP_S)
+    2. Put FNC_RETURN tag (0xFEFFFFFE)to $LR
+    3. CPU changes to Non-Secure state
+        &gt; Switch to Non-Secure-Stack (MSP_NS)
+    4.  Put NSPE-Address to $PC
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>40</x>
+      <y>430</y>
+      <w>310</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>NSPE function with 
+**__attribute__((cmse_nonsecure_call))**
+
+Return to SPE function
+**bx $LR**
+--
++ CPU hardware flow
+    1. CPU detects $LR is FNC_RETURN tag 
+       (0xFEFFFFFE)
+    2. CPU changes to Secure state
+        &gt; Switch to Secure-Stack (MSP_S)
+    3. Pop 'return-addr' to $PC
+
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
