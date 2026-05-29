@@ -28,6 +28,18 @@ Trusted_Firmware-M
     >> hacker 可藉由搜尋 SPE binary data 中, 與 `sg instruction` op-code 相同數值的 data 位址,
     再將 $PC 指到這個 data address 執行 (把 data 當指令執行, 來打開 SPE mode), 藉此來繞過預設的 APIs 入口
 
++ REE (Rich Execution Environment)
+    > REE 必須透過特定接口, 向 TEE 發出請求, 以確保敏感資料不外洩
+
+    - 定義: 通用的作業系統環境(如 Android, iOS, Windows)
+    - 特點: 功能豐富, 高度開放, 但容易受到惡意軟體攻擊, 安全性較低
+    - 用途: 處理日常應用程式, UI 界面, 瀏覽器等
+
++ TEE (Trusted Execution Environment)
+    - 定義: 隔離於 REE 之外, 受硬體保護的安全區域(通常基於 ARM TrustZone 技術)
+    - 特點: 權限最高, 確保內部的程式與資料具備極高的機密性與完整性
+    - 用途: 處理敏感操作, 如生物識別(指紋/臉部比對), 行動支付驗證, 數位版權管理 (DRM) 及密鑰加密
+
 
 
 
@@ -168,6 +180,7 @@ Power_On -> BL1 (ROM if exsit)
       | (S/w Setting)  / (H/w Config) |
       +-------------------------------+
                        |
+                       | transation
             +----------+----------+
             |                     |
             V                     V
@@ -176,12 +189,25 @@ Power_On -> BL1 (ROM if exsit)
         |  MPU   |          |     MPU    |
         +--------+          +------------+
             |                     |
-            V                     V
+            |                     |
+            +----------+----------+
+                       |
+                       V
     +-----------------------------------------+
     |                  AHB Bus                |
     +-----------------------------------------+
 
 ```
+
+依照 destination address 的 Secure space, 決定 transation 的屬性 (Secure/Non-Secure),
+再依照 transation 屬性, 決定轉發給 MPU_S 或是 MPU_NS, 通過 MPU 審查的 transation 才能發往 BUS
+
++ Instruction access (I-Bus)
+    > SAU/IDAU 對此不會限制
+
++ Data access (D-Bus)
+    > 當 NSPE 要求訪問 SPE 數據時, SAU/IDAU 會阻擋這個訪問
+
 
 ### IDAU (Implementation Defined Attribution Unit)
 IDAU 用來指示 CPU, Memory Address Area 是 Secure/Non-Secure/Non-Secure-Callable
@@ -352,6 +378,12 @@ CPU 會偵測到 `Secure Stack` 中, 並沒有對應的有效返回記錄(Stack 
 
 > + 在 Nested interrupt 中, CPU 會確保 `FNC_RETURN` push/pop 的順序是符合 LIFO (Last Input First Output)
 
+
++ Interrupt 可以發生在 SPE 或 NSPE 的程序中, 因此 CPU 會將 GPRs push 到目前 Secure state 的 stack (MSP_S/PSP_S/MSP_NS/PSP_NS) 中
+    > 如果 Interrupt 是 SPE 往 NSPE ISR 時 (SPE 資訊不能外流), CPU 自己會將重要的內部 common registers (e.g. GPRs, xPSR) 清除
+
+
+
 ### CMSE (Cortex-M Secure Extension) of ARMv8-M of ARM GCC
 
 在編譯時, 加上 `-mcmse` option flag 讓 ARM-GCC 啟用 CMSE 功能,
@@ -417,7 +449,7 @@ CPU 會偵測到 `Secure Stack` 中, 並沒有對應的有效返回記錄(Stack 
     ```
 
 
-SPE/NSPE 是個別編譯並燒錄, 通常 SPE 會提供 header/object file 給 NSPE.
+**SPE 和 NSPE 是個別編譯並燒錄**, 通常 SPE 會提供 header/object file 給 NSPE.
 > + header file: 宣告 `veneer functions (or SG stups)`
 > + object file (e.g. CMSE_importLib.o): `veneer functions (or SG stups)` 的 machine code
 
@@ -486,6 +518,92 @@ ARMv8-M CMSE lib 提供了 `cmse_check_address_range()` 來檢查 address 是否
 
 
 當封裝成 lib (*.a) 時, 需使用 `whole-archive` linker 選項, 這樣 CMSE import lib 才會加入 veneer functions
+　
+## Exception and Interrupt
+
+SPE 和 NSPE 都有自己獨立的 Interrupt vector table(Register: VTOR_S/VTOR_NS)
+> CPU 會依照 interrupt 設定 (NVIC_ITNS Register), 將 IRQ 對應到所屬的 `Vector Table of Secure state (SPE or NSPE)`
+>> 從 SPE 中斷到 NSPE ISR 時, CPU 為了清除 GPRs, 會造成一定程度的中斷響應延遲(12T 延遲到 21T)
+
+
+```c
+__Vector[] =
+{
+    _estack,
+    Reset_Handler,
+    NMI_Handler,        <--- SCB_AIRCR->BFHFNMINS 決定
+    HardFault_Handler,  <--- SCB_AIRCR->BFHFNMINS 決定
+    MemManage_Handler,  <--- SCB_SHCSR/SCB_NS_SHCSR 各自 enable/disable
+    BusFault_Handler,   <--- SCB_AIRCR->BFHFNMINS 決定
+    UsageFault_Handler, <--- SCB_SHCSR/SCB_NS_SHCSR 各自 enable/disable
+    SecureFault_Handler, <--- Only on SPE (hard code)
+    0,
+    0,
+    0,
+    SVC_Handler,        <--- NSEP/SPE 各自獨立
+    DebugMon_Handler,
+    0,
+    PendSV_Handler,     <--- NSEP/SPE 各自獨立
+    SysTick_Handler,    <--- NSEP/SPE 各自獨立
+    //==== external interrupt ====
+    ...
+
+}
+```
+
+### SCB_AIRCR (Application Interrupt and Reset Control Register)
+
+> Configurate **Exceptions**
+
++ Bit-field `PRIS (Priority Secure)`
+    > `PRIS = 1` 時, 強制將所有 Non-Secure Interrupt 的 priority 降級,
+    確保所有 Secure Interrupt 都會優先於 Non-Secure Interrupt
+
++ Bit-field `BFHFNMINS (BusFault/HardFault/NMI Non-Secure enable)`
+    > 決定 BusFault/HardFault/NMI handler 由 SPE 還是 NSPE 來處理
+
+    - `BFHFNMINS = 0 (default)`
+        > 一律強制進入 SPE 處理
+
+    - `BFHFNMINS = 1 (實務上推薦)`
+        > SPE/NSPE 各自處理自己的 BusFault/HardFault/NMI exceptions
+
+        1. 避免 NSPE 的錯誤, 導致整個系統癱瘓
+            > 如果都給 SPE 處理時, 會造成 SPE 必須同時考慮 NSPE 可能發生的各種錯誤,
+            甚至可能造成整個 system crash
+
+### SCB_x->SHCSR, x= S or NS (System Handler Control and State Register)
+
+> Configurate **Exceptions**
+
+SPE/NSPE 各自開啟, 是否進入 MemManageFault, UsageFault handler, 否則自動導向到 HardFault
+
++ `SecureFault` 只能在 SPE 中開啟
+
+    - Scenario: NSPE 程序企圖越界讀取 SPE 記憶體
+        1. 當 NSPE 程序試圖存取 Secure region
+
+            ```
+            // '0x30000000' is defined Secure region by IDAU/SAU
+            uint32_t secret = *(uint32_t*)(0x30000000);
+            ```
+        1. SAU 阻斷這項存取, 並觸發最高級別的 `SecureFault`
+        1. 雖然 `BFHFNMINS = 1`, 但因為是安全違規, hardware 強制無視該設定, CPU 立刻跳進 SPE 的 SecureFault_Handler
+        SPE 端可以判定為, NSPE 端正在遭受駭客攻擊, 直接執行晶片鎖死(Lockup)或抹除關鍵金鑰
+
+
+### NVIC_ITNS [16] (Interrupt Non-Secure State Register)
+
+> Configurate external **Interrupts**
+
+IRQ index 對應到 NVIC_ITNS[16] 的 bit order, NVIC_ITNS 只能在 Secure 狀態下進行讀寫, Non-Secure 狀態完全無法存取此暫存器,
+這確保了 NSPE 的惡意軟體無法篡改中斷的安全級別
+
++ `0` (default): 該中斷屬於 Secure 屬性
+    > 中斷觸發時, CPU 會跳轉到 Secure 空間的`VTOR_S`, 且只有在 Secure 狀態(或透過 NS 委託)下才能處理
+
++ `1`: 該中斷屬於 Non-Secure 屬性
+    > 中斷觸發時, CPU 會直接跳轉到 Non-Secure 空間的 `VTOR_NS`, 由普通域的作業系統(e.g. FreeRTOS)或應用程式自行處理
 
 
 
@@ -804,7 +922,7 @@ trusted-firmware-m/secure_fw/spm/cmsis_psa/main.c: main()
     - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
     - [TrustZone technology for Armv8-M Architecture Version 2.1](https://developer.arm.com/documentation/100690/0201/)
 + STM32
-    - [STM32L5 入門課程系列（一） 從 Cortex-M33 核心認識 TrustZone | STMCU 中文官網 --- STM32L5 入门课程系列（一） 从Cortex-M33内核认识TrustZone | STMCU中文官网](https://www.stmcu.com.cn/ecosystem/chip/chipfamily-STM32L5)
+    - [STM32L5 入門課程系列(一) 從 Cortex-M33 核心認識 TrustZone | STMCU 中文官網 --- STM32L5 入门课程系列(一) 从Cortex-M33内核认识TrustZone | STMCU中文官网](https://www.stmcu.com.cn/ecosystem/chip/chipfamily-STM32L5)
 
 
 + [Using the ARMv8-M TrustZone with GCC – Lobaro.com](https://www.lobaro.com/using-the-armv8-m-trustzone-with-gcc/#)
