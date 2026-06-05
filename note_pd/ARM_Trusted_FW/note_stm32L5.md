@@ -90,6 +90,11 @@ GPIO Pins 預設都是 SPE, 可藉由 SECCFGR(Secure Configure Register) 來單�
     - System-Layer 收到 transation 後, `transation_S` 可以訪問 SPE 和 NSPE, `transation_NS` 只能訪問 NSPE
         > 只有 `transation_NS` 訪問 SPE 時, 才會被 block
 
+# Practice
+
+## [Example-GPIO_TZ](note_stm32L5_gpio_example.md)
+
+
 # Reference
 
 + [STM32L5 入門課程（二）STM32L5 的系統新架構 | STMCU 中文官網 --- STM32L5 入门课程（二）STM32L5的系统新架构 | STMCU中文官网](https://www.stmcu.com.cn/ecosystem/chip/chipfamily-STM32L5-2)
