@@ -124,26 +124,32 @@ IDAU 是從 hardware 實作的角度, 定義 Mapped-Address Area 的屬性 (會�
 
 + 往下執行到 `SystemInit() -> TZ_SAU_Setup()` 時, 會重新配置 SAU (NSP: `0x0800_0000 ~ 0x0BFF_FFFF`, `0x2000_0000 ~ 0x2FFF_FFFF`), 如下
 
-    - Secure status after re-configure SAU
+    - Secure status after re-configure SAU (Only SPE's permission)
         > + `0x0804_0000` 區域, 可獲得 Memory data (Transation 與 FMC 呼應)
         > + `0x0C04_0000` 區域, 無資料 (Transation 與 FMC 不匹配)
         > + `0x2001_8000` 區域, 無資料 (Transation 與 TZC->MPCBB 不匹配)
 
-        | Address                   | IDAU | SAU  | Transation  | FMC (Option-Bytes)                | SRAM (GTZC->MPCBB)            |
-        | :-:                       | :-   | :-   | :-:         | :-:                               | :-:                           |
-        | 0x0000_0000 ~ 0x07FF_FFFF | NS   | S    |   S         |                                   |                               |
-        | 0x0800_0000 ~ 0x0803_FFFF | NS   | S    |   S         | 0x0800_0000 ~ 0x0803_FFFF (S)     |                               |
-        | 0x0804_0000 ~ 0x0807_FFFF | NS   | NS   |   NS        | 0x0804_0000 ~ 0x0807_FFFF (NS)    |                               |
-        | 0x0808_0000 ~ 0x0BFF_FFFF | NS   | S    |   S         |                                   |                               |
-        | 0x0C00_0000 ~ 0x0C03_FFFF | NSC  | S    |   S         | 0x0C00_0000 ~ 0x0C03_FFFF (S)     |                               |
-        | 0x0C04_0000 ~ 0x0C07_FFFF | NSC  | S    |   S         | 0x0C04_0000 ~ 0x0C07_FFFF (NS)    |                               |
-        | 0x0C08_0000 ~ 0x0FFF_FFFF | NSC  | S    |   S         |                                   |                               |
-        | 0x2000_0000 ~ 0x2001_7FFF | NS   | S    |   S         |                                   | 0x2000_0000 ~ 0x2001_7FFF (S) |
-        | 0x2001_8000 ~ 0x2003_FFFF | NS   | NS   |   NS        |                                   | 0x2001_8000 ~ 0x2003_FFFF (S) |
-        | 0x2004_0000 ~ 0x2FFF_FFFF | NS   | S    |   S         |                                   |                               |
-        | 0x3000_0000 ~ 0x3001_7FFF | NSC  | S    |   S         |                                   | 0x3000_0000 ~ 0x3001_7FFF (S) |
-        | 0x3001_8000 ~ 0x3003_FFFF | NSC  | S    |   S         |                                   | 0x3001_8000 ~ 0x3003_FFFF (S) |
-        | 0x3004_0000 ~ 0x3FFF_FFFF | NSC  | S    |   S         |                                   |                               |
+        | Address                   | IDAU | SAU    | Transation  | FMC (Option-Bytes)                | SRAM (GTZC->MPCBB)            |
+        | :-:                       | :-   | :-     | :-:         | :-:                               | :-:                           |
+        | 0x0000_0000 ~ 0x07FF_FFFF | NS   | S      |   S         |                                   |                               |
+        | 0x0800_0000 ~ 0x0803_FFFF | NS   | S      |   S         | 0x0800_0000 ~ 0x0803_FFFF (S)     |                               |
+        | 0x0804_0000 ~ 0x0807_FFFF | NS   | **NS** |   NS        | 0x0804_0000 ~ 0x0807_FFFF (NS)    |                               |
+        | 0x0808_0000 ~ 0x0BFF_FFFF | NS   | S      |   S         |                                   |                               |
+        | 0x0C00_0000 ~ 0x0C03_FFFF | NSC  | S      |   S         | 0x0C00_0000 ~ 0x0C03_FFFF (S)     |                               |
+        | 0x0C04_0000 ~ 0x0C07_FFFF | NSC  | S      |   S         | 0x0C04_0000 ~ 0x0C07_FFFF (NS)    |                               |
+        | 0x0C08_0000 ~ 0x0FFF_FFFF | NSC  | S      |   S         |                                   |                               |
+        | 0x2000_0000 ~ 0x2001_7FFF | NS   | S      |   S         |                                   | 0x2000_0000 ~ 0x2001_7FFF (S) |
+        | 0x2001_8000 ~ 0x2003_FFFF | NS   | **NS** |   NS        |                                   | 0x2001_8000 ~ 0x2003_FFFF (S) |
+        | 0x2004_0000 ~ 0x2FFF_FFFF | NS   | S      |   S         |                                   |                               |
+        | 0x3000_0000 ~ 0x3001_7FFF | NSC  | S      |   S         |                                   | 0x3000_0000 ~ 0x3001_7FFF (S) |
+        | 0x3001_8000 ~ 0x3003_FFFF | NSC  | S      |   S         |                                   | 0x3001_8000 ~ 0x3003_FFFF (S) |
+        | 0x3004_0000 ~ 0x3FFF_FFFF | NSC  | S      |   S         |                                   |                               |
+
+
+    - 配置 interrupts 的安全屬性 (Only SPE's permission)
+        > 藉由設定 `NVIC_ITNS Register`, 決定將那些 IRQ 歸到 NSPE
+        >> `NVIC_ITNS[]` 中的 bit order 分別對應 IRQn order, 其中 `0 (default): Secure, 1: Non-secure`
+
 
 + 再往下執行到 `main() -> MX_GTZC_S_Init()` 時, 重新配置 `GTZC->MPCBB`, 來限制 SRAM 的存取權限
 
@@ -153,28 +159,73 @@ IDAU 是從 hardware 實作的角度, 定義 Mapped-Address Area 的屬性 (會�
         > + `0x3000_0000` 區域, 可獲得 Memory data (Transation 與 FMC 呼應)
         > + `0x3001_8000` 區域, 無資料 (Transation 與 TZC->MPCBB 不匹配)
 
-        | Address                   | IDAU | SAU  | Transation  | FMC (Option-Bytes)                | SRAM (GTZC->MPCBB)             |
-        | :-:                       | :-   | :-   | :-:         | :-:                               | :-:                            |
-        | 0x0000_0000 ~ 0x07FF_FFFF | NS   | S    |   S         |                                   |                                |
-        | 0x0800_0000 ~ 0x0803_FFFF | NS   | S    |   S         | 0x0800_0000 ~ 0x0803_FFFF (S)     |                                |
-        | 0x0804_0000 ~ 0x0807_FFFF | NS   | NS   |   NS        | 0x0804_0000 ~ 0x0807_FFFF (NS)    |                                |
-        | 0x0808_0000 ~ 0x0BFF_FFFF | NS   | S    |   S         |                                   |                                |
-        | 0x0C00_0000 ~ 0x0C03_FFFF | NSC  | S    |   S         | 0x0C00_0000 ~ 0x0C03_FFFF (S)     |                                |
-        | 0x0C04_0000 ~ 0x0C07_FFFF | NSC  | S    |   S         | 0x0C04_0000 ~ 0x0C07_FFFF (NS)    |                                |
-        | 0x0C08_0000 ~ 0x0FFF_FFFF | NSC  | S    |   S         |                                   |                                |
-        | 0x2000_0000 ~ 0x2001_7FFF | NS   | S    |   S         |                                   | 0x2000_0000 ~ 0x2001_7FFF (S)  |
-        | 0x2001_8000 ~ 0x2003_FFFF | NS   | NS   |   NS        |                                   | 0x2001_8000 ~ 0x2003_FFFF (NS) |
-        | 0x2004_0000 ~ 0x2FFF_FFFF | NS   | S    |   S         |                                   |                                |
-        | 0x3000_0000 ~ 0x3001_7FFF | NSC  | S    |   S         |                                   | 0x3000_0000 ~ 0x3001_7FFF (S)  |
-        | 0x3001_8000 ~ 0x3003_FFFF | NSC  | S    |   S         |                                   | 0x3001_8000 ~ 0x3003_FFFF (NS) |
-        | 0x3004_0000 ~ 0x3FFF_FFFF | NSC  | S    |   S         |                                   |                                |
+        | Address                   | IDAU | SAU    | Transation  | FMC (Option-Bytes)                | SRAM (GTZC->MPCBB)                  |
+        | :-:                       | :-   | :-     | :-:         | :-:                               | :-:                                 |
+        | 0x0000_0000 ~ 0x07FF_FFFF | NS   | S      |   S         |                                   |                                     |
+        | 0x0800_0000 ~ 0x0803_FFFF | NS   | S      |   S         | 0x0800_0000 ~ 0x0803_FFFF (S)     |                                     |
+        | 0x0804_0000 ~ 0x0807_FFFF | NS   | **NS** |   NS        | 0x0804_0000 ~ 0x0807_FFFF (NS)    |                                     |
+        | 0x0808_0000 ~ 0x0BFF_FFFF | NS   | S      |   S         |                                   |                                     |
+        | 0x0C00_0000 ~ 0x0C03_FFFF | NSC  | S      |   S         | 0x0C00_0000 ~ 0x0C03_FFFF (S)     |                                     |
+        | 0x0C04_0000 ~ 0x0C07_FFFF | NSC  | S      |   S         | 0x0C04_0000 ~ 0x0C07_FFFF (NS)    |                                     |
+        | 0x0C08_0000 ~ 0x0FFF_FFFF | NSC  | S      |   S         |                                   |                                     |
+        | 0x2000_0000 ~ 0x2001_7FFF | NS   | S      |   S         |                                   | 0x2000_0000 ~ 0x2001_7FFF (S)       |
+        | 0x2001_8000 ~ 0x2003_FFFF | NS   | **NS** |   NS        |                                   | 0x2001_8000 ~ 0x2003_FFFF (**NS**)  |
+        | 0x2004_0000 ~ 0x2FFF_FFFF | NS   | S      |   S         |                                   |                                     |
+        | 0x3000_0000 ~ 0x3001_7FFF | NSC  | S      |   S         |                                   | 0x3000_0000 ~ 0x3001_7FFF (S)       |
+        | 0x3001_8000 ~ 0x3003_FFFF | NSC  | S      |   S         |                                   | 0x3001_8000 ~ 0x3003_FFFF (**NS**)  |
+        | 0x3004_0000 ~ 0x3FFF_FFFF | NSC  | S      |   S         |                                   |                                     |
+
++ 往下執行到 `main() -> MX_GPIO_Init()` 時, 配置 PINs 的安全屬性 (Only SPE's permission)
+    > 因 GPIO 是 `TrustZone aware` module, 代表 GPIO 可以自行配置 PINs 的安全屬性, 預設為 SPE
+
+    ```
+    /**
+     *  \brief  Configure the Secure attributes of GPIO PINs.
+     *              ps. This function is "only available in secure"
+     *
+     *  \param [in] GPIOx           the instance of GPIO Port
+     *  \param [in] GPIO_Pin        the specific pin indx
+     *  \param [in] PinAttributes   the Secure attribute, 0: Non-secure, 1: Secure
+     *  \return
+     *      None
+     */
+    void HAL_GPIO_ConfigPinAttributes(GPIO_TypeDef  *GPIOx, uint16_t  GPIO_Pin, uint32_t  PinAttributes);
+    ```
+
++ 在 SPE Boot 階段的最後, 跳轉到 NSPE 的方式
+
+    ```c
+    static void NonSecure_Init(void)
+    {
+        funcptr_NS    NS_ResetHandler;
+
+        SCB_NS->VTOR = VTOR_TABLE_NS_START_ADDR;    <--- Set the NS Vector Table
+
+        /* Set non-secure main stack (MSP_NS) */
+        __TZ_set_MSP_NS((*(uint32_t *)VTOR_TABLE_NS_START_ADDR));
+
+        /* Get non-secure reset handler */
+        NS_ResetHandler = (funcptr_NS)(*((uint32_t *)((VTOR_TABLE_NS_START_ADDR) + 4U)));
+
+        /* Start non-secure state software application */
+        NS_ResetHandler();
+    }
+    ```
 
 
++ Secure Handler of NVIC
+    > Secure Handler 發生在 SPE, 再藉由 `__attribute__((cmse_nonsecure_call)) callback` 來通知 NSPE
+    >> `secure_nsc.c: SECURE_RegisterCallback()` 提供一個 NSC function,
+    讓 NPSE 可以註冊對應的 callback, 給 Secure Handler 回傳錯誤到 NSPE
+
+    - `SecureFault_Handler()`
+        > CPU exception, 只反應 CPU 切換 SPE/NSPE 時的安全越界
+
+    - `GTZC_IRQHandler()`
+        > System layer interrupt, 反應 CPU 以外(e.g. SRAM, eFlash, extFlash, Peripheral)的安全越界
 
 
-
-
-
++ Cortex-M33 有兩組 systick (SPE/NSPE), 根據在 `SCB->VTOR` 和 `SCB_NS->VTOR` 的 Vector Table 來跳轉
 
 
 

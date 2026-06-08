@@ -41,7 +41,7 @@ STM32L5 GTZC subsystem block diagram from spec<br>
     > `MPCBBx` 保護的對象是 `Internal-SRAM`
 
 + `TZSC`: TrustZone Security Controller (橘色和黃色區域)
-    - 管理直接接在 AHB 上的 master/slave 裝置 (橘色區域)
+    - 管理直接接在 AHB 上的 master/slave 裝置 (橘色區域 PPC, Peripheral Protection Controller)
         > APB 也間接接在 AHB 上
 
         1. Peripheral 也可以個別歸屬到 SPE 或 NSPE
