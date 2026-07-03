@@ -1,6 +1,8 @@
 stm32L5 GPIO_TZ Example [[Back](note_stm32L5.md#example-gpio_tz)]
 ---
 
+> Board: STM32L5_NUCLEO, SoC: STM32L552ZE
+
 Official: `STM32CubeL5/Projects/NUCLEO-L552ZE-Q/Examples/GPIO/GPIO_IOToggle_TrustZone`
 > 上電後, 會先從 SPE 啟動, 初始化並配置安全屬性後, 切換到 NSPE 執行, 接著是 SPE 和 NSPE 之間的互動.
 
@@ -123,7 +125,8 @@ IDAU 是從 hardware 實作的角度, 定義 Mapped-Address Area 的屬性 (會�
 
 
 + 往下執行到 `SystemInit() -> TZ_SAU_Setup()` 時, 會重新配置 SAU (NSP: `0x0800_0000 ~ 0x0BFF_FFFF`, `0x2000_0000 ~ 0x2FFF_FFFF`), 如下
-
+    > `TZ_SAU_Setup()` is in `partition_stm32l552xx.h`
+    
     - Secure status after re-configure SAU (Only SPE's permission)
         > + `0x0804_0000` 區域, 可獲得 Memory data (Transation 與 FMC 呼應)
         > + `0x0C04_0000` 區域, 無資料 (Transation 與 FMC 不匹配)
