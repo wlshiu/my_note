@@ -124,10 +124,12 @@ QEMU 原生支援 Arm 的 MPS2/MPS3 測試板(AN521 FPGA 映像), 其核心就�
 ## TFM (Trusted Firmware MCU) example
 
 
+
 + tfm examples in Zephyr-RTOS
     > `<ZEPHYR_ROOT_DIR>/samples/tfm_integration`
 
     ```
+    # '-p': clean project
     $ west build -p -b mps2/an521/cpu0/ns samples/tfm_integration/tfm_ipc
     ```
 
@@ -145,36 +147,41 @@ QEMU 原生支援 Arm 的 MPS2/MPS3 測試板(AN521 FPGA 映像), 其核心就�
     ```
 
 + Debug with GDB in Qemu
+    > `west debugserver/debug` 竟然無法使用在 tfm ...
 
     - Wait GDB-Client connection
 
         ```
-        ## 有錯誤發生,無法使用
-        $ west build -t run -- -DCONFIG_QEMU_EXTRA_FLAGS="-s -S"
-        ```
-
-        ```
-        $ qemu-system-arm -M mps2-an521 -device loader,file=<ZEPHYR_ROOT_DIR>/build/zephyr/tfm_merged.hex -serial stdio -nographic -s -S
+        $ qemu-system-arm -M mps2-an521 -device loader,file=<ZEPHYR_ROOT_DIR>/build/zephyr/tfm_merged.hex -nographic -s -S
         ```
 
     - GDB-Client connects to Qemu
 
         ```
-        $ arm-none-eabi-gdb <ZEPHYR_ROOT_DIR>/build/zephyr/zephyr.elf
-        ```
-        ```
-        $ arm-none-eabi-gdb <ZEPHYR_ROOT_DIR>/build/zephyr/zephyr.elf \
-            -ex "target remote:1234" \
-            -ex "add-symbol-file <ZEPHYR_ROOT_DIR>/build/tfm/bin/tfm_s.elf" \
+        $ arm-none-eabi-gdb ./zephyr/build/zephyr/zephyr.elf \
+            -ex "set pagination off" \
+            -ex "add-symbol-file ./zephyr/build/tfm/bin/tfm_s.elf" \
             -ex "b __start" \
+            -ex "target remote localhost:1234" \
             -tui
+
+        GDB-Console:
+            ...
+            Remote debugging using localhost:1234
+            0x100009f4 in ?? ()
+            => 0x100009f4:  08 b5   push    {r3, lr}
+            (gdb) info breakpoints
+            Num     Type           Disp Enb Address    What
+            1       breakpoint     keep y   0x00100bdc /home/lubwl/working/test/rtos/Zephyr/zephyr/arch/arm/core/cortex_m/reset.S:95
+            (gdb) c
+            Continuing.
+
+            Breakpoint 1, z_arm_reset () at /home/lubwl/working/test/rtos/Zephyr/zephyr/arch/arm/core/cortex_m/reset.S:95
+            warning: Source file is more recent than executable.
+            (gdb)
+
         ```
-        ```
-        cgdb -d gdb-multiarch <ZEPHYR_ROOT_DIR>/build/zephyr/zephyr.elf \
-            -ex "target remote:1234" \
-            -ex "add-symbol-file <ZEPHYR_ROOT_DIR>/build/tfm/bin/tfm_s.elf" \
-            -ex "b __start"
-        ```
+
 
 # Reference
 
