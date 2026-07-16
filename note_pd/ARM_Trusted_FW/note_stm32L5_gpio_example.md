@@ -219,7 +219,7 @@ IDAU 是從 hardware 實作的角度, 定義 Mapped-Address Area 的屬性 (會�
 + Secure Handler of NVIC
     > Secure Handler 發生在 SPE, 再藉由 `__attribute__((cmse_nonsecure_call)) callback` 來通知 NSPE
     >> `secure_nsc.c: SECURE_RegisterCallback()` 提供一個 NSC function,
-    讓 NPSE 可以註冊對應的 callback, 給 Secure Handler 回傳錯誤到 NSPE
+    讓 NSPE 可以註冊對應的 callback, 給 Secure Handler 回傳錯誤到 NSPE
 
     - `SecureFault_Handler()`
         > CPU exception, 只反應 CPU 切換 SPE/NSPE 時的安全越界
