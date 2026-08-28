@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>595</y>
+      <w>833</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=MAGENTA</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0;250.0;40.0;280.0;50.0;300.0;30.0;330.0;40.0;420.0;20.0;470.0;50.0;520.0;30.0;550.0;40.0;580.0;10.0;920.0;10.0;960.0;40.0;1080.0;20.0;1130.0;40.0;1150.0;20.0;1170.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>672</y>
+      <w>840</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>1180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>371</y>
+      <w>469</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>10.0;340.0;20.0;330.0;30.0;340.0;40.0;320.0;70.0;340.0;90.0;320.0;110.0;340.0;120.0;320.0;140.0;340.0;150.0;310.0;160.0;330.0;170.0;320.0;180.0;340.0;190.0;320.0;200.0;340.0;220.0;320.0;230.0;340.0;240.0;320.0;250.0;360.0;260.0;330.0;270.0;430.0;280.0;310.0;290.0;350.0;300.0;260.0;310.0;320.0;320.0;320.0;330.0;360.0;340.0;330.0;350.0;350.0;360.0;320.0;370.0;330.0;380.0;320.0;390.0;340.0;400.0;310.0;410.0;330.0;420.0;300.0;430.0;340.0;440.0;320.0;450.0;360.0;460.0;320.0;470.0;370.0;480.0;330.0;490.0;350.0;500.0;330.0;510.0;350.0;520.0;330.0;530.0;350.0;540.0;320.0;550.0;360.0;560.0;330.0;580.0;320.0;590.0;200.0;610.0;100.0;650.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>665</x>
+      <y>336</y>
+      <w>378</w>
+      <h>301</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=#3c7a00</panel_attributes>
+    <additional_attributes>10.0;60.0;20.0;70.0;30.0;40.0;40.0;60.0;50.0;50.0;60.0;70.0;70.0;40.0;80.0;50.0;90.0;20.0;100.0;60.0;110.0;40.0;120.0;80.0;130.0;10.0;140.0;70.0;150.0;20.0;160.0;50.0;170.0;30.0;180.0;60.0;190.0;10.0;200.0;50.0;220.0;80.0;230.0;140.0;260.0;230.0;280.0;370.0;290.0;390.0;300.0;380.0;320.0;390.0;320.0;410.0;330.0;360.0;340.0;400.0;350.0;370.0;360.0;410.0;370.0;350.0;380.0;400.0;390.0;380.0;400.0;400.0;420.0;370.0;430.0;390.0;440.0;360.0;460.0;400.0;470.0;380.0;490.0;400.0;510.0;370.0;520.0;390.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>322</x>
+      <y>602</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>567</y>
+      <w>826</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;10.0;240.0;10.0;270.0;30.0;300.0;10.0;340.0;30.0;420.0;10.0;480.0;40.0;530.0;10.0;550.0;40.0;580.0;20.0;920.0;20.0;960.0;50.0;1080.0;20.0;1130.0;40.0;1160.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>217</x>
+      <y>623</y>
+      <w>833</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;20.0;230.0;20.0;280.0;40.0;420.0;20.0;470.0;40.0;520.0;30.0;550.0;40.0;580.0;10.0;920.0;10.0;960.0;30.0;1080.0;10.0;1130.0;30.0;1170.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>287</x>
+      <y>567</y>
+      <w>21</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;
+fg=BLUE</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>238</x>
+      <y>616</y>
+      <w>91</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>*Valid Noise area*
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>665</x>
+      <y>378</y>
+      <w>28</w>
+      <h>238</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>12.0;10.0;10.0;320.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>679</x>
+      <y>399</y>
+      <w>105</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>*Delta-Value*
+(Raw_Amp - Baseline)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>665</x>
+      <y>371</y>
+      <w>14</w>
+      <h>14</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>434</y>
+      <w>434</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=.
+fg=#a0522d
+
+
+</panel_attributes>
+    <additional_attributes>10.0;20.0;600.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>875</x>
+      <y>448</y>
+      <w>133</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>*Raw-Threshold*
+Baseline * (1 + SNR_Factor)
+fg=#a0522d
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>168</x>
+      <y>609</y>
+      <w>49</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>*Baseline*
+
+fg=MAGENTA</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>168</x>
+      <y>588</y>
+      <w>56</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>*Raw_Amp*
+fg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>721</x>
+      <y>441</y>
+      <w>21</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-&gt;&gt;&gt;
+fg=#ffa500
+</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>728</x>
+      <y>455</y>
+      <w>105</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>*Threshold*
+Baseline * SNR_Factor
+fg=#ffa500
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>714</x>
+      <y>665</y>
+      <w>56</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>*Amp= 0*</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>630</x>
+      <y>322</y>
+      <w>210</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=.
+Touched Signals
+
+
+
+fg=red
+
+
+
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>224</x>
+      <y>644</y>
+      <w>119</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>*Baseline x (1 +- percent)*
+
+fg=BLUE</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
