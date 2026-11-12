@@ -1,4 +1,4 @@
-PicoRV32 [[Back](./note_LiteX.md##CPU-PicoRV32)]
+PicoRV32 [[Back](./note_LiteX.md#CPU-PicoRV32)]
 ---
 
 PicoRV32 不支援內部 DM (Debug Module, 沒有 jTag)

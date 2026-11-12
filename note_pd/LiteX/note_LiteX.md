@@ -33,7 +33,13 @@ note_LiteX
 # 環境建立
 
 + Dependency
-
+    
+    - ubuntu
+        
+        ```
+        $ sudo apt-get install -y openjdk-17-jdk
+        ```
+        
     - Toolchain
         1. [Version 11.5.0-2 released | xPack GNU RISC-V Embedded GCC](https://xpack-dev-tools.github.io/riscv-none-elf-gcc-xpack/blog/2024/09/02/riscv-none-elf-gcc-v11-5-0-2-released/)
 
@@ -122,3 +128,4 @@ note_LiteX
 
 
 ## [CPU-PicoRV32](./PicoRV32.md)
+## [CPU-VexRISCV](./VexRISCV.md)
