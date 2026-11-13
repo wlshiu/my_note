@@ -7,7 +7,11 @@ VexRISCV [[Back](./note_LiteX.md#CPU-VexRISCV)]
 
 
 ```
+#
+# xpack-riscv-none-elf-gcc-11.5.0-2
+#   ps. xpack-riscv-none-embed-gcc-8.2.0-3.1 編譯 fail..., 只能使用 GDB 功能
 $ export LITEX_ENV_CC_TRIPLE=riscv-none-elf
+
 
 # 1. 建立 VexRISCV 模擬專案結構(先產生軟體標頭檔與 BIOS)
 $ litex_sim --cpu-type=vexriscv --integrated-main-ram-size=0x10000 --no-compile-gateware
@@ -128,6 +132,8 @@ VexRiscv 原生未帶 Debug-Module (當時 RISC-V DM 規範尚未定案),
     ```
 
 + Build OpenOCD
+    > VexRISCV 開發時, RISC-V Debug-Module 尚未定案,
+    因此特製 `SpinalHDL/openocd_riscv`, 造成與 RISC-V Official toolchain 有相容性問題
 
     ```
     # 忽略 git2cl fail
@@ -445,14 +451,17 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
         from litex.soc.integration.builder import Builder, builder_args, builder_argdict
         from litex.soc.integration.soc_core import soc_core_args, soc_core_argdict
         from litex.tools.litex_sim import SimSoC, sim_args
+        from litex.soc.integration.soc_core import soc_core_args, soc_core_argdict, get_mem_data
+
 
         # 1. 在模擬平台定義外接 4-pin JTAG 腳位
         _sim_jtag_io = [
-            ("jtag_ext", 0,
+            ("jtag", 0,
                 Subsignal("tck", Pins(1)),
                 Subsignal("tms", Pins(1)),
                 Subsignal("tdi", Pins(1)),
                 Subsignal("tdo", Pins(1)),
+                Subsignal("ntrst", Pins(1)),
             ),
         ]
 
@@ -461,9 +470,15 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
             def __init__(self, **kwargs):
                 super().__init__(**kwargs)
 
+                # 跳過開機 RAM 測試(避免洗掉剛載入的 demo.bin)並直接跳轉至 0x40000000
+                self.add_constant("MEMTEST_DISABLE")
+
+                #  self.add_constant("FLASH_BOOT_ADDRESS", 0x40000000)
+                self.add_constant("ROM_BOOT_ADDRESS", 0x40000000) # ROM_BOOT_ADDRESS無條件跳轉,不檢查檔頭與 CRC
+
                 # 註冊並取得模擬器的 JTAG 頂層訊號
                 self.platform.add_extension(_sim_jtag_io)
-                jtag_pads = self.platform.request("jtag_ext")
+                jtag_pads = self.platform.request("jtag")
 
                 # 將實體模擬訊號連接到 VexRiscv 核心暴露的 jtag_* 介面
                 jtag_halted = Signal()
@@ -485,8 +500,11 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
 
             # 配置模擬器基本周邊 (系統時脈 + 序列埠 Console)
             sim_config = SimConfig()
-            sim_config.add_clocker("sys_clk", freq_hz=int(1e6)) # 模擬 clock 1MHz, 50e6= 50MHz
+            sim_config.add_clocker("sys_clk", freq_hz=int(20e6))
             sim_config.add_module("serial2console", "serial")
+
+            # 直接呼叫 LiteX 內建的 libjtagremote.so 模組,自動將 jtag_ext 的 tck、tms、tdi、tdo 綁定到 TCP Port 4444
+            sim_config.add_module("jtagremote", "jtag", args={"port": "5555"})
 
             # 強制指定使用我們註冊的 minimal+jtag 變體
             soc_kwargs = soc_core_argdict(args)
@@ -494,13 +512,23 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
             soc_kwargs["cpu_variant"] = "minimal+jtag"
             soc_kwargs["uart_name"] = "sim"
 
+            # 新增：配置 64KiB 的內部 Main RAM (起始位址 0x40000000) 供載入應用程式
+            soc_kwargs["integrated_main_ram_size"] = 0x10000
+            soc_kwargs["integrated_main_ram_init"] = get_mem_data("./demo/demo.bin", endianness="little")
+            # 2. 關鍵：關閉開機 Memtest, 避免 BIOS 把剛載入 0x40000000 的 demo.bin 洗掉！
+            soc_kwargs["with_memtest"] = False
+
             soc = JtagSimSoC(
                 sim_config = sim_config,
                 **soc_kwargs
             )
 
             builder = Builder(soc, **builder_argdict(args))
-            builder.build(sim_config=sim_config)
+            builder.build(
+                sim_config=sim_config,
+                # threads    = 4,      # 開啟 Verilator 4 執行緒平行模擬 (不穩定)
+                opt_level  = "O3",   # 強制使用 C++ 最高最佳化等級 -O3
+                )
 
         if __name__ == "__main__":
             main()
@@ -518,7 +546,7 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
 
         ```
         $ ./sim_jtag_soc.py
-        ...
+            ...
             [clocker] sys_clk: freq_hz=1000000, phase_deg=0
 
                     __   _ __      _  __
@@ -555,6 +583,16 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
 
         ```
 
+        1. `--no-compile`: 啟動模擬器時,不需要重新編譯
+            > `--sim-speed`: 監控目前主機實際跑出的模擬頻率(kHz/MHz)
+
+            ```
+            $ ./sim_jtag_soc.py --no-compile --sim-speed
+            $ ./sim_jtag_soc.py --sim-speed --ram-init=demo/demo.bin
+            ```
+
+
+
     - `Terminal_2` 啟動 `OpenOCD server`
 
         1. 建立 OpenOCD 設定檔 `vexriscv_sim.cfg`
@@ -586,15 +624,16 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
             ```
 
     - `Terminal_3` 啟動 GDB Client
-        > `$ riscv-none-elf-gdb -tui ./build/sim/software/bios/bios.elf`
+        > `$ cgdb -d .../riscv-none-embed-gdb ./demo/demo.elf`
 
         1. GDB 操作
             > LiteX SimSoC 模擬頻率(1MHz)較低,用終端命令 `-ex "target remote localhost:3333"`會連不上
 
             ```
             # 1. 連線至 OpenOCD 的 GDB Server
-            (gdb) target remote localhost:3333      # 新版: target extended-remote localhost:3333
-            (gdb) set remotetimeout 60              # 避免 GDB 因為等不到 OpenOCD 回應而主動斷線
+            (gdb) set remotetimeout 60                  # 避免 GDB 因為等不到 OpenOCD 回應而主動斷線
+            (gdb) target extended-remote localhost:3333 # 舊版: target remote localhost:3333
+
 
             # 2. 暫停 CPU 並查看目前程式計數器 (PC) 與所有暫存器
             (gdb) monitor halt
@@ -629,7 +668,34 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
             當 `stepi` 結束時, OpenOCD 回傳的 GDB Remote Serial Protocol (RSP) 停止封包格式,讓 GDB 的 Hex 解析器印出這行警告.
             >> 例如: 包含字串 `reason:watchpoint` 或未預期的 ASCII 字元 (十進位 79 對應 ASCII 字元 `O`)
 
+        1. 使用 `thbreak` (Temp Hardware Breakpointer) 取代 `stepi/next`
+            > `thbreak` 使用臨時 headware breakpointer, 程式停止後會自動刪除
+
+            ```
+            # 1. 取代 stepi(前進到下一道組合語言指令):
+            (gdb) thbreak *($pc + 4)
+            (gdb) continue
+
+            # 2. 取代 next(前進到下一行 C 語言原始碼, 例如第 45 行):
+            (gdb) thbreak 45
+            (gdb) continue
+            ```
+
+            ```
+            # 用 GDB 巨集定義
+            define stepi_2
+                thbreak *($pc + 4)
+                continue
+            end
+            ```
+
+        1. 降低單次 JTAG 延遲
+            > + 調降 `readWaitCycles`: 在 `vexriscv_sim.cfg` 中, 將 `vexriscv readWaitCycles` 設為 15 或 20 (只要不會出現讀取錯誤, 越小越快).
+            > + 開啟 Verilator 多執行緒 (不穩定)
+
 + 建立 Application Program
+    > `sim_jtag_soc.py` 會依照 python 編寫 重新產生 memory layout的配置,
+    若有修改 Chip 參數, 最好重建 Application project (重讀 `build/sim` 中的 memory mapping)
 
     ```
     [.../exported_rtl]
@@ -654,6 +720,70 @@ Verilator 模擬器會直接驅動 VexRiscv 模組的 `jtag_tck、jtag_tms、jta
 
 + 執行 Application 模擬
 
-    ```
-    $ ./sim_jtag_soc.py --ram-init=./demo/demo.bin
-    ```
+    - Use `tmux` with script `z_VexRiscv_develop.sh`
+        > `$ ./z_VexRiscv_develop.sh`
+
+        ```bash
+        #!/bin/bash
+
+        set -e
+
+        #
+        # + switch-window: Ctrl+b 方向鍵
+        # + close window: Ctrl+b x (check y/n ?)
+        # + scroll history: Ctrl+b [ (leave scroll mode: press q or ESC)
+        #
+
+        # ================= 設定區 =================
+        SESSION_NAME="vexriscv_debug"
+        WINDOW_NAME="DebugEnv"
+        OPENOCD_BIN="openocd"
+        OPENOCD_CFG="./vexriscv_sim.cfg"
+        GDB_BIN="cgdb -d $HOME/Toolchain/xpack-riscv-none-embed-gcc-8.2.0-3.1/bin/riscv-none-embed-gdb"
+        # GDB_BIN="$HOME/Toolchain/xpack-riscv-none-embed-gcc-8.2.0-3.1/bin/riscv-none-embed-gdb"
+        GDB_PORT="3333"
+        ELF_FILE="./demo/demo.elf"
+        # ==========================================
+
+
+        echo "Start tmux ..."
+        tmux kill-session -t $SESSION_NAME 2>/dev/null || true
+
+        # 1. 建立 Session 與初始視窗(此時只有 1 個全螢幕 Pane)
+        tmux new-session -d -s $SESSION_NAME -n "$WINDOW_NAME"
+
+        # 2. 左右分割 (-h)：切出'右半部'
+        # -p 50 代表右半部佔 50% 寬度(可依需求調整,例如 -p 40)
+        tmux split-window -h -p 35 -t "$SESSION_NAME:$WINDOW_NAME"
+
+        # --- 此時的 Pane 編號分布 ---
+        # .0 = 左上
+        # .1 = 左下
+        # .2 = 右半部
+        # 3. 選取左邊的 Pane (編號 0),再進行上下分割 (-v): 切出左下
+        # tmux select-pane -t "$SESSION_NAME:$WINDOW_NAME.0"
+        # tmux split-window -v -p 50 -t "$SESSION_NAME:$WINDOW_NAME.0"
+
+        # tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.0" "./sim_jtag_soc.py --sim-speed" C-m
+        # tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.1" "echo 'Wait Simulator...'; sleep 3; $OPENOCD_BIN -f $OPENOCD_CFG" C-m
+        # tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.2" "echo 'Wait OpenOCD Link...'; while ! nc -z localhost $GDB_PORT >/dev/null 2>&1; do sleep 1; done; $GDB_BIN $ELF_FILE -ex 'set remotetimeout 60' -ex 'target extended-remote localhost:3333'" C-m
+
+
+        # --- 此時的 Pane 編號分布 ---
+        # .0 = 左半部
+        # .1 = 右上
+        # .2 = 右下
+        # 3. 選取右邊的 Pane (編號 1),再進行上下分割 (-v): 切出左下
+        tmux select-pane -t "$SESSION_NAME:$WINDOW_NAME.1"
+        tmux split-window -v -p 50 -t "$SESSION_NAME:$WINDOW_NAME.1"
+
+        tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.1" "./sim_jtag_soc.py --sim-speed" C-m
+        tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.2" "echo 'Wait Simulator...'; sleep 5; $OPENOCD_BIN -f $OPENOCD_CFG" C-m
+        tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.0" "echo 'Wait OpenOCD Link...'; while ! nc -z localhost $GDB_PORT >/dev/null 2>&1; do sleep 1; done; $GDB_BIN $ELF_FILE -ex 'set remotetimeout 60' -ex 'target extended-remote localhost:3333'" C-m
+
+
+        # 進入 tmux 畫面
+        tmux attach-session -t $SESSION_NAME
+
+        ```
+
