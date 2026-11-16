@@ -1,0 +1,34 @@
+--- ./Murax.scala.org	2026-11-16 09:02:05.574609481 +0800
++++ Murax.scala	2026-11-16 15:41:15.456097752 +0800
+@@ -89,7 +89,12 @@
+         earlyInjection = false,
+         bigEndian = bigEndian
+       ),
+-      new CsrPlugin(CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x80000020l)),
++      new CsrPlugin(
++        CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x80000020l).copy(
++          pipelineCsrRead = false,
++          deterministicInteruptionEntry = true
++        )
++      ),
+       new DecoderSimplePlugin(
+         catchIllegalInstruction = false
+       ),
+@@ -113,7 +118,7 @@
+         pessimisticAddressMatch = false
+       ),
+       new BranchPlugin(
+-        earlyBranch = false,
++        earlyBranch = true,
+         catchAddressMisaligned = false
+       ),
+       new YamlPlugin("cpu0.yaml")
+@@ -234,6 +239,8 @@
+     //Instanciate the CPU
+     val cpu = new VexRiscv(
+       config = VexRiscvConfig(
++        withMemoryStage = false,
++        withWriteBackStage = false,
+         plugins = cpuPlugins += new DebugPlugin(debugClockDomain, hardwareBreakpointCount)
+       )
+     )
