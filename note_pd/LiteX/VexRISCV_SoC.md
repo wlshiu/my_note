@@ -5,6 +5,7 @@ VexRISCV_SoC
 + [Murax ](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
     > Murax SoC 是一個極其輕量級、以 SpinalHDL 撰寫的開源 RISC-V SoC設計。
     它以 VexRiscv 處理器核心為基礎, 專門設計用來塞入像 Lattice iCE40 這樣資源極省的小型 FPGA 中
+    >> license: `Apache 2.0`
 
     - Spec
 
@@ -29,6 +30,42 @@ VexRISCV_SoC
             > 約 `51 MHz`, 使用 2,387 個邏輯單元(LC), 效能約 `0.37 – 0.45 DMIPS/MHz`
         1. RV32I(Bypassed stages)
             > 約 `45 MHz`, 使用 2,718 個邏輯單元(LC), 效能約 `0.55 – 0.65 DMIPS/MHz`
+
+    - 實際 ASIC 應用案例
+        1. 開源 ASIC 生態與 Google SkyWater MPW 投片計畫
+            > + Efabless Caravel 平台與 OpenLane 流程:
+            Google 與 Efabless 推動的 `SkyWater 130nm` 開源製程計畫中,許多團隊採用 VexRiscv(或整合在 LiteX 下的 VexRiscv SoC)作為 Chip 的管理核心(Management Core)或運算核心,
+            並直接透過開源 EDA 工具鏈(OpenLane / OpenROAD)完成從 RTL 到 GDSII 的實體設計與投片
+
+            > + 微型晶片競賽與學術流片:
+            在 `Tiny Tapeout` 等群眾募資的微型 ASIC 專案中,
+            開發者經常利用 VexRiscv 精簡的插件機制(移除不必要的快取與浮點單元,將邏輯閘數壓縮至極低),
+            在極小的矽晶面積內塞入完整的 32 位元 RISC-V 系統並完成實體晶片製造
+
+        1. 安全控制與信任根(Root of Trust)協處理器
+            > + 客製化安全指令與 PMP 隔離:
+                VexRiscv 內建完整的`實體記憶體保護(PMP)`插件,且基於 SpinalHDL 的架構允許設計者在不更動主體管線的情況下,
+                輕鬆插入自訂的加密加速指令(Custom Instructions)
+
+            > + 商業化導入優勢:
+                由於 VexRiscv 採用商業友善的開源授權,新創與晶片設計公司常將其作為大型 SoC 內部的`安全島(Security Island)`或管理子系統(Housekeeping MCU).
+                這類應用不追求極致的時脈頻率,而是看重其面積小、驗證成熟,以及在 FPGA 模擬階段與 ASIC 量產階段能保持 100% 行為一致的特性
+
+        1. 混合訊號(Mixed-Signal)與智慧感測器 ASIC
+            > + 取代複雜狀態機:
+                許多企業將極簡配置的 VexRiscv(例如 2 or 3 級管線、無快取配置)直接整合進類比混合訊號 ASIC 中,
+                利用 C 語言韌體取代繁瑣的硬體狀態機控制邏輯
+
+            > + FPGA 到 ASIC 的無痛轉移:
+                開發團隊通常先在平價 FPGA 上運行 Efinix Sapphire 或 LiteX 的 VexRiscv SoC 進行感測器演算法驗證;
+                待系統穩定後,直接將 SpinalHDL 產生的標準 Verilog,
+                匯入 Synopsys Design Compiler 或 Cadence Genus 進行標準元件庫(Standard Cell)邏輯合成與 ASIC 投片
+
+        1. AI 加速器與邊緣運算晶片的控制核心
+            > + 低成本硬體(DMA)排程:
+                相比於全硬體排程器,在 AI ASIC 內部嵌入幾顆 VexRiscv 核心,僅佔用極微小的晶片面積(約數萬個邏輯閘),卻能賦予加速器極高的軟體靈活性;
+                開發者可透過自訂 CSR 暫存器讓 VexRiscv 直接控制內部 SRAM 與運算陣列的資料流,大幅縮短 AI 晶片的軟體適配與上市時程
+
 
 + [Briey](https://github.com/SpinalHDL/VexRiscv/tree/master#briey-soc)
     > Briey SoC 定位為高效能應用型(配備 I/D Cache 與外部 SDRAM 介面)
@@ -197,7 +234,7 @@ $ make clean run
     adapter speed 1000
 
     set _CHIPNAME riscv
-    # 關鍵修正 1：Murax.v 的 jtag_tap_instruction 是 4-bit，必須設為 -irlen 4
+    # 關鍵修正 1：Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
     jtag newtap $_CHIPNAME cpu -irlen 4 -expected-id 0x10001fff
 
     set _TARGETNAME $_CHIPNAME.cpu
@@ -249,13 +286,328 @@ $ make clean run
 $ cd <VexRiscv_Root>/src/main/c/murax/hello_world
 $ make clean && make
 
-$ riscv32-unknown-elf-gdb -tui ./build/hello_world.elf -ex "target remote localhost:3333" -ex "monitor reset halt"
+$ riscv32-unknown-elf-gdb -tui ./build/hello_world.elf -ex "target extended-remote :3333" -ex "monitor reset halt"
 GNU gdb (GDB) 12.1
 ...
 
 (gdb) load  # run-time load the target elf to DUT
 (gdb) si    # execte the 1st instruction (start at 'crtStart')
 ```
+
+# Customization (Use 3-stages pipeline base on default `Murax` + eFlash)
+
+Memory mapping
+> + eFlash: base= 0x0, 32KBytes
+> + SRAM: base= 0x20000000, 2KBytes
+
+Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_eFlash Diff file](Murax_3Stages_eFlash.diff)
+
++ 編譯新 MMP 的 Application
+
+    ```
+    $ cd <VexRiscv_Root>/src/main/c/murax
+    $ cp -fr ./hello_world ./my_hello
+    $ cd my_hello
+    $ vi src/crt.S      # modify
+    $ vi src/linker.ld  # modify
+    $ make clean && make
+
+    # Default hex path of Verilator
+    $ cp ./build/my_hello.hex  <VexRiscv_Root>/src/main/ressource/hex/
+
+    ```
+
+    - `crt.S`
+
+        ```
+        .global main
+        .global irqCallback
+
+        .section .init, "ax"
+        .global _start
+        _start:
+          /* 關閉全域中斷 (MIE = 0) */
+          csrci mstatus, 8
+
+          /* 跳過 0x20 的中斷向量區段，前往初始化流程 */
+          j _init_system
+
+        /* 中斷向量入口 (對齊於 0x00000020) */
+        .section .trap, "ax"
+        .global trap_entry
+        trap_entry:
+          addi sp, sp, -64
+          sw ra,   0(sp)
+          sw t0,   4(sp)
+          sw t1,   8(sp)
+          sw t2,  12(sp)
+          sw a0,  16(sp)
+          sw a1,  20(sp)
+          sw a2,  24(sp)
+          sw a3,  28(sp)
+          sw a4,  32(sp)
+          sw a5,  36(sp)
+          sw a6,  40(sp)
+          sw a7,  44(sp)
+          sw t3,  48(sp)
+          sw t4,  52(sp)
+          sw t5,  56(sp)
+          sw t6,  60(sp)
+
+          /* 呼叫 C 語言中斷處理函式 (若無定義則可改為弱符號或直接返回) */
+          call irqCallback
+
+          lw ra,   0(sp)
+          lw t0,   4(sp)
+          lw t1,   8(sp)
+          lw t2,  12(sp)
+          lw a0,  16(sp)
+          lw a1,  20(sp)
+          lw a2,  24(sp)
+          lw a3,  28(sp)
+          lw a4,  32(sp)
+          lw a5,  36(sp)
+          lw a6,  40(sp)
+          lw a7,  44(sp)
+          lw t3,  48(sp)
+          lw t4,  52(sp)
+          lw t5,  56(sp)
+          lw t6,  60(sp)
+          addi sp, sp, 64
+          mret
+
+        .section .text
+        _init_system:
+          /* 設定堆疊指標 (Stack Pointer = 0x80000800) */
+          la sp, _stack_start
+
+          /* 1. 將 .data 從 Flash (_data_lma) 搬移至 SRAM (_data_vma_start ~ _data_vma_end) */
+          la a0, _data_lma
+          la a1, _data_vma_start
+          la a2, _data_vma_end
+          bgeu a1, a2, _copy_data_done
+
+        _copy_data_loop:
+          lw t0, 0(a0)
+          sw t0, 0(a1)
+          addi a0, a0, 4
+          addi a1, a1, 4
+          bltu a1, a2, _copy_data_loop
+
+        _copy_data_done:
+          /* 2. 將 SRAM 中的 .bss 區段清零 (_bss_start ~ _bss_end) */
+          la a0, _bss_start
+          la a1, _bss_end
+          bgeu a0, a1, _clear_bss_done
+
+        _clear_bss_loop:
+          sw zero, 0(a0)
+          addi a0, a0, 4
+          bltu a0, a1, _clear_bss_loop
+
+        _clear_bss_done:
+          /* 確保 mtvec 指向 trap_entry (0x00000020) */
+          la t0, trap_entry
+          csrw mtvec, t0
+
+          /* 呼叫 C 語言主程式 */
+          call main
+
+        /* 若 main() 返回，進入無窮迴圈 */
+        _exit_loop:
+          j _exit_loop
+
+        /* 提供預設的弱符號 irqCallback，避免未定義中斷函式時連結錯誤 */
+        .weak irqCallback
+        irqCallback:
+          ret
+
+        ```
+
+    - `linker.ld`
+
+        ```
+        /*
+        This is free and unencumbered software released into the public domain.
+
+        Anyone is free to copy, modify, publish, use, compile, sell, or
+        distribute this software, either in source code form or as a compiled
+        binary, for any purpose, commercial or non-commercial, and by any
+        means.
+        */
+        OUTPUT_FORMAT("elf32-littleriscv", "elf32-littleriscv", "elf32-littleriscv")
+        OUTPUT_ARCH(riscv)
+
+
+        ENTRY(_start)
+
+        MEMORY
+        {
+          FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 32K
+          RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 2K
+        }
+
+        SECTIONS
+        {
+          /* 程式進入點與中斷向量表 (位於 0x00000000) */
+          .text :
+          {
+            . = ALIGN(4);
+            KEEP(*(.init))
+            /* 確保中斷向量表對齊 0x00000020 (對應 CsrPlugin 的 mtvecInit) */
+            . = 0x20;
+            KEEP(*(.trap))
+            *(.text .text.*)
+            *(.rodata .rodata.*)
+            *(.srodata .srodata.*)
+            . = ALIGN(4);
+          } > FLASH
+
+          /* 記錄 .data 在 Flash 中的起始位置 (Load Memory Address) */
+          _data_lma = LOADADDR(.data);
+
+          /* 已初始化的全域/靜態變數 (執行時位於 SRAM, 初始值存於 Flash) */
+          .data :
+          {
+            . = ALIGN(4);
+            _data_vma_start = .;
+            *(.data .data.*)
+            *(.sdata .sdata.*)
+            . = ALIGN(4);
+            _data_vma_end = .;
+          } > RAM AT > FLASH
+
+          /* 未初始化變數區段 (位於 SRAM, 開機清零) */
+          .bss (NOLOAD) :
+          {
+            . = ALIGN(4);
+            _bss_start = .;
+            *(.bss .bss.*)
+            *(.sbss .sbss.*)
+            *(COMMON)
+            . = ALIGN(4);
+            _bss_end = .;
+          } > RAM
+
+          /* 堆疊指標設在 2KB SRAM 的最頂端 (0x20000000 + 0x800) */
+          PROVIDE(_stack_start = ORIGIN(RAM) + LENGTH(RAM));
+        }
+        ```
+
+
+## 生成 RTL code
+
+```
+$ cd <VexRiscv_Root>
+$ vi z_gen_rtl.sh
+    #!/bin/bash
+
+    sbt "runMain vexriscv.demo.MuraxWithRamInit"  # 生成 Murax.v
+    sed -i 's/\$urandom/\$random/g' Murax.v
+
+$ ./z_gen_rtl.sh
+```
+
+## 啟動 Verilator 模擬環境
+
+```
+[<VexRiscv_Root>/src/test/cpp/murax] (sha:baf7dc8)
+$ make clean run
+rm -rf obj_dir
+rm -f Murax.v*.bin
+rm -f Murax.v*.bin
+cp ../../../../Murax.v*.bin . | true
+verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
+No stack.
+make  -j  -C obj_dir/ -f VMurax.mk VMurax
+make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
+/usr/bin/perl /usr/share/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include VMurax.cpp VMurax_Murax.cpp VMurax_VexRiscv.cpp VMurax__Dpi.cpp VMurax__Slow.cpp VMurax_Murax__Slow.cpp VMurax_VexRiscv__Slow.cpp VMurax__Syms.cpp > VMurax__ALL.cpp
+g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o VMurax__ALL.o VMurax__ALL.cpp
+ar -cr VMurax__ALL.a VMurax__ALL.o
+ranlib VMurax__ALL.a
+g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
+make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+./obj_dir/VMurax
+BOOT
+hello world arty a7 v1
+
+```
+## OpenOCD Server (for Verilator Simulation)
+
++ `murax.cfg` for OpenOCD
+
+    ```
+    adapter driver jtag_tcp
+    adapter speed 1000
+
+    set _CHIPNAME riscv
+    # 關鍵修正 1：Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
+    jtag newtap $_CHIPNAME cpu -irlen 4 -expected-id 0x10001fff
+
+    set _TARGETNAME $_CHIPNAME.cpu
+    target create $_TARGETNAME vexriscv -endian little -chain-position $_TARGETNAME
+
+    # 關鍵修正 2：對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
+    vexriscv jtagMapping 2 3 0 0 0 0
+    vexriscv cpuConfigFile cpu0.yaml
+    vexriscv readWaitCycles 40
+
+    reset_config none
+    init
+    ```
+
++ Start OpenOCD server
+    > 需使用 VexRISCV 特製的 OpenOCD 版本
+
+    ```
+    $ openocd -f ./murax.cfg
+        Open On-Chip Debugger 0.11.0+dev-04036-ga0220ad30 (2026-11-11-17:21)
+        Licensed under GNU GPL v2
+        For bug reports, read
+                http://openocd.org/doc/doxygen/bugs.html
+        Info : only one transport option; autoselect 'jtag'
+        Info : clock speed 1000 kHz
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+        Error: ERROR: Error while reading from socket: Socket operation on non-socket
+        [riscv.cpu] Target successfully examined.
+        Info : starting gdb server for riscv.cpu on 3333
+        Info : Listening on port 3333 for gdb connections
+        Info : Listening on port 6666 for tcl connections
+        Info : Listening on port 4444 for telnet connections
+        Info : accepting 'gdb' connection on tcp/3333
+        Warn : Prefer GDB command "target extended-remote :3333" instead of "target remote :3333"
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+    ```
+
+
+## GDB client
+
+```
+$ cd <VexRiscv_Root>/src/main/c/murax/my_hello
+$ make clean && make
+
+$ riscv32-unknown-elf-gdb -tui ./build/my_hello.elf -ex "target extended-remote :3333"
+GNU gdb (GDB) 12.1
+...
+
+(gdb) monitor reset halt    # reset DUT
+(gdb) si                    # execte the 1st instruction (start at 'crtStart')
+(gdb) hbreak main
+(gdb) c
+```
+
 
 # Reference
 
