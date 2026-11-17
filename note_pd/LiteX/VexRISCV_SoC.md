@@ -3,7 +3,7 @@ VexRISCV_SoC
 
 [VexRISCV](https://github.com/SpinalHDL/VexRiscv/tree/master#briey-soc) ASIC 案例
 + [Murax ](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
-    > Murax SoC 是一個極其輕量級、以 SpinalHDL 撰寫的開源 RISC-V SoC設計。
+    > Murax SoC 是一個極其輕量級、以 SpinalHDL 撰寫的開源 RISC-V SoC設計.
     它以 VexRiscv 處理器核心為基礎, 專門設計用來塞入像 Lattice iCE40 這樣資源極省的小型 FPGA 中
     >> license: `Apache 2.0`
 
@@ -86,6 +86,74 @@ VexRISCV_SoC
             > + VGA
 
 
+## Peripheral
+
+### Apb3Gpio (Base: 0xF0000000)
+
+| Offset |暫存器名稱      | Bit-Fields  | 讀寫權限  | 功能說明
+| :-     | :-            | :-          | :-       | :-
+| 0x00   | INPUT         | [31:0]      | R        | 讀取外部 GPIO 接腳的當前邏輯準位狀態(經過同步器採樣).
+| 0x04   | OUTPUT        | [31:0]      | R/W      | 設定 GPIO 輸出資料(當對應位元的 OUTPUT_ENABLE 為 1 時輸出至接腳).
+| 0x08   | OUTPUT_ENABLE | [31:0]      | R/W      | 三態緩衝器方向控制:<br> 1: 輸出模式(Output);<br> 0: 高阻抗輸入模式(Input / Hi-Z，預設值).
+
+### Apb3UartCtrl  (Base: 0xF0010000)
+
+| Offset  | 暫存器名稱     | Bit-Fields | 讀寫權限  | 功能說明
+| :-     | :-            | :-          | :-       | :-
+| 0x00    | DATA          | [7:0]      | R/W      |  寫入: 將 1 byte 資料推入 TX FIFO 等待傳送.<br> 讀取: 從 RX FIFO 彈出(Pop)1 byte 已接收的資料.
+|         |               | [15:8]     | —        |  保留(讀取為 0).
+|         |               | [16]       | R        |  RX Data Valid(部分 SpinalHDL 版本支援):<br> 1 表示讀取到的 [7:0] 為有效資料(通常建議直接讀取 STATUS[31:24] 判斷是否有資料).
+| 0x04    | STATUS        | [0]        | R/W      |  TX Interrupt Enable:<br> 1: 當 TX FIFO 為空時觸發中斷;<br> 0: 關閉(預設 0).
+|         |               | [1]        | R/W      |  RX Interrupt Enable:<br> 1: 當 RX FIFO 非空(有資料可讀)時觸發中斷;<br> 0: 關閉(預設 0).
+|         |               | [7:2]      | —        |  保留.
+|         |               | [8]        | R        |  TX Interrupt Pending:<br> 1: 目前 TX 中斷條件成立(TX FIFO 空且 [0]=1).
+|         |               | [9]        | R        |  RX Interrupt Pending:<br> 1: 目前 RX 中斷條件成立(RX FIFO 非空且 [1]=1).
+|         |               | [15:10]    | —        |  保留.
+|         |               | [23:16]    | R        |  TX FIFO Write Availability: 目前 TX FIFO 還可寫入的剩餘空間(0: 已滿，16: 全空). 傳送前需確認此欄位 `> 0`.
+|         |               | [31:24]    | R        |  RX FIFO Read Occupancy: 目前 RX FIFO 內待讀取的位元組數量(0: 無資料，16: 已滿). 讀取前需確認此欄位 `> 0`.
+| 0x08    | CLOCK_DIVIDER | [19:0]     | R        |  鮑率除頻器數值, 計算公式: `(F_clk / (Baudrate * SamplingSize)) - 1`. 因 Murax 鎖定配置，軟體寫入無效.
+| 0x0C    | FRAME_CONFIG  | [7:0]      | R        |  資料位元長度(7 代表 8 bits). 因 Murax 鎖定配置，軟體寫入無效.
+|         |               | [15:8]     | R        |  同位檢查設定(0: NONE; 1: EVEN; 2: ODD;).
+|         |               | [23:16]    | R        |  停止位元設定(0: 1 stop bit; 1: 2 stop bits;).
+
+
+### MuraxApb3Timer (Base: 0xF0020000)
+
++ 預除頻器(Prescaler) TIMA/TIMB 共用
+
+| Offset | 暫存器名稱       | Bit-Fields  | 讀寫權限    | 功能說明
+| :-     | :-              | :-          | :-         | :-
+| 0x00   | PRESCALER_LIMIT | [15:0]      | R/W 16-bit |  預除頻上限值.內部計數器從 `0` 數到 `LIMIT` 時產生一個 Tick 脈衝給 Timer-A/Timer-B (實際除頻倍率為 `LIMIT + 1`).
+|        |                 | [31:16]     | —          |  保留.
+
+
++ 中斷狀態與遮罩(Interrupt Control)
+
+| Offset | 暫存器名稱         | Bit-Fields | 讀寫權限  |  功能說明
+| :-     | :-                | :-         | :-       | :-
+| 0x30   | INTERRUPT_STATUS  | [0]        |  R/W1C   | Timer A 溢位中斷旗標:<br> 當 Timer A 達到 LIMIT 時硬體自動設為 1.<br> 寫入 1 清除此旗標(Write-1-to-Clear).
+|        |                   | [1]        |  R/W1C   | Timer B 溢位中斷旗標:<br> 當 Timer B 達到 LIMIT 時硬體自動設為 1.<br> 寫入 1 清除此旗標(Write-1-to-Clear).
+|        |                   | [31:2]     |  —       | 保留.
+| 0x34   | INTERRUPT_MASK    | [0]        |  R/W     | Timer A 中斷致能:<br> 1: 允許 Timer A 產生 Interrupt 送往 CPU;<br> 0: 遮罩(關閉).
+|        |                   | [1]        |  R/W     | Timer B 中斷致能:<br> 1: 允許 Timer B 產生 Interrupt 送往 CPU;<br> 0: 遮罩(關閉).
+|        |                   | [31:2]     |  —       | 保留.
+
+
++ Timer-A /Timer-B
+
+| Offset (A/B) | 暫存器名稱   | Bit-Fields | 讀寫權限   | 功能說明
+| :-           | :-          | :-         | :-        | :-
+| 0x10/0x20    | TIMER_LIMIT | [15:0]     | R/W       | 計時器溢位上限值(Auto-reload target).
+|              |             | [31:16]    | —         | 保留.
+| 0x14/0x24    | TIMER_VALUE | [15:0]     | R/W       | 讀取或直接設定計時器當前的 16-bit 計數值.
+|              |             | [31:16]    | —         | 保留.
+| 0x18/0x28    | TIMER_CTRL  | [0]        | R/W       | Clock Enable(計數致能):<br> 1: 跟隨 Prescaler Tick 向上計數;<br> 0: 停止計數.
+|              |             | [1]        | R/W       | Clear on Limit(自動重載):<br> 1: 當 `VALUE == LIMIT` 時自動清零並繼續循環計數(週期定時模式);<br> 0: 達到上限後維持數值(單次模式).
+|              |             | [15:2]     | —         | 保留.
+|              |             | [16]       | R/W       | Timer A Tick Cascade(僅 Timer B 有效，部分版本支援):<br> 在標準 Murax 中，Timer A 與 B 皆使用 Prescaler Tick; 若需串接，通常由 Prescaler 統一控制.
+
+
+
 # Customization (Use 3-stages pipeline base on default `Murax`)
 
 `2-stages pipeline` 需要做非同步處理,造成需要較高電路實現,因此改為 `3-stages pipeline`
@@ -98,7 +166,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages Diff file](Murax_3Stages.diff)
+    > [Murax_3Stages Diff file](VerRISCV/Murax_3Stages.diff)
 
     - 修改重點說明
 
@@ -115,7 +183,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 
         1. 原生中斷接線保留
             > 原生版本在 APB 周邊區塊(第 273 行與第 277 行)已經包含 `externalInterrupt setWhen(uartCtrl.io.interrupt)`
-            與 `timerInterrupt setWhen(timer.io.interrupt)`, 因此不需要額外改動即可直接支援 UART 與 Timer 中斷。
+            與 `timerInterrupt setWhen(timer.io.interrupt)`, 因此不需要額外改動即可直接支援 UART 與 Timer 中斷.
 
 
 ## 生成 RTL code
@@ -234,13 +302,13 @@ $ make clean run
     adapter speed 1000
 
     set _CHIPNAME riscv
-    # 關鍵修正 1：Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
+    # 關鍵修正 1: Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
     jtag newtap $_CHIPNAME cpu -irlen 4 -expected-id 0x10001fff
 
     set _TARGETNAME $_CHIPNAME.cpu
     target create $_TARGETNAME vexriscv -endian little -chain-position $_TARGETNAME
 
-    # 關鍵修正 2：對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
+    # 關鍵修正 2: 對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
     vexriscv jtagMapping 2 3 0 0 0 0
     vexriscv cpuConfigFile cpu0.yaml
     vexriscv readWaitCycles 40
@@ -308,7 +376,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages_eFlash Diff file](Murax_3Stages_eFlash.diff)
+    > [Murax_3Stages_eFlash Diff file](VerRISCV/Murax_3Stages_eFlash.diff)
 
 + 編譯新 MMP 的 Application
 
@@ -552,13 +620,13 @@ hello world arty a7 v1
     adapter speed 1000
 
     set _CHIPNAME riscv
-    # 關鍵修正 1：Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
+    # 關鍵修正 1: Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
     jtag newtap $_CHIPNAME cpu -irlen 4 -expected-id 0x10001fff
 
     set _TARGETNAME $_CHIPNAME.cpu
     target create $_TARGETNAME vexriscv -endian little -chain-position $_TARGETNAME
 
-    # 關鍵修正 2：對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
+    # 關鍵修正 2: 對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
     vexriscv jtagMapping 2 3 0 0 0 0
     vexriscv cpuConfigFile cpu0.yaml
     vexriscv readWaitCycles 40
@@ -607,6 +675,58 @@ GNU gdb (GDB) 12.1
 (gdb) hbreak main
 (gdb) c
 ```
+
+
+# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC)
+
+Memory mapping
+> + eFlash: base= 0x0, 32KBytes
+> + SRAM: base= 0x20000000, 2KBytes
+
+Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+
++ System-Arch
+
+    ![sys_arch](VerRISCV/VexRISCV_SysArch.png)
+
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_rv32imc_eFlash Diff file](VerRISCV/Murax_3Stages_rv32imc_eFlash.diff)
+
+
+## Application configuration
+
++ 編譯新 MMP 的 Application
+
+    ```
+    $ cd <VexRiscv_Root>/src/main/c/murax
+    $ cp -fr ./hello_world ./my_hello
+    $ cd my_hello
+    $ vi src/crt.S      # modify
+    $ vi src/linker.ld  # modify
+    $ vi makeile
+        ...
+        #
+        # RISC-V Extension 修改為 'rv32imc',
+        # 有些較新的 GCC 會要求加上 'rv32imc_zicsr'
+        #
+        CFLAGS += -march=rv32imc -mabi=ilp32
+        LDFLAGS += -march=rv32imc -mabi=ilp32
+        ...
+
+    $ make clean && make
+
+    # Default hex path of Verilator
+    $ cp ./build/my_hello.hex  <VexRiscv_Root>/src/main/ressource/hex/
+    ```
+
+
 
 
 # Reference
