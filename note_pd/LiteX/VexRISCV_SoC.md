@@ -16,6 +16,11 @@ VexRISCV_SoC
         1. 內建 JTAG 偵錯器, 相容於 GDB 與 OpenOCD
         1. SRAM: `8 KBytes`, XIP with SPI-Flash (No Embedded Flash)
         1. 簡單的 System-Bus 和 APB3
+        1. Interrupt (最多 32 個)
+            > + Non-nested
+            > + No Vector Table (所有 `interrupt` 和 `exception` 都進同一個 function)
+            > + No Hardware Priority (由 Software 撰寫來決定)
+
         1. Peripheral
             > + APB 總線(APB bus for peripherals)
             > + 32 個 GPIO 引腳
