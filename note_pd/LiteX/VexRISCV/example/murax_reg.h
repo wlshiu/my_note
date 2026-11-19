@@ -102,6 +102,75 @@ typedef struct
 #define TIMER_INT_B                     (1UL << 1)
 
 /* =========================================================================
+ * 1. APB3 SPI Master 暫存器定義 (Base: 0xF0030000)
+ * ========================================================================= */
+#define SPI_BASE        0xF0030000
+
+typedef struct
+{
+    volatile uint32_t DATA;       /* 0x00: TX/RX FIFO 讀寫 (Bit[31]=RX Valid, Bit[24]=Push RX, Bit[7:0]=Data) */
+    volatile uint32_t STATUS;     /* 0x04: Bit[31:16]=TX FIFO 可用空間, Bit[9]=RX中斷Pending, Bit[8]=Cmd空Pending, Bit[1]=RX中斷致能, Bit[0]=Cmd空中斷致能 */
+    volatile uint32_t CONFIG;     /* 0x08: Bit[0]=CPOL, Bit[1]=CPHA, Bit[7:4]=SS Active High Mask */
+    volatile uint32_t CLOCK_DIV;  /* 0x0C: SCLK 除頻器 (SCLK = F_sys / (2 * (CLOCK_DIV + 1))) */
+    volatile uint32_t SS_SETUP;   /* 0x10: SS 拉低到第一個 SCLK 的延遲週期數 */
+    volatile uint32_t SS_HOLD;    /* 0x14: 最後一個 SCLK 到 SS 拉高的延遲週期數 */
+    volatile uint32_t SS_DISABLE; /* 0x18: 連續傳輸間 SS 維持高電位的最小週期數 */
+} Spi_Reg;
+
+#define SPI ((Spi_Reg *)SPI_BASE)
+
+/* SPI 命令格式 (寫入 SPI->DATA) */
+#define SPI_CMD_DATA(byte)      (0x00000000 | ((byte) & 0xFF))  /* 僅送出 1 Byte */
+#define SPI_CMD_DATA_RX(byte)   (0x01000000 | ((byte) & 0xFF))  /* 送出 1 Byte 並將接收資料推入 RX FIFO */
+#define SPI_CMD_SS_ENABLE(id)   (0x11000000 | ((id) & 0xFF))    /* 拉低指定 SS 片選腳 (例如 id=0) */
+#define SPI_CMD_SS_DISABLE(id)  (0x10000000 | ((id) & 0xFF))    /* 釋放指定 SS 片選腳 */
+
+/* =========================================================================
+ * 2. APB3 I2C Controller 暫存器定義 (Base: 0xF0040000)
+ * ========================================================================= */
+#define I2C_BASE        0xF0040000
+
+typedef struct
+{
+    volatile uint32_t TX_DATA;        /* 0x00: Bit[8]=Valid, Bit[9]=Enable, Bit[10]=Repeat, Bit[11]=DisableOnDataConflict, Bit[7:0]=Data */
+    volatile uint32_t TX_ACK;         /* 0x04: Bit[8]=Valid, Bit[9]=Enable, Bit[10]=Repeat, Bit[0]=ACK/NACK (0=ACK, 1=NACK) */
+    volatile uint32_t RX_DATA;        /* 0x08: Bit[8]=Valid (讀取後自動清除), Bit[7:0]=Received Data */
+    volatile uint32_t RX_ACK;         /* 0x0C: Bit[8]=Valid, Bit[0]=Received ACK (0=ACK, 1=NACK) */
+    volatile uint32_t RESERVED0[4];   /* 0x10 ~ 0x1C */
+    volatile uint32_t INT_ENABLE;     /* 0x20: 中斷致能遮罩 */
+    volatile uint32_t INT_FLAG;       /* 0x24: 中斷狀態旗標 (寫 1 清除) */
+    volatile uint32_t SAMPLING_DIV;   /* 0x28: 輸入取樣時脈除頻 */
+    volatile uint32_t TIMEOUT;        /* 0x2C: Bus 逾時週期數 */
+    volatile uint32_t TSU_DAT;        /* 0x30: Data Setup Time */
+    volatile uint32_t RESERVED1[3];   /* 0x34 ~ 0x3C */
+    volatile uint32_t MASTER_STATUS;  /* 0x40: Bit[0]=IsBusy, Bit[4]=Start, Bit[5]=Stop, Bit[6]=Drop */
+    volatile uint32_t RESERVED2[3];   /* 0x44 ~ 0x4C */
+    volatile uint32_t T_LOW;          /* 0x50: SCL 低電位週期數 */
+    volatile uint32_t T_HIGH;         /* 0x54: SCL 高電位週期數 */
+    volatile uint32_t T_BUF;          /* 0x58: Bus Free Time (Stop 到 Start 間隔) */
+} I2c_Reg;
+
+#define I2C ((I2c_Reg *)I2C_BASE)
+
+/* I2C 常用控制位元 */
+#define I2C_TX_VALID            (1 << 8)
+#define I2C_TX_ENABLE           (1 << 9)
+#define I2C_MASTER_BUSY         (1 << 0)
+#define I2C_MASTER_START        (1 << 4)
+#define I2C_MASTER_STOP         (1 << 5)
+#define I2C_MASTER_DROP         (1 << 6)
+
+/* I2C 中斷旗標位元 (INT_ENABLE / INT_FLAG) */
+#define I2C_INT_TX_DATA_EMPTY   (1 << 0)
+#define I2C_INT_TX_ACK_EMPTY    (1 << 1)
+#define I2C_INT_RX_DATA_FULL    (1 << 2)
+#define I2C_INT_RX_ACK_FULL     (1 << 3)
+#define I2C_INT_START           (1 << 4)
+#define I2C_INT_STOP            (1 << 5)
+#define I2C_INT_DROP            (1 << 6)
+#define I2C_INT_CLOCK_GEN_BUSY  (1 << 16)
+
+/* =========================================================================
  * 5. RISC-V CSR 中斷控制巨集
  * ========================================================================= */
 #define MSTATUS_MIE                     (1UL << 3)  /* Machine Global Interrupt Enable */

@@ -2,6 +2,12 @@ VexRISCV [[Back](./note_LiteX.md#CPU-VexRISCV)]
 ---
 
 [GitHub - SpinalHDL/VexRiscv: A FPGA friendly 32 bit RISC-V CPU implementation · GitHub](https://github.com/SpinalHDL/VexRiscv)
+> + Official PlugIn
+>> [SpinalHDL/lib/src/main/scala/spinal/lib at dev · SpinalHDL/SpinalHDL · GitHub](https://github.com/SpinalHDL/SpinalHDL/tree/dev/lib/src/main/scala/spinal/lib)
+
+
+# [VexRISCV_SoC](VexRISCV_SoC.md)
+實際案例
 
 # 建立測試程式
 

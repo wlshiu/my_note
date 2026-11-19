@@ -90,6 +90,7 @@ _clear_bss_loop:
   bltu a0, a1, _clear_bss_loop
 
 _clear_bss_done:
+
   /* 確保 mtvec 指向 trap_entry (0x00000020) */
   la t0, trap_entry
   csrw mtvec, t0

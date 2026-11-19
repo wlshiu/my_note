@@ -1,4 +1,4 @@
-VexRISCV_SoC
+VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 ----
 
 [VexRISCV](https://github.com/SpinalHDL/VexRiscv/tree/master#briey-soc) ASIC 案例
@@ -99,7 +99,7 @@ VexRISCV_SoC
 | :-     | :-            | :-          | :-       | :-
 | 0x00   | INPUT         | [31:0]      | R        | 讀取外部 GPIO 接腳的當前邏輯準位狀態(經過同步器採樣).
 | 0x04   | OUTPUT        | [31:0]      | R/W      | 設定 GPIO 輸出資料(當對應位元的 OUTPUT_ENABLE 為 1 時輸出至接腳).
-| 0x08   | OUTPUT_ENABLE | [31:0]      | R/W      | 三態緩衝器方向控制:<br> 1: 輸出模式(Output);<br> 0: 高阻抗輸入模式(Input / Hi-Z，預設值).
+| 0x08   | OUTPUT_ENABLE | [31:0]      | R/W      | 三態緩衝器方向控制:<br> 1: 輸出模式(Output);<br> 0: 高阻抗輸入模式(Input / Hi-Z,預設值).
 
 ### Apb3UartCtrl  (Base: 0xF0010000)
 
@@ -114,10 +114,10 @@ VexRISCV_SoC
 |         |               | [8]        | R        |  TX Interrupt Pending:<br> 1: 目前 TX 中斷條件成立(TX FIFO 空且 [0]=1).
 |         |               | [9]        | R        |  RX Interrupt Pending:<br> 1: 目前 RX 中斷條件成立(RX FIFO 非空且 [1]=1).
 |         |               | [15:10]    | —        |  保留.
-|         |               | [23:16]    | R        |  TX FIFO Write Availability: 目前 TX FIFO 還可寫入的剩餘空間(0: 已滿，16: 全空). 傳送前需確認此欄位 `> 0`.
-|         |               | [31:24]    | R        |  RX FIFO Read Occupancy: 目前 RX FIFO 內待讀取的位元組數量(0: 無資料，16: 已滿). 讀取前需確認此欄位 `> 0`.
-| 0x08    | CLOCK_DIVIDER | [19:0]     | R        |  鮑率除頻器數值, 計算公式: `(F_clk / (Baudrate * SamplingSize)) - 1`. 因 Murax 鎖定配置，軟體寫入無效.
-| 0x0C    | FRAME_CONFIG  | [7:0]      | R        |  資料位元長度(7 代表 8 bits). 因 Murax 鎖定配置，軟體寫入無效.
+|         |               | [23:16]    | R        |  TX FIFO Write Availability: 目前 TX FIFO 還可寫入的剩餘空間(0: 已滿,16: 全空). 傳送前需確認此欄位 `> 0`.
+|         |               | [31:24]    | R        |  RX FIFO Read Occupancy: 目前 RX FIFO 內待讀取的位元組數量(0: 無資料,16: 已滿). 讀取前需確認此欄位 `> 0`.
+| 0x08    | CLOCK_DIVIDER | [19:0]     | R        |  鮑率除頻器數值, 計算公式: `(F_clk / (Baudrate * SamplingSize)) - 1`. 因 Murax 鎖定配置,軟體寫入無效.
+| 0x0C    | FRAME_CONFIG  | [7:0]      | R        |  資料位元長度(7 代表 8 bits). 因 Murax 鎖定配置,軟體寫入無效.
 |         |               | [15:8]     | R        |  同位檢查設定(0: NONE; 1: EVEN; 2: ODD;).
 |         |               | [23:16]    | R        |  停止位元設定(0: 1 stop bit; 1: 2 stop bits;).
 
@@ -155,7 +155,78 @@ VexRISCV_SoC
 | 0x18/0x28    | TIMER_CTRL  | [0]        | R/W       | Clock Enable(計數致能):<br> 1: 跟隨 Prescaler Tick 向上計數;<br> 0: 停止計數.
 |              |             | [1]        | R/W       | Clear on Limit(自動重載):<br> 1: 當 `VALUE == LIMIT` 時自動清零並繼續循環計數(週期定時模式);<br> 0: 達到上限後維持數值(單次模式).
 |              |             | [15:2]     | —         | 保留.
-|              |             | [16]       | R/W       | Timer A Tick Cascade(僅 Timer B 有效，部分版本支援):<br> 在標準 Murax 中，Timer A 與 B 皆使用 Prescaler Tick; 若需串接，通常由 Prescaler 統一控制.
+|              |             | [16]       | R/W       | Timer A Tick Cascade(僅 Timer B 有效,部分版本支援):<br> 在標準 Murax 中,Timer A 與 B 皆使用 Prescaler Tick; 若需串接,通常由 Prescaler 統一控制.
+
+### Apb3SpiMasterCtrl (Base: 0xF0030000)
+
+
+| Offset | 暫存器名稱     | Bit-Fields | 讀寫權限   | 功能說明
+| :-     | :-            | :-         | :-        | :-
+| 0x00   | DATA (W mode) | [7:0]      | W         | Tx Data(Tx FIFO) / SS_ID:(Mode=0) 欲送出的 8-bit TX 資料;(Mode=1) 片選編號(填 0)
+|        |               | [23:8]     | —         | 保留.
+|        |               | [24]       | W         | Read Enable (`Mode= 0`) <br>  1: 傳送同時將 MISO 推入 RX FIFO; <br>  0= 僅傳送不接收<br>SS Enable(`Mode= 1`)<br>  1: 啟用(Assert)對應的 SS 腳位;<br>  0: 關閉(De-assert)對應的 SS 腳位。
+|        |               | [31:28]    | W         | Mode:0x0: 資料傳輸命令; <br>0x1: 片選(SS)控制命令
+|        | DATA (R mode) | [7:0]      | R         | RX Data(Rx FIFO):從 MISO 接收到的 8-bit 資料
+|        |               | [30:8]     | —         | 保留(讀出為 0).
+|        |               | [31]       | R         | Valid Flag<br> 1: 讀取有效,且硬體自動將該筆資料彈出(Pop)RX FIFO; <br> 0: RX FIFO 為空,無有效資料
+| 0x04   | STATUS        | [0]        | R/W       | Cmd Int Enable:<br> 1: 致能 TX 命令 FIFO 全空中斷;<br> 0: 關閉
+|        |               | [1]        | R/W       | Rx Int Enable :<br> 1: 致能 RX FIFO 非空中斷;<br> 0: 關閉
+|        |               | [8]        | R         | Cmd Int Pending :<br> 1: TX 命令 FIFO 全空中斷發生(寫入命令自動清除)
+|        |               | [9]        | R         | RX Int Pending :<br> 1: RX FIFO 非空中斷發生(讀空 RX FIFO 自動清除)
+|        |               | [31:16]    | R         | TX FIFO Avail :<br>TX 命令 FIFO 剩餘可用格數(滿空時為 32)
+| 0x08   | CONFIG        | [0]        | W         | CPOL<br> 0: 閒置時 SCLK 為低電位(Mode 0/1);<br> 1: 閒置時為高電位(Mode 2/3)
+|        |               | [1]        | W         | CPHA<br> 0: 第一個 SCLK 邊緣取樣(Mode 0/2);<br> 1: 第二個邊緣取樣(Mode 1/3)
+|        |               | [4]        | W         | SS Active High<br> 0: ss 低電位有效(預設);<br> 1: ss 高電位有效
+| 0x0C   | CLOCK_DIVIDER | [15:0]     | W         | Clock Div<br> SCLK 除頻值,輸出頻率 `F_sclk = F_sys /(2 *(Div+1))`, 12MHz 下設 5 得 1MHz
+| 0x10   | SS_SETUP      | [15:0]     | W         | Setup Cycles<br> SS 啟用後,等待多少個系統時脈週期才發出第一個 SCLK
+| 0x14   | SS_HOLD       | [15:0]     | W         | Hold Cycles<br> 最後一個 SCLK 結束後,維持 SS 有效多少個系統時脈週期
+| 0x18   | SS_DISABLE    | [15:0]     | W         | Disable Cycles<br> 關閉 SS 後,至少等待多少個系統時脈週期才允許下次啟用
+
+
+### Apb3I2cCtrl (Base: 0xF0040000)
+
+| Offset | 暫存器名稱     | Bit-Fields | 讀寫權限   | 功能說明
+| :-     | :-            | :-         | :-        | :-
+| 0x00   | TX_DATA       | [7:0]      | R/W       | Value: 欲透過 SDA 傳送的 8-bit 資料(MSB First)
+|        |               | [8]        | R/W       | Valid:<br> 1:  資料已就緒(完成 8-bit 傳輸後自動清為 0);<br> 0: 拉低 SCL 等待)
+|        |               | [9]        | R/W       | Enable:<br> 1:  主動驅動 SDA 送出資料(Master 寫入);<br> 0: 釋放 SDA(Master 讀取)
+|        |               | [10]       | R/W       | Repeat:<br> 1:  持續重複發送此筆資料;<br> 0: 單次發送(完成後清零 Bit 8)
+|        |               | [11]       | R/W       | DisableOnConflict:<br> 1: 仲裁失敗時自動停止發送;<br> 0: 忽略衝突
+| 0x04   | TX_ACK        | [0]        | R/W       | Value:<br> 0: 送出 ACK(拉低 SDA);<br> 1: 送出 NACK(釋放 SDA)
+|        |               | [8]        | R/W       | Valid:<br> 1: ACK 設定已就緒;<br> 0: 於第 9 個時脈拉低 SCL 等待軟體寫入)
+|        |               | [9]        | R/W       | Enable:<br> 1: 主動輸出 ACK/NACK(Master 讀完資料後); <br> 0: 釋放 SDA 收 Slave ACK
+|        |               | [10]       | R/W       | Repeat:<br> 1: 重複套用此 ACK 設定;<br> 0: 單次有效(完成第 9 個時脈後清零 Bit 8)
+| 0x08   | RX_DATA       | [7:0]      | R         | Value:<br> 第 1~8 個時脈採樣到的 8-bit 資料
+|        |               | [8]        | R         | Valid:<br> 1: 已收到完整 1 Byte(CPU 讀取此暫存器後硬體自動清為 0)
+| 0x0C   | RX_ACK        | [0]        | R         | Value:<br> 第 9 個時脈讀到的匯流排狀態(0: ACK, 1: NACK)
+|        |               | [8]        | RC        | Valid:<br> 1: 已完成第 9 個時脈採樣(CPU 讀取後硬體自動清為 0)
+| 0x20   | INT_ENABLE    | [0]        | R/W       | TX_DATA_EMPTY:<br> TX_DATA 已送出變空(Valid = 0)
+|        |               | [1]        | R/W       | TX_ACK_EMPTY:<br> TX_ACK 已送出變空(Valid = 0)
+|        |               | [2]        | R/W       | RX_DATA_FULL:<br> RX_DATA 收到新資料(Valid = 1)
+|        |               | [3]        | R/W       | RX_ACK_FULL:<br> RX_ACK 收到新狀態(Valid = 1)
+|        |               | [4]        | R/W       | START:<br> 匯流排偵測到 START / Repeated START 條件
+|        |               | [5]        | R/W       | STOP:<br> 匯流排偵測到 STOP 條件
+|        |               | [6]        | R/W       | DROP:<br> 傳輸異常中止或強制 Drop
+|        |               | [16]       | R/W       | CLOCK_GEN_BUSY:<br> Master 時脈產生器忙碌狀態變化
+| 0x24   | INT_FLAG      | [0]        | R / W1C   | TX_DATA_EMPTY:<br> TX_DATA 已送出變空(Valid = 0)
+|        |               | [1]        | R / W1C   | TX_ACK_EMPTY:<br> TX_ACK 已送出變空(Valid = 0)
+|        |               | [2]        | R / W1C   | RX_DATA_FULL:<br> RX_DATA 收到新資料(Valid = 1)
+|        |               | [3]        | R / W1C   | RX_ACK_FULL:<br> RX_ACK 收到新狀態(Valid = 1)
+|        |               | [4]        | R / W1C   | START:<br> 匯流排偵測到 START / Repeated START 條件
+|        |               | [5]        | R / W1C   | STOP:<br> 匯流排偵測到 STOP 條件
+|        |               | [6]        | R / W1C   | DROP:<br> 傳輸異常中止或強制 Drop
+|        |               | [16]       | R / W1C   | CLOCK_GEN_BUSY:<br> Master 時脈產生器忙碌狀態變化
+| 0x28   | SAMPLING_DIV  | [9:0]      | R/W       | Divider:<br> 輸入濾波取樣時脈除頻值,每 (Div + 1) 個系統時脈取樣一次 SDA/SCL
+| 0x2C   | TIMEOUT       | [19:0]     | R/W       | Cycles:<br> SCL 持續為低電位超過此週期數則觸發逾時復位(`填 0 停用`)
+| 0x30   | TSU_DAT       | [9:0]      | R/W       | Cycles:<br> SDA 變化後至釋放 SCL 上升緣之間的最小 Data Setup 時間週期數
+| 0x40   | MASTER_STATUS | [0]        | R         | IsBusy:<br> 1: I2C 匯流排忙碌中(處於 START 與 STOP 之間);<br> 0: 匯流排閒置
+|        |               | [4]        | R/W       | Start:<br> 1: 發送 START / Repeated START 條件(完成後自動清回 0)
+|        |               | [5]        | R/W       | Stop:<br> 1: 發送 STOP 條件(完成後硬體自動清回 0)
+|        |               | [6]        | R/W       | Drop:<br> 1: 強制中止傳輸並釋放匯流排(完成後硬體自動清回 0)
+| 0x50   | TLOW          | [11:0]     | R/W       | Cycles: Master 模式下 SCL 低電位持續週期數(12MHz 跑 100kHz 設 60)
+| 0x54   | THIGH         | [11:0]     | R/W       | Cycles: Master 模式下 SCL 高電位持續週期數(12MHz 跑 100kHz 設 60)
+| 0x58   | TBUF          | [11:0]     | R/W       | Cycles: Master 模式下 STOP 後至下一次 START 的最小匯流排閒置週期數
+
 
 
 
@@ -171,7 +242,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages Diff file](VerRISCV/Murax_3Stages.diff)
+    > [Murax_3Stages Diff file](VexRISCV/Murax_3Stages.diff)
 
     - 修改重點說明
 
@@ -381,7 +452,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages_eFlash Diff file](VerRISCV/Murax_3Stages_eFlash.diff)
+    > [Murax_3Stages_eFlash Diff file](VexRISCV/Murax_3Stages_eFlash.diff)
 
 + 編譯新 MMP 的 Application
 
@@ -410,7 +481,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
           /* 關閉全域中斷 (MIE = 0) */
           csrci mstatus, 8
 
-          /* 跳過 0x20 的中斷向量區段，前往初始化流程 */
+          /* 跳過 0x20 的中斷向量區段,前往初始化流程 */
           j _init_system
 
         /* 中斷向量入口 (對齊於 0x00000020) */
@@ -494,11 +565,11 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
           /* 呼叫 C 語言主程式 */
           call main
 
-        /* 若 main() 返回，進入無窮迴圈 */
+        /* 若 main() 返回,進入無窮迴圈 */
         _exit_loop:
           j _exit_loop
 
-        /* 提供預設的弱符號 irqCallback，避免未定義中斷函式時連結錯誤 */
+        /* 提供預設的弱符號 irqCallback,避免未定義中斷函式時連結錯誤 */
         .weak irqCallback
         irqCallback:
           ret
@@ -616,6 +687,7 @@ BOOT
 hello world arty a7 v1
 
 ```
+
 ## OpenOCD Server (for Verilator Simulation)
 
 + `murax.cfg` for OpenOCD
@@ -693,7 +765,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 
 + System-Arch
 
-    ![sys_arch](VerRISCV/VexRISCV_SysArch.png)
+    ![sys_arch](VexRISCV/VexRISCV_SysArch.png)
 
 
 ## diff (from Gemini)
@@ -702,7 +774,7 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages_rv32imc_eFlash Diff file](VerRISCV/Murax_3Stages_rv32imc_eFlash.diff)
+    > [Murax_3Stages_rv32imc_eFlash Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash.diff)
 
 
 ## Application configuration
@@ -731,7 +803,29 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
     $ cp ./build/my_hello.hex  <VexRiscv_Root>/src/main/ressource/hex/
     ```
 
+# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
 
+Memory mapping
+> + eFlash: base= 0x0, 32KBytes
+> + SRAM: base= 0x20000000, 2KBytes
+
+Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_rv32imc_eFlash_i2c_spi Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi.diff)
+
+
+
+## 啟動 Verilator 模擬環境
+
+新增 `SpiI2cSimProcess` 掛載進 `Workspace<VMurax>`, 實作 SPI Loopback(MOSI 接回 MISO)以及 I2C Open-Drain 上拉與虛擬 Slave 狀態機
+> diff file (base on `<VexRiscv_Root>/src/test/cpp/murax/main.cpp`)
+>> [sim-main](VexRISCV/sim_main.diff)
 
 
 # Reference
