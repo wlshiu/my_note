@@ -12,7 +12,9 @@ static uint32_t g_bss_var;                /* 應由 crt.S 清零為 0x00000000 *
 static uint32_t g_exception_cause = 0;
 
 /* 中斷狀態計數器 */
-static uint32_t g_timer_ticks = 0;
+static uint32_t g_timer_a_ticks = 0;
+static uint32_t g_timer_b_ticks = 0;
+
 static uint32_t g_uart_rx_count = 0;
 static char     g_uart_last_char = 0;
 
@@ -89,15 +91,28 @@ void main()
 
     /* ---------------------------------------------------------------------
      * 測試 3: Timer 週期性中斷驗證 (12MHz -> 1ms tick, 觸發 5 次)
+     * 測試 3: Timer A 週期性中斷驗證 (12MHz -> 1ms tick, mcause 0x80000007)
      * --------------------------------------------------------------------- */
-    uart_puts("\n[Test 3] Timer Interrupt (mcause 0x80000007):\n");
+    uart_puts("\n[Test 3] Timer A Interrupt (mcause 0x80000007):\n");
     timer_set_prescaler(12000000, 1000000); /* 12MHz / 12 = 1MHz (1us/tick) */
     timer_init(TIMA, 1000, true, true);     /* 1000us = 1ms 自動重載並開啟中斷 */
 
-    while (g_timer_ticks < 5);              /* 等待 5 次中斷 (5ms) */
+    while (g_timer_a_ticks < 5);            /* 等待 5 次中斷 (5ms) */
     timer_init(TIMA, 1000, false, false);   /* 關閉 Timer A 中斷 */
 
-    uart_puts("  Timer ticks = "); uart_put_hex(g_timer_ticks); uart_puts("\n");
+    uart_puts("  Timer A ticks = "); uart_put_hex(g_timer_a_ticks); uart_puts("\n");
+    uart_puts("  -> PASS!\n");
+
+     /* ---------------------------------------------------------------------
+      * 測試 3B: Timer B 外部中斷驗證 (12MHz -> 1ms tick, mcause 0x8000000B)
+      * --------------------------------------------------------------------- */
+    uart_puts("\n[Test 3B] Timer B External Interrupt (mcause 0x8000000B):\n");
+    timer_init(TIMB, 1000, true, true);     /* 1000us = 1ms 自動重載並開啟中斷 */
+
+    while (g_timer_b_ticks < 5);            /* 等待 5 次外部中斷 (5ms) */
+    timer_init(TIMB, 1000, false, false);   /* 關閉 Timer B 中斷 */
+
+    uart_puts("  Timer B ticks = "); uart_put_hex(g_timer_b_ticks); uart_puts("\n");
     uart_puts("  -> PASS!\n");
 
     /* ---------------------------------------------------------------------
@@ -231,11 +246,11 @@ void irqCallback(void)
 
     mcause &= MCAUSE_CODE_MASK;
 
-    if( mcause == MCAUSE_MTI ) /* 1. 檢查是否為 Timer 中斷 (Machine Timer Interrupt, Code = 7) */
+    if( mcause == MCAUSE_MTI ) /* 1. 檢查是否為 Timer A 中斷 (Machine Timer Interrupt, Code = 7) */
     {
         if( TIMER_INTERRUPT->PENDINGS & TIMER_IRQ_A )
         {
-            g_timer_ticks++;
+            g_timer_a_ticks++;
             timer_a_clear_irq();
         }
     }
@@ -247,6 +262,13 @@ void irqCallback(void)
         /**
          *  Software interrupt priority
          */
+
+        /* 檢查 Timer B 中斷旗標 (TIMER_INTERRUPT->PENDINGS Bit 1) */
+        if( TIMER_INTERRUPT->PENDINGS & TIMER_IRQ_B )
+        {
+            g_timer_b_ticks++;
+            timer_b_clear_irq();
+        }
 
         /* 檢查 SPI RX FIFO 非空中斷 (STATUS Bit 9 = RX Interrupt Pending) */
         if( SPI->STATUS & SPI_STATUS_RX_INT_PENDING )

@@ -984,6 +984,25 @@ GNU gdb (GDB) 12.1
 ```
 
 
+# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB)
+
+**將 Tim-B 放到外部中斷**
+
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_rv32imc_eFlash_i2c_spi_timb Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb.diff)
+
+
 
 # Reference
 

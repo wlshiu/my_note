@@ -1,0 +1,279 @@
+--- ./Murax.scala.org	2026-11-16 09:02:05.574609481 +0800
++++ ./Murax.scala	2026-11-20 11:29:52.000000000 +0800
+@@ -8,6 +8,8 @@
+ import spinal.lib.com.jtag.Jtag
+ import spinal.lib.com.spi.ddr.SpiXdrMaster
+ import spinal.lib.com.uart._
++import spinal.lib.com.i2c._
++import spinal.lib.com.spi._
+ import spinal.lib.io.{InOutWrapper, TriStateArray}
+ import spinal.lib.misc.{InterruptCtrl, Prescaler, Timer}
+ import spinal.lib.soc.pinsec.{PinsecTimerCtrl, PinsecTimerCtrlExternal}
+@@ -18,6 +20,7 @@
+ import scala.collection.mutable.ArrayBuffer
+ import scala.collection.Seq
+ import spinal.lib.com.jtag.JtagTapInstructionCtrl
++import spinal.lib.misc.HexTools
+ 
+ /**
+  * Created by PIC32F_USER on 28/07/2017.
+@@ -38,11 +41,15 @@
+ case class MuraxConfig(coreFrequency : HertzNumber,
+                        onChipRamSize      : BigInt,
+                        onChipRamHexFile   : String,
++                       eFlashSize         : BigInt,
++                       eFlashHexFile      : String,
+                        pipelineDBus       : Boolean,
+                        pipelineMainBus    : Boolean,
+                        pipelineApbBridge  : Boolean,
+                        gpioWidth          : Int,
+                        uartCtrlConfig     : UartCtrlMemoryMappedConfig,
++                       spiMasterConfig    : SpiMasterCtrlMemoryMappedConfig,
++                       i2cConfig          : I2cSlaveMemoryMappedGenerics,
+                        xipConfig          : SpiXdrMasterCtrl.MemoryMappingParameters,
+                        hardwareBreakpointCount : Int,
+                        withNativeJtag      : Boolean,
+@@ -59,8 +66,10 @@
+   def default : MuraxConfig = default(false, false)
+   def default(withXip : Boolean = false, bigEndian : Boolean = false) =  MuraxConfig(
+     coreFrequency         = 12 MHz,
+-    onChipRamSize         = 8 kB,
++    onChipRamSize         = 2 kB,
+     onChipRamHexFile      = null,
++    eFlashSize            = 32 kB,
++    eFlashHexFile         = null,
+     pipelineDBus          = true,
+     pipelineMainBus       = false,
+     pipelineApbBridge     = true,
+@@ -71,16 +80,16 @@
+       rspFifoDepth = 32,
+       xip = SpiXdrMasterCtrl.XipBusParameters(addressWidth = 24, lengthWidth = 2)
+     )),
+-    hardwareBreakpointCount = if(withXip) 3 else 0,
++    hardwareBreakpointCount = 4,
+     withNativeJtag = false,
+     cpuPlugins = ArrayBuffer( //DebugPlugin added by the toplevel
+       new IBusSimplePlugin(
+-        resetVector = if(withXip) 0xF001E000l else 0x80000000l,
++        resetVector = if(withXip) 0xF001E000l else 0x00000000l,
+         cmdForkOnSecondStage = true,
+         cmdForkPersistence = withXip, //Required by the Xip controller
+         prediction = NONE,
+         catchAccessFault = false,
+-        compressedGen = false,
++        compressedGen = true,
+         bigEndian = bigEndian
+       ),
+       new DBusSimplePlugin(
+@@ -89,7 +98,12 @@
+         earlyInjection = false,
+         bigEndian = bigEndian
+       ),
+-      new CsrPlugin(CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x80000020l)),
++      new CsrPlugin(
++        CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x00000020l).copy(
++          pipelineCsrRead = false,
++          deterministicInteruptionEntry = true
++        )
++      ),
+       new DecoderSimplePlugin(
+         catchIllegalInstruction = false
+       ),
+@@ -103,6 +117,8 @@
+         executeInsertion = false
+       ),
+       new LightShifterPlugin,
++      new MulSimplePlugin,
++      new DivPlugin,
+       new HazardSimplePlugin(
+         bypassExecute = false,
+         bypassMemory = false,
+@@ -113,7 +129,7 @@
+         pessimisticAddressMatch = false
+       ),
+       new BranchPlugin(
+-        earlyBranch = false,
++        earlyBranch = true,
+         catchAddressMisaligned = false
+       ),
+       new YamlPlugin("cpu0.yaml")
+@@ -134,8 +150,28 @@
+       ),
+       busCanWriteClockDividerConfig = false,
+       busCanWriteFrameConfig = false,
+-      txFifoDepth = 16,
+-      rxFifoDepth = 16
++      txFifoDepth = 4,
++      rxFifoDepth = 4
++    ),
++    spiMasterConfig = SpiMasterCtrlMemoryMappedConfig(
++      ctrlGenerics = SpiMasterCtrlGenerics(
++        ssWidth      = 1,
++        timerWidth   = 16,
++        dataWidth    = 8
++      ),
++      cmdFifoDepth = 4,
++      rspFifoDepth = 4
++    ),
++    i2cConfig = I2cSlaveMemoryMappedGenerics(
++      ctrlGenerics = I2cSlaveGenerics(
++        samplingWindowSize        = 3,
++        samplingClockDividerWidth = 10 bits,
++        timeoutWidth              = 20 bits
++      ),
++      addressFilterCount = 0,
++      masterGenerics = I2cMasterMemoryMappedGenerics(
++        timerWidth = 12
++      )
+     )
+ 
+   )
+@@ -156,6 +192,63 @@
+   }
+ }
+ 
++// Read-Only Embedded Flash emulated by FPGA Block RAM
++class MuraxEmbeddedFlash(eFlashSize : BigInt,
++                         eFlashHexFile : String,
++                         pipelinedMemoryBusConfig : PipelinedMemoryBusConfig,
++                         bigEndian : Boolean = false) extends Component{
++  val io = new Bundle{
++    val bus = slave(PipelinedMemoryBus(pipelinedMemoryBusConfig))
++  }
++
++  val flash = Mem(Bits(32 bits), eFlashSize / 4)
++  if(eFlashHexFile != null){
++    HexTools.initRam(flash, eFlashHexFile, 0x00000000l)
++  }
++
++  io.bus.cmd.ready := True
++  io.bus.rsp.valid := RegNext(io.bus.cmd.fire && !io.bus.cmd.write) init(False)
++  io.bus.rsp.data  := flash.readSync(
++    address = io.bus.cmd.address(2, log2Up(eFlashSize / 4) bits),
++    enable  = io.bus.cmd.fire && !io.bus.cmd.write
++  )
++}
++
++// Custom Timer with split interrupts: Timer A -> MTI, Timer B -> MEI
++class MuraxSplitApb3Timer extends Component {
++  val io = new Bundle {
++    val apb        = slave(Apb3(Apb3Config(addressWidth = 8, dataWidth = 32)))
++    val interruptA = out Bool()
++    val interruptB = out Bool()
++  }
++
++  val prescaler = Prescaler(16)
++  val timerA    = Timer(16)
++  val timerB    = Timer(16)
++
++  val busCtrl = Apb3SlaveFactory(io.apb)
++  val prescalerBridge = prescaler.driveFrom(busCtrl, 0x00)
++
++  val timerABridge = timerA.driveFrom(busCtrl, 0x40)(
++    ticks  = List(True, prescaler.io.overflow),
++    clears = List(timerA.io.full)
++  )
++
++  val timerBBridge = timerB.driveFrom(busCtrl, 0x50)(
++    ticks  = List(True, prescaler.io.overflow),
++    clears = List(timerB.io.full)
++  )
++
++  val interruptCtrl = InterruptCtrl(2)
++  val interruptCtrlBridge = interruptCtrl.driveFrom(busCtrl, 0x10)
++  interruptCtrl.io.inputs(0) := timerA.io.full
++  interruptCtrl.io.inputs(1) := timerB.io.full
++
++  // Split interrupt outputs instead of OR-ing them together
++  io.interruptA := interruptCtrl.io.pendings(0) && interruptCtrl.io.masks(0)
++  io.interruptB := interruptCtrl.io.pendings(1) && interruptCtrl.io.masks(1)
++}
++
+ 
+ case class Murax(config : MuraxConfig) extends Component{
+   import config._
+@@ -171,6 +264,8 @@
+     //Peripherals IO
+     val gpioA = master(TriStateArray(gpioWidth bits))
+     val uart = master(Uart())
++    val spi = master(SpiMaster(ssWidth = spiMasterConfig.ctrlGenerics.ssWidth))
++    val i2c = master(I2c())
+ 
+     val xip = ifGen(genXip)(master(SpiXdrMaster(xipConfig.ctrl.spi)))
+   }
+@@ -234,6 +329,8 @@
+     //Instanciate the CPU
+     val cpu = new VexRiscv(
+       config = VexRiscvConfig(
++        withMemoryStage = false,
++        withWriteBackStage = false,
+         plugins = cpuPlugins += new DebugPlugin(debugClockDomain, hardwareBreakpointCount)
+       )
+     )
+@@ -272,13 +369,21 @@
+ 
+     //****** MainBus slaves ********
+     val mainBusMapping = ArrayBuffer[(PipelinedMemoryBus,SizeMapping)]()
++    val eFlash = new MuraxEmbeddedFlash(
++      eFlashSize = eFlashSize,
++      eFlashHexFile = eFlashHexFile,
++      pipelinedMemoryBusConfig = pipelinedMemoryBusConfig,
++      bigEndian = bigEndianDBus
++    )
++    mainBusMapping += eFlash.io.bus -> (0x00000000l, eFlashSize)
++
+     val ram = new MuraxPipelinedMemoryBusRam(
+       onChipRamSize = onChipRamSize,
+       onChipRamHexFile = onChipRamHexFile,
+       pipelinedMemoryBusConfig = pipelinedMemoryBusConfig,
+       bigEndian = bigEndianDBus
+     )
+-    mainBusMapping += ram.io.bus -> (0x80000000l, onChipRamSize)
++    mainBusMapping += ram.io.bus -> (0x20000000l, onChipRamSize)
+ 
+     val apbBridge = new PipelinedMemoryBusToApbBridge(
+       apb3Config = Apb3Config(
+@@ -303,10 +408,22 @@
+     externalInterrupt setWhen(uartCtrl.io.interrupt)
+     apbMapping += uartCtrl.io.apb  -> (0x10000, 4 kB)
+ 
+-    val timer = new MuraxApb3Timer()
+-    timerInterrupt setWhen(timer.io.interrupt)
++    val timer = new MuraxSplitApb3Timer()
++    timerInterrupt    setWhen(timer.io.interruptA)
++    externalInterrupt setWhen(timer.io.interruptB)
++
+     apbMapping += timer.io.apb     -> (0x20000, 4 kB)
+ 
++    val spiCtrl = new Apb3SpiMasterCtrl(spiMasterConfig)
++    spiCtrl.io.spi <> io.spi
++    externalInterrupt setWhen(spiCtrl.io.interrupt)
++    apbMapping += spiCtrl.io.apb   -> (0x30000, 4 kB)
++
++    val i2cCtrl = new Apb3I2cCtrl(i2cConfig)
++    i2cCtrl.io.i2c <> io.i2c
++    externalInterrupt setWhen(i2cCtrl.io.interrupt)
++    apbMapping += i2cCtrl.io.apb   -> (0x40000, 4 kB)
++
+     val xip = ifGen(genXip)(new Area{
+       val ctrl = Apb3SpiXdrMasterCtrl(xipConfig)
+       ctrl.io.spi <> io.xip
+@@ -517,7 +634,7 @@
+         catchAddressMisaligned = false
+       )
+       config.cpuPlugins += new IBusSimplePlugin(
+-        resetVector = 0x80000000l,
++        resetVector = 0x00000000l,
+         cmdForkOnSecondStage = true,
+         cmdForkPersistence = false,
+         prediction = STATIC,
+@@ -534,7 +651,8 @@
+ //Will blink led and echo UART RX to UART TX   (in the verilator sim, type some text and press enter to send UART frame to the Murax RX pin)
+ object MuraxWithRamInit{
+   def main(args: Array[String]) {
+-    SpinalVerilog(Murax(MuraxConfig.default.copy(onChipRamSize = 4 kB, onChipRamHexFile = "src/main/ressource/hex/muraxDemo.hex")))
++    // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
++    SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
+   }
+ }
+ 

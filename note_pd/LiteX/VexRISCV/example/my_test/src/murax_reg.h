@@ -376,17 +376,17 @@ static inline void timer_init(Timer_Reg *pTim, uint16_t period_ticks, bool auto_
     pTim->VALUE = 0; // 清空目前計數值
     pTim->CLEARS_TICKS = (auto_reload ? TIMER_AUTO_RELOAD : 0) | TIMER_TICK_PRESCALER;
 
-    // 清除殘留的中斷旗標並開啟 Timer A 中斷遮罩
+    // 清除殘留的中斷旗標並開啟對應 Timer 中斷遮罩 (PENDINGS 為 W1C，不可用 '|=')
     if( irq_en )
     {
         if( pTim == TIMA )
         {
-            TIMER_INTERRUPT->PENDINGS |= TIMER_IRQ_A;
+            TIMER_INTERRUPT->PENDINGS  = TIMER_IRQ_A;
             TIMER_INTERRUPT->MASKS    |= TIMER_IRQ_A;
         }
         else if( pTim == TIMB )
         {
-            TIMER_INTERRUPT->PENDINGS |= TIMER_IRQ_B;
+            TIMER_INTERRUPT->PENDINGS  = TIMER_IRQ_B;
             TIMER_INTERRUPT->MASKS    |= TIMER_IRQ_B;
         }
     }
@@ -395,12 +395,12 @@ static inline void timer_init(Timer_Reg *pTim, uint16_t period_ticks, bool auto_
         if( pTim == TIMA )
         {
             TIMER_INTERRUPT->MASKS    &= ~TIMER_IRQ_A;
-            TIMER_INTERRUPT->PENDINGS &= ~TIMER_IRQ_A;
+            TIMER_INTERRUPT->PENDINGS  = TIMER_IRQ_A;
         }
         else if( pTim == TIMB )
         {
             TIMER_INTERRUPT->MASKS    &= ~TIMER_IRQ_B;
-            TIMER_INTERRUPT->PENDINGS &= ~TIMER_IRQ_B;
+            TIMER_INTERRUPT->PENDINGS  = TIMER_IRQ_B;
         }
     }
     return;
@@ -408,13 +408,13 @@ static inline void timer_init(Timer_Reg *pTim, uint16_t period_ticks, bool auto_
 
 static inline void timer_a_clear_irq(void)
 {
-    TIMER_INTERRUPT->PENDINGS |= TIMER_IRQ_A;
+    TIMER_INTERRUPT->PENDINGS = TIMER_IRQ_A;
     return;
 }
 
 static inline void timer_b_clear_irq(void)
 {
-    TIMER_INTERRUPT->PENDINGS |= TIMER_IRQ_B;
+    TIMER_INTERRUPT->PENDINGS = TIMER_IRQ_B;
     return;
 }
 
