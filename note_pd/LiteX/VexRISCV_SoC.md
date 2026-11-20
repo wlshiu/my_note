@@ -336,7 +336,7 @@ $ make clean run
     verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
     No stack.
     make  -j  -C obj_dir/ -f VMurax.mk VMurax
-    make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Entering directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
@@ -345,7 +345,7 @@ $ make clean run
     ar -cr VMurax__ALL.a VMurax__ALL.o
     ranlib VMurax__ALL.a
     g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
-    make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Leaving directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     ./obj_dir/VMurax
     BOOT
     A
@@ -714,7 +714,7 @@ cp ../../../../Murax.v*.bin . | true
 verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
 No stack.
 make  -j  -C obj_dir/ -f VMurax.mk VMurax
-make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+make[1]: Entering directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
 g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
 g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
 g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
@@ -723,7 +723,7 @@ g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vlt
 ar -cr VMurax__ALL.a VMurax__ALL.o
 ranlib VMurax__ALL.a
 g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
-make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+make[1]: Leaving directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
 ./obj_dir/VMurax
 BOOT
 hello world arty a7 v1
@@ -847,6 +847,8 @@ GNU gdb (GDB) 12.1
     $ cp ./build/my_hello.hex  <VexRiscv_Root>/src/main/ressource/hex/
     ```
 
+
+
 # Customization 4 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
 
 + Change Items
@@ -858,13 +860,29 @@ GNU gdb (GDB) 12.1
 
 + Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
 
-+ The test example is at `VexRISCV/example/my_test`
++ The test example is referenced at `./VexRISCV/example/my_test`
+
+    - Build Application program
+
+        ```
+        $ cd <VexRiscv>/src/main/c/murax/my_test
+        $ vi z_update_bin.sh
+            #!/bin/bash
+
+            make clean && make
+
+            ./z_update_ram.py -i ./build/my_test.bin -t flash
+
+            cp -f Murax.v_toplevel_system_eFlash_flash.bin <VexRiscv>/
+
+        $ ./z_update_bin.sh  # Compile App and copy to '<VexRiscv>/Murax.v_toplevel_system_eFlash_flash.bin'
+        ```
 
     - 測試項目如下
 
         ```
         ...
-        ving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+        ving directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
         ./obj_dir/VMurax
         BOOT
         CONNECTED
@@ -951,7 +969,7 @@ GNU gdb (GDB) 12.1
     verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
     No stack.
     make  -j  -C obj_dir/ -f VMurax.mk VMurax
-    make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Entering directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
@@ -960,7 +978,7 @@ GNU gdb (GDB) 12.1
     ar -cr VMurax__ALL.a VMurax__ALL.o
     ranlib VMurax__ALL.a
     g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
-    make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Leaving directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     ./obj_dir/VMurax
     BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
     ```
@@ -1101,7 +1119,7 @@ GNU gdb (GDB) 12.1
     verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
     No stack.
     make  -j  -C obj_dir/ -f VMurax.mk VMurax
-    make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Entering directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
     g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
@@ -1110,7 +1128,7 @@ GNU gdb (GDB) 12.1
     ar -cr VMurax__ALL.a VMurax__ALL.o
     ranlib VMurax__ALL.a
     g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
-    make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    make[1]: Leaving directory '<VexRiscv>/src/test/cpp/murax/obj_dir'
     ./obj_dir/VMurax
     BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
     ```
