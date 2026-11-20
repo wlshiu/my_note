@@ -16,6 +16,11 @@ static uint32_t g_timer_ticks = 0;
 static uint32_t g_uart_rx_count = 0;
 static char     g_uart_last_char = 0;
 
+static uint32_t g_spi_rx_count = 0;
+static uint8_t  g_spi_rx_buf[4];
+
+static volatile uint32_t g_i2c_rx_count = 0;
+static volatile uint8_t  g_i2c_rx_data  = 0;
 
 static void delay_loops(volatile uint32_t count)
 {
@@ -122,6 +127,82 @@ void main()
     uart_puts("  Last RX Byte      = "); uart_put_hex(g_uart_last_char); uart_puts("\n");
     uart_puts("  -> PASS!\n");
 
+    /* ---------------------------------------------------------------------
+     * 測試 5: SPI Master Loopback 驗證 (mcause 0x8000000B)
+     * --------------------------------------------------------------------- */
+    uart_puts("\n[Test 5] SPI Master Loopback (mcause 0x8000000B):\n");
+
+    /* 清空可能殘留的 SPI RX FIFO */
+    while (SPI->DATA & SPI_DATA_RX_VALID);
+
+    g_spi_rx_count = 0;
+
+    /* 初始化 SPI: 12MHz / (2 * (5 + 1)) = 1MHz SCLK, Mode 0 */
+    spi_init_master(5, 0);
+    spi_rx_irq_enable(true);
+
+    /* 執行一次 2-Byte 完整傳輸 (SS0 拉低 -> 送收 0xA5, 0x5A -> SS0 釋放) */
+    spi_push_cmd(SPI_CMD_SS_ENABLE(0));
+    spi_push_cmd(SPI_CMD_DATA_RX(0xA5));
+    spi_push_cmd(SPI_CMD_DATA_RX(0x5A));
+    spi_push_cmd(SPI_CMD_SS_DISABLE(0));
+
+    /* 等待 2 筆資料皆透過外部中斷接收完成 (附帶簡單超時保護避免死鎖) */
+    uint32_t timeout = 100000;
+    while ((g_spi_rx_count < 2) && (--timeout > 0));
+
+    spi_rx_irq_enable(false);
+
+    uart_puts("  SPI RX IRQ Count = "); uart_put_hex(g_spi_rx_count);  uart_puts("\n");
+    uart_puts("  RX Byte[0]       = "); uart_put_hex(g_spi_rx_buf[0]); uart_puts("\n");
+    uart_puts("  RX Byte[1]       = "); uart_put_hex(g_spi_rx_buf[1]); uart_puts("\n");
+
+    if (g_spi_rx_count == 2 && g_spi_rx_buf[0] == 0xA5 && g_spi_rx_buf[1] == 0x5A)
+        uart_puts("  -> PASS!\n");
+    else
+        uart_puts("  -> FAIL!\n");
+
+
+    /* ---------------------------------------------------------------------
+     * 測試 6: I2C Master 讀取虛擬 Slave (0x50 -> 0x5A, mcause 0x8000000B)
+     * --------------------------------------------------------------------- */
+    uart_puts("\n[Test 6] I2C Master Read Slave 0x50 (mcause 0x8000000B):\n");
+
+    g_i2c_rx_count = 0;
+    g_i2c_rx_data  = 0;
+
+    i2c_init_master_100khz();
+    i2c_irq_enable(I2C_INT_RX_DATA);
+
+    /* 1. 發出 START */
+    i2c_master_start();
+
+    /* 2. 送出 Slave Address (0x50) + Read Bit (1) = 0xA1 */
+    bool ack_ok = i2c_master_write_byte((0x50 << 1) | 0x01);
+    uart_puts("  Slave 0x50 Addr ACK = "); uart_put_hex(ack_ok ? 1 : 0); uart_puts("\n");
+
+    if (ack_ok)
+    {
+        /* 3. 讀取 1 Byte 資料並回傳 NACK 結束讀取 (資料將由 irqCallback 接收) */
+        i2c_master_trigger_read_byte(true);
+
+        uint32_t i2c_timeout = 100000;
+        while ((g_i2c_rx_count == 0) && (--i2c_timeout > 0));
+    }
+
+    /* 4. 發出 STOP 釋放匯流排 */
+    i2c_master_stop();
+    i2c_irq_disable(I2C_INT_RX_DATA);
+
+    uart_puts("  I2C RX IRQ Count    = "); uart_put_hex(g_i2c_rx_count); uart_puts("\n");
+    uart_puts("  Received Data       = "); uart_put_hex(g_i2c_rx_data);  uart_puts("\n");
+
+    if (ack_ok && g_i2c_rx_count == 1 && g_i2c_rx_data == 0x5A)
+        uart_puts("  -> PASS!\n");
+    else
+        uart_puts("  -> FAIL!\n");
+
+
     uart_puts("\n========================================\n");
     uart_puts("  Core & Timer Tests Completed!\n");
     uart_puts("========================================\n");
@@ -168,14 +249,28 @@ void irqCallback(void)
          */
 
         /* 檢查 SPI RX FIFO 非空中斷 (STATUS Bit 9 = RX Interrupt Pending) */
-        if( SPI->STATUS & (1 << 9) )
+        if( SPI->STATUS & SPI_STATUS_RX_INT_PENDING )
         {
+            uint32_t    rx_word;
+            while ((rx_word = SPI->DATA) & SPI_DATA_RX_VALID)
+            {
+                if (g_spi_rx_count < 4)
+                {
+                    g_spi_rx_buf[g_spi_rx_count] = (uint8_t)(rx_word & SPI_DATA_MASK);
+                }
+                g_spi_rx_count++;
+            }
         }
 
         /* 檢查 I2C 中斷旗標 */
-        status = I2C->INT_FLAG;
-        if( status & I2C_INT_RX_DATA_FULL )
+        if (I2C->INT_ENABLE & I2C_INT_RX_DATA)
         {
+            uint32_t rx_val = I2C->RX_DATA;
+            if (rx_val & I2C_RX_VALID)
+            {
+                g_i2c_rx_data = (uint8_t)(rx_val & I2C_RX_DATA_MASK);
+                g_i2c_rx_count++;
+            }
         }
 
         /* 檢查 UART RX 中斷 (若也有開啟 UART 中斷) */

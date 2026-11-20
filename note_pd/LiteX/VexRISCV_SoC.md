@@ -122,40 +122,36 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 |         |               | [23:16]    | R        |  停止位元設定(0: 1 stop bit; 1: 2 stop bits;).
 
 
-### MuraxApb3Timer (Base: 0xF0020000)
-
-+ 預除頻器(Prescaler) TIMA/TIMB 共用
-
-| Offset | 暫存器名稱       | Bit-Fields  | 讀寫權限    | 功能說明
-| :-     | :-              | :-          | :-         | :-
-| 0x00   | PRESCALER_LIMIT | [15:0]      | R/W 16-bit |  預除頻上限值.內部計數器從 `0` 數到 `LIMIT` 時產生一個 Tick 脈衝給 Timer-A/Timer-B (實際除頻倍率為 `LIMIT + 1`).
-|        |                 | [31:16]     | —          |  保留.
 
 
-+ 中斷狀態與遮罩(Interrupt Control)
+### Prescaler 預分頻器 (Base: 0xF0020000)
 
-| Offset | 暫存器名稱         | Bit-Fields | 讀寫權限  |  功能說明
-| :-     | :-                | :-         | :-       | :-
-| 0x30   | INTERRUPT_STATUS  | [0]        |  R/W1C   | Timer A 溢位中斷旗標:<br> 當 Timer A 達到 LIMIT 時硬體自動設為 1.<br> 寫入 1 清除此旗標(Write-1-to-Clear).
-|        |                   | [1]        |  R/W1C   | Timer B 溢位中斷旗標:<br> 當 Timer B 達到 LIMIT 時硬體自動設為 1.<br> 寫入 1 清除此旗標(Write-1-to-Clear).
-|        |                   | [31:2]     |  —       | 保留.
-| 0x34   | INTERRUPT_MASK    | [0]        |  R/W     | Timer A 中斷致能:<br> 1: 允許 Timer A 產生 Interrupt 送往 CPU;<br> 0: 遮罩(關閉).
-|        |                   | [1]        |  R/W     | Timer B 中斷致能:<br> 1: 允許 Timer B 產生 Interrupt 送往 CPU;<br> 0: 遮罩(關閉).
-|        |                   | [31:2]     |  —       | 保留.
+用於將系統時脈分頻,產生一個週期性的溢位訊號(prescaler.io.overflow)供 Timer A 與 Timer B 使用。
+
+| Offset  | 暫存器名稱 | Bit-Fields | 讀寫權限  | 功能說明
+| :-     | :-         | :-         | :-       | :-
+| 0x00   | LIMIT      | [15:0]     | R/W      | 計數器從 `0` 數到 `LIMIT` 後歸零並產生一個 tick 脈衝。 <br>公式: `F = PCLK / (LIMIT + 1)`。
 
 
-+ Timer-A /Timer-B
+### InterruptCtrl 中斷控制器 (Base: 0xF0020010)
+管理 Timer A 與 Timer B 的中斷狀態與遮罩(Bit 0 對應 Timer A,Bit 1 對應 Timer B)。
 
-| Offset (A/B) | 暫存器名稱   | Bit-Fields | 讀寫權限   | 功能說明
-| :-           | :-          | :-         | :-        | :-
-| 0x10/0x20    | TIMER_LIMIT | [15:0]     | R/W       | 計時器溢位上限值(Auto-reload target).
-|              |             | [31:16]    | —         | 保留.
-| 0x14/0x24    | TIMER_VALUE | [15:0]     | R/W       | 讀取或直接設定計時器當前的 16-bit 計數值.
-|              |             | [31:16]    | —         | 保留.
-| 0x18/0x28    | TIMER_CTRL  | [0]        | R/W       | Clock Enable(計數致能):<br> 1: 跟隨 Prescaler Tick 向上計數;<br> 0: 停止計數.
-|              |             | [1]        | R/W       | Clear on Limit(自動重載):<br> 1: 當 `VALUE == LIMIT` 時自動清零並繼續循環計數(週期定時模式);<br> 0: 達到上限後維持數值(單次模式).
-|              |             | [15:2]     | —         | 保留.
-|              |             | [16]       | R/W       | Timer A Tick Cascade(僅 Timer B 有效,部分版本支援):<br> 在標準 Murax 中,Timer A 與 B 皆使用 Prescaler Tick; 若需串接,通常由 Prescaler 統一控制.
+| Offset  | 暫存器名稱 | Bit-Fields | 讀寫權限  | 功能說明
+| :-      | :-        | :-         | :-       | :-
+| 0x00    | PENDINGS  | [31:0]     | R/W1C    | 中斷掛起狀態,每個 bit 對應一個中斷<br> Read:<br> 1: 表示該計時器已觸發溢位中斷<br> Write: <br> 1: 清除對應位元的中斷旗標(Write-1-to-Clear,例如 TIMER_INTERRUPT->PENDINGS = 0x1;)
+| 0x04    | MASKS     | [31:0]     | R/W      | 中斷致能遮罩 <br> 1: Enable <br> 0: Disable <br> Bit[0]: Timer A 中斷<br>Bit[1]: Timer B 中斷
+
+
+### MuraxApb3Timer, Timer A (Base: 0xF0020040) 與 Timer B (Base: 0xF0020050)
+
+
+| Offset | 暫存器名稱    | Bit-Fields | 讀寫權限   | 功能說明
+| :-     | :-           | :-         | :-        | :-
+| 0x00   | CLEARS_TICKS | [15:0]     | R/W	     | TICKS: 選擇觸發計數器 +1 的時脈來源:<br>0x1 (Bit 0): 系統主時脈(每個 clock cycle 加 1)<br>0x2 (Bit 1): Prescaler 溢位訊號(預分頻後的 tick)
+|        |              | [31:16]    | R/W       | CLEARS: 選擇觸發計數器自動歸零(Auto-reload)的條件:<br>1 (Bit 16): 當計數值達到 LIMIT(full)時自動歸零
+| 0x04   | LIMIT        | [15:0]     | R/W       | 計數上限值,當 `VALUE == LIMIT` 時觸發 `full` 事件(產生中斷並依設定自動歸零)。<br> ps. 寫入此暫存器時硬體也會同步將 `VALUE` 清零。
+| 0x08    | VALUE        | [15:0]     | R/W       | 目前計數值<br> Read: 回傳當前的計數器數值 <br>Write: 寫入任意值會直接將計數器清零
+
 
 ### Apb3SpiMasterCtrl (Base: 0xF0030000)
 
@@ -198,27 +194,26 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 |        |               | [10]       | R/W       | Repeat:<br> 1: 重複套用此 ACK 設定;<br> 0: 單次有效(完成第 9 個時脈後清零 Bit 8)
 | 0x08   | RX_DATA       | [7:0]      | R         | Value:<br> 第 1~8 個時脈採樣到的 8-bit 資料
 |        |               | [8]        | R         | Valid:<br> 1: 已收到完整 1 Byte(CPU 讀取此暫存器後硬體自動清為 0)
+|        |               | [9]        | RW        | Listen<br> 必須設為 1 才會將收到的資料推入 RX_DATA
 | 0x0C   | RX_ACK        | [0]        | R         | Value:<br> 第 9 個時脈讀到的匯流排狀態(0: ACK, 1: NACK)
 |        |               | [8]        | RC        | Valid:<br> 1: 已完成第 9 個時脈採樣(CPU 讀取後硬體自動清為 0)
-| 0x20   | INT_ENABLE    | [0]        | R/W       | TX_DATA_EMPTY:<br> TX_DATA 已送出變空(Valid = 0)
-|        |               | [1]        | R/W       | TX_ACK_EMPTY:<br> TX_ACK 已送出變空(Valid = 0)
-|        |               | [2]        | R/W       | RX_DATA_FULL:<br> RX_DATA 收到新資料(Valid = 1)
-|        |               | [3]        | R/W       | RX_ACK_FULL:<br> RX_ACK 收到新狀態(Valid = 1)
+|        |               | [9]        | RW        | Listen<br> 必須設為 1 才會將收到的資料推入 RX_DATA
+| 0x20   | INT_ENABLE    | [0]        | R/W       | RX_DATA_FULL:<br> RX_DATA 收到新資料(Valid = 1)
+|        |               | [1]        | R/W       | RX_ACK:<br> RX_ACK 收到新狀態(Valid = 1)
+|        |               | [2]        | R/W       | TX_DATA_EMPTY:<br> TX_DATA 已送出變空(Valid = 0)
+|        |               | [3]        | R/W       | TX_ACK:<br> TX_ACK 已送出變空(Valid = 0)
 |        |               | [4]        | R/W       | START:<br> 匯流排偵測到 START / Repeated START 條件
-|        |               | [5]        | R/W       | STOP:<br> 匯流排偵測到 STOP 條件
-|        |               | [6]        | R/W       | DROP:<br> 傳輸異常中止或強制 Drop
-|        |               | [16]       | R/W       | CLOCK_GEN_BUSY:<br> Master 時脈產生器忙碌狀態變化
-| 0x24   | INT_FLAG      | [0]        | R / W1C   | TX_DATA_EMPTY:<br> TX_DATA 已送出變空(Valid = 0)
-|        |               | [1]        | R / W1C   | TX_ACK_EMPTY:<br> TX_ACK 已送出變空(Valid = 0)
-|        |               | [2]        | R / W1C   | RX_DATA_FULL:<br> RX_DATA 收到新資料(Valid = 1)
-|        |               | [3]        | R / W1C   | RX_ACK_FULL:<br> RX_ACK 收到新狀態(Valid = 1)
+|        |               | [5]        | R/W       | RESTART:<br>
+|        |               | [6]        | R/W       | STOP:<br> 匯流排偵測到 STOP 條件
+|        |               | [7]        | R/W       | DROP:<br> 傳輸異常中止或強制 Drop
+| 0x24   | INT_FLAG      | -          | -         | 注意: RX_DATA 與 RX_ACK 中斷是 Level 觸發,無獨立 Flag 位元
 |        |               | [4]        | R / W1C   | START:<br> 匯流排偵測到 START / Repeated START 條件
-|        |               | [5]        | R / W1C   | STOP:<br> 匯流排偵測到 STOP 條件
-|        |               | [6]        | R / W1C   | DROP:<br> 傳輸異常中止或強制 Drop
-|        |               | [16]       | R / W1C   | CLOCK_GEN_BUSY:<br> Master 時脈產生器忙碌狀態變化
+|        |               | [5]        | R / W1C   | RESTART:<br>
+|        |               | [6]        | R / W1C   | STOP:<br> 匯流排偵測到 STOP 條件
+|        |               | [7]        | R / W1C   | DROP:<br> 傳輸異常中止或強制 Drop
 | 0x28   | SAMPLING_DIV  | [9:0]      | R/W       | Divider:<br> 輸入濾波取樣時脈除頻值,每 (Div + 1) 個系統時脈取樣一次 SDA/SCL
 | 0x2C   | TIMEOUT       | [19:0]     | R/W       | Cycles:<br> SCL 持續為低電位超過此週期數則觸發逾時復位(`填 0 停用`)
-| 0x30   | TSU_DAT       | [9:0]      | R/W       | Cycles:<br> SDA 變化後至釋放 SCL 上升緣之間的最小 Data Setup 時間週期數
+| 0x30   | TSU_DAT       | [5:0]      | R/W       | Cycles:<br> SDA 變化後至釋放 SCL 上升緣之間的最小 Data Setup 時間週期數
 | 0x40   | MASTER_STATUS | [0]        | R         | IsBusy:<br> 1: I2C 匯流排忙碌中(處於 START 與 STOP 之間);<br> 0: 匯流排閒置
 |        |               | [4]        | R/W       | Start:<br> 1: 發送 START / Repeated START 條件(完成後自動清回 0)
 |        |               | [5]        | R/W       | Stop:<br> 1: 發送 STOP 條件(完成後硬體自動清回 0)
@@ -805,11 +800,71 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 
 # Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
 
-Memory mapping
-> + eFlash: base= 0x0, 32KBytes
-> + SRAM: base= 0x20000000, 2KBytes
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
 
-Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
++ The test example is at `VexRISCV/example/my_test`
+
+    - 測試項目如下
+
+        ```
+        ...
+        ving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+        ./obj_dir/VMurax
+        BOOT
+        CONNECTED
+
+        ========================================
+        VexRiscv Murax SoC Core & Timer Test
+        ========================================
+        [Test 0] CSR Check:
+            MIE     = 0x00000880
+            MSTATUS = 0x00001808
+
+        [Test 1] SRAM .data & .bss Check:
+            Init .data (expect 0x12345678) = 0x12345678
+            Init .bss  (expect 0x00000000) = 0x00000000
+            -> PASS!
+
+        [Test 2] RV32M Hardware Mul/Div Check:
+            MUL = 0x04FED79D
+            DIV = 0x000A65A7
+            REM = 0x00000060
+            -> PASS!
+
+        [Test 3] Timer Interrupt (mcause 0x80000007):
+            Timer ticks = 0x00000005
+            -> PASS!
+
+        [Test 4] UART RX Interrupt (mcause 0x8000000B):
+            [Waiting] Please type a character and press Enter...
+            hhh
+            hhh
+            UART RX IRQ Count = 0x00000004
+            Last RX Byte      = 0x0000000A
+            -> PASS!
+
+        [Test 5] SPI Master Loopback (mcause 0x8000000B):
+            SPI RX IRQ Count = 0x00000002
+            RX Byte[0]       = 0x000000A5
+            RX Byte[1]       = 0x0000005A
+            -> PASS!
+
+        [Test 6] I2C Master Read Slave 0x50 (mcause 0x8000000B):
+            Slave 0x50 Addr ACK = 0x00000001
+            I2C RX IRQ Count    = 0x00000001
+            Received Data       = 0x0000005A
+            -> PASS!
+
+        ========================================
+        Core & Timer Tests Completed!
+        ========================================
+        ```
+
+
 
 ## diff (from Gemini)
 
@@ -819,18 +874,122 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
     > [Murax_3Stages_rv32imc_eFlash_i2c_spi Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi.diff)
 
+    - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI.scala)
 
 
 ## 啟動 Verilator 模擬環境
 
 新增 `SpiI2cSimProcess` 掛載進 `Workspace<VMurax>`, 實作 SPI Loopback(MOSI 接回 MISO)以及 I2C Open-Drain 上拉與虛擬 Slave 狀態機
 > diff file (base on `<VexRiscv_Root>/src/test/cpp/murax/main.cpp`)
->> [sim-main](VexRISCV/sim_main.diff)
+
++ The modified [main.cpp](VexRISCV/example/main.cpp)
+    > 增加 SP/I2C 模擬項目
+
+    - [sim-main](VexRISCV/example/sim_main.diff)
+
++ 執行 Verilator 模擬
+
+    ```
+    [<VexRiscv_Root>/src/test/cpp/murax] (sha:baf7dc8)
+    $ make clean run
+    rm -rf obj_dir
+    rm -f Murax.v*.bin
+    rm -f Murax.v*.bin
+    cp ../../../../Murax.v*.bin . | true
+    verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
+    No stack.
+    make  -j  -C obj_dir/ -f VMurax.mk VMurax
+    make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
+    /usr/bin/perl /usr/share/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include VMurax.cpp VMurax_Murax.cpp VMurax_VexRiscv.cpp VMurax__Dpi.cpp VMurax__Slow.cpp VMurax_Murax__Slow.cpp VMurax_VexRiscv__Slow.cpp VMurax__Syms.cpp > VMurax__ALL.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o VMurax__ALL.o VMurax__ALL.cpp
+    ar -cr VMurax__ALL.a VMurax__ALL.o
+    ranlib VMurax__ALL.a
+    g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
+    make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    ./obj_dir/VMurax
+    BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
+    ```
+
+## OpenOCD Server (for Verilator Simulation)
+
++ `murax.cfg` for OpenOCD
+
+    ```
+    adapter driver jtag_tcp
+    adapter speed 1000
+
+    set _CHIPNAME riscv
+    # 關鍵修正 1: Murax.v 的 jtag_tap_instruction 是 4-bit,必須設為 -irlen 4
+    jtag newtap $_CHIPNAME cpu -irlen 4 -expected-id 0x10001fff
+
+    set _TARGETNAME $_CHIPNAME.cpu
+    target create $_TARGETNAME vexriscv -endian little -chain-position $_TARGETNAME
+
+    # 關鍵修正 2: 對應 JtagBridge (IR_WRITE=2, IR_READ=3, DR_WRITE_OFFSET=0, DR_READ_OFFSET=0, DR_WRITE_LEN=0, DR_READ_LEN=0)
+    vexriscv jtagMapping 2 3 0 0 0 0
+    vexriscv cpuConfigFile cpu0.yaml
+    vexriscv readWaitCycles 40
+
+    reset_config none
+    init
+    ```
+
++ Start OpenOCD server
+    > 需使用 VexRISCV 特製的 OpenOCD 版本
+
+    ```
+    $ openocd -f ./murax.cfg
+        Open On-Chip Debugger 0.11.0+dev-04036-ga0220ad30 (2026-11-11-17:21)
+        Licensed under GNU GPL v2
+        For bug reports, read
+                http://openocd.org/doc/doxygen/bugs.html
+        Info : only one transport option; autoselect 'jtag'
+        Info : clock speed 1000 kHz
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+        Error: ERROR: Error while reading from socket: Socket operation on non-socket
+        [riscv.cpu] Target successfully examined.
+        Info : starting gdb server for riscv.cpu on 3333
+        Info : Listening on port 3333 for gdb connections
+        Info : Listening on port 6666 for tcl connections
+        Info : Listening on port 4444 for telnet connections
+        Info : accepting 'gdb' connection on tcp/3333
+        Warn : Prefer GDB command "target extended-remote :3333" instead of "target remote :3333"
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+        Info : JTAG tap: riscv.cpu tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+    ```
+
+
+## GDB client
+
+```
+$ cd <VexRiscv_Root>/src/main/c/murax/my_test
+$ make clean && make
+
+$ vi z_run_gdb.sh
+    #!/bin/bash
+
+    ELF_FILE="<VexRiscv_Root>/src/main/c/murax/my_test/build/my_test.elf"
+    cgdb -d riscv32-unknown-elf-gdb $ELF_FILE -ex 'set remotetimeout 60' -ex 'target extended-remote localhost:3333'"
+
+$ z_run_gdb.sh
+GNU gdb (GDB) 12.1
+...
+
+(gdb) monitor reset halt    # reset DUT
+(gdb) si                    # execte the 1st instruction (start at 'crtStart')
+(gdb) c                     # 開始執行 Verilator 模擬
+```
+
 
 
 # Reference
 
 + [GitHub - SpinalHDL/VexRiscv: A FPGA friendly 32 bit RISC-V CPU implementation · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
 + [在iCESugar上运行MuraxSoC](https://www.muselab-tech.com/zai-icesugarshang-yun-xing-muraxsoc/)
+
+
 
 

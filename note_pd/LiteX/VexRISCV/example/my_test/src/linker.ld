@@ -27,7 +27,7 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.init))
     /* 確保中斷向量表對齊 0x00000020 (對應 CsrPlugin 的 mtvecInit) */
-    . = 0x20;
+    . = ORIGIN(FLASH) + 0x20;
     KEEP(*(.trap))
     *(.text .text.*)
     *(.rodata .rodata.*)

@@ -54,7 +54,7 @@ tmux split-window -v -p 50 -t "$SESSION_NAME:$WINDOW_NAME.1"
 
 
 tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.1" "cd $HOME/Working/vexriscv/VexRiscv/src/test/cpp/murax; make clean run" C-m
-tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.2" "echo 'Wait Simulator...'; sleep 7; $OPENOCD_BIN -f $OPENOCD_CFG" C-m
+tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.2" "echo 'Wait Simulator...'; sleep 10; $OPENOCD_BIN -f $OPENOCD_CFG" C-m
 tmux send-keys -t "$SESSION_NAME:$WINDOW_NAME.0" "echo 'Wait OpenOCD Link...'; while ! nc -z localhost $GDB_PORT >/dev/null 2>&1; do sleep 1; done; $GDB_BIN $ELF_FILE -ex 'set remotetimeout 60' -ex 'target extended-remote localhost:3333'" C-m
 
 

@@ -149,6 +149,20 @@ typedef struct
 
 #define SPI ((Spi_Reg *)SPI_BASE)
 
+/* SPI DATA 讀取 Bit-fields */
+#define SPI_DATA_RX_VALID           (1UL << 31)
+#define SPI_DATA_MASK               (0xFFUL)
+
+/* SPI STATUS Bit-fields */
+#define SPI_STATUS_CMD_INT_EN       (1UL << 0)
+#define SPI_STATUS_RX_INT_EN        (1UL << 1)
+#define SPI_STATUS_CMD_INT_PENDING  (1UL << 8)
+#define SPI_STATUS_RX_INT_PENDING   (1UL << 9)
+#define SPI_STATUS_TX_AVAIL_SHIFT   16
+#define SPI_STATUS_TX_AVAIL_MASK    (0xFFFFUL << SPI_STATUS_TX_AVAIL_SHIFT)
+
+
+
 /* SPI 命令格式 (寫入 SPI->DATA) */
 #define SPI_CMD_DATA(byte)      (0x00000000 | ((byte) & 0xFF))  /* 僅送出 1 Byte */
 #define SPI_CMD_DATA_RX(byte)   (0x01000000 | ((byte) & 0xFF))  /* 送出 1 Byte 並將接收資料推入 RX FIFO */
@@ -185,20 +199,26 @@ typedef struct
 /* I2C 常用控制位元 */
 #define I2C_TX_VALID            (1 << 8)
 #define I2C_TX_ENABLE           (1 << 9)
+#define I2C_RX_VALID            (1 << 8)
+#define I2C_RX_LISTEN           (1 << 9)  /* 必須設為 1 才會鎖存接收到的 Data/ACK */
+#define I2C_RX_DATA_MASK        (0xFF)
+#define I2C_TX_ACK_NACK         (1 << 0)  /* 0 = ACK, 1 = NACK */
+#define I2C_RX_ACK_NACK         (1 << 0)  /* 0 = 收到 ACK, 1 = 收到 NACK */
+
 #define I2C_MASTER_BUSY         (1 << 0)
 #define I2C_MASTER_START        (1 << 4)
 #define I2C_MASTER_STOP         (1 << 5)
 #define I2C_MASTER_DROP         (1 << 6)
 
-/* I2C 中斷旗標位元 (INT_ENABLE / INT_FLAG) */
-#define I2C_INT_TX_DATA_EMPTY   (1 << 0)
-#define I2C_INT_TX_ACK_EMPTY    (1 << 1)
-#define I2C_INT_RX_DATA_FULL    (1 << 2)
-#define I2C_INT_RX_ACK_FULL     (1 << 3)
-#define I2C_INT_START           (1 << 4)
-#define I2C_INT_STOP            (1 << 5)
-#define I2C_INT_DROP            (1 << 6)
-#define I2C_INT_CLOCK_GEN_BUSY  (1 << 16)
+/* I2C 中斷位元 (依據 Murax.v 實際映射) */
+#define I2C_INT_RX_DATA         (1 << 0)  /* INT_ENABLE Bit 0: RX_DATA Valid 中斷 */
+#define I2C_INT_RX_ACK          (1 << 1)  /* INT_ENABLE Bit 1: RX_ACK Valid 中斷 */
+#define I2C_INT_TX_DATA_EMPTY   (1 << 2)  /* INT_ENABLE Bit 2 */
+#define I2C_INT_TX_ACK_EMPTY    (1 << 3)  /* INT_ENABLE Bit 3 */
+#define I2C_INT_START           (1 << 4)  /* INT_ENABLE / INT_FLAG Bit 4 */
+#define I2C_INT_RESTART         (1 << 5)  /* INT_ENABLE / INT_FLAG Bit 5 */
+#define I2C_INT_STOP            (1 << 6)  /* INT_ENABLE / INT_FLAG Bit 6 */
+#define I2C_INT_DROP            (1 << 7)  /* INT_ENABLE / INT_FLAG Bit 7 */
 
 /* =========================================================================
  * 5. RISC-V CSR 中斷控制巨集
@@ -398,7 +418,95 @@ static inline void timer_b_clear_irq(void)
     return;
 }
 
+/* --- SPI 輔助函式 --- */
+static inline void spi_init_master(uint32_t clk_div, uint32_t mode)
+{
+    SPI->CONFIG     = (mode & 0x03);     /* Mode 0~3 (Bit0=CPOL, Bit1=CPHA), SS Active-Low */
+    SPI->CLOCK_DIV  = clk_div;           /* 12MHz / (2 * (clk_div + 1)) -> div=5 時為 1MHz */
+    SPI->SS_SETUP   = 2;
+    SPI->SS_HOLD    = 2;
+    SPI->SS_DISABLE = 2;
+    return;
+}
 
+static inline void spi_rx_irq_enable(bool enable)
+{
+    if (enable)
+        SPI->STATUS |= SPI_STATUS_RX_INT_EN;
+    else
+        SPI->STATUS &= ~SPI_STATUS_RX_INT_EN;
+}
+
+static inline uint32_t spi_tx_free_slots(void)
+{
+    return (SPI->STATUS & SPI_STATUS_TX_AVAIL_MASK) >> SPI_STATUS_TX_AVAIL_SHIFT;
+}
+
+static inline void spi_push_cmd(uint32_t cmd)
+{
+    while (spi_tx_free_slots() == 0);
+    SPI->DATA = cmd;
+}
+
+/* --- I2C 輔助函式 --- */
+static inline void i2c_init_master_100khz(void)
+{
+    I2C->SAMPLING_DIV = 2;      /* 12MHz / (2 + 1) = 4MHz 取樣率 */
+    // I2C->TIMEOUT      = 0;      /* 停用 Timeout 避免單步除錯或模擬誤觸發 */
+    I2C->TIMEOUT      = 120000; /* 10ms 逾時保護 (不可設為 0，否則會立即觸發 Drop) */
+    I2C->TSU_DAT      = 6;      /* 500ns Data Setup Time */
+    I2C->T_LOW        = 60;     /* 5us SCL Low (12MHz * 5us = 60) */
+    I2C->T_HIGH       = 60;     /* 5us SCL High (12MHz * 5us = 60) */
+    I2C->T_BUF        = 60;     /* 5us Bus Free Time */
+
+    /* 清除所有殘留中斷旗標 */
+    I2C->INT_FLAG     = 0xFFFFFFFF;
+}
+
+static inline void i2c_irq_enable(uint32_t mask)
+{
+    I2C->INT_ENABLE |= mask;
+}
+
+static inline void i2c_irq_disable(uint32_t mask)
+{
+    I2C->INT_ENABLE &= ~mask;
+}
+
+static inline void i2c_master_start(void)
+{
+    I2C->MASTER_STATUS = I2C_MASTER_START;
+    while (I2C->MASTER_STATUS & I2C_MASTER_START);
+}
+
+static inline void i2c_master_stop(void)
+{
+    I2C->MASTER_STATUS = I2C_MASTER_STOP;
+    while (I2C->MASTER_STATUS & I2C_MASTER_STOP);
+}
+
+/* Master 送出 1 Byte 並等待 Slave 回應 ACK (回傳 true 代表收到 ACK) */
+static inline bool i2c_master_write_byte(uint8_t byte)
+{
+    I2C->RX_ACK  = I2C_RX_LISTEN; /* 開啟 RX_ACK 鎖存 */
+    I2C->TX_DATA = (uint32_t)byte | I2C_TX_VALID | I2C_TX_ENABLE;
+    I2C->TX_ACK  = I2C_TX_VALID;  /* ENABLE=0: 釋放 SDA 讀取 Slave ACK */
+
+    uint32_t ack;
+    do {
+        ack = I2C->RX_ACK;
+    } while (!(ack & I2C_RX_VALID));
+
+    return ((ack & I2C_RX_ACK_NACK) == 0);
+}
+
+/* Master 觸發接收 1 Byte (由中斷或輪詢讀取 RX_DATA)，send_nack=true 代表最後一筆 */
+static inline void i2c_master_trigger_read_byte(bool send_nack)
+{
+    I2C->RX_DATA = I2C_RX_LISTEN; /* 開啟 RX_DATA 鎖存 */
+    I2C->TX_DATA = I2C_TX_VALID;  /* ENABLE=0: 釋放 SDA 讓 Slave 傳送資料 */
+    I2C->TX_ACK  = I2C_TX_VALID | I2C_TX_ENABLE | (send_nack ? I2C_TX_ACK_NACK : 0);
+}
 
 #ifdef __cplusplus
 }
