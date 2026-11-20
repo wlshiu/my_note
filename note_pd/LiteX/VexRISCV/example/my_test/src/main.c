@@ -3,7 +3,7 @@
 
 #include "murax_reg.h"
 
-#define HSI_CLOCK_Hz        (12ul*1000*1000)
+#define HSI_CLOCK_Hz        (32ul*1000*1000)
 
 
 static uint32_t g_data_var = 0x12345678;  /* 應由 crt.S 從 Flash 搬移至 SRAM */
@@ -38,9 +38,12 @@ void main()
     TIMER_INTERRUPT->MASKS    = 0x0ul;
     TIMER_INTERRUPT->PENDINGS = 0xFFFFFFFF;
 
-    timer_set_prescaler(HSI_CLOCK_Hz, 12*1000);
+    /* 開啟 UART 腳位多工 (IOPAD[0]=TXD, IOPAD[1]=RXD) */
+    pinmux_enable_uart(true);
 
-    gpio_set_dir(0xFF, true);
+    timer_set_prescaler(HSI_CLOCK_Hz, 32*1000);
+
+    gpio_set_dir(0x0F00, true); /* 僅設定純 GPIO IOPAD[11:8] 為輸出，避免干擾 ALT 腳位 */
     gpio_write(0x0);
 
     uart_puts("\n========================================\n");
@@ -94,7 +97,7 @@ void main()
      * 測試 3: Timer A 週期性中斷驗證 (12MHz -> 1ms tick, mcause 0x80000007)
      * --------------------------------------------------------------------- */
     uart_puts("\n[Test 3] Timer A Interrupt (mcause 0x80000007):\n");
-    timer_set_prescaler(12000000, 1000000); /* 12MHz / 12 = 1MHz (1us/tick) */
+    timer_set_prescaler(32000000, 1000000); /* 32MHz / 32 = 1MHz (1us/tick) */
     timer_init(TIMA, 1000, true, true);     /* 1000us = 1ms 自動重載並開啟中斷 */
 
     while (g_timer_a_ticks < 5);            /* 等待 5 次中斷 (5ms) */
@@ -152,8 +155,11 @@ void main()
 
     g_spi_rx_count = 0;
 
-    /* 初始化 SPI: 12MHz / (2 * (5 + 1)) = 1MHz SCLK, Mode 0 */
-    spi_init_master(5, 0);
+    /* 切換 IOPAD[7:4] 為 SPI 功能 */
+    pinmux_enable_spi(true);
+
+    /* 初始化 SPI: 32MHz / (2 * (15 + 1)) = 1MHz SCLK, Mode 0 */
+    spi_init_master(15, 0);
     spi_rx_irq_enable(true);
 
     /* 執行一次 2-Byte 完整傳輸 (SS0 拉低 -> 送收 0xA5, 0x5A -> SS0 釋放) */
@@ -185,6 +191,9 @@ void main()
 
     g_i2c_rx_count = 0;
     g_i2c_rx_data  = 0;
+
+    /* 切換 IOPAD[3:2] 為 I2C 功能 */
+    pinmux_enable_i2c(true);
 
     i2c_init_master_100khz();
     i2c_irq_enable(I2C_INT_RX_DATA);

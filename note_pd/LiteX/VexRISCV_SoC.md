@@ -147,7 +147,7 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 
 | Offset | 暫存器名稱    | Bit-Fields | 讀寫權限   | 功能說明
 | :-     | :-           | :-         | :-        | :-
-| 0x00   | CLEARS_TICKS | [15:0]     | R/W	     | TICKS: 選擇觸發計數器 +1 的時脈來源:<br>0x1 (Bit 0): 系統主時脈(每個 clock cycle 加 1)<br>0x2 (Bit 1): Prescaler 溢位訊號(預分頻後的 tick)
+| 0x00   | CLEARS_TICKS | [15:0]     | R/W       | TICKS: 選擇觸發計數器 +1 的時脈來源:<br>0x1 (Bit 0): 系統主時脈(每個 clock cycle 加 1)<br>0x2 (Bit 1): Prescaler 溢位訊號(預分頻後的 tick)
 |        |              | [31:16]    | R/W       | CLEARS: 選擇觸發計數器自動歸零(Auto-reload)的條件:<br>1 (Bit 16): 當計數值達到 LIMIT(full)時自動歸零
 | 0x04   | LIMIT        | [15:0]     | R/W       | 計數上限值,當 `VALUE == LIMIT` 時觸發 `full` 事件(產生中斷並依設定自動歸零)。<br> ps. 寫入此暫存器時硬體也會同步將 `VALUE` 清零。
 | 0x08    | VALUE        | [15:0]     | R/W       | 目前計數值<br> Read: 回傳當前的計數器數值 <br>Write: 寫入任意值會直接將計數器清零
@@ -222,14 +222,58 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 | 0x54   | THIGH         | [11:0]     | R/W       | Cycles: Master 模式下 SCL 高電位持續週期數(12MHz 跑 100kHz 設 60)
 | 0x58   | TBUF          | [11:0]     | R/W       | Cycles: Master 模式下 STOP 後至下一次 START 的最小匯流排閒置週期數
 
+### SysCtrl (Base: 0xF0050000)
+
+| Offset | 暫存器名稱     | Bit-Fields | 讀寫權限   | 功能說明
+| :-     | :-            | :-         | :-        | :-
+| 0x00   | PINMUX_SEL0   | [1:0]      | R/W       | IOPAD[0]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [3:2]      | R/W       | IOPAD[1]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [5:4]      | R/W       | IOPAD[2]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [7:6]      | R/W       | IOPAD[3]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [9:8]      | R/W       | IOPAD[4]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [11:10]    | R/W       | IOPAD[5]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [13:12]    | R/W       | IOPAD[6]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [15:14]    | R/W       | IOPAD[7]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+| 0x04   | PINMUX_SEL1   | [1:0]      | R/W       | IOPAD[8]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [3:2]      | R/W       | IOPAD[9]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [5:4]      | R/W       | IOPAD[10]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [7:6]      | R/W       | IOPAD[11]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [9:8]      | R/W       | IOPAD[12]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [11:10]    | R/W       | IOPAD[13]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [13:12]    | R/W       | IOPAD[14]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+|        |               | [15:14]    | R/W       | IOPAD[15]:<br> 0: GPIO<br>  1: UART/I2C/JTAG<br> 2: SPI<br> 3: 保留
+| 0x08   | SYS_STATUS    | [7:0]      | R         | 周邊版本辨識碼(0x16)
+|        |               | [31:16]    | R         | 核心時脈 MHz (32)
+
+## Pin Mux
+
+
+| 實體腳位       | Mode 0 (2'b00)  | Mode 1 (2'b01 - 開機 JTAG 預設) | Mode 2 (2'b10)  | Open-Drain / 電氣特性說明
+| :-            | :-              | :-                              | :-              | :-
+| IOPAD[0]      | GPIO[0]         | UART_TXD (推挽輸出)             | —               | —
+| IOPAD[1]      | GPIO[1]         | UART_RXD (輸入)                 | —               | —
+| IOPAD[2]      | GPIO[2]         | I2C_SCL (Open-Drain)           |  —               | 輸出固定 0,writeEnable = ~scl.write
+| IOPAD[3]      | GPIO[3]         | I2C_SDA (Open-Drain)           |  —               | 輸出固定 0,writeEnable = ~sda.write
+| IOPAD[4]      | GPIO[4]         | —                              |  SPI_SS[0] (輸出) | —
+| IOPAD[5]      | GPIO[5]         | —                              |  SPI_SCLK (輸出)  | —
+| IOPAD[6]      | GPIO[6]         | —                              |  SPI_MOSI (輸出)  | —
+| IOPAD[7]      | GPIO[7]         | —                              |  SPI_MISO (輸入)  | —
+| IOPAD[8..11]  | GPIO[8..11]     | —                              |  —                | 純通用 GPIO
+| IOPAD[12]     | GPIO[12]        | JTAG_TMS (預設)                 | —                | 重置後預設為 Mode 1 (0x1),確保上電即支援 OpenOCD
+| IOPAD[13]     | GPIO[13]        | JTAG_TCK (預設)                 | —                | 重置後預設為 Mode 1 (0x1)
+| IOPAD[14]     | GPIO[14]        | JTAG_TDI (預設)                 | —                | 重置後預設為 Mode 1 (0x1)
+| IOPAD[15]     | GPIO[15]        | JTAG_TDO (預設)                 | —                | 重置後預設為 Mode 1 (0x1)
 
 
 
-# Customization (Use 3-stages pipeline base on default `Murax`)
 
-`2-stages pipeline` 需要做非同步處理,造成需要較高電路實現,因此改為 `3-stages pipeline`
+# Customization 1 (Use 3-stages pipeline base on default `Murax`)
 
-Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
++ Change Items
+
+    - `2-stages pipeline` 需要做非同步處理,造成需要較高電路實現,因此改為 `3-stages pipeline`
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
 
 ## diff (from Gemini)
 
@@ -433,13 +477,16 @@ GNU gdb (GDB) 12.1
 (gdb) si    # execte the 1st instruction (start at 'crtStart')
 ```
 
-# Customization (Use 3-stages pipeline base on default `Murax` + eFlash)
+# Customization 2 (Use 3-stages pipeline base on default `Murax` + eFlash)
 
-Memory mapping
-> + eFlash: base= 0x0, 32KBytes
-> + SRAM: base= 0x20000000, 2KBytes
++ Change Items
+    - 增加 eFlash
 
-Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
 
 ## diff (from Gemini)
 
@@ -749,14 +796,16 @@ GNU gdb (GDB) 12.1
 ```
 
 
-# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC)
+# Customization 3 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC)
 
-Memory mapping
-> + eFlash: base= 0x0, 32KBytes
-> + SRAM: base= 0x20000000, 2KBytes
++ Change Items
+    - 增加 `RV32IMC` extensions
 
-Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
 
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
 
 + System-Arch
 
@@ -798,7 +847,10 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
     $ cp ./build/my_hello.hex  <VexRiscv_Root>/src/main/ressource/hex/
     ```
 
-# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
+# Customization 4 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
+
++ Change Items
+    - 增加 I2C/SPI
 
 + Memory mapping
     > + eFlash: base= 0x0, 32KBytes
@@ -882,10 +934,10 @@ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](
 新增 `SpiI2cSimProcess` 掛載進 `Workspace<VMurax>`, 實作 SPI Loopback(MOSI 接回 MISO)以及 I2C Open-Drain 上拉與虛擬 Slave 狀態機
 > diff file (base on `<VexRiscv_Root>/src/test/cpp/murax/main.cpp`)
 
-+ The modified [main.cpp](VexRISCV/example/main.cpp)
++ The modified [main.cpp](VexRISCV/example/main_spi_i2c.cpp)
     > 增加 SP/I2C 模擬項目
 
-    - [sim-main](VexRISCV/example/sim_main.diff)
+    - [sim-main_spi_i2c](VexRISCV/example/sim_main_spi_i2c.diff)
 
 + 執行 Verilator 模擬
 
@@ -984,9 +1036,10 @@ GNU gdb (GDB) 12.1
 ```
 
 
-# Customization (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB)
+# Customization 5 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB)
 
-**將 Tim-B 放到外部中斷**
++ Change Items
+    - 將 Tim-B 連接到**外部中斷**
 
 + Memory mapping
     > + eFlash: base= 0x0, 32KBytes
@@ -1002,6 +1055,464 @@ GNU gdb (GDB) 12.1
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
     > [Murax_3Stages_rv32imc_eFlash_i2c_spi_timb Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb.diff)
 
+
+# Customization 6 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB + GPIO16P + SysCtrl)
+
++ Change Items
+    - System Clock 換到 `32MHz`
+    - GPIO 縮減到 `16-IO`
+    - 加入 PinMux 與 SysCtrl
+
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl.diff)
+
+    - [Murax scala](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl.scala)
+
+## 啟動 Verilator 模擬環境
+
+新增 `SpiI2cSimProcess` 掛載進 `Workspace<VMurax>`, 實作 SPI Loopback(MOSI 接回 MISO)以及 I2C Open-Drain 上拉與虛擬 Slave 狀態機
+> diff file (base on `<VexRiscv_Root>/src/test/cpp/murax/main.cpp`)
+
++ The modified [main.cpp](VexRISCV/example/main_spi_i2c_sysctrl.cpp)
+    > 增加 SP/I2C/SysCtrl 模擬項目
+
+    - [sim-main_spi_i2c_sysctrl](VexRISCV/example/main_spi_i2c_sysctrl.diff)
+
++ 執行 Verilator 模擬
+
+    ```
+    [<VexRiscv_Root>/src/test/cpp/murax] (sha:baf7dc8)
+    $ make clean run
+    rm -rf obj_dir
+    rm -f Murax.v*.bin
+    rm -f Murax.v*.bin
+    cp ../../../../Murax.v*.bin . | true
+    verilator -I../../../.. -cc  ../../../../Murax.v -CFLAGS -pthread -LDFLAGS -pthread -CFLAGS "-O3" -CFLAGS -DTRACE_START=0 --gdbbt  -Wno-WIDTH -Wno-UNOPTFLAT --x-assign unique --exe main.cpp
+    No stack.
+    make  -j  -C obj_dir/ -f VMurax.mk VMurax
+    make[1]: Entering directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o main.o ../main.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o verilated_dpi.o /usr/share/verilator/include/verilated_dpi.cpp
+    /usr/bin/perl /usr/share/verilator/bin/verilator_includer -DVL_INCLUDE_OPT=include VMurax.cpp VMurax_Murax.cpp VMurax_VexRiscv.cpp VMurax__Dpi.cpp VMurax__Slow.cpp VMurax_Murax__Slow.cpp VMurax_VexRiscv__Slow.cpp VMurax__Syms.cpp > VMurax__ALL.cpp
+    g++  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow     -pthread -O3 -DTRACE_START=0  -Os -c -o VMurax__ALL.o VMurax__ALL.cpp
+    ar -cr VMurax__ALL.a VMurax__ALL.o
+    ranlib VMurax__ALL.a
+    g++    main.o verilated.o verilated_dpi.o VMurax__ALL.a   -pthread    -o VMurax
+    make[1]: Leaving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+    ./obj_dir/VMurax
+    BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
+    ```
+
+
+# FPGA (DE10-Nano)
+
++ Install `Quartus-lite-22.1std.2.922-linux.tar`
+
+    ```
+    $ mkdir -p ~/intelFPGA_lite/22.1std
+    $ mkdir -p Quartus-lite-22.1std.2.922-linux
+    $ cd Quartus-lite-22.1std.2.922-linux
+    $ tar -xf Quartus-lite-22.1std.2.922-linux.tar
+    $ cd components
+
+    $ ls # 只保留以下檔案
+        cyclonev-22.1std.2.922.qdz  QuartusLiteSetup-22.1std.2.922-linux.run
+
+    # 佔約 10GB size
+    $ ./QuartusLiteSetup-22.1std.2.922-linux.run \
+      --mode unattended \
+      --unattendedmodeui none \
+      --installdir ~/intelFPGA_lite/22.1std \
+      --disable-components quartus_help,questa_fse,questa_fe \
+      --accept_eula 1
+    ```
+
+    - Environment PATH
+
+        ```
+        $ vi ~/.bashrc
+            ...
+            export QUARTUS_ROOTDIR=$HOME/intelFPGA_lite/22.1std/quartus
+            export PATH=$QUARTUS_ROOTDIR/bin:$PATH
+
+        $ ./quartus_sh --version
+            Quartus Prime Shell
+            Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
+            Copyright (C) 2023  Intel Corporation. All rights reserved.
+        ```
+
+
++ DE10-Nano `GPIO_0` 實體腳位接線對照表
+    > SEGGER J-Link 的 Pin 1 (VTref) 必須接到 DE10-Nano 的 3.3V(GPIO_0 Pin 29),否則 J-Link 會偵測不到目標板電壓而拒絕連線。
+
+| Murax 訊號   | 功能說明(預設 PinMux)   |  DE10-Nano GPIO_0      |  2x20 排針實體 Pin            | 外部連接目標(USB-UART / J-Link / 感測器)
+| :-           | :-                     | :-                     |:-                            | :-
+| IOPAD[0]     | UART_TXD (或 GPIO[0])   |  GPIO_0[0] (PIN_V12)   |  Pin 1                       | USB-UART 轉接板 RXD
+| IOPAD[1]     | UART_RXD (或 GPIO[1])   |  GPIO_0[1] (PIN_E8)    |  Pin 2                       | USB-UART 轉接板 TXD
+| IOPAD[2]     | I2C_SCL (Open-Drain)    |  GPIO_0[2] (PIN_W12)   |  Pin 3                        | I2C SCL(已啟用內部弱上拉，建議外加 4.7kΩ)
+| IOPAD[3]     | I2C_SDA (Open-Drain)    |  GPIO_0[3] (PIN_D11)   |  Pin 4                        | I2C SDA(已啟用內部弱上拉，建議外加 4.7kΩ)
+| IOPAD[4]     | SPI_SS0 (或 GPIO[4])    |  GPIO_0[4] (PIN_D8)    |  Pin 5                       | SPI CS / SS0
+| IOPAD[5]     | SPI_SCLK (或 GPIO[5])   |  GPIO_0[5] (PIN_AH13)  |  Pin 6                       | SPI SCLK
+| IOPAD[6]     | SPI_MOSI (或 GPIO[6])   |  GPIO_0[6] (PIN_AF7)   |  Pin 7                       | SPI MOSI
+| IOPAD[7]     | SPI_MISO (或 GPIO[7])   |  GPIO_0[7] (PIN_AH14)  |  Pin 8                       | SPI MISO
+| IOPAD[8..11] | GPIO[8..11] (通用 GPIO)  | GPIO_0[8..11]         | Pin 9, 10, 13, 14             | 外部測試點 / 邏輯分析儀(註：Pin 11=VCC5, Pin 12=GND)
+| IOPAD[12]    | JTAG_TMS (開機預設)      | GPIO_0[12] (PIN_AE7)   | Pin 15                       | J-Link Pin 7 (TMS)
+| IOPAD[13]    | JTAG_TCK (開機預設)      | GPIO_0[13] (PIN_AF6)   | Pin 16                       | J-Link Pin 9 (TCK)
+| IOPAD[14]    | JTAG_TDI (開機預設)      | GPIO_0[14] (PIN_AF9)   | Pin 17                       | J-Link Pin 5 (TDI)
+| IOPAD[15]    | JTAG_TDO (開機預設)      | GPIO_0[15] (PIN_AE8)   | Pin 18                       | J-Link Pin 13 (TDO)
+| —            | 共地與參考電壓            | GND / VCC3P3          | Pin 30 (GND) / Pin 29 (3.3V)  | J-Link Pin 4 (GND) & Pin 1 (VTref = 3.3V)
+
+
+## Create Project
+
++ 重建 `Murax.v` (for FPGA)
+    > 移除所有給 Verilator 用的 `$random` 初始化區塊
+
+    ```
+    // src/main/scala/vexriscv/demo/Murax.scala
+    ...
+     //Will blink led and echo UART RX to UART TX   (in the verilator sim, type some text and press enter to send UART frame to the Murax RX pin)
+     object MuraxWithRamInit{
+       def main(args: Array[String]) {
+    -    // For Verilator Simulation
+    -    // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
+    -    SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
+
+    +    // For FPGA
+    +    SpinalConfig(
+    +      noRandBoot = true
+    +    ).generateVerilog(
+    +      Murax(MuraxConfig.default.copy(
+    +        eFlashSize = 32 kB,
+    +        eFlashHexFile = "src/main/ressource/hex/my_hello.hex",
+    +        onChipRamSize = 2 kB
+    +      ))
+    +    )
+       }
+     }
+     ...
+    ```
+
+    - 必需將 `Murax.v` 和 `Murax.v_toplevel_system_eFlash_flash.bin` 一起複製到 `FPGA_DE10_nano/`
+        > Quartus 在綜合 eFlash 的 `$readmemb` 區塊時才能找到開機韌體初始化檔。
+
+        ```
+        $ sbt "runMain vexriscv.demo.MuraxWithRamInit"
+        $ cp -f Murax.v  ~/FPGA_DE10_nano/
+        $ cp -f Murax.v_toplevel_system_eFlash_flash.bin ~/FPGA_DE10_nano/
+        $ cd ~/FPGA_DE10_nano
+        $ make compile
+        ```
+
++ Create `MuraxDe10NanoTop.v`(頂層 Wrapper: 50 MHz -> 32 MHz PLL + 三態匯流排)
+
+    ```
+    module MuraxDe10NanoTop (
+        input  wire        FPGA_CLK1_50, // DE10-Nano 50 MHz 主時脈
+        input  wire [1:0]  KEY,          // KEY[0]: Active-Low Reset 按鍵
+        output wire [7:0]  LED,          // LED[0]: PLL Locked 指示燈
+        inout  wire [15:0] GPIO_0        // 對應 Murax io.iopad[15:0]
+    );
+
+        wire clk_32m;
+        wire pll_locked;
+        wire sys_reset;
+
+        // 1. Cyclone V 原生 PLL：50 MHz * 16 / 25 = 32.000 MHz
+        altera_pll #(
+            .fractional_vco_multiplier("false"),
+            .reference_clock_frequency("50.0 MHz"),
+            .operation_mode("direct"),
+            .number_of_clocks(1),
+            .output_clock_frequency0("32.000000 MHz"),
+            .phase_shift0("0 ps"),
+            .duty_cycle0(50),
+            .pll_type("General"),
+            .pll_subtype("General")
+        ) u_pll_32m (
+            .rst      (~KEY[0]),
+            .outclk   (clk_32m),
+            .locked   (pll_locked),
+            .fboutclk (),
+            .fbclk    (1'b0),
+            .refclk   (FPGA_CLK1_50)
+        );
+
+        // 2. 系統同步重置：當按下 KEY[0] 或 PLL 尚未鎖定時保持重置 (Active-High)
+        assign sys_reset = (~KEY[0]) | (~pll_locked);
+
+        // 3. Murax SoC 16-bit 雙向三態匯流排介面
+        wire [15:0] io_iopad_read;
+        wire [15:0] io_iopad_write;
+        wire [15:0] io_iopad_writeEnable;
+
+        genvar i;
+        generate
+            for (i = 0; i < 16; i = i + 1) begin : gen_iopad
+                assign GPIO_0[i]        = io_iopad_writeEnable[i] ? io_iopad_write[i] : 1'bz;
+                assign io_iopad_read[i] = GPIO_0[i];
+            end
+        endgenerate
+
+        // 4. 實例化 VexRiscv Murax SoC
+        Murax u_murax (
+            .io_asyncReset        (sys_reset),
+            .io_mainClk           (clk_32m),
+            .io_iopad_read        (io_iopad_read),
+            .io_iopad_write       (io_iopad_write),
+            .io_iopad_writeEnable (io_iopad_writeEnable)
+        );
+
+        // 5. 板載 LED 狀態顯示
+        assign LED[0]   = pll_locked;       // 亮起表示 32 MHz 時脈穩定
+        assign LED[1]   = ~sys_reset;       // 亮起表示系統正常運行中
+        assign LED[7:2] = io_iopad_write[11:6]; // 映射部分腳位狀態供除錯觀察
+
+    endmodule
+    ```
+
++ Create `murax_de10_nano.sdc` (時序約束檔：32 MHz 主時脈與 JTAG CDC)
+
+    ```
+    # 1. 定義板載 50 MHz 輸入時脈 (週期 20.0 ns)
+    create_clock -name {FPGA_CLK1_50} -period 20.000 [get_ports {FPGA_CLK1_50}]
+
+    # 2. 自動推導 PLL 產生的 32 MHz 時脈 (31.25 ns)
+    derive_pll_clocks
+    derive_clock_uncertainty
+
+    # 3. 定義外部 J-Link TCK 時脈 (GPIO_0[13])，假設最高 10 MHz (100 ns)
+    create_clock -name {jtag_tck} -period 100.000 [get_ports {GPIO_0[13]}]
+
+    # 4. 宣告 32 MHz 主時脈與 JTAG TCK 為非同步時脈域
+    set_clock_groups -asynchronous \
+        -group [get_clocks {FPGA_CLK1_50 u_pll_32m|*}] \
+        -group [get_clocks {jtag_tck}]
+
+    # 5. 放寬按鍵、LED 與一般 GPIO 外部 IO 時序檢查 (避免無謂的 IO Timing Violation)
+    set_false_path -from [get_ports {KEY[*]}]
+    set_false_path -to   [get_ports {LED[*]}]
+    set_false_path -from [get_ports {GPIO_0[*]}]
+    set_false_path -to   [get_ports {GPIO_0[*]}]
+
+    ```
+
++ Create `pins.tcl` (DE10-Nano 5CSEBA6U23I7 腳位與電氣屬性約束)
+
+    ```
+    # ==============================================================================
+    # Clock, Reset & LEDs (3.3-V LVTTL)
+    # ==============================================================================
+    set_location_assignment PIN_V11  -to FPGA_CLK1_50
+    set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to FPGA_CLK1_50
+
+    set_location_assignment PIN_AH17 -to KEY[0]
+    set_location_assignment PIN_AH16 -to KEY[1]
+    set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY[*]
+
+    set_location_assignment PIN_W15  -to LED[0]
+    set_location_assignment PIN_AA24 -to LED[1]
+    set_location_assignment PIN_V16  -to LED[2]
+    set_location_assignment PIN_V15  -to LED[3]
+    set_location_assignment PIN_AF26 -to LED[4]
+    set_location_assignment PIN_AE26 -to LED[5]
+    set_location_assignment PIN_Y16  -to LED[6]
+    set_location_assignment PIN_AA23 -to LED[7]
+    set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[*]
+
+    # ==============================================================================
+    # GPIO_0[15:0] -> Murax IOPAD[15:0] (3.3-V LVTTL)
+    # ==============================================================================
+    set_location_assignment PIN_V12  -to GPIO_0[0]   ;# UART_TXD / GPIO[0]
+    set_location_assignment PIN_E8   -to GPIO_0[1]   ;# UART_RXD / GPIO[1]
+    set_location_assignment PIN_W12  -to GPIO_0[2]   ;# I2C_SCL  / GPIO[2]
+    set_location_assignment PIN_D11  -to GPIO_0[3]   ;# I2C_SDA  / GPIO[3]
+    set_location_assignment PIN_D8   -to GPIO_0[4]   ;# SPI_SS0  / GPIO[4]
+    set_location_assignment PIN_AH13 -to GPIO_0[5]   ;# SPI_SCLK / GPIO[5]
+    set_location_assignment PIN_AF7  -to GPIO_0[6]   ;# SPI_MOSI / GPIO[6]
+    set_location_assignment PIN_AH14 -to GPIO_0[7]   ;# SPI_MISO / GPIO[7]
+    set_location_assignment PIN_AF4  -to GPIO_0[8]   ;# GPIO[8]
+    set_location_assignment PIN_AH3  -to GPIO_0[9]   ;# GPIO[9]
+    set_location_assignment PIN_AD5  -to GPIO_0[10]  ;# GPIO[10]
+    set_location_assignment PIN_AG14 -to GPIO_0[11]  ;# GPIO[11]
+    set_location_assignment PIN_AE7  -to GPIO_0[12]  ;# JTAG_TMS / GPIO[12]
+    set_location_assignment PIN_AF6  -to GPIO_0[13]  ;# JTAG_TCK / GPIO[13]
+    set_location_assignment PIN_AF9  -to GPIO_0[14]  ;# JTAG_TDI / GPIO[14]
+    set_location_assignment PIN_AE8  -to GPIO_0[15]  ;# JTAG_TDO / GPIO[15]
+
+    set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to GPIO_0[*]
+
+    # 啟用 I2C 與 JTAG 腳位內部弱上拉電阻 (確保開機與浮接狀態穩定)
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[1]  ;# UART_RXD
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[2]  ;# I2C_SCL
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[3]  ;# I2C_SDA
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[12] ;# JTAG_TMS
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[13] ;# JTAG_TCK
+    set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to GPIO_0[14] ;# JTAG_TDI
+
+    ```
+
+
++ `build.tcl` 與 `Makefile` (CLI 全自動編譯與燒錄)
+
+    ```
+    # build.tcl
+    load_package flow
+    project_new -overwrite murax_de10_nano
+
+    set_global_assignment -name FAMILY "Cyclone V"
+    set_global_assignment -name DEVICE 5CSEBA6U23I7
+    set_global_assignment -name TOP_LEVEL_ENTITY MuraxDe10NanoTop
+    set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+    # 加入 RTL 與約束
+    set_global_assignment -name VERILOG_FILE Murax.v
+    set_global_assignment -name VERILOG_FILE MuraxDe10NanoTop.v
+    set_global_assignment -name SDC_FILE murax_de10_nano.sdc
+
+    # 載入腳位定義
+    source pins.tcl
+
+    # 執行完整編譯 (綜合 -> 繞線 -> 生成 .sof -> 時序分析)
+    execute_flow -compile
+    project_close
+
+    ```
+
+    ```
+    # Makefile
+    PROJECT = murax_de10_nano
+    SOF     = output_files/$(PROJECT).sof
+    TEST_BIN =
+    FW_BIN  = <VexRiscv_Root>/Murax.v_toplevel_system_eFlash_flash.bin
+
+    all: compile
+
+    compile:
+        quartus_sh -t build.tcl
+
+    # 快速更新 C 韌體並重新燒錄 (免重新綜合與繞線)
+    update_fw:
+        cp $(FW_BIN) .
+        quartus_cdb $(PROJECT) --update_mif
+        quartus_asm $(PROJECT)
+
+        # quartus_pgm -m jtag -o "p;$(SOF)@2"
+
+    # 檢查 DE10-Nano 板載 USB-Blaster II 連線狀態
+    scan:
+        jtagconfig
+
+    # 燒錄 .sof 至 DE10-Nano FPGA (@2 為 Cyclone V FPGA 節點)
+    program: $(SOF)
+        quartus_pgm -m jtag -o "p;$(SOF)@2"
+
+    clean:
+        rm -rf db incremental_db output_files *.qpf *.qsf *.rpt *.summary *.smsg *.pin *.done *.jdi *.sld
+
+    .PHONY: all compile scan program clean
+
+    ```
+
+## Build bitstream
+
+```
+#
+# put files to '~/FPGA_DE10_nano'
+#  + build.tcl
+#  + Makefile
+#  + murax_de10_nano.sdc
+#  + MuraxDe10NanoTop.v
+#  + Murax.v (使用 'Murax.scala' 中 FPGA 版本)
+#  + Murax.v_toplevel_system_eFlash_flash.bin
+#  + pins.tcl
+#
+$ cd ~/FPGA_DE10_nano
+$ make compile
+$ ls output_files
+    ... murax_de10_nano.sof ...
+```
+
++ script file
+
+    ```
+    $ vi z_build_FPGA.sh
+
+        #!/bin/bash
+
+        cd ~/FPGA_DE10_nano
+
+        # make clean
+        make compile
+
+        # 1. 檢查邏輯資源 (ALM) 與 BRAM 記憶體位元數 (32KB eFlash + 2KB SRAM ≈ 278,528 bits)
+        cat output_files/murax_de10_nano.fit.summary
+
+        # 2. 檢查 32 MHz 時序是否全部過關 (Slack 應全為正值，無負值)
+        cat output_files/murax_de10_nano.sta.summary
+
+        # 3. 確認 Quartus 有成功載入 Murax.v_toplevel_system_eFlash_flash.bin 而不是全 0
+        grep -i "flash" output_files/murax_de10_nano.map.rpt | head -n 20
+
+    ```
+
++ 更新 `.sof` 中的 `.bin`
+
+    ```
+    $ vi z_update_bin2Sof.sh
+        # !/bin/bash
+
+        #
+        # 1. 更新 .bin 檔案後，重新生成 eFlash MIF 並更新資料庫
+        #    ps. 固定 bin 是 'Murax.v_toplevel_system_eFlash_flash.bin'
+        #
+        quartus_cdb murax_de10_nano --update_mif
+
+        # 2. 重新打包產生新版 .sof
+        quartus_asm murax_de10_nano
+
+        # 3. 燒錄至 DE10-Nano
+        # make program
+    ```
+
+## OpenOCD
+
++ `murax_jlink.cfg` for OpenOCD
+
+    ```
+    # 'murax_jlink.cfg' 未驗證
+
+    adapter driver jlink
+    transport select jtag
+    adapter speed 1000
+
+    set _CHIPNAME riscv
+
+    # 依照 OpenOCD link log  'tap/device found: 0xXXXXXXXX', 修改 '0x10001fff'
+    jtag newtap $_CHIPNAME cpu -irlen 5 -expected-id 0x10001fff
+
+    set _TARGETNAME $_CHIPNAME.cpu
+    target create $_TARGETNAME riscv -chain-position $_TARGETNAME
+
+    # 對應 VexRiscv Murax 規格 (4 組硬體斷點、無系統匯流排存取)
+    riscv set_prefer_sba off
+    gdb_breakpoint_override hard
+
+    init
+    # halt
+    ```
 
 
 # Reference

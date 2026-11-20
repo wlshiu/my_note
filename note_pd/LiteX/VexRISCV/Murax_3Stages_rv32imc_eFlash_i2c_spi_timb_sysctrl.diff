@@ -1,0 +1,455 @@
+--- ./Murax.scala.org	2026-11-16 09:02:05.574609481 +0800
++++ ./Murax.scala	2026-11-20 13:47:20.000000000 +0800
+@@ -8,6 +8,8 @@
+ import spinal.lib.com.jtag.Jtag
+ import spinal.lib.com.spi.ddr.SpiXdrMaster
+ import spinal.lib.com.uart._
++import spinal.lib.com.i2c._
++import spinal.lib.com.spi._
+ import spinal.lib.io.{InOutWrapper, TriStateArray}
+ import spinal.lib.misc.{InterruptCtrl, Prescaler, Timer}
+ import spinal.lib.soc.pinsec.{PinsecTimerCtrl, PinsecTimerCtrlExternal}
+@@ -18,6 +20,7 @@
+ import scala.collection.mutable.ArrayBuffer
+ import scala.collection.Seq
+ import spinal.lib.com.jtag.JtagTapInstructionCtrl
++import spinal.lib.misc.HexTools
+ 
+ /**
+  * Created by PIC32F_USER on 28/07/2017.
+@@ -38,11 +41,15 @@
+ case class MuraxConfig(coreFrequency : HertzNumber,
+                        onChipRamSize      : BigInt,
+                        onChipRamHexFile   : String,
++                       eFlashSize         : BigInt,
++                       eFlashHexFile      : String,
+                        pipelineDBus       : Boolean,
+                        pipelineMainBus    : Boolean,
+                        pipelineApbBridge  : Boolean,
+                        gpioWidth          : Int,
+                        uartCtrlConfig     : UartCtrlMemoryMappedConfig,
++                       spiMasterConfig    : SpiMasterCtrlMemoryMappedConfig,
++                       i2cConfig          : I2cSlaveMemoryMappedGenerics,
+                        xipConfig          : SpiXdrMasterCtrl.MemoryMappingParameters,
+                        hardwareBreakpointCount : Int,
+                        withNativeJtag      : Boolean,
+@@ -58,29 +65,31 @@
+ object MuraxConfig{
+   def default : MuraxConfig = default(false, false)
+   def default(withXip : Boolean = false, bigEndian : Boolean = false) =  MuraxConfig(
+-    coreFrequency         = 12 MHz,
+-    onChipRamSize         = 8 kB,
++    coreFrequency         = 32 MHz,
++    onChipRamSize         = 2 kB,
+     onChipRamHexFile      = null,
++    eFlashSize            = 32 kB,
++    eFlashHexFile         = null,
+     pipelineDBus          = true,
+     pipelineMainBus       = false,
+     pipelineApbBridge     = true,
+-    gpioWidth = 32,
++    gpioWidth = 16,
+     xipConfig = ifGen(withXip) (SpiXdrMasterCtrl.MemoryMappingParameters(
+       SpiXdrMasterCtrl.Parameters(8, 12, SpiXdrParameter(2, 2, 1)).addFullDuplex(0,1,false),
+       cmdFifoDepth = 32,
+       rspFifoDepth = 32,
+       xip = SpiXdrMasterCtrl.XipBusParameters(addressWidth = 24, lengthWidth = 2)
+     )),
+-    hardwareBreakpointCount = if(withXip) 3 else 0,
++    hardwareBreakpointCount = 4,
+     withNativeJtag = false,
+     cpuPlugins = ArrayBuffer( //DebugPlugin added by the toplevel
+       new IBusSimplePlugin(
+-        resetVector = if(withXip) 0xF001E000l else 0x80000000l,
++        resetVector = if(withXip) 0xF001E000l else 0x00000000l,
+         cmdForkOnSecondStage = true,
+         cmdForkPersistence = withXip, //Required by the Xip controller
+         prediction = NONE,
+         catchAccessFault = false,
+-        compressedGen = false,
++        compressedGen = true,
+         bigEndian = bigEndian
+       ),
+       new DBusSimplePlugin(
+@@ -89,7 +98,12 @@
+         earlyInjection = false,
+         bigEndian = bigEndian
+       ),
+-      new CsrPlugin(CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x80000020l)),
++      new CsrPlugin(
++        CsrPluginConfig.smallest(mtvecInit = if(withXip) 0xE0040020l else 0x00000020l).copy(
++          pipelineCsrRead = false,
++          deterministicInteruptionEntry = true
++        )
++      ),
+       new DecoderSimplePlugin(
+         catchIllegalInstruction = false
+       ),
+@@ -103,6 +117,8 @@
+         executeInsertion = false
+       ),
+       new LightShifterPlugin,
++      new MulSimplePlugin,
++      new DivPlugin,
+       new HazardSimplePlugin(
+         bypassExecute = false,
+         bypassMemory = false,
+@@ -113,7 +129,7 @@
+         pessimisticAddressMatch = false
+       ),
+       new BranchPlugin(
+-        earlyBranch = false,
++        earlyBranch = true,
+         catchAddressMisaligned = false
+       ),
+       new YamlPlugin("cpu0.yaml")
+@@ -134,8 +150,28 @@
+       ),
+       busCanWriteClockDividerConfig = false,
+       busCanWriteFrameConfig = false,
+-      txFifoDepth = 16,
+-      rxFifoDepth = 16
++      txFifoDepth = 4,
++      rxFifoDepth = 4
++    ),
++    spiMasterConfig = SpiMasterCtrlMemoryMappedConfig(
++      ctrlGenerics = SpiMasterCtrlGenerics(
++        ssWidth      = 1,
++        timerWidth   = 16,
++        dataWidth    = 8
++      ),
++      cmdFifoDepth = 4,
++      rspFifoDepth = 4
++    ),
++    i2cConfig = I2cSlaveMemoryMappedGenerics(
++      ctrlGenerics = I2cSlaveGenerics(
++        samplingWindowSize        = 3,
++        samplingClockDividerWidth = 10 bits,
++        timeoutWidth              = 20 bits
++      ),
++      addressFilterCount = 0,
++      masterGenerics = I2cMasterMemoryMappedGenerics(
++        timerWidth = 12
++      )
+     )
+ 
+   )
+@@ -156,6 +192,165 @@
+   }
+ }
+ 
++// Read-Only Embedded Flash emulated by FPGA Block RAM
++class MuraxEmbeddedFlash(eFlashSize : BigInt,
++                         eFlashHexFile : String,
++                         pipelinedMemoryBusConfig : PipelinedMemoryBusConfig,
++                         bigEndian : Boolean = false) extends Component{
++  val io = new Bundle{
++    val bus = slave(PipelinedMemoryBus(pipelinedMemoryBusConfig))
++  }
++
++  val flash = Mem(Bits(32 bits), eFlashSize / 4)
++  if(eFlashHexFile != null){
++    HexTools.initRam(flash, eFlashHexFile, 0x00000000l)
++  }
++
++  io.bus.cmd.ready := True
++  io.bus.rsp.valid := RegNext(io.bus.cmd.fire && !io.bus.cmd.write) init(False)
++  io.bus.rsp.data  := flash.readSync(
++    address = io.bus.cmd.address(2, log2Up(eFlashSize / 4) bits),
++    enable  = io.bus.cmd.fire && !io.bus.cmd.write
++  )
++}
++
++// Custom Timer with split interrupts: Timer A -> MTI, Timer B -> MEI
++class MuraxSplitApb3Timer extends Component {
++  val io = new Bundle {
++    val apb        = slave(Apb3(Apb3Config(addressWidth = 8, dataWidth = 32)))
++    val interruptA = out Bool()
++    val interruptB = out Bool()
++  }
++
++  val prescaler = Prescaler(16)
++  val timerA    = Timer(16)
++  val timerB    = Timer(16)
++
++  val busCtrl = Apb3SlaveFactory(io.apb)
++  val prescalerBridge = prescaler.driveFrom(busCtrl, 0x00)
++
++  val timerABridge = timerA.driveFrom(busCtrl, 0x40)(
++    ticks  = List(True, prescaler.io.overflow),
++    clears = List(timerA.io.full)
++  )
++
++  val timerBBridge = timerB.driveFrom(busCtrl, 0x50)(
++    ticks  = List(True, prescaler.io.overflow),
++    clears = List(timerB.io.full)
++  )
++
++  val interruptCtrl = InterruptCtrl(2)
++  val interruptCtrlBridge = interruptCtrl.driveFrom(busCtrl, 0x10)
++  interruptCtrl.io.inputs(0) := timerA.io.full
++  interruptCtrl.io.inputs(1) := timerB.io.full
++
++  // Split interrupt outputs instead of OR-ing them together
++  io.interruptA := interruptCtrl.io.pendings(0) && interruptCtrl.io.masks(0)
++  io.interruptB := interruptCtrl.io.pendings(1) && interruptCtrl.io.masks(1)
++}
++
++// APB3 SysCtrl & 16-Pin IOPAD PinMux Controller (Base: 0xF0050000)
++class MuraxSysCtrlPinMux(gpioWidth: Int, withNativeJtag: Boolean) extends Component {
++  require(gpioWidth == 16, "MuraxSysCtrlPinMux requires gpioWidth == 16")
++
++  val io = new Bundle {
++    val apb        = slave(Apb3(Apb3Config(addressWidth = 8, dataWidth = 32)))
++
++    // Internal peripheral interfaces
++    val gpio       = slave(TriStateArray(16 bits))
++    val uart       = slave(Uart())
++    val spi        = slave(SpiMaster(ssWidth = 1))
++    val i2c        = slave(I2c())
++    val jtag       = ifGen(!withNativeJtag)(master(Jtag()))
++
++    // Unified 16-pin Physical IOPAD interface
++    val iopad      = master(TriStateArray(16 bits))
++  }
++
++  val busCtrl = Apb3SlaveFactory(io.apb)
++
++  // 0x00: PINMUX_SEL0 (IOPAD[7:0], 2 bits per pin, default 0 = GPIO)
++  // 0x04: PINMUX_SEL1 (IOPAD[15:8], 2 bits per pin, IOPAD[15:12] default 1 = JTAG -> 0x5500)
++  val pinMuxSel0 = busCtrl.createReadAndWrite(Bits(16 bits), 0x00, 0) init(0x0000)
++  val pinMuxSel1 = busCtrl.createReadAndWrite(Bits(16 bits), 0x04, 0) init(0x5500)
++
++  // 0x08: SYS_STATUS (Read-Only: [31:16]=32 MHz, [7:0]=0x16 ID)
++  busCtrl.read(B(0x00200016L, 32 bits), 0x08, 0)
++
++  val sel = Vec(Bits(2 bits), 16)
++  for (i <- 0 until 8) {
++    sel(i)     := pinMuxSel0(i * 2, 2 bits)
++    sel(i + 8) := pinMuxSel1(i * 2, 2 bits)
++  }
++
++  // Default all IOPADs to GPIO
++  for (i <- 0 until 16) {
++    io.iopad.write(i)       := io.gpio.write(i)
++    io.iopad.writeEnable(i) := io.gpio.writeEnable(i)
++    io.gpio.read(i)         := io.iopad.read(i)
++  }
++
++  // IOPAD[0]: Mode 1 = UART_TXD
++  when(sel(0) === 1) {
++    io.iopad.write(0)       := io.uart.txd
++    io.iopad.writeEnable(0) := True
++  }
++
++  // IOPAD[1]: Mode 1 = UART_RXD
++  io.uart.rxd := (sel(1) === 1) ? io.iopad.read(1) | True
++  when(sel(1) === 1) {
++    io.iopad.writeEnable(1) := False
++  }
++
++  // IOPAD[2]: Mode 1 = I2C_SCL (Open-Drain: drive 0 when write == 0)
++  io.i2c.scl.read := (sel(2) === 1) ? io.iopad.read(2) | True
++  when(sel(2) === 1) {
++    io.iopad.write(2)       := False
++    io.iopad.writeEnable(2) := !io.i2c.scl.write
++  }
++
++  // IOPAD[3]: Mode 1 = I2C_SDA (Open-Drain: drive 0 when write == 0)
++  io.i2c.sda.read := (sel(3) === 1) ? io.iopad.read(3) | True
++  when(sel(3) === 1) {
++    io.iopad.write(3)       := False
++    io.iopad.writeEnable(3) := !io.i2c.sda.write
++  }
++
++  // IOPAD[4..7]: Mode 2 = SPI Master (SS0, SCLK, MOSI, MISO)
++  when(sel(4) === 2) {
++    io.iopad.write(4)       := io.spi.ss(0)
++    io.iopad.writeEnable(4) := True
++  }
++  when(sel(5) === 2) {
++    io.iopad.write(5)       := io.spi.sclk
++    io.iopad.writeEnable(5) := True
++  }
++  when(sel(6) === 2) {
++    io.iopad.write(6)       := io.spi.mosi
++    io.iopad.writeEnable(6) := True
++  }
++  io.spi.miso := (sel(7) === 2) ? io.iopad.read(7) | True
++  when(sel(7) === 2) {
++    io.iopad.writeEnable(7) := False
++  }
++
++  // IOPAD[12..15]: Mode 1 = JTAG (TMS, TCK, TDI, TDO) - Enabled by default at reset
++  if (!withNativeJtag) {
++    io.jtag.tms := (sel(12).addTag(crossClockDomain) === 1) ? io.iopad.read(12) | True
++    when(sel(12) === 1) { io.iopad.writeEnable(12) := False }
++
++    io.jtag.tck := (sel(13).addTag(crossClockDomain) === 1) ? io.iopad.read(13) | False
++    when(sel(13) === 1) { io.iopad.writeEnable(13) := False }
++
++    io.jtag.tdi := (sel(14).addTag(crossClockDomain) === 1) ? io.iopad.read(14) | True
++    when(sel(14) === 1) { io.iopad.writeEnable(14) := False }
++
++    when(sel(15) === 1) {
++      io.iopad.write(15)       := io.jtag.tdo
++      io.iopad.writeEnable(15) := True
++    }
++  }
++}
+ 
+ case class Murax(config : MuraxConfig) extends Component{
+   import config._
+@@ -165,12 +360,8 @@
+     val asyncReset = in Bool()
+     val mainClk = in Bool()
+ 
+-    //Main components IO
+-    val jtag = ifGen(!config.withNativeJtag) (slave(Jtag()))
+-
+-    //Peripherals IO
+-    val gpioA = master(TriStateArray(gpioWidth bits))
+-    val uart = master(Uart())
++    // Unified 16-pin Physical IOPAD (Multiplexes GPIO[15:0], UART, SPI, I2C, JTAG)
++    val iopad = master(TriStateArray(gpioWidth bits))
+ 
+     val xip = ifGen(genXip)(master(SpiXdrMaster(xipConfig.ctrl.spi)))
+   }
+@@ -234,10 +425,16 @@
+     //Instanciate the CPU
+     val cpu = new VexRiscv(
+       config = VexRiscvConfig(
++        withMemoryStage = false,
++        withWriteBackStage = false,
+         plugins = cpuPlugins += new DebugPlugin(debugClockDomain, hardwareBreakpointCount)
+       )
+     )
+ 
++    // Instantiate SysCtrl & PinMux early so JTAG can bind cleanly
++    val sysCtrl = new MuraxSysCtrlPinMux(gpioWidth, config.withNativeJtag)
++    sysCtrl.io.iopad <> io.iopad
++
+     //Checkout plugins used to instanciate the CPU to connect them to the SoC
+     val timerInterrupt = False
+     val externalInterrupt = False
+@@ -262,7 +459,7 @@
+         if (withNativeJtag) {
+           jtagNative.jtagCtrl <> plugin.io.bus.fromJtagInstructionCtrl(ClockDomain(jtagNative.tap.TCK),0)
+         } else {
+-          io.jtag <> plugin.io.bus.fromJtag()
++          sysCtrl.io.jtag <> plugin.io.bus.fromJtag()
+         }
+       }
+       case _ =>
+@@ -272,13 +469,21 @@
+ 
+     //****** MainBus slaves ********
+     val mainBusMapping = ArrayBuffer[(PipelinedMemoryBus,SizeMapping)]()
++    val eFlash = new MuraxEmbeddedFlash(
++      eFlashSize = eFlashSize,
++      eFlashHexFile = eFlashHexFile,
++      pipelinedMemoryBusConfig = pipelinedMemoryBusConfig,
++      bigEndian = bigEndianDBus
++    )
++    mainBusMapping += eFlash.io.bus -> (0x00000000l, eFlashSize)
++
+     val ram = new MuraxPipelinedMemoryBusRam(
+       onChipRamSize = onChipRamSize,
+       onChipRamHexFile = onChipRamHexFile,
+       pipelinedMemoryBusConfig = pipelinedMemoryBusConfig,
+       bigEndian = bigEndianDBus
+     )
+-    mainBusMapping += ram.io.bus -> (0x80000000l, onChipRamSize)
++    mainBusMapping += ram.io.bus -> (0x20000000l, onChipRamSize)
+ 
+     val apbBridge = new PipelinedMemoryBusToApbBridge(
+       apb3Config = Apb3Config(
+@@ -295,18 +500,31 @@
+     //******** APB peripherals *********
+     val apbMapping = ArrayBuffer[(Apb3, SizeMapping)]()
+     val gpioACtrl = Apb3Gpio(gpioWidth = gpioWidth, withReadSync = true)
+-    io.gpioA <> gpioACtrl.io.gpio
++    sysCtrl.io.gpio <> gpioACtrl.io.gpio
+     apbMapping += gpioACtrl.io.apb -> (0x00000, 4 kB)
+ 
+     val uartCtrl = Apb3UartCtrl(uartCtrlConfig)
+-    uartCtrl.io.uart <> io.uart
++    uartCtrl.io.uart <> sysCtrl.io.uart
+     externalInterrupt setWhen(uartCtrl.io.interrupt)
+     apbMapping += uartCtrl.io.apb  -> (0x10000, 4 kB)
+ 
+-    val timer = new MuraxApb3Timer()
+-    timerInterrupt setWhen(timer.io.interrupt)
++    val timer = new MuraxSplitApb3Timer()
++    timerInterrupt    setWhen(timer.io.interruptA)
++    externalInterrupt setWhen(timer.io.interruptB)
+     apbMapping += timer.io.apb     -> (0x20000, 4 kB)
+ 
++    val spiCtrl = new Apb3SpiMasterCtrl(spiMasterConfig)
++    spiCtrl.io.spi <> sysCtrl.io.spi
++    externalInterrupt setWhen(spiCtrl.io.interrupt)
++    apbMapping += spiCtrl.io.apb   -> (0x30000, 4 kB)
++
++    val i2cCtrl = new Apb3I2cCtrl(i2cConfig)
++    i2cCtrl.io.i2c <> sysCtrl.io.i2c
++    externalInterrupt setWhen(i2cCtrl.io.interrupt)
++    apbMapping += i2cCtrl.io.apb   -> (0x40000, 4 kB)
++
++    apbMapping += sysCtrl.io.apb   -> (0x50000, 4 kB)
++
+     val xip = ifGen(genXip)(new Area{
+       val ctrl = Apb3SpiXdrMasterCtrl(xipConfig)
+       ctrl.io.spi <> io.xip
+@@ -450,18 +668,24 @@
+     mainClkBuffer.USER_SIGNAL_TO_GLOBAL_BUFFER <> io.mainClk
+     mainClkBuffer.GLOBAL_BUFFER_OUTPUT <> murax.io.mainClk
+ 
++    // Connect to the unified 16-bit IOPAD interface
++    murax.io.iopad.read := 0
++
++    // UART (IOPAD[0] = TXD, IOPAD[1] = RXD)
++    io.uart_txd := murax.io.iopad.write(0)
++    murax.io.iopad.read(1) := io.uart_rxd
++
++    // LEDs mapped to IOPAD[11:8] (4 bits available alongside peripherals)
++    io.led := murax.io.iopad.write(11 downto 8).resized
++
++    // JTAG (IOPAD[12]=TMS, IOPAD[13]=TCK, IOPAD[14]=TDI, IOPAD[15]=TDO)
+     val jtagClkBuffer = SB_GB()
+     jtagClkBuffer.USER_SIGNAL_TO_GLOBAL_BUFFER <> io.jtag_tck
+-    jtagClkBuffer.GLOBAL_BUFFER_OUTPUT <> murax.io.jtag.tck
+-
+-    io.led <> murax.io.gpioA.write(7 downto 0)
++    murax.io.iopad.read(13) := jtagClkBuffer.GLOBAL_BUFFER_OUTPUT
+ 
+-    murax.io.jtag.tdi <> io.jtag_tdi
+-    murax.io.jtag.tdo <> io.jtag_tdo
+-    murax.io.jtag.tms <> io.jtag_tms
+-    murax.io.gpioA.read <> 0
+-    murax.io.uart.txd <> io.uart_txd
+-    murax.io.uart.rxd <> io.uart_rxd
++    murax.io.iopad.read(12) := io.jtag_tms
++    murax.io.iopad.read(14) := io.jtag_tdi
++    io.jtag_tdo := murax.io.iopad.write(15)
+ 
+ 
+ 
+@@ -517,7 +741,7 @@
+         catchAddressMisaligned = false
+       )
+       config.cpuPlugins += new IBusSimplePlugin(
+-        resetVector = 0x80000000l,
++        resetVector = 0x00000000l,
+         cmdForkOnSecondStage = true,
+         cmdForkPersistence = false,
+         prediction = STATIC,
+@@ -534,7 +758,8 @@
+ //Will blink led and echo UART RX to UART TX   (in the verilator sim, type some text and press enter to send UART frame to the Murax RX pin)
+ object MuraxWithRamInit{
+   def main(args: Array[String]) {
+-    SpinalVerilog(Murax(MuraxConfig.default.copy(onChipRamSize = 4 kB, onChipRamHexFile = "src/main/ressource/hex/muraxDemo.hex")))
++    // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
++    SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
+   }
+ }
+ 

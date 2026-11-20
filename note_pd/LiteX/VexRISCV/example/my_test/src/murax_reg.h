@@ -26,6 +26,8 @@ extern "C" {
 #define TIMER_A_BASE            0xF0020040UL
 #define TIMER_B_BASE            0xF0020050UL
 
+#define SYSCTRL_BASE            0xF0050000UL
+
 /* =========================================================================
  * 2. GPIO 控制器 (Apb3Gpio)
  * ========================================================================= */
@@ -219,6 +221,25 @@ typedef struct
 #define I2C_INT_RESTART         (1 << 5)  /* INT_ENABLE / INT_FLAG Bit 5 */
 #define I2C_INT_STOP            (1 << 6)  /* INT_ENABLE / INT_FLAG Bit 6 */
 #define I2C_INT_DROP            (1 << 7)  /* INT_ENABLE / INT_FLAG Bit 7 */
+
+/* =========================================================================
+ * 2B. 系統控制與 16-Pin IOPAD PinMux 控制器 (Base: 0xF0050000)
+ * ========================================================================= */
+typedef struct
+{
+    volatile uint32_t PINMUX_SEL0;    /* 0x00: IOPAD[7:0]  功能選擇 (每腳 2-bit) */
+    volatile uint32_t PINMUX_SEL1;    /* 0x04: IOPAD[15:8] 功能選擇 (每腳 2-bit, [15:12]預設 0x5500 = JTAG) */
+    volatile uint32_t SYS_STATUS;     /* 0x08: [31:16]=主頻 MHz (32), [7:0]=版本 ID (0x16) */
+} SysCtrl_Reg;
+
+#define SYSCTRL ((SysCtrl_Reg *)SYSCTRL_BASE)
+
+#define PINMUX_MODE_GPIO        0x0UL
+#define PINMUX_MODE_ALT1        0x1UL   /* Pin0~1: UART, Pin2~3: I2C, Pin12~15: JTAG */
+#define PINMUX_MODE_ALT2        0x2UL   /* Pin4~7: SPI */
+
+#define PINMUX_JTAG_MASK        0x5500UL /* IOPAD[15:12] = ALT1 (JTAG) */
+#define PINMUX_JTAG_FREE_MASK   0x0000UL /* IOPAD[15:12] = GPIO (釋放 JTAG 腳位) */
 
 /* =========================================================================
  * 5. RISC-V CSR 中斷控制巨集
@@ -422,7 +443,7 @@ static inline void timer_b_clear_irq(void)
 static inline void spi_init_master(uint32_t clk_div, uint32_t mode)
 {
     SPI->CONFIG     = (mode & 0x03);     /* Mode 0~3 (Bit0=CPOL, Bit1=CPHA), SS Active-Low */
-    SPI->CLOCK_DIV  = clk_div;           /* 12MHz / (2 * (clk_div + 1)) -> div=5 時為 1MHz */
+    SPI->CLOCK_DIV  = clk_div;           /* 32MHz / (2 * (clk_div + 1)) -> div=15 時為 1MHz */
     SPI->SS_SETUP   = 2;
     SPI->SS_HOLD    = 2;
     SPI->SS_DISABLE = 2;
@@ -451,13 +472,12 @@ static inline void spi_push_cmd(uint32_t cmd)
 /* --- I2C 輔助函式 --- */
 static inline void i2c_init_master_100khz(void)
 {
-    I2C->SAMPLING_DIV = 2;      /* 12MHz / (2 + 1) = 4MHz 取樣率 */
-    // I2C->TIMEOUT      = 0;      /* 停用 Timeout 避免單步除錯或模擬誤觸發 */
-    I2C->TIMEOUT      = 120000; /* 10ms 逾時保護 (不可設為 0，否則會立即觸發 Drop) */
-    I2C->TSU_DAT      = 6;      /* 500ns Data Setup Time */
-    I2C->T_LOW        = 60;     /* 5us SCL Low (12MHz * 5us = 60) */
-    I2C->T_HIGH       = 60;     /* 5us SCL High (12MHz * 5us = 60) */
-    I2C->T_BUF        = 60;     /* 5us Bus Free Time */
+    I2C->SAMPLING_DIV = 7;      /* 32MHz / (7 + 1) = 4MHz 取樣率 */
+    I2C->TIMEOUT      = 320000; /* 10ms 逾時保護 (32MHz * 10ms = 320000) */
+    I2C->TSU_DAT      = 16;     /* 500ns Data Setup Time (32MHz * 500ns = 16) */
+    I2C->T_LOW        = 160;    /* 5us SCL Low (32MHz * 5us = 160) */
+    I2C->T_HIGH       = 160;    /* 5us SCL High (32MHz * 5us = 160) */
+    I2C->T_BUF        = 160;    /* 5us Bus Free Time (32MHz * 5us = 160) */
 
     /* 清除所有殘留中斷旗標 */
     I2C->INT_FLAG     = 0xFFFFFFFF;
@@ -506,6 +526,44 @@ static inline void i2c_master_trigger_read_byte(bool send_nack)
     I2C->RX_DATA = I2C_RX_LISTEN; /* 開啟 RX_DATA 鎖存 */
     I2C->TX_DATA = I2C_TX_VALID;  /* ENABLE=0: 釋放 SDA 讓 Slave 傳送資料 */
     I2C->TX_ACK  = I2C_TX_VALID | I2C_TX_ENABLE | (send_nack ? I2C_TX_ACK_NACK : 0);
+}
+
+/* --- SysCtrl & 16-Pin PinMux 輔助函式 --- */
+static inline void pinmux_set_pin(uint8_t pin, uint32_t mode)
+{
+    if (pin < 8)
+    {
+        uint32_t shift = pin * 2;
+        SYSCTRL->PINMUX_SEL0 = (SYSCTRL->PINMUX_SEL0 & ~(0x3UL << shift)) | ((mode & 0x3UL) << shift);
+    }
+    else if (pin < 16)
+    {
+        uint32_t shift = (pin - 8) * 2;
+        SYSCTRL->PINMUX_SEL1 = (SYSCTRL->PINMUX_SEL1 & ~(0x3UL << shift)) | ((mode & 0x3UL) << shift);
+    }
+}
+
+static inline void pinmux_enable_uart(bool enable)
+{
+    uint32_t mode = enable ? PINMUX_MODE_ALT1 : PINMUX_MODE_GPIO;
+    pinmux_set_pin(0, mode); /* IOPAD[0] = UART_TXD */
+    pinmux_set_pin(1, mode); /* IOPAD[1] = UART_RXD */
+}
+
+static inline void pinmux_enable_i2c(bool enable)
+{
+    uint32_t mode = enable ? PINMUX_MODE_ALT1 : PINMUX_MODE_GPIO;
+    pinmux_set_pin(2, mode); /* IOPAD[2] = I2C_SCL */
+    pinmux_set_pin(3, mode); /* IOPAD[3] = I2C_SDA */
+}
+
+static inline void pinmux_enable_spi(bool enable)
+{
+    uint32_t mode = enable ? PINMUX_MODE_ALT2 : PINMUX_MODE_GPIO;
+    pinmux_set_pin(4, mode); /* IOPAD[4] = SPI_SS0 */
+    pinmux_set_pin(5, mode); /* IOPAD[5] = SPI_SCLK */
+    pinmux_set_pin(6, mode); /* IOPAD[6] = SPI_MOSI */
+    pinmux_set_pin(7, mode); /* IOPAD[7] = SPI_MISO */
 }
 
 #ifdef __cplusplus
