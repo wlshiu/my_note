@@ -522,7 +522,7 @@ case class Murax(config : MuraxConfig) extends Component{
     i2cCtrl.io.i2c <> sysCtrl.io.i2c
     externalInterrupt setWhen(i2cCtrl.io.interrupt)
     apbMapping += i2cCtrl.io.apb   -> (0x40000, 4 kB)
-    
+
     apbMapping += sysCtrl.io.apb   -> (0x50000, 4 kB)
 
     val xip = ifGen(genXip)(new Area{
@@ -761,7 +761,7 @@ object MuraxWithRamInit{
     // ==== For Verilator Simulation ====
     // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
     SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
-    
+
     // ==== For FPGA ====
     // SpinalConfig(
     //   noRandBoot = true

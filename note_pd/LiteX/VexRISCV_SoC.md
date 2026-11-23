@@ -1133,6 +1133,38 @@ GNU gdb (GDB) 12.1
     BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
     ```
 
+# Customization 7 (Use 3-stages pipeline base on default `Murax` + eFlash + I2/SPI/TimB + GPIO16P + SysCtrl + RV32EMC + CPU Exception)
+
++ Change Items
+    - 從 `RV32IMC` 改成 `RV32EMC`
+    - 增加 CPU exception 偵測
+
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc.diff)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # FPGA (DE10-Nano)
 
