@@ -267,7 +267,7 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 
 
 
-# Customization 1 (Use 3-stages pipeline base on default `Murax`)
+# `Customization 1` (Use 3-stages pipeline base on default `Murax`)
 
 + Change Items
 
@@ -477,7 +477,7 @@ GNU gdb (GDB) 12.1
 (gdb) si    # execte the 1st instruction (start at 'crtStart')
 ```
 
-# Customization 2 (Use 3-stages pipeline base on default `Murax` + eFlash)
+# `Customization 2` (Use 3-stages pipeline base on default `Murax` + eFlash)
 
 + Change Items
     - 增加 eFlash
@@ -796,7 +796,7 @@ GNU gdb (GDB) 12.1
 ```
 
 
-# Customization 3 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC)
+# `Customization 3` (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC)
 
 + Change Items
     - 增加 `RV32IMC` extensions
@@ -849,7 +849,7 @@ GNU gdb (GDB) 12.1
 
 
 
-# Customization 4 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
+# `Customization 4` (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2C + SPI)
 
 + Change Items
     - 增加 I2C/SPI
@@ -1054,7 +1054,7 @@ GNU gdb (GDB) 12.1
 ```
 
 
-# Customization 5 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB)
+# `Customization 5` (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB)
 
 + Change Items
     - 將 Tim-B 連接到**外部中斷**
@@ -1074,7 +1074,7 @@ GNU gdb (GDB) 12.1
     > [Murax_3Stages_rv32imc_eFlash_i2c_spi_timb Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb.diff)
 
 
-# Customization 6 (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB + GPIO16P + SysCtrl)
+# `Customization 6` (Use 3-stages pipeline base on default `Murax` + eFlash + RV32IMC + I2/SPI/TimB + GPIO16P + SysCtrl)
 
 + Change Items
     - System Clock 換到 `32MHz`
@@ -1095,7 +1095,7 @@ GNU gdb (GDB) 12.1
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
     > [Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl Diff file](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl.diff)
 
-    - [Murax scala](VexRISCV/Murax_3Stages_rv32imc_eFlash_i2c_spi_timb_sysctrl.scala)
+    - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI_SysCtrl_Timb.scala)
 
 ## 啟動 Verilator 模擬環境
 
@@ -1133,7 +1133,7 @@ GNU gdb (GDB) 12.1
     BOOT            <--- 未執行 Application, 須由 GDB trigger ?!
     ```
 
-# Customization 7 (Use 3-stages pipeline base on default `Murax` + eFlash + I2/SPI/TimB + GPIO16P + SysCtrl + RV32EMC + CPU Exception)
+# `Customization 7` (Use 3-stages pipeline base on default `Murax` + eFlash + I2/SPI/TimB + GPIO16P + SysCtrl + RV32EMC + CPU Exception)
 
 + Change Items
     - 從 `RV32IMC` 改成 `RV32EMC`
@@ -1153,6 +1153,7 @@ GNU gdb (GDB) 12.1
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
     > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc.diff)
 
+    - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI_SysCtrl_RV32EMC.scala)
 
 
 
@@ -1165,8 +1166,7 @@ GNU gdb (GDB) 12.1
 
 
 
-
-# FPGA (DE10-Nano)
+# `FPGA (DE10-Nano)`
 
 + Install `Quartus-lite-22.1std.2.922-linux.tar`
 

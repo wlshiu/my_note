@@ -32,8 +32,10 @@ SIFIVE_GCC_PACK ?= yes
 	# endif
 # endif
 
+
 MABI=ilp32
 MARCH := rv32i
+
 ifeq ($(MULDIV),yes)
 	MARCH := $(MARCH)m
 endif
