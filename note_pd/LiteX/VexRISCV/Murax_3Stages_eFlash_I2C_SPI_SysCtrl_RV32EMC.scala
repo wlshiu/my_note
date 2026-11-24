@@ -205,6 +205,7 @@ class MuraxEmbeddedFlash(eFlashSize : BigInt,
                          bigEndian : Boolean = false) extends Component{
   val io = new Bundle{
     val bus = slave(PipelinedMemoryBus(pipelinedMemoryBusConfig))
+    val writeError = out Bool()
   }
 
   val flash = Mem(Bits(32 bits), eFlashSize / 4)
@@ -214,6 +215,7 @@ class MuraxEmbeddedFlash(eFlashSize : BigInt,
 
   io.bus.cmd.ready := True
   io.bus.rsp.valid := RegNext(io.bus.cmd.fire && !io.bus.cmd.write) init(False)
+  io.writeError    := RegNext(io.bus.cmd.fire && io.bus.cmd.write) init(False)
   io.bus.rsp.data  := flash.readSync(
     address = io.bus.cmd.address(2, log2Up(eFlashSize / 4) bits),
     enable  = io.bus.cmd.fire && !io.bus.cmd.write
@@ -440,7 +442,7 @@ case class Murax(config : MuraxConfig) extends Component{
 
     //Arbiter of the cpu dBus/iBus to drive the mainBus
     //Priority to dBus, !! cmd transactions can change on the fly !!
-    val mainBusArbiter = new MuraxMasterArbiter(pipelinedMemoryBusConfig, bigEndianDBus)
+    val mainBusArbiter = new MuraxSafeMasterArbiter(pipelinedMemoryBusConfig, bigEndianDBus)
 
     //Instanciate the CPU
     val cpu = new VexRiscv(
@@ -568,15 +570,100 @@ case class Murax(config : MuraxConfig) extends Component{
     )
 
     val mainBusDecoder = new Area {
-      val logic = new MuraxPipelinedMemoryBusDecoder(
+      val logic = new MuraxSafePipelinedMemoryBusDecoder(
         master = mainBusArbiter.io.masterBus,
         specification = mainBusMapping.toSeq,
         pipelineMaster = pipelineMainBus
       )
+      
+      mainBusArbiter.io.masterBusRspError := logic.io.rspError || eFlash.io.writeError
     }
   }
 }
 
+// 支援回報 Access Fault (noHit / Read-Only Violation) 的安全匯流排仲裁器
+class MuraxSafeMasterArbiter(pipelinedMemoryBusConfig : PipelinedMemoryBusConfig, bigEndian : Boolean = false) extends Component{
+  val io = new Bundle{
+    val iBus = slave(IBusSimpleBus(null))
+    val dBus = slave(DBusSimpleBus(bigEndian))
+    val masterBus = master(PipelinedMemoryBus(pipelinedMemoryBusConfig))
+    val masterBusRspError = in Bool()
+  }
+
+  io.masterBus.cmd.valid   := io.iBus.cmd.valid || io.dBus.cmd.valid
+  io.masterBus.cmd.write   := io.dBus.cmd.valid && io.dBus.cmd.wr
+  io.masterBus.cmd.address := io.dBus.cmd.valid ? io.dBus.cmd.address | io.iBus.cmd.pc
+  io.masterBus.cmd.data    := io.dBus.cmd.data
+  io.masterBus.cmd.mask    := io.dBus.cmd.size.mux(
+    0 -> B"0001",
+    1 -> B"0011",
+    default -> B"1111"
+  ) |<< io.dBus.cmd.address(1 downto 0)
+  io.iBus.cmd.ready := io.masterBus.cmd.ready && !io.dBus.cmd.valid
+  io.dBus.cmd.ready := io.masterBus.cmd.ready
+
+  val rspPending = RegInit(False) clearWhen(io.masterBus.rsp.valid)
+  val rspTarget = RegInit(False)
+  when(io.masterBus.cmd.fire && !io.masterBus.cmd.write){
+    rspTarget  := io.dBus.cmd.valid
+    rspPending := True
+  }
+
+  when(rspPending && !io.masterBus.rsp.valid){
+    io.iBus.cmd.ready := False
+    io.dBus.cmd.ready := False
+    io.masterBus.cmd.valid := False
+  }
+
+  io.iBus.rsp.valid := io.masterBus.rsp.valid && !rspTarget
+  io.iBus.rsp.inst  := io.masterBus.rsp.data
+  io.iBus.rsp.error := io.masterBusRspError && !rspTarget
+
+  io.dBus.rsp.ready := io.masterBus.rsp.valid && rspTarget
+  io.dBus.rsp.data  := io.masterBus.rsp.data
+  io.dBus.rsp.error := io.masterBusRspError && rspTarget
+}
+
+// 支援未映射位址 (noHit) 回報 rspError 的匯流排解碼器
+class MuraxSafePipelinedMemoryBusDecoder(master : PipelinedMemoryBus, val specification : Seq[(PipelinedMemoryBus,SizeMapping)], pipelineMaster : Boolean) extends Area{
+  val io = new Bundle {
+    val rspError = out Bool()
+  }
+  val masterPipelined = PipelinedMemoryBus(master.config)
+  if(!pipelineMaster) {
+    masterPipelined.cmd << master.cmd
+    masterPipelined.rsp >> master.rsp
+  } else {
+    masterPipelined.cmd <-< master.cmd
+    masterPipelined.rsp >> master.rsp
+  }
+
+  val slaveBuses = specification.map(_._1)
+  val memorySpaces = specification.map(_._2)
+
+  val hits = for((slaveBus, memorySpace) <- specification) yield {
+    val hit = memorySpace.hit(masterPipelined.cmd.address)
+    slaveBus.cmd.valid   := masterPipelined.cmd.valid && hit
+    slaveBus.cmd.payload := masterPipelined.cmd.payload
+    hit
+  }
+  val noHit = !hits.orR
+  masterPipelined.cmd.ready := (hits, slaveBuses).zipped.map(_ && _.cmd.ready).orR || noHit
+
+  val rspPending  = RegInit(False) clearWhen(masterPipelined.rsp.valid) setWhen(masterPipelined.cmd.fire && !masterPipelined.cmd.write)
+  val rspNoHit    = RegNext(noHit) init(False)
+  val rspSourceId = RegNextWhen(OHToUInt(hits), masterPipelined.cmd.fire)
+  masterPipelined.rsp.valid := slaveBuses.map(_.rsp.valid).orR || (rspPending && rspNoHit)
+  masterPipelined.rsp.data  := slaveBuses.map(_.rsp.data).read(rspSourceId)
+
+  // 當發生未映射位址讀取 (rspNoHit) 時，回報匯流排錯誤
+  io.rspError := rspPending && rspNoHit
+
+  when(rspPending && !masterPipelined.rsp.valid) {
+    masterPipelined.cmd.ready := False
+    slaveBuses.foreach(_.cmd.valid := False)
+  }
+}
 
 
 object Murax{
@@ -778,11 +865,11 @@ object MuraxDhrystoneReadyMulDivStatic{
 //Will blink led and echo UART RX to UART TX   (in the verilator sim, type some text and press enter to send UART frame to the Murax RX pin)
 object MuraxWithRamInit{
   def main(args: Array[String]) {
-    // ==== For Verilator Simulation ====
+    // ---- For Verilator simulation ----
     // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
     SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
 
-    // ==== For FPGA ====
+    // ---- For FPGA ----
     // SpinalConfig(
     //   noRandBoot = true
     // ).generateVerilog(

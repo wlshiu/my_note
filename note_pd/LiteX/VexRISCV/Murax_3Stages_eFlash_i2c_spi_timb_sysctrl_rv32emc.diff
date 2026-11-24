@@ -480,11 +480,11 @@
  object MuraxWithRamInit{
    def main(args: Array[String]) {
 -    SpinalVerilog(Murax(MuraxConfig.default.copy(onChipRamSize = 4 kB, onChipRamHexFile = "src/main/ressource/hex/muraxDemo.hex")))
-+    // For Verilator simulation
++    // ---- For Verilator simulation ----
 +    // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
 +    SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
 +
-+    // for FPGA
++    // ---- For FPGA ----
 +    // SpinalConfig(
 +    //   noRandBoot = true
 +    // ).generateVerilog(

@@ -651,8 +651,20 @@ object MuraxDhrystoneReadyMulDivStatic{
 //Will blink led and echo UART RX to UART TX   (in the verilator sim, type some text and press enter to send UART frame to the Murax RX pin)
 object MuraxWithRamInit{
   def main(args: Array[String]) {
+    // ---- For Verilator simulation ----
     // SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/muraxDemo.hex", onChipRamSize = 2 kB)))
     SpinalVerilog(Murax(MuraxConfig.default.copy(eFlashSize = 32 kB, eFlashHexFile = "src/main/ressource/hex/my_hello.hex", onChipRamSize = 2 kB)))
+
+    // ---- For FPGA ----
+    // SpinalConfig(
+    //   noRandBoot = true
+    // ).generateVerilog(
+    //   Murax(MuraxConfig.default.copy(
+    //     eFlashSize = 32 kB,
+    //     eFlashHexFile = "src/main/ressource/hex/my_hello.hex",
+    //     onChipRamSize = 2 kB
+    //   ))
+    // )
   }
 }
 

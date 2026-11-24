@@ -860,12 +860,12 @@ GNU gdb (GDB) 12.1
 
 + Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
 
-+ The test example is referenced at `./VexRISCV/example/my_test`
++ The test example is referenced at `./VexRISCV/example/my_test_rv32imc`
 
     - Build Application program
 
         ```
-        $ cd <VexRiscv>/src/main/c/murax/my_test
+        $ cd <VexRiscv>/src/main/c/murax/my_test_rv32imc
         $ vi z_update_bin.sh
             #!/bin/bash
 
@@ -1151,16 +1151,141 @@ GNU gdb (GDB) 12.1
 > base on SHA ID `baf7dc8`
 
 + Base on `src/main/scala/vexriscv/demo/Murax.scala`
-    > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc.diff)
+    > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc_excp.diff)
 
     - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI_SysCtrl_RV32EMC.scala)
 
++ The test example is referenced at `./VexRISCV/example/my_test_rv32emc`
 
+    - Build Application program
 
+        ```
+        $ cd <VexRiscv>/src/main/c/murax/my_test_rv32emc
+        $ vi z_update_bin.sh
+            #!/bin/bash
 
+            make clean && make
 
+            ./z_update_ram.py -i ./build/my_test.bin -t flash
 
+            cp -f Murax.v_toplevel_system_eFlash_flash.bin <VexRiscv>/
 
+        $ ./z_update_bin.sh  # Compile App and copy to '<VexRiscv>/Murax.v_toplevel_system_eFlash_flash.bin'
+        ```
+
+    - 測試項目如下
+
+        ```
+        ving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+        ./obj_dir/VMurax
+        BOOT
+        CONNECTED
+
+        ========================================
+        VexRiscv Murax SoC Core & Timer Test
+        ========================================
+        [Test 0] CSR Check:
+            MIE     = 0x00000880
+            MSTATUS = 0x00001808
+
+        [Test 1] SRAM .data & .bss Check:
+            Init .data (expect 0x12345678) = 0x12345678
+            Init .bss  (expect 0x00000000) = 0x00000000
+            -> PASS!
+
+        [Test 2] RV32M Hardware Mul/Div Check:
+            MUL = 0x04FED79D
+            DIV = 0x000A65A7
+            REM = 0x00000060
+            -> PASS!
+
+        [Test 3] Timer A Interrupt (mcause 0x80000007):
+            Timer A ticks = 0x00000005
+            -> PASS!
+
+        [Test 3B] Timer B External Interrupt (mcause 0x8000000B):
+            Timer B ticks = 0x00000005
+            -> PASS!
+
+        [Test 4] UART RX Interrupt (mcause 0x8000000B):
+        [Waiting] Please type a character and press Enter...
+            kk
+            kk
+            UART RX IRQ Count = 0x00000003
+            Last RX Byte      = 0x0000000A
+            -> PASS!
+
+        [Test 5] SPI Master Loopback (mcause 0x8000000B):
+            SPI RX IRQ Count = 0x00000002
+            RX Byte[0]       = 0x000000A5
+            RX Byte[1]       = 0x0000005A
+            -> PASS!
+
+        [Test 6] I2C Master Read Slave 0x50 (mcause 0x8000000B):
+            Slave 0x50 Addr ACK = 0x00000001
+            I2C RX IRQ Count    = 0x00000001
+            Received Data       = 0x0000005A
+            -> PASS!
+
+        [Test 7] Trigger exceptions
+
+        --- 7.1: EXCP_ILLEGAL_INSTRUCTION (code= 2) ---
+
+        [TRAP] Exception!
+        mcause=0x00000002 mepc=0x00000CFA mtval=0x00000000
+        -> Illegal Instruction (or RV32I x16-x31 access)!
+
+            [Pass] '16-bit C.ILLEGAL (0x0000)'
+            [FAIL] 'RV32E x16 register access'
+
+        --- 7.2: EXCP_LOAD_MISALIGNED (code= 4) ---
+
+        [TRAP] Exception!
+        mcause=0x00000004 mepc=0x00000D78 mtval=0x20000001
+        -> Unaligned Memory Access at addr: 0x20000001
+
+            [Pass] 'Unaligned 32-bit Load (0x20000001)'
+
+        --- 7.3: EXCP_STORE_MISALIGNED  (code= 6) ---
+
+        [TRAP] Exception!
+        mcause=0x00000006 mepc=0x00000DD2 mtval=0x20000003
+        -> Unaligned Memory Access at addr: 0x20000003
+
+            [Pass] 'Unaligned 16-bit Store (0x20000003)'
+
+        --- 7.4: EXCP_LOAD_ACCESS_FAULT (code= 5) ---
+
+        [TRAP] Exception!
+        mcause=0x00000005 mepc=0x00000E1E mtval=0x80000000
+        -> Load Invalid Address
+
+            [Pass] 'Unmapped Memory Load (0x80000000)'
+
+        --- 7.5: EXCP_STORE_ACCESS_FAULT (code= 7) ---
+            [FAIL] 'Unmapped Memory Store (0x80000000)'
+
+        --- 7.6: EXCP_INST_ACCESS_FAULT (code= 1) ---
+
+        [TRAP] Exception!
+        mcause=0x00000001 mepc=0x80000000 mtval=0x80000000
+        -> Instruction Fetch Invalid Address
+
+            [Pass] 'Jump to Unmapped Address (0x80000000)'
+
+        ========================================
+        Core & Timer Tests Completed!
+        ========================================
+        ```
+
+        1. `7.1B (RV32E x16 register access)` 為何 `[FAIL]`
+            > 這是 VexRiscv 的預設硬體行為
+            >> 原因解析: 在 VexRiscv 的設計中,`DecoderSimplePlugin` 只檢查指令編碼的 **Opcode / Funct3 / Funct7** 是否合法(addi 本身是合法 Opcode),
+            而 `RegFilePlugin(rv32e = true)` 僅負責將 `x16~x31` 的寫入動作**屏蔽為 NOP**(在 `Murax.v` 中即 `when_RegFilePlugin_l66` 將 `REGFILE_WRITE_VALID` 設為`0`),
+            VexRiscv 的 `RegFilePlugin` 預設並不會把存取 `x16~x31` 當作 **Illegal Instruction Trap**
+
+        1. `7.5 (EXCP_STORE_ACCESS_FAULT, mcause = 7)`為何 `[FAIL]`
+            > VexRiscv 的 `DBusSimplePlugin` 採用 Posted Write(不等待寫入回應),因此 `sw` 寫入無效位址不會觸發 `mcause = 7`,這是正常現象
 
 
 
@@ -1211,8 +1336,8 @@ GNU gdb (GDB) 12.1
 | :-           | :-                     | :-                     |:-                            | :-
 | IOPAD[0]     | UART_TXD (或 GPIO[0])   |  GPIO_0[0] (PIN_V12)   |  Pin 1                       | USB-UART 轉接板 RXD
 | IOPAD[1]     | UART_RXD (或 GPIO[1])   |  GPIO_0[1] (PIN_E8)    |  Pin 2                       | USB-UART 轉接板 TXD
-| IOPAD[2]     | I2C_SCL (Open-Drain)    |  GPIO_0[2] (PIN_W12)   |  Pin 3                        | I2C SCL(已啟用內部弱上拉，建議外加 4.7kΩ)
-| IOPAD[3]     | I2C_SDA (Open-Drain)    |  GPIO_0[3] (PIN_D11)   |  Pin 4                        | I2C SDA(已啟用內部弱上拉，建議外加 4.7kΩ)
+| IOPAD[2]     | I2C_SCL (Open-Drain)    |  GPIO_0[2] (PIN_W12)   |  Pin 3                        | I2C SCL(已啟用內部弱上拉,建議外加 4.7kΩ)
+| IOPAD[3]     | I2C_SDA (Open-Drain)    |  GPIO_0[3] (PIN_D11)   |  Pin 4                        | I2C SDA(已啟用內部弱上拉,建議外加 4.7kΩ)
 | IOPAD[4]     | SPI_SS0 (或 GPIO[4])    |  GPIO_0[4] (PIN_D8)    |  Pin 5                       | SPI CS / SS0
 | IOPAD[5]     | SPI_SCLK (或 GPIO[5])   |  GPIO_0[5] (PIN_AH13)  |  Pin 6                       | SPI SCLK
 | IOPAD[6]     | SPI_MOSI (或 GPIO[6])   |  GPIO_0[6] (PIN_AF7)   |  Pin 7                       | SPI MOSI
@@ -1343,7 +1468,7 @@ GNU gdb (GDB) 12.1
     derive_pll_clocks
     derive_clock_uncertainty
 
-    # 3. 定義外部 J-Link TCK 時脈 (GPIO_0[13])，假設最高 10 MHz (100 ns)
+    # 3. 定義外部 J-Link TCK 時脈 (GPIO_0[13]),假設最高 10 MHz (100 ns)
     create_clock -name {jtag_tck} -period 100.000 [get_ports {GPIO_0[13]}]
 
     # 4. 宣告 32 MHz 主時脈與 JTAG TCK 為非同步時脈域
@@ -1510,7 +1635,7 @@ $ ls output_files
         # 1. 檢查邏輯資源 (ALM) 與 BRAM 記憶體位元數 (32KB eFlash + 2KB SRAM ≈ 278,528 bits)
         cat output_files/murax_de10_nano.fit.summary
 
-        # 2. 檢查 32 MHz 時序是否全部過關 (Slack 應全為正值，無負值)
+        # 2. 檢查 32 MHz 時序是否全部過關 (Slack 應全為正值,無負值)
         cat output_files/murax_de10_nano.sta.summary
 
         # 3. 確認 Quartus 有成功載入 Murax.v_toplevel_system_eFlash_flash.bin 而不是全 0
@@ -1525,7 +1650,7 @@ $ ls output_files
         # !/bin/bash
 
         #
-        # 1. 更新 .bin 檔案後，重新生成 eFlash MIF 並更新資料庫
+        # 1. 更新 .bin 檔案後,重新生成 eFlash MIF 並更新資料庫
         #    ps. 固定 bin 是 'Murax.v_toplevel_system_eFlash_flash.bin'
         #
         quartus_cdb murax_de10_nano --update_mif
