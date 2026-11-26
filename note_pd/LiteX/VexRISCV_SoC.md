@@ -1137,7 +1137,23 @@ GNU gdb (GDB) 12.1
 
 + Change Items
     - 從 `RV32IMC` 改成 `RV32EMC`
-    - 增加 CPU exception 偵測
+    - 增強 CPU exception 偵測 (`CsrPluginConfig.smallest` 改用 `CsrPluginConfig.all`)
+        > 增加約 `1.8K ~ 2.5K Gates`
+
+        | 功能 / CSR 暫存器          | `CsrPluginConfig.smallest` (極致精簡版)                                                        | `CsrPluginConfig.all` (完整規格版)                                                                                      | 專案實際影響 (針對 `Murax.scala`)
+        | :-                        | :-                                                                                            | :-                                                                                                                     | :-
+        | `mtvec` (中斷向量基底)      | 唯讀固定值 (NONE): 硬體直接寫死為 `mtvecInit (0x20)`,無法用 `csrw` 修改,寫入會觸發非法指令異常。   | 可讀寫 (READ_WRITE): 預設為 `mtvecInit (0x20)`,但韌體執行期可透過 `csrw mtvec` 動態切換向量表位址或模式(Direct / Vectored)。 | `all` 允許未來若需要 Bootloader 與 App 切換獨立中斷向量表時可直接支援。
+        | `mcause` (異常/中斷原因)    | 精簡位寬 (`4 bits`): 僅保留中斷旗標 (`MSB`) 與低 `4-bit` 錯誤碼(只支援 `0~15`)。                 | `完整位寬 (32 bits)`: 完整儲存 standard RISC-V 32-bit `mcause` 編碼。                                                     | 兩者皆可分辨 `0~15` 異常碼,但 `all` 完全符合標準架構規範。
+        | `mtval`/`mbadaddr` (異常值) | 無 (NONE): 發生異常時**不會記錄**出錯的記憶體位址或非法指令內容(讀出永遠為 0)。                    | 可讀寫 (READ_WRITE): 發生非對齊存取、Access Fault 時自動鎖存錯誤位址;發生非法指令時鎖存該指令編碼。                           | 關鍵差異: 您的 `main.c` Test 7 能印出 `mtval=0x20000001` 與 `0x80000000`,全靠 `all` 啟用了此暫存器。
+        | `mscratch` (M-Mode 暫存)    | 無 (NONE): 不生成此暫存器。                                                                    | 可讀寫 (READ_WRITE): 提供作業系統或中斷服務程式(ISR)快速交換指標(如保存 `sp`)的專用暫存器。                                  | 若未來移植 FreeRTOS / RT-Thread 等 RTOS,此暫存器能大幅簡化 Context Switch。
+        | `mepc` (異常返回位址)       | 可讀寫 (READ_WRITE)                                                                           | 可讀寫 (READ_WRITE)                                                                                                    | 兩者皆完整支援中斷/異常返回。
+        | `mstatus` & `mie` & `mip`  | 僅實作必要位元: 僅保留 `MIE`、`MPIE`、`MEIE`、`MTIE`、`MSIE` 等核心位元。                           | 完整實作: 包含 `MPP` (Machine Previous Privilege) 等完整狀態位元。                                                        | 兩者皆能正常開關中斷,但 `all` 對標準除錯工具(如 OpenOCD)狀態解析更友善。
+        | `misa` (架構識別碼)         | 無 (NONE)                                                                                    | 唯讀 (READ_ONLY)(可選): 回報 CPU 支援的擴充指令集(如 E, M, C)。                                                           | 方便啟動程式碼在執行期自動偵測硬體能力。
+        | `ecall`/`ebreak` 指令       | 預設關閉 (false): 執行 `ecall` 會被當作一般的**非法指令 (mcause=2)**處理。                       | 預設開啟 (true): 執行 `ecall` 會精準觸發 `EXCP_ECALL_FROM_M_MODE (mcause=11)`。                                          | 您的 `Murax.scala` 透過 `all` 啟用了 `ecallGen = true`,才能區分系統呼叫與非法指令。
+        | `wfi` (等待中斷休眠)        | 預設關閉 (false): `wfi` 當作 `NOP` 執行。                                                       | 預設開啟 (true)(但您在 `Murax.scala` 中手動覆寫為 `wfiGenAsWait = false`)。                                              | 覆寫為 `false` 可避免在沒有外部中斷喚醒時,JTAG 除錯器因 CPU 停擺而連線逾時。
+        | `mcycle`/`minstret` 計數器  | 預設關閉 (NONE)                                                                               | 預設開啟 (READ_ONLY)(但您在 `Murax.scala` 手動設為 `NONE`)。                                                             | 關閉 64-bit 硬體效能計數器是極為聰明的做法,直接省下約 **2.5K ~ 3.5K Gates** 的加法器與 DFF 面積！
+
+
 
 + Memory mapping
     > + eFlash: base= 0x0, 32KBytes
@@ -1288,7 +1304,144 @@ GNU gdb (GDB) 12.1
             > VexRiscv 的 `DBusSimplePlugin` 採用 Posted Write(不等待寫入回應),因此 `sw` 寫入無效位址不會觸發 `mcause = 7`,這是正常現象
 
 
+# `Customization 8` (Use 3-stages pipeline base on default `Murax` + eFlash + I2/SPI/TimB + GPIO16P + SysCtrl + RV32EMC + CPU Exception + WFI)
 
+
++ Change Items
+    - 增加 `wfi` 來等待 Wake-up
+
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc_wfi Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc_excp_wfi.diff)
+
+    - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI_SysCtrl_RV32EMC_wfi.scala)
+
++ The test example is referenced at `./VexRISCV/example/my_test_rv32emc`
+
+    - 測試項目如下
+
+        ```
+        ving directory '/home/padauk/Working/vexriscv/VexRiscv/src/test/cpp/murax/obj_dir'
+        ./obj_dir/VMurax
+        BOOT
+        CONNECTED
+
+        ========================================
+        VexRiscv Murax SoC Core & Timer Test
+        ========================================
+        [Test 0] CSR Check:
+            MIE     = 0x00000880
+            MSTATUS = 0x00001808
+
+        [Test 1] SRAM .data & .bss Check:
+            Init .data (expect 0x12345678) = 0x12345678
+            Init .bss  (expect 0x00000000) = 0x00000000
+            -> PASS!
+
+        [Test 2] RV32M Hardware Mul/Div Check:
+            MUL = 0x04FED79D
+            DIV = 0x000A65A7
+            REM = 0x00000060
+            -> PASS!
+
+        [Test 3] Timer A Interrupt (mcause 0x80000007):
+            Timer A ticks = 0x00000005
+            -> PASS!
+
+        [Test 3B] Timer B External Interrupt (mcause 0x8000000B):
+            Timer B ticks = 0x00000005
+            -> PASS!
+
+        [Test 4] UART RX Interrupt (mcause 0x8000000B):
+        [Waiting] Please type a character and press Enter...
+            kk
+            kk
+            UART RX IRQ Count = 0x00000003
+            Last RX Byte      = 0x0000000A
+            -> PASS!
+
+        [Test 5] SPI Master Loopback (mcause 0x8000000B):
+            SPI RX IRQ Count = 0x00000002
+            RX Byte[0]       = 0x000000A5
+            RX Byte[1]       = 0x0000005A
+            -> PASS!
+
+        [Test 6] I2C Master Read Slave 0x50 (mcause 0x8000000B):
+            Slave 0x50 Addr ACK = 0x00000001
+            I2C RX IRQ Count    = 0x00000001
+            Received Data       = 0x0000005A
+            -> PASS!
+
+        [Test 7] Trigger exceptions
+
+        --- 7.1: EXCP_ILLEGAL_INSTRUCTION (code= 2) ---
+
+        [TRAP] Exception!
+        mcause=0x00000002 mepc=0x00000CFA mtval=0x00000000
+        -> Illegal Instruction (or RV32I x16-x31 access)!
+
+            [Pass] '16-bit C.ILLEGAL (0x0000)'
+            [FAIL] 'RV32E x16 register access'
+
+        --- 7.2: EXCP_LOAD_MISALIGNED (code= 4) ---
+
+        [TRAP] Exception!
+        mcause=0x00000004 mepc=0x00000D78 mtval=0x20000001
+        -> Unaligned Memory Access at addr: 0x20000001
+
+            [Pass] 'Unaligned 32-bit Load (0x20000001)'
+
+        --- 7.3: EXCP_STORE_MISALIGNED  (code= 6) ---
+
+        [TRAP] Exception!
+        mcause=0x00000006 mepc=0x00000DD2 mtval=0x20000003
+        -> Unaligned Memory Access at addr: 0x20000003
+
+            [Pass] 'Unaligned 16-bit Store (0x20000003)'
+
+        --- 7.4: EXCP_LOAD_ACCESS_FAULT (code= 5) ---
+
+        [TRAP] Exception!
+        mcause=0x00000005 mepc=0x00000E1E mtval=0x80000000
+        -> Load Invalid Address
+
+            [Pass] 'Unmapped Memory Load (0x80000000)'
+
+        --- 7.5: EXCP_STORE_ACCESS_FAULT (code= 7) ---
+            [FAIL] 'Unmapped Memory Store (0x80000000)'
+
+        --- 7.6: EXCP_INST_ACCESS_FAULT (code= 1) ---
+
+        [TRAP] Exception!
+        mcause=0x00000001 mepc=0x80000000 mtval=0x80000000
+        -> Instruction Fetch Invalid Address
+
+            [Pass] 'Jump to Unmapped Address (0x80000000)'
+
+        [Test 8] WFI Sleep & Interrupt Wakeup:
+        --- 8.1: WFI with Global IRQ Enabled ---
+            Ticks after WFI = 0x00000001
+            [Pass] 'WFI Wakeup via Timer A ISR'
+
+        --- 8.2: WFI with Global IRQ Disabled (mstatus.MIE=0) ---
+            Timer Pending = 0x00000001
+            ISR Ticks     = 0x00000000
+            [Pass] 'WFI Wakeup without ISR Jump'
+
+        ========================================
+        Core & Timer Tests Completed!
+        ========================================
+        ```
 
 
 # `FPGA (DE10-Nano)`
@@ -1342,7 +1495,7 @@ GNU gdb (GDB) 12.1
 | IOPAD[5]     | SPI_SCLK (或 GPIO[5])   |  GPIO_0[5] (PIN_AH13)  |  Pin 6                       | SPI SCLK
 | IOPAD[6]     | SPI_MOSI (或 GPIO[6])   |  GPIO_0[6] (PIN_AF7)   |  Pin 7                       | SPI MOSI
 | IOPAD[7]     | SPI_MISO (或 GPIO[7])   |  GPIO_0[7] (PIN_AH14)  |  Pin 8                       | SPI MISO
-| IOPAD[8..11] | GPIO[8..11] (通用 GPIO)  | GPIO_0[8..11]         | Pin 9, 10, 13, 14             | 外部測試點 / 邏輯分析儀(註：Pin 11=VCC5, Pin 12=GND)
+| IOPAD[8..11] | GPIO[8..11] (通用 GPIO)  | GPIO_0[8..11]         | Pin 9, 10, 13, 14             | 外部測試點 / 邏輯分析儀(註: Pin 11=VCC5, Pin 12=GND)
 | IOPAD[12]    | JTAG_TMS (開機預設)      | GPIO_0[12] (PIN_AE7)   | Pin 15                       | J-Link Pin 7 (TMS)
 | IOPAD[13]    | JTAG_TCK (開機預設)      | GPIO_0[13] (PIN_AF6)   | Pin 16                       | J-Link Pin 9 (TCK)
 | IOPAD[14]    | JTAG_TDI (開機預設)      | GPIO_0[14] (PIN_AF9)   | Pin 17                       | J-Link Pin 5 (TDI)
@@ -1405,7 +1558,7 @@ GNU gdb (GDB) 12.1
         wire pll_locked;
         wire sys_reset;
 
-        // 1. Cyclone V 原生 PLL：50 MHz * 16 / 25 = 32.000 MHz
+        // 1. Cyclone V 原生 PLL: 50 MHz * 16 / 25 = 32.000 MHz
         altera_pll #(
             .fractional_vco_multiplier("false"),
             .reference_clock_frequency("50.0 MHz"),
@@ -1425,7 +1578,7 @@ GNU gdb (GDB) 12.1
             .refclk   (FPGA_CLK1_50)
         );
 
-        // 2. 系統同步重置：當按下 KEY[0] 或 PLL 尚未鎖定時保持重置 (Active-High)
+        // 2. 系統同步重置: 當按下 KEY[0] 或 PLL 尚未鎖定時保持重置 (Active-High)
         assign sys_reset = (~KEY[0]) | (~pll_locked);
 
         // 3. Murax SoC 16-bit 雙向三態匯流排介面
@@ -1458,7 +1611,7 @@ GNU gdb (GDB) 12.1
     endmodule
     ```
 
-+ Create `murax_de10_nano.sdc` (時序約束檔：32 MHz 主時脈與 JTAG CDC)
++ Create `murax_de10_nano.sdc` (時序約束檔: 32 MHz 主時脈與 JTAG CDC)
 
     ```
     # 1. 定義板載 50 MHz 輸入時脈 (週期 20.0 ns)

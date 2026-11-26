@@ -378,6 +378,62 @@ void main()
     uart_puts("'M-Mode ECALL Instruction'\n");
 
 
+    /* ---------------------------------------------------------------------
+     * 測試 8: WFI (Wait For Interrupt) 睡眠與中斷喚醒驗證
+     * --------------------------------------------------------------------- */
+    uart_puts("\n[Test 8] WFI Sleep & Interrupt Wakeup:\n");
+
+    /* --- 8.1: 正常開啟全域中斷 (mstatus.MIE = 1) 下的 WFI 喚醒 --- */
+    uart_puts("  --- 8.1: WFI with Global IRQ Enabled ---\n");
+    g_timer_a_ticks = 0;
+
+    /* 設定 Timer A 為 1ms 單次/週期觸發 (32MHz / 32 = 1MHz -> 1000us) */
+    timer_set_prescaler(32000000, 1000000);
+    timer_init(TIMA, 1000, true, true);
+
+    /* 執行 WFI：CPU 管線凍結、io_inWfi 拉高為 1，直到 1ms 後 Timer A 中斷喚醒 */
+    __asm__ volatile ("wfi");
+
+    /* 喚醒並執行完 trap_handler 後，g_timer_a_ticks 必定 >= 1 */
+    uint32_t ticks_after_wfi = g_timer_a_ticks;
+    timer_init(TIMA, 1000, false, false);
+
+    uart_puts("    Ticks after WFI = "); uart_put_hex(ticks_after_wfi); uart_puts("\n");
+    if (ticks_after_wfi >= 1)
+        uart_puts("    [Pass] 'WFI Wakeup via Timer A ISR'\n");
+    else
+        uart_puts("    [FAIL] 'WFI did not wait for interrupt'\n");
+
+
+    /* --- 8.2: 關閉全域中斷 (mstatus.MIE = 0) 下的 WFI 同步喚醒 --- */
+    uart_puts("  --- 8.2: WFI with Global IRQ Disabled (mstatus.MIE=0) ---\n");
+    g_timer_a_ticks = 0;
+
+    /* 1. 清除 mstatus.MIE (Bit 3 = 0x8)，關閉中斷向量跳轉，但保留 mie.MTIE = 1 */
+    __asm__ volatile ("csrci mstatus, 0x8");
+
+    /* 2. 啟動 Timer A (1ms) 並進入 WFI 睡眠 */
+    timer_init(TIMA, 1000, true, true);
+    __asm__ volatile ("wfi");
+
+    /* 3. CPU 已被喚醒且未進入 ISR (g_timer_a_ticks 應仍為 0，但 Timer Pending 位元已立起) */
+    uint32_t pending_flag = (TIMER_INTERRUPT->PENDINGS & TIMER_IRQ_A) ? 1 : 0;
+    uint32_t ticks_masked = g_timer_a_ticks;
+
+    /* 4. 清除 Timer 旗標並重新開啟全域中斷 (mstatus.MIE = 1) */
+    timer_init(TIMA, 1000, false, false);
+    timer_a_clear_irq();
+    __asm__ volatile ("csrsi mstatus, 0x8");
+
+    uart_puts("    Timer Pending = "); uart_put_hex(pending_flag); uart_puts("\n");
+    uart_puts("    ISR Ticks     = "); uart_put_hex(ticks_masked); uart_puts("\n");
+    if (pending_flag == 1 && ticks_masked == 0)
+        uart_puts("    [Pass] 'WFI Wakeup without ISR Jump'\n");
+    else
+        uart_puts("    [FAIL] 'Masked WFI Wakeup Abnormal'\n");
+
+
+
     uart_puts("\n========================================\n");
     uart_puts("  Core & Timer Tests Completed!\n");
     uart_puts("========================================\n");
