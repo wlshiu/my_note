@@ -17,9 +17,9 @@ _start:
 .global trap_entry
 trap_entry:
 #if !defined(USE_RV32E)
-  addi sp, sp, -76 /*-64*/
+  addi sp, sp, -80 /*-64*/ /* 76 bytes 內容 + 4 bytes padding = 80 (16-byte 對齊) */
 #else
-  addi sp, sp, -52
+  addi sp, sp, -64 /* 52 bytes 內容 + 12 bytes padding = 64 (16-byte 對齊) */
 #endif
 
   sw ra,   0(sp)
@@ -36,7 +36,6 @@ trap_entry:
   /* 讀取關鍵 CSR 並存入堆疊結構體 (TrapFrame) */
   csrr t0, mcause
   csrr t1, mepc
-  csrr t2, mtval
 
 #if !defined(USE_RV32E)
   sw a6,  40(sp)
@@ -48,11 +47,11 @@ trap_entry:
 
   sw t0,  64(sp)   /* frame->mcause   */
   sw t1,  68(sp)   /* frame->mepc     */
-  sw t2,  72(sp)   /* frame->mtval    */
+  sw zero, 72(sp)  /* frame->mtval (smallest profile 無 mtval,填 0) */
 #else
   sw t0,  40(sp)   /* frame->mcause   */
   sw t1,  44(sp)   /* frame->mepc     */
-  sw t2,  48(sp)   /* frame->mtval    */
+  sw zero, 48(sp)  /* frame->mtval (smallest profile 無 mtval,填 0) */
 #endif
 
   /* 呼叫 C 語言處理函式: void trap_handler(TrapFrame *frame) */
@@ -60,7 +59,11 @@ trap_entry:
   call trap_handler
 
   /* 寫回可能被 C 語言修改過的 mepc (例如跳過非法指令) */
+#if !defined(USE_RV32E)
+  lw t1, 68(sp)
+#else
   lw t1, 44(sp)
+#endif
   csrw mepc, t1
 
   lw ra,   0(sp)
@@ -81,9 +84,9 @@ trap_entry:
   lw t4,  52(sp)
   lw t5,  56(sp)
   lw t6,  60(sp)
-  addi sp, sp, 72 /*64*/
+  addi sp, sp, 80
 #else
-  addi sp, sp, 52
+  addi sp, sp, 64
 #endif
 
   mret

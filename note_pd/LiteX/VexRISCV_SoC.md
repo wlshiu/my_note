@@ -1140,20 +1140,18 @@ GNU gdb (GDB) 12.1
     - 增強 CPU exception 偵測 (`CsrPluginConfig.smallest` 改用 `CsrPluginConfig.all`)
         > 增加約 `1.8K ~ 2.5K Gates`
 
-        | 功能 / CSR 暫存器          | `CsrPluginConfig.smallest` (極致精簡版)                                                        | `CsrPluginConfig.all` (完整規格版)                                                                                      | 專案實際影響 (針對 `Murax.scala`)
-        | :-                        | :-                                                                                            | :-                                                                                                                     | :-
-        | `mtvec` (中斷向量基底)      | 唯讀固定值 (NONE): 硬體直接寫死為 `mtvecInit (0x20)`,無法用 `csrw` 修改,寫入會觸發非法指令異常。   | 可讀寫 (READ_WRITE): 預設為 `mtvecInit (0x20)`,但韌體執行期可透過 `csrw mtvec` 動態切換向量表位址或模式(Direct / Vectored)。 | `all` 允許未來若需要 Bootloader 與 App 切換獨立中斷向量表時可直接支援。
-        | `mcause` (異常/中斷原因)    | 精簡位寬 (`4 bits`): 僅保留中斷旗標 (`MSB`) 與低 `4-bit` 錯誤碼(只支援 `0~15`)。                 | `完整位寬 (32 bits)`: 完整儲存 standard RISC-V 32-bit `mcause` 編碼。                                                     | 兩者皆可分辨 `0~15` 異常碼,但 `all` 完全符合標準架構規範。
-        | `mtval`/`mbadaddr` (異常值) | 無 (NONE): 發生異常時**不會記錄**出錯的記憶體位址或非法指令內容(讀出永遠為 0)。                    | 可讀寫 (READ_WRITE): 發生非對齊存取、Access Fault 時自動鎖存錯誤位址;發生非法指令時鎖存該指令編碼。                           | 關鍵差異: 您的 `main.c` Test 7 能印出 `mtval=0x20000001` 與 `0x80000000`,全靠 `all` 啟用了此暫存器。
-        | `mscratch` (M-Mode 暫存)    | 無 (NONE): 不生成此暫存器。                                                                    | 可讀寫 (READ_WRITE): 提供作業系統或中斷服務程式(ISR)快速交換指標(如保存 `sp`)的專用暫存器。                                  | 若未來移植 FreeRTOS / RT-Thread 等 RTOS,此暫存器能大幅簡化 Context Switch。
-        | `mepc` (異常返回位址)       | 可讀寫 (READ_WRITE)                                                                           | 可讀寫 (READ_WRITE)                                                                                                    | 兩者皆完整支援中斷/異常返回。
-        | `mstatus` & `mie` & `mip`  | 僅實作必要位元: 僅保留 `MIE`、`MPIE`、`MEIE`、`MTIE`、`MSIE` 等核心位元。                           | 完整實作: 包含 `MPP` (Machine Previous Privilege) 等完整狀態位元。                                                        | 兩者皆能正常開關中斷,但 `all` 對標準除錯工具(如 OpenOCD)狀態解析更友善。
-        | `misa` (架構識別碼)         | 無 (NONE)                                                                                    | 唯讀 (READ_ONLY)(可選): 回報 CPU 支援的擴充指令集(如 E, M, C)。                                                           | 方便啟動程式碼在執行期自動偵測硬體能力。
-        | `ecall`/`ebreak` 指令       | 預設關閉 (false): 執行 `ecall` 會被當作一般的**非法指令 (mcause=2)**處理。                       | 預設開啟 (true): 執行 `ecall` 會精準觸發 `EXCP_ECALL_FROM_M_MODE (mcause=11)`。                                          | 您的 `Murax.scala` 透過 `all` 啟用了 `ecallGen = true`,才能區分系統呼叫與非法指令。
-        | `wfi` (等待中斷休眠)        | 預設關閉 (false): `wfi` 當作 `NOP` 執行。                                                       | 預設開啟 (true)(但您在 `Murax.scala` 中手動覆寫為 `wfiGenAsWait = false`)。                                              | 覆寫為 `false` 可避免在沒有外部中斷喚醒時,JTAG 除錯器因 CPU 停擺而連線逾時。
-        | `mcycle`/`minstret` 計數器  | 預設關閉 (NONE)                                                                               | 預設開啟 (READ_ONLY)(但您在 `Murax.scala` 手動設為 `NONE`)。                                                             | 關閉 64-bit 硬體效能計數器是極為聰明的做法,直接省下約 **2.5K ~ 3.5K Gates** 的加法器與 DFF 面積！
-
-
+| 功能 / CSR 暫存器          | `CsrPluginConfig.smallest` (極致精簡版)                                                        | `CsrPluginConfig.all` (完整規格版)                                                                                      | 專案實際影響 (針對 `Murax.scala`)
+| :-                        | :-                                                                                            | :-                                                                                                                     | :-
+| `mtvec` (中斷向量基底)      | 唯讀固定值 (NONE): 硬體直接寫死為 `mtvecInit (0x20)`,無法用 `csrw` 修改,寫入會觸發非法指令異常。   | 可讀寫 (READ_WRITE): 預設為 `mtvecInit (0x20)`,但韌體執行期可透過 `csrw mtvec` 動態切換向量表位址或模式(Direct / Vectored)。 | `all` 允許未來若需要 Bootloader 與 App 切換獨立中斷向量表時可直接支援。
+| `mcause` (異常/中斷原因)    | 精簡位寬 (`4 bits`): 僅保留中斷旗標 (`MSB`) 與低 `4-bit` 錯誤碼(只支援 `0~15`)。                 | `完整位寬 (32 bits)`: 完整儲存 standard RISC-V 32-bit `mcause` 編碼。                                                     | 兩者皆可分辨 `0~15` 異常碼,但 `all` 完全符合標準架構規範。
+| `mtval`/`mbadaddr` (異常值) | 無 (NONE): 發生異常時**不會記錄**出錯的記憶體位址或非法指令內容(讀出永遠為 0)。                    | 可讀寫 (READ_WRITE): 發生非對齊存取、Access Fault 時自動鎖存錯誤位址;發生非法指令時鎖存該指令編碼。                           | 關鍵差異: 您的 `main.c` Test 7 能印出 `mtval=0x20000001` 與 `0x80000000`,全靠 `all` 啟用了此暫存器。
+| `mscratch` (M-Mode 暫存)    | 無 (NONE): 不生成此暫存器。                                                                    | 可讀寫 (READ_WRITE): 提供作業系統或中斷服務程式(ISR)快速交換指標(如保存 `sp`)的專用暫存器。                                  | 若未來移植 FreeRTOS / RT-Thread 等 RTOS,此暫存器能大幅簡化 Context Switch。
+| `mepc` (異常返回位址)       | 可讀寫 (READ_WRITE)                                                                           | 可讀寫 (READ_WRITE)                                                                                                    | 兩者皆完整支援中斷/異常返回。
+| `mstatus` & `mie` & `mip`  | 僅實作必要位元: 僅保留 `MIE`、`MPIE`、`MEIE`、`MTIE`、`MSIE` 等核心位元。                           | 完整實作: 包含 `MPP` (Machine Previous Privilege) 等完整狀態位元。                                                        | 兩者皆能正常開關中斷,但 `all` 對標準除錯工具(如 OpenOCD)狀態解析更友善。
+| `misa` (架構識別碼)         | 無 (NONE)                                                                                    | 唯讀 (READ_ONLY)(可選): 回報 CPU 支援的擴充指令集(如 E, M, C)。                                                           | 方便啟動程式碼在執行期自動偵測硬體能力。
+| `ecall`/`ebreak` 指令       | 預設關閉 (false): 執行 `ecall` 會被當作一般的**非法指令 (mcause=2)**處理。                       | 預設開啟 (true): 執行 `ecall` 會精準觸發 `EXCP_ECALL_FROM_M_MODE (mcause=11)`。                                          | 您的 `Murax.scala` 透過 `all` 啟用了 `ecallGen = true`,才能區分系統呼叫與非法指令。
+| `wfi` (等待中斷休眠)        | 預設關閉 (false): `wfi` 當作 `NOP` 執行。                                                       | 預設開啟 (true)(但您在 `Murax.scala` 中手動覆寫為 `wfiGenAsWait = false`)。                                              | 覆寫為 `false` 可避免在沒有外部中斷喚醒時,JTAG 除錯器因 CPU 停擺而連線逾時。
+| `mcycle`/`minstret` 計數器  | 預設關閉 (NONE)                                                                               | 預設開啟 (READ_ONLY)(但您在 `Murax.scala` 手動設為 `NONE`)。                                                             | 關閉 64-bit 硬體效能計數器是極為聰明的做法,直接省下約 **2.5K ~ 3.5K Gates** 的加法器與 DFF 面積！
 
 + Memory mapping
     > + eFlash: base= 0x0, 32KBytes
@@ -1442,6 +1440,41 @@ GNU gdb (GDB) 12.1
         Core & Timer Tests Completed!
         ========================================
         ```
+
+# `Customization 9` (Use 3-stages pipeline base on default `Murax` + eFlash + I2/SPI/TimB + GPIO16P + SysCtrl + RV32EMC + CPU Exception lite + WFI)
+
+
++ Change Items
+    - 輕量 化CPU Exception (將大部分 CSR 喚回 `smallest` 以節省面積)
+
+        1. `mtvec` 使用 `smallest` profile
+        1. `mcause` 使用 `smallest` profile
+        1. `mtval` 使用 `smallest` profile
+        1. `mscratch` 使用 `smallest` profile
+        1. `mstatus & mie & mip` 使用 `smallest` profile
+        1. `misa` 使用 `smallest` profile
+        1. `ecall/ebreak` 使用 `all` profile
+        1. `wfi` 使用 `all` profile
+        1. `mcycle/minstret ` 使用 `smallest` profile
+
++ Memory mapping
+    > + eFlash: base= 0x0, 32KBytes
+    > + SRAM: base= 0x20000000, 2KBytes
+
++ Toolchain: [riscv-collab/riscv-gnu-toolchain: riscv32-elf-2022.11.16 · GitHub](https://github.com/riscv-collab/riscv-gnu-toolchain/releases/tag/2022.11.16)
+
+## diff (from Gemini)
+
+[GitHub - SpinalHDL/VexRiscv · GitHub](https://github.com/SpinalHDL/VexRiscv/tree/master#murax-soc)
+> base on SHA ID `baf7dc8`
+
++ Base on `src/main/scala/vexriscv/demo/Murax.scala`
+    > [Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc_wfi Diff file](VexRISCV/Murax_3Stages_eFlash_i2c_spi_timb_sysctrl_rv32emc_excp-lite_wfi.diff)
+
+    - [Murax scala](VexRISCV/Murax_3Stages_eFlash_I2C_SPI_SysCtrl_RV32EMC_excp-lite_wfi.scala)
+
+
+
 
 
 # `FPGA (DE10-Nano)`
