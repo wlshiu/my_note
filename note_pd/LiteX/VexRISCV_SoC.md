@@ -1,4 +1,4 @@
-VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
+VexRISCV_SoC [[Back](./VexRISCV.md#vexriscv_soc)]
 ----
 
 [VexRISCV](https://github.com/SpinalHDL/VexRiscv/tree/master#briey-soc) ASIC 案例
@@ -92,6 +92,8 @@ VexRISCV_SoC [[Back](./VexRISCV.md#VexRISCV_SoC)]
 
 
 ## Peripheral
+
+### [PipelinedMemoryBus](./note_VexRISCV_Bus.md)
 
 ### Apb3Gpio (Base: 0xF0000000)
 
